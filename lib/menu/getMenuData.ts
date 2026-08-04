@@ -15,7 +15,7 @@ export async function getMenuData(qrSlug: string) {
   const { data: orderPoint } = await supabase
     .from("order_points")
     .select(
-      "id, label, active, unit_id, business_id, units(id, name, photo_url, hours, status), businesses(*)",
+      "id, label, active, unit_id, business_id, units(id, name, photo_url, hours, status, paused_until), businesses(*)",
     )
     .eq("qr_slug", qrSlug)
     .eq("active", true)
@@ -28,7 +28,22 @@ export async function getMenuData(qrSlug: string) {
   const unit = orderPoint.units
   const business = orderPoint.businesses
 
-  if (unit.status !== "active") return null
+  // Archivado: el QR deja de funcionar de verdad (foodtruckos-datos Regla 3).
+  if (unit.status === "archived") return null
+
+  // Pausado: se reabre solo en cuanto pasa paused_until, sin ningún trabajo
+  // de fondo — se compara al momento de leer, no con un job programado.
+  if (unit.status === "paused") {
+    const stillPaused = !unit.paused_until || new Date(unit.paused_until) > new Date()
+    if (stillPaused) {
+      return {
+        paused: true as const,
+        business,
+        unit: { name: unit.name },
+        pausedUntil: unit.paused_until,
+      }
+    }
+  }
 
   const [{ data: categories }, { data: products }, { data: unitProducts }, { data: optionGroups }, { data: options }] =
     await Promise.all([
@@ -59,6 +74,7 @@ export async function getMenuData(qrSlug: string) {
     ])
 
   return {
+    paused: false as const,
     orderPoint: { id: orderPoint.id, label: orderPoint.label },
     unit,
     business,
@@ -71,3 +87,4 @@ export async function getMenuData(qrSlug: string) {
 }
 
 export type MenuData = NonNullable<Awaited<ReturnType<typeof getMenuData>>>
+export type ActiveMenuData = Extract<MenuData, { paused: false }>

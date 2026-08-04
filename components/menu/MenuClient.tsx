@@ -4,11 +4,11 @@ import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
-import type { MenuData } from "@/lib/menu/getMenuData"
+import type { ActiveMenuData } from "@/lib/menu/getMenuData"
 
 type CartLine = CartItemInput & { key: string }
 
-export function MenuClient({ data }: { data: MenuData }) {
+export function MenuClient({ data }: { data: ActiveMenuData }) {
   const { lang, setLang, t } = useLang()
   const router = useRouter()
   const [cart, setCart] = useState<CartLine[]>([])

@@ -14,6 +14,9 @@ export async function resolveUnitByToken(token: string) {
     .eq("kitchen_access_token", token)
     .maybeSingle()
 
-  if (!unit || unit.status !== "active") return null
+  // Archivado de verdad bloquea cocina; pausado no — el dueño puede pausar a
+  // media hora pico y el personal sigue necesitando ver/entregar lo que ya
+  // estaba en curso.
+  if (!unit || unit.status === "archived") return null
   return unit
 }

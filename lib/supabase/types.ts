@@ -926,6 +926,7 @@ export type Database = {
           kitchen_access_token: string
           kitchen_alert_minutes: number
           name: string
+          paused_until: string | null
           photo_url: string | null
           status: string
           type: string
@@ -939,6 +940,7 @@ export type Database = {
           kitchen_access_token?: string
           kitchen_alert_minutes?: number
           name: string
+          paused_until?: string | null
           photo_url?: string | null
           status?: string
           type?: string
@@ -952,6 +954,7 @@ export type Database = {
           kitchen_access_token?: string
           kitchen_alert_minutes?: number
           name?: string
+          paused_until?: string | null
           photo_url?: string | null
           status?: string
           type?: string

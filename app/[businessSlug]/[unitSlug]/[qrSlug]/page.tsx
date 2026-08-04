@@ -17,6 +17,25 @@ export default async function MenuPage({
 
   if (!data) notFound()
 
+  if (data.paused) {
+    const reopenTime = data.pausedUntil
+      ? new Date(data.pausedUntil).toLocaleString("es-MX", {
+          weekday: "long",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : null
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-2 bg-neutral-950 px-6 text-center text-white">
+        <h1 className="text-xl font-bold">{data.business.name}</h1>
+        <p className="text-neutral-400">
+          {data.unit.name} está cerrado por ahora.
+          {reopenTime ? ` Reabre ${reopenTime}.` : " Vuelve a intentar más tarde."}
+        </p>
+      </div>
+    )
+  }
+
   const canonicalBusinessSlug = data.business.slug
   const canonicalUnitSlug = slugify(data.unit.name)
 
