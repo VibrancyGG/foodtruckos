@@ -3,6 +3,7 @@ import { getMenuData } from "@/lib/menu/getMenuData"
 import { LangProvider } from "@/lib/i18n/LangProvider"
 import { BrandProvider } from "@/lib/branding/BrandProvider"
 import { MenuClient } from "@/components/menu/MenuClient"
+import { slugify } from "@/lib/utils/slugify"
 
 // El qr_slug es la clave real; businessSlug/unitSlug en la URL son cosméticos.
 // Si alguien edita esos segmentos a mano pero el qr_slug sigue siendo válido,
@@ -50,13 +51,4 @@ export default async function MenuPage({
       </BrandProvider>
     </LangProvider>
   )
-}
-
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
 }

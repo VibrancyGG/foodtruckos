@@ -7,6 +7,7 @@ const TABS = [
   { href: "/panel/marca", label: "Marca" },
   { href: "/panel/menu", label: "Menú" },
   { href: "/panel/trucks", label: "Trucks" },
+  { href: "/panel/qr", label: "Códigos QR" },
 ]
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
