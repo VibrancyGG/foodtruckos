@@ -90,9 +90,19 @@ export function MenuClient({ data }: { data: MenuData }) {
         className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 text-[var(--brand-on-primary)]"
         style={{ background: "var(--brand-primary)" }}
       >
-        <div>
-          <div className="font-bold">{data.business.name}</div>
-          <div className="text-xs opacity-90">{data.unit.name}</div>
+        <div className="flex items-center gap-2">
+          {data.business.logo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={data.business.logo_url}
+              alt=""
+              className="h-9 w-9 rounded-full object-cover"
+            />
+          )}
+          <div>
+            <div className="font-bold">{data.business.name}</div>
+            <div className="text-xs opacity-90">{data.unit.name}</div>
+          </div>
         </div>
         <button
           className="rounded-full border border-current px-3 py-1 text-xs font-semibold"
