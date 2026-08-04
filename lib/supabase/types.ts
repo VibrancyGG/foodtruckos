@@ -977,6 +977,10 @@ export type Database = {
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }
       next_order_folio: { Args: { p_business_id: string }; Returns: number }
+      request_subscription_cancel: {
+        Args: { p_business_id: string; p_note?: string | null }
+        Returns: undefined
+      }
       staff_business_id: { Args: never; Returns: string }
       staff_unit_id: { Args: never; Returns: string }
     }
