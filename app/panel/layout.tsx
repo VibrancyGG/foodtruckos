@@ -7,6 +7,7 @@ const TABS = [
   { href: "/panel/marca", label: "Marca" },
   { href: "/panel/menu", label: "Menú" },
   { href: "/panel/trucks", label: "Trucks" },
+  { href: "/panel/personal", label: "Personal" },
   { href: "/panel/qr", label: "Códigos QR" },
   { href: "/panel/cuenta", label: "Cuenta" },
 ]
