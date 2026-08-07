@@ -977,6 +977,28 @@ export type Database = {
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }
       next_order_folio: { Args: { p_business_id: string }; Returns: number }
+      log_owner_action: {
+        Args: {
+          p_business_id: string
+          p_action: string
+          p_entity_type: string
+          p_entity_id: string
+          p_before?: Json | null
+          p_after?: Json | null
+        }
+        Returns: undefined
+      }
+      log_admin_action: {
+        Args: {
+          p_business_id: string
+          p_action: string
+          p_entity_type: string
+          p_entity_id: string
+          p_before?: Json | null
+          p_after?: Json | null
+        }
+        Returns: undefined
+      }
       request_subscription_cancel: {
         Args: { p_business_id: string; p_note?: string | null }
         Returns: undefined

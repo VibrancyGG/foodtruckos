@@ -44,6 +44,13 @@ export async function pauseUnit(input: {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo pausar" }
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "unit_paused",
+    p_entity_type: "unit",
+    p_entity_id: input.unitId,
+    p_after: { paused_until: input.pausedUntil },
+  })
   revalidatePath("/panel/trucks")
   return { ok: true }
 }
@@ -60,6 +67,12 @@ export async function reopenUnit(unitId: string): Promise<Result> {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo reabrir" }
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "unit_reopened",
+    p_entity_type: "unit",
+    p_entity_id: unitId,
+  })
   revalidatePath("/panel/trucks")
   return { ok: true }
 }
@@ -79,6 +92,12 @@ export async function archiveUnit(unitId: string): Promise<Result> {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo archivar" }
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "unit_archived",
+    p_entity_type: "unit",
+    p_entity_id: unitId,
+  })
   revalidatePath("/panel/trucks")
   return { ok: true }
 }
@@ -95,6 +114,12 @@ export async function reactivateUnit(unitId: string): Promise<Result> {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo reactivar" }
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "unit_reactivated",
+    p_entity_type: "unit",
+    p_entity_id: unitId,
+  })
   revalidatePath("/panel/trucks")
   return { ok: true }
 }
