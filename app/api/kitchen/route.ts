@@ -1,36 +1,42 @@
 import { NextRequest, NextResponse } from "next/server"
-import { resolveUnitByToken } from "@/lib/kitchen/resolveUnit"
+import { verifyStaffSession } from "@/lib/staff/session"
+import { DEVICE_COOKIE, STAFF_SESSION_COOKIE, isSameOriginRequest } from "@/lib/staff/http"
 import { createServiceClient } from "@/lib/supabase/service"
 
 // Único punto de la rebanada que usa la llave de servicio, y solo del lado
-// del servidor (Route Handler, nunca en el navegador). Existe porque cocina
-// no tiene autenticación real todavía (units.kitchen_access_token es un
-// parche temporal) — ver TODO(auth-phase) en resolveUnit.ts.
-// El token SIEMPRE se vuelve a resolver aquí; nunca se confía en business_id/
-// unit_id que mande el cliente.
+// del servidor (Route Handler, nunca en el navegador). La identidad SIEMPRE
+// se resuelve aquí a partir de las cookies de personal (verifyStaffSession);
+// nunca se confía en business_id/unit_id que mande el cliente en el body.
 
 const NEXT: Record<string, string> = { recibido: "preparando", preparando: "listo" }
 const TAX_RATE = 0.08625
 
 type Body =
-  | { action: "advance"; token: string; orderId: string }
-  | { action: "deliver"; token: string; orderId: string; paid: boolean }
-  | { action: "soldOut"; token: string; unitProductId: string; soldOut: boolean }
+  | { action: "advance"; orderId: string }
+  | { action: "deliver"; orderId: string; paid: boolean }
+  | { action: "soldOut"; unitProductId: string; soldOut: boolean }
   | {
       action: "ventanilla"
-      token: string
       taxIncluded: boolean
       paidNow: boolean
       items: { productId: string; productName: string; quantity: number; unitPrice: number; notes?: string }[]
     }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as Body
-  const unit = await resolveUnitByToken(body.token)
-  if (!unit) {
-    return NextResponse.json({ error: "Token de cocina inválido o unidad archivada" }, { status: 401 })
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ error: "Origen no permitido" }, { status: 403 })
   }
 
+  const session = await verifyStaffSession(
+    req.cookies.get(DEVICE_COOKIE)?.value,
+    req.cookies.get(STAFF_SESSION_COOKIE)?.value,
+  )
+  if (!session) {
+    return NextResponse.json({ error: "Sesión de personal no válida" }, { status: 401 })
+  }
+  const unit = { id: session.unitId, business_id: session.businessId }
+
+  const body = (await req.json()) as Body
   const supabase = createServiceClient()
 
   if (body.action === "advance") {
@@ -52,6 +58,7 @@ export async function POST(req: NextRequest) {
       from_status: order.status,
       to_status: to,
       actor_type: "staff",
+      actor_id: session.staffId,
     })
     return NextResponse.json({ status: to })
   }
@@ -75,6 +82,7 @@ export async function POST(req: NextRequest) {
       from_status: order.status,
       to_status: "entregado",
       actor_type: "staff",
+      actor_id: session.staffId,
     })
     return NextResponse.json({ status: "entregado" })
   }

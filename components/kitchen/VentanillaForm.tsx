@@ -7,7 +7,6 @@ import type { KitchenData } from "@/lib/kitchen/getKitchenData"
 type Line = { productId: string; productName: string; quantity: number; unitPrice: number }
 
 export function VentanillaForm({
-  unitToken,
   products,
   unitProducts,
   taxIncluded,
@@ -15,7 +14,6 @@ export function VentanillaForm({
   onClose,
   onCreated,
 }: {
-  unitToken: string
   products: KitchenData["products"]
   unitProducts: KitchenData["unitProducts"]
   taxIncluded: boolean
@@ -47,7 +45,7 @@ export function VentanillaForm({
       const res = await fetch("/api/kitchen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "ventanilla", token: unitToken, taxIncluded, paidNow, items: lines }),
+        body: JSON.stringify({ action: "ventanilla", taxIncluded, paidNow, items: lines }),
       })
       if (!res.ok) throw new Error()
       onCreated()

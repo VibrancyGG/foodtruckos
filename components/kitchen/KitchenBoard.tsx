@@ -11,14 +11,12 @@ import type { KitchenData } from "@/lib/kitchen/getKitchenData"
 const COLUMNS = ["recibido", "preparando", "listo"] as const
 
 export function KitchenBoard({
-  unitToken,
   unitId,
   businessId,
   unitName,
   taxIncluded,
   initial,
 }: {
-  unitToken: string
   unitId: string
   businessId: string
   unitName: string
@@ -74,8 +72,8 @@ export function KitchenBoard({
 
     const poll = setInterval(refetch, 10000)
     const drain = setInterval(() => {
-      drainQueue(unitToken, () => setPending(pendingCount(unitToken)))
-      setPending(pendingCount(unitToken))
+      drainQueue(unitId, () => setPending(pendingCount(unitId)))
+      setPending(pendingCount(unitId))
     }, 4000)
 
     return () => {
@@ -83,29 +81,29 @@ export function KitchenBoard({
       clearInterval(poll)
       clearInterval(drain)
     }
-  }, [unitId, unitToken, refetch])
+  }, [unitId, refetch])
 
   function act(body: unknown) {
-    enqueueAction(unitToken, body)
-    setPending(pendingCount(unitToken))
-    drainQueue(unitToken, () => setPending(pendingCount(unitToken)))
+    enqueueAction(unitId, body)
+    setPending(pendingCount(unitId))
+    drainQueue(unitId, () => setPending(pendingCount(unitId)))
   }
 
   function advance(orderId: string) {
     const NEXT: Record<string, string> = { recibido: "preparando", preparando: "listo" }
     setOrders((os) => os.map((o) => (o.id === orderId ? { ...o, status: NEXT[o.status] ?? o.status } : o)))
-    act({ action: "advance", token: unitToken, orderId })
+    act({ action: "advance", orderId })
   }
 
   function deliver(orderId: string, paid: boolean) {
     setOrders((os) => os.filter((o) => o.id !== orderId))
-    act({ action: "deliver", token: unitToken, orderId, paid })
+    act({ action: "deliver", orderId, paid })
     setAskPayFor(null)
   }
 
   function toggleSoldOut(unitProductId: string, soldOut: boolean) {
     setUnitProducts((ups) => ups.map((up) => (up.id === unitProductId ? { ...up, sold_out: soldOut } : up)))
-    act({ action: "soldOut", token: unitToken, unitProductId, soldOut })
+    act({ action: "soldOut", unitProductId, soldOut })
   }
 
   return (
@@ -190,7 +188,6 @@ export function KitchenBoard({
 
       {showVentanilla && (
         <VentanillaForm
-          unitToken={unitToken}
           products={initial.products}
           unitProducts={unitProducts}
           taxIncluded={taxIncluded}

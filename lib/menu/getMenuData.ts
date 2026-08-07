@@ -8,10 +8,9 @@ import { toNumber } from "@/lib/supabase/numeric"
 export async function getMenuData(qrSlug: string) {
   const supabase = await createClient()
 
-  // OJO: nunca "units(*)" aquí — units.kitchen_access_token es un secreto de
-  // cocina y esto se sirve a un comensal sin cuenta. Se listan las columnas
-  // explícitamente para que agregar una columna sensible a units no la filtre
-  // por accidente a esta página pública.
+  // OJO: nunca "units(*)" aquí — esto se sirve a un comensal sin cuenta. Se
+  // listan las columnas explícitamente para que agregar una columna sensible
+  // a units no la filtre por accidente a esta página pública.
   const { data: orderPoint } = await supabase
     .from("order_points")
     .select(

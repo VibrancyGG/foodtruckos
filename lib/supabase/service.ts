@@ -4,9 +4,10 @@ import type { Database } from "./types"
 // SOLO se importa desde Route Handlers server-side (app/api/**), nunca desde
 // un componente cliente ni desde código que pueda terminar en el bundle del
 // navegador. Es la única excepción documentada a "todo con la llave anon" —
-// existe porque cocina todavía no tiene PIN/dispositivo real (ver
-// units.kitchen_access_token) y RLS no puede distinguir personal sin esa
-// autenticación. Se borra en cuanto exista.
+// personal (cocina/ventanilla) nunca pasa por Supabase Auth ni por RLS, así
+// que sus mutaciones necesitan la llave de servicio una vez que su propia
+// sesión ya fue verificada a mano (ver lib/staff/session.ts). La regla de
+// ESLint no-restricted-imports en eslint.config.mjs hace cumplir esto.
 export function createServiceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!key) {

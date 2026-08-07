@@ -276,6 +276,7 @@ export type Database = {
           issued_at: string
           last_seen_at: string | null
           revoked_at: string | null
+          session_secret_hash: string
           staff_id: string
         }
         Insert: {
@@ -285,6 +286,7 @@ export type Database = {
           issued_at?: string
           last_seen_at?: string | null
           revoked_at?: string | null
+          session_secret_hash: string
           staff_id: string
         }
         Update: {
@@ -294,6 +296,7 @@ export type Database = {
           issued_at?: string
           last_seen_at?: string | null
           revoked_at?: string | null
+          session_secret_hash?: string
           staff_id?: string
         }
         Relationships: [
@@ -318,11 +321,13 @@ export type Database = {
           business_id: string
           created_at: string
           device_secret_hash: string | null
+          failed_pin_attempts: number
           id: string
           label: string
           last_seen_at: string | null
           paired_at: string | null
           pairing_code_hash: string | null
+          pin_locked_until: string | null
           revoked_at: string | null
           unit_id: string
         }
@@ -330,11 +335,13 @@ export type Database = {
           business_id: string
           created_at?: string
           device_secret_hash?: string | null
+          failed_pin_attempts?: number
           id?: string
           label: string
           last_seen_at?: string | null
           paired_at?: string | null
           pairing_code_hash?: string | null
+          pin_locked_until?: string | null
           revoked_at?: string | null
           unit_id: string
         }
@@ -342,11 +349,13 @@ export type Database = {
           business_id?: string
           created_at?: string
           device_secret_hash?: string | null
+          failed_pin_attempts?: number
           id?: string
           label?: string
           last_seen_at?: string | null
           paired_at?: string | null
           pairing_code_hash?: string | null
+          pin_locked_until?: string | null
           revoked_at?: string | null
           unit_id?: string
         }
@@ -923,7 +932,6 @@ export type Database = {
           created_at: string
           hours: Json
           id: string
-          kitchen_access_token: string
           kitchen_alert_minutes: number
           name: string
           paused_until: string | null
@@ -937,7 +945,6 @@ export type Database = {
           created_at?: string
           hours?: Json
           id?: string
-          kitchen_access_token?: string
           kitchen_alert_minutes?: number
           name: string
           paused_until?: string | null
@@ -951,7 +958,6 @@ export type Database = {
           created_at?: string
           hours?: Json
           id?: string
-          kitchen_access_token?: string
           kitchen_alert_minutes?: number
           name?: string
           paused_until?: string | null
