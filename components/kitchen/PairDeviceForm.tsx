@@ -42,7 +42,7 @@ export function PairDeviceForm() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Código de emparejamiento"
-          className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-3 text-center text-lg tracking-widest"
+          className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-3 text-center text-lg tracking-widest text-white placeholder:text-neutral-500"
           autoFocus
         />
         {error && <p className="text-sm text-red-400">{error}</p>}

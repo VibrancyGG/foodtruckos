@@ -46,7 +46,7 @@ export function EnterPinForm() {
           type="password"
           inputMode="numeric"
           placeholder="••••"
-          className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-3 text-center text-2xl tracking-[0.5em]"
+          className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-3 text-center text-2xl tracking-[0.5em] text-white placeholder:text-neutral-500"
           autoFocus
         />
         {error && <p className="text-sm text-red-400">{error}</p>}
