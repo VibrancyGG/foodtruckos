@@ -9,17 +9,28 @@ import { createServiceClient } from "@/lib/supabase/service"
 // nunca se confía en business_id/unit_id que mande el cliente en el body.
 
 const NEXT: Record<string, string> = { recibido: "preparando", preparando: "listo" }
+const PREV: Record<string, string> = { preparando: "recibido", listo: "preparando" }
 const TAX_RATE = 0.08625
 
 type Body =
   | { action: "advance"; orderId: string }
+  | { action: "regress"; orderId: string }
   | { action: "deliver"; orderId: string; paid: boolean }
   | { action: "soldOut"; unitProductId: string; soldOut: boolean }
+  | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
   | {
       action: "ventanilla"
       taxIncluded: boolean
       paidNow: boolean
-      items: { productId: string; productName: string; quantity: number; unitPrice: number; notes?: string }[]
+      orderNotes?: string
+      items: {
+        productId: string
+        productName: string
+        quantity: number
+        unitPrice: number
+        customizations: { groupName: string; optionName: string; priceDelta: number; kind: "add" | "remove" }[]
+        notes?: string
+      }[]
     }
 
 export async function POST(req: NextRequest) {
@@ -50,6 +61,30 @@ export async function POST(req: NextRequest) {
 
     const to = NEXT[order.status]
     if (!to) return NextResponse.json({ error: "Ese pedido no puede avanzar así" }, { status: 400 })
+
+    await supabase.from("orders").update({ status: to }).eq("id", order.id)
+    await supabase.from("order_status_events").insert({
+      business_id: unit.business_id,
+      order_id: order.id,
+      from_status: order.status,
+      to_status: to,
+      actor_type: "staff",
+      actor_id: session.staffId,
+    })
+    return NextResponse.json({ status: to })
+  }
+
+  if (body.action === "regress") {
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id, status, unit_id")
+      .eq("id", body.orderId)
+      .eq("unit_id", unit.id)
+      .maybeSingle()
+    if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
+
+    const to = PREV[order.status]
+    if (!to) return NextResponse.json({ error: "Ese pedido no puede regresar" }, { status: 400 })
 
     await supabase.from("orders").update({ status: to }).eq("id", order.id)
     await supabase.from("order_status_events").insert({
@@ -97,11 +132,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
+  if (body.action === "optionSoldOut") {
+    const { error } = await supabase
+      .from("product_options")
+      .update({ sold_out: body.soldOut })
+      .eq("id", body.optionId)
+      .eq("business_id", unit.business_id)
+    if (error) return NextResponse.json({ error: "No se pudo actualizar" }, { status: 400 })
+    return NextResponse.json({ ok: true })
+  }
+
   if (body.action === "ventanilla") {
     if (body.items.length === 0) {
       return NextResponse.json({ error: "El pedido está vacío" }, { status: 400 })
     }
-    const subtotal = Math.round(body.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0) * 100) / 100
+    // Igual que el pedido del comensal: el total se recalcula aquí a partir de
+    // las personalizaciones, nunca se confía en el total armado en la tablet.
+    const lines = body.items.map((i) => {
+      const optionsDelta = i.customizations.reduce((s, c) => s + c.priceDelta, 0)
+      const lineTotal = Math.round((i.unitPrice + optionsDelta) * i.quantity * 100) / 100
+      return { ...i, lineTotal }
+    })
+    const subtotal = Math.round(lines.reduce((s, l) => s + l.lineTotal, 0) * 100) / 100
     const taxAmount = body.taxIncluded ? 0 : Math.round(subtotal * TAX_RATE * 100) / 100
     const total = Math.round((subtotal + taxAmount) * 100) / 100
 
@@ -117,6 +169,7 @@ export async function POST(req: NextRequest) {
         tax_amount: taxAmount,
         tax_included_snapshot: body.taxIncluded,
         total,
+        notes: body.orderNotes || null,
       })
       .select("id, folio")
       .single()
@@ -126,18 +179,26 @@ export async function POST(req: NextRequest) {
     }
 
     await supabase.from("order_items").insert(
-      body.items.map((i) => ({
+      lines.map((l) => ({
         business_id: unit.business_id,
         order_id: order.id,
-        product_id: i.productId,
-        product_name_snapshot: i.productName,
-        unit_price_snapshot: i.unitPrice,
-        quantity: i.quantity,
-        customizations_snapshot: [],
-        line_total: Math.round(i.unitPrice * i.quantity * 100) / 100,
-        notes: i.notes || null,
+        product_id: l.productId,
+        product_name_snapshot: l.productName,
+        unit_price_snapshot: l.unitPrice,
+        quantity: l.quantity,
+        customizations_snapshot: l.customizations,
+        line_total: l.lineTotal,
+        notes: l.notes || null,
       })),
     )
+    await supabase.from("order_status_events").insert({
+      business_id: unit.business_id,
+      order_id: order.id,
+      from_status: null,
+      to_status: "recibido",
+      actor_type: "staff",
+      actor_id: session.staffId,
+    })
 
     return NextResponse.json({ orderId: order.id, folio: order.folio })
   }

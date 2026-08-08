@@ -40,6 +40,8 @@ export function CustomizeSheet({
   }, [groups, options])
 
   function toggle(group: OptionGroup, optionId: string) {
+    const opt = options.find((o) => o.id === optionId)
+    if (opt?.sold_out) return
     setSelected((s) => {
       const current = s[group.id] ?? []
       if (group.max_select <= 1) {
@@ -172,7 +174,8 @@ export function CustomizeSheet({
                   <button
                     key={o.id}
                     onClick={() => toggle(g, o.id)}
-                    className="min-h-[44px] rounded-lg border-2 px-3.5 py-2.5 text-left text-sm font-semibold"
+                    disabled={o.sold_out}
+                    className="min-h-[44px] rounded-lg border-2 px-3.5 py-2.5 text-left text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
                     style={
                       isSel
                         ? { borderColor: "var(--brand-primary)", background: "var(--brand-primary)", color: "var(--brand-on-primary)" }
@@ -180,8 +183,11 @@ export function CustomizeSheet({
                     }
                   >
                     {lang === "es" ? o.option_name_es : o.option_name_en}
-                    {o.kind === "add" && o.price_delta > 0 && (
-                      <span className="block text-xs font-medium opacity-80">+${o.price_delta.toFixed(2)}</span>
+                    {o.sold_out ? (
+                      <span className="block text-xs font-medium opacity-80">{t.menu.soldOut}</span>
+                    ) : (
+                      o.kind === "add" &&
+                      o.price_delta > 0 && <span className="block text-xs font-medium opacity-80">+${o.price_delta.toFixed(2)}</span>
                     )}
                   </button>
                 )

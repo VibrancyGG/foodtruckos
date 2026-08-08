@@ -7,15 +7,26 @@ import { toNumber } from "@/lib/supabase/numeric"
 export async function getKitchenData(unitId: string, businessId: string) {
   const supabase = await createClient()
 
-  const [{ data: orders }, { data: products }, { data: unitProducts }, { data: business }] = await Promise.all([
+  const [
+    { data: orders },
+    { data: categories },
+    { data: products },
+    { data: unitProducts },
+    { data: optionGroups },
+    { data: options },
+    { data: business },
+  ] = await Promise.all([
     supabase
       .from("orders")
       .select("*")
       .eq("unit_id", unitId)
       .not("status", "in", "(entregado,cancelado)")
       .order("created_at"),
+    supabase.from("menu_categories").select("*").eq("business_id", businessId).order("sort_order"),
     supabase.from("products").select("*").eq("business_id", businessId).eq("status", "active"),
     supabase.from("unit_products").select("*").eq("unit_id", unitId),
+    supabase.from("product_option_groups").select("*").eq("business_id", businessId).order("sort_order"),
+    supabase.from("product_options").select("*").eq("business_id", businessId).order("sort_order"),
     supabase.from("businesses").select("tax_included").eq("id", businessId).single(),
   ])
 
@@ -32,8 +43,11 @@ export async function getKitchenData(unitId: string, businessId: string) {
       total: toNumber(o.total),
     })),
     items: (items ?? []).map((i) => ({ ...i, unit_price_snapshot: toNumber(i.unit_price_snapshot), line_total: toNumber(i.line_total) })),
+    categories: categories ?? [],
     products: (products ?? []).map((p) => ({ ...p, price: toNumber(p.price) })),
     unitProducts: unitProducts ?? [],
+    optionGroups: optionGroups ?? [],
+    options: (options ?? []).map((o) => ({ ...o, price_delta: toNumber(o.price_delta) })),
     taxIncluded: business?.tax_included ?? false,
   }
 }

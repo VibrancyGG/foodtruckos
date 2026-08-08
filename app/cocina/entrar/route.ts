@@ -8,27 +8,21 @@ import {
   isSameOriginRequest,
 } from "@/lib/staff/http"
 
-const ERROR_MESSAGE: Record<string, string> = {
-  invalid_device: "Este dispositivo no está emparejado",
-  locked: "Demasiados intentos, espera un momento",
-  invalid_pin: "PIN incorrecto",
-}
-
 export async function POST(req: NextRequest) {
   if (!isSameOriginRequest(req)) {
-    return NextResponse.json({ error: "Origen no permitido" }, { status: 403 })
+    return NextResponse.json({ error: "origin_not_allowed" }, { status: 403 })
   }
 
   const deviceToken = req.cookies.get(DEVICE_COOKIE)?.value
-  if (!deviceToken) return NextResponse.json({ error: "Este dispositivo no está emparejado" }, { status: 401 })
+  if (!deviceToken) return NextResponse.json({ error: "invalid_device" }, { status: 401 })
 
   const body = (await req.json()) as { pin?: string }
   const pin = (body.pin ?? "").trim()
-  if (!pin) return NextResponse.json({ error: "Falta el PIN" }, { status: 400 })
+  if (!pin) return NextResponse.json({ error: "missing_pin" }, { status: 400 })
 
   const result = await startStaffSession(deviceToken, pin)
   if (!result.ok) {
-    return NextResponse.json({ error: ERROR_MESSAGE[result.error] }, { status: 401 })
+    return NextResponse.json({ error: result.error }, { status: 401 })
   }
 
   const res = NextResponse.json({ ok: true })
