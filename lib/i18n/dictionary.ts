@@ -332,21 +332,49 @@ export type Dictionary = {
       staffTitle: string
       addPerson: string
       staffHint: string
+      whoLabel: string
       namePlaceholder: string
-      pinPlaceholder: string
+      addStaffHint: string
+      whatWillDoLabel: string
+      roleCocina: string
+      roleCocinaHint: string
+      roleCajero: string
+      roleCajeroHint: string
+      roleEncargado: string
+      roleEncargadoHint: string
+      whichTruckLabel: string
       allTrucks: string
+      createPin: string
+      pinRevealTitle: string
+      pinRevealHint: (name: string) => string
+      pinRevealLabel: (name: string, truck: string) => string
+      understood: string
       noStaffYet: string
       showRemoved: (n: number) => string
       hideRemoved: (n: number) => string
       confirmRemoveAccess: string
+      usedToday: string
+      usedYesterday: string
+      usedDaysAgo: (n: number) => string
+      neverUsedPin: string
+      stillHereBadge: string
       devicesTitle: string
       devicesHint: string
       pairTablet: string
       deviceNamePlaceholder: string
+      whichTruckDeviceLabel: string
       generateCode: string
-      pairingCodeTitle: string
-      pairingCodeHint: string
-      done: string
+      connectDeviceTitle: string
+      connectDeviceHint: string
+      pairingCodeLabel: string
+      codeExpiresIn: (mmss: string) => string
+      codeExpired: string
+      close: string
+      connectedSince: (date: string) => string
+      lastSeenToday: string
+      lastSeenYesterday: string
+      lastSeenDaysAgo: (n: number) => string
+      neverConnected: string
       noDevicesYet: string
       showRevoked: (n: number) => string
       hideRevoked: (n: number) => string
@@ -850,33 +878,61 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       personalPage: {
         title: "Personal",
-        subtitle: "PINs para cocina y ventanilla, y las tablets que los usan. Nada de esto pasa por correo ni contraseña — el dueño resuelve altas, bajas y dispositivos perdidos sin llamarnos.",
-        staffTitle: "Personal",
-        addPerson: "+ Agregar persona",
-        staffHint: "Cada persona entra a cocina con su PIN de 4 dígitos. Quitarla corta su acceso al instante.",
-        namePlaceholder: "Nombre",
-        pinPlaceholder: "PIN de 4 dígitos",
+        subtitle: "Tu personal no necesita correo ni contraseña. La tablet del truck se conecta una vez y se queda conectada; cada persona entra con su PIN de cuatro dígitos.",
+        staffTitle: "Personas",
+        addPerson: "Agregar persona",
+        staffHint: "Cada quien con su PIN, para saber quién atendió cada orden.",
+        whoLabel: "¿Cómo se llama?",
+        namePlaceholder: "Nombre y apellido",
+        addStaffHint: "Le vamos a crear un PIN de cuatro dígitos. Solo eso necesita para entrar.",
+        whatWillDoLabel: "¿Qué va a hacer?",
+        roleCocina: "Cocina",
+        roleCocinaHint: "Ve las órdenes y las va marcando",
+        roleCajero: "Cajero",
+        roleCajeroHint: "Además captura pedidos y cobra",
+        roleEncargado: "Encargado",
+        roleEncargadoHint: "También ve las ventas de su truck",
+        whichTruckLabel: "¿En qué truck?",
         allTrucks: "Todos los trucks",
-        noStaffYet: "Todavía no hay personal.",
+        createPin: "Crear su PIN",
+        pinRevealTitle: "Listo, ya puede entrar",
+        pinRevealHint: (name) => `Este es el PIN de ${name}. Anótalo o mándaselo — no lo podemos volver a mostrar después, así que captúralo ahora.`,
+        pinRevealLabel: (name, truck) => `PIN de ${name} · ${truck}`,
+        understood: "Entendido",
+        noStaffYet: "Todavía no has dado de alta a nadie. Agrega a la primera persona.",
         showRemoved: (n) => `Ver personal dado de baja (${n})`,
         hideRemoved: (n) => `Ocultar personal dado de baja (${n})`,
-        confirmRemoveAccess: "¿Quitar acceso?",
-        devicesTitle: "Dispositivos",
-        devicesHint: "Cada tablet o celular de cocina se conecta una sola vez con un código. Revocarlo la desconecta al instante.",
-        pairTablet: "+ Emparejar tablet",
-        deviceNamePlaceholder: "Nombre del dispositivo (ej. Tablet cocina)",
+        confirmRemoveAccess: "Su PIN deja de servir de inmediato. ¿Quitar?",
+        usedToday: "usó su PIN hoy",
+        usedYesterday: "usó su PIN ayer",
+        usedDaysAgo: (n) => `usó su PIN hace ${n} días`,
+        neverUsedPin: "todavía no ha entrado",
+        stillHereBadge: "¿sigue aquí?",
+        devicesTitle: "Tablets y celulares conectados",
+        devicesHint: "Los aparatos que ya están dentro del sistema. Se conectan una sola vez.",
+        pairTablet: "Conectar un aparato",
+        deviceNamePlaceholder: "Nombre del aparato (ej. Tablet de cocina)",
+        whichTruckDeviceLabel: "¿De qué truck es?",
         generateCode: "Generar código",
-        pairingCodeTitle: "Código de emparejamiento — captúralo ahora, no se vuelve a mostrar",
-        pairingCodeHint: "En la tablet, abre /cocina y escribe este código.",
-        done: "Listo",
+        connectDeviceTitle: "Conectar un aparato",
+        connectDeviceHint: "En la tablet o el celular, abre la página del sistema y escribe este código. Con eso queda conectado y ya no lo vuelve a pedir.",
+        pairingCodeLabel: "Código para conectar",
+        codeExpiresIn: (mmss) => `Sirve por ${mmss} más`,
+        codeExpired: "Se venció. Genera otro.",
+        close: "Cerrar",
+        connectedSince: (date) => `Conectado desde el ${date}`,
+        lastSeenToday: "última vez hoy",
+        lastSeenYesterday: "última vez ayer",
+        lastSeenDaysAgo: (n) => `última vez hace ${n} días`,
+        neverConnected: "Nunca se ha conectado",
         noDevicesYet: "Todavía no hay dispositivos.",
-        showRevoked: (n) => `Ver revocados (${n})`,
-        hideRevoked: (n) => `Ocultar revocados (${n})`,
-        pairedBadge: "Emparejado",
+        showRevoked: (n) => `Ver desconectados (${n})`,
+        hideRevoked: (n) => `Ocultar desconectados (${n})`,
+        pairedBadge: "Activo",
         waitingCodeBadge: "Esperando código",
-        confirmRevoke: "¿Revocar?",
-        yesRevoke: "Sí, revocar",
-        revoke: "Revocar",
+        confirmRevoke: "Deja de entrar al sistema ahora mismo. ¿Desconectar?",
+        yesRevoke: "Sí, desconectar",
+        revoke: "Desconectar",
       },
       qrPage: {
         title: "Códigos QR",
@@ -1367,33 +1423,61 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       personalPage: {
         title: "Staff",
-        subtitle: "PINs for the kitchen and the counter, and the tablets that use them. None of this goes through email or a password — the owner handles additions, removals, and lost devices without calling us.",
-        staffTitle: "Staff",
-        addPerson: "+ Add person",
-        staffHint: "Each person enters the kitchen with their 4-digit PIN. Removing them cuts their access instantly.",
-        namePlaceholder: "Name",
-        pinPlaceholder: "4-digit PIN",
+        subtitle: "Your staff doesn't need an email or a password. The truck's tablet connects once and stays connected; each person enters with their four-digit PIN.",
+        staffTitle: "People",
+        addPerson: "Add person",
+        staffHint: "Each person with their own PIN, so you know who handled each order.",
+        whoLabel: "What's their name?",
+        namePlaceholder: "First and last name",
+        addStaffHint: "We'll create a four-digit PIN for them. That's all they need to enter.",
+        whatWillDoLabel: "What will they do?",
+        roleCocina: "Kitchen",
+        roleCocinaHint: "Sees the orders and marks them as they go",
+        roleCajero: "Cashier",
+        roleCajeroHint: "Also takes orders and collects payment",
+        roleEncargado: "Manager",
+        roleEncargadoHint: "Also sees their truck's sales",
+        whichTruckLabel: "Which truck?",
         allTrucks: "All trucks",
-        noStaffYet: "No staff yet.",
+        createPin: "Create their PIN",
+        pinRevealTitle: "Done, they can enter now",
+        pinRevealHint: (name) => `This is ${name}'s PIN. Write it down or send it to them — we can't show it again after this, so capture it now.`,
+        pinRevealLabel: (name, truck) => `${name}'s PIN · ${truck}`,
+        understood: "Got it",
+        noStaffYet: "You haven't added anyone yet. Add your first person.",
         showRemoved: (n) => `Show removed staff (${n})`,
         hideRemoved: (n) => `Hide removed staff (${n})`,
-        confirmRemoveAccess: "Remove access?",
-        devicesTitle: "Devices",
-        devicesHint: "Each kitchen tablet or phone connects once with a code. Revoking it disconnects it instantly.",
-        pairTablet: "+ Pair tablet",
+        confirmRemoveAccess: "Their PIN stops working right away. Remove?",
+        usedToday: "used their PIN today",
+        usedYesterday: "used their PIN yesterday",
+        usedDaysAgo: (n) => `used their PIN ${n} days ago`,
+        neverUsedPin: "hasn't entered yet",
+        stillHereBadge: "still around?",
+        devicesTitle: "Connected tablets and phones",
+        devicesHint: "The devices already inside the system. They connect just once.",
+        pairTablet: "Connect a device",
         deviceNamePlaceholder: "Device name (e.g. Kitchen tablet)",
+        whichTruckDeviceLabel: "Which truck is it for?",
         generateCode: "Generate code",
-        pairingCodeTitle: "Pairing code — capture it now, it won't show again",
-        pairingCodeHint: "On the tablet, open /cocina and enter this code.",
-        done: "Done",
+        connectDeviceTitle: "Connect a device",
+        connectDeviceHint: "On the tablet or phone, open the system's page and type this code. That connects it, and it won't ask again.",
+        pairingCodeLabel: "Code to connect",
+        codeExpiresIn: (mmss) => `Valid for ${mmss} more`,
+        codeExpired: "It expired. Generate another one.",
+        close: "Close",
+        connectedSince: (date) => `Connected since ${date}`,
+        lastSeenToday: "last seen today",
+        lastSeenYesterday: "last seen yesterday",
+        lastSeenDaysAgo: (n) => `last seen ${n} days ago`,
+        neverConnected: "Never connected",
         noDevicesYet: "No devices yet.",
-        showRevoked: (n) => `Show revoked (${n})`,
-        hideRevoked: (n) => `Hide revoked (${n})`,
-        pairedBadge: "Paired",
+        showRevoked: (n) => `Show disconnected (${n})`,
+        hideRevoked: (n) => `Hide disconnected (${n})`,
+        pairedBadge: "Active",
         waitingCodeBadge: "Waiting for code",
-        confirmRevoke: "Revoke?",
-        yesRevoke: "Yes, revoke",
-        revoke: "Revoke",
+        confirmRevoke: "It stops entering the system right away. Disconnect?",
+        yesRevoke: "Yes, disconnect",
+        revoke: "Disconnect",
       },
       qrPage: {
         title: "QR codes",

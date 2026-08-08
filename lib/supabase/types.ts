@@ -331,6 +331,7 @@ export type Database = {
           label: string
           last_seen_at: string | null
           paired_at: string | null
+          pairing_code_expires_at: string | null
           pairing_code_hash: string | null
           pin_locked_until: string | null
           revoked_at: string | null
@@ -345,6 +346,7 @@ export type Database = {
           label: string
           last_seen_at?: string | null
           paired_at?: string | null
+          pairing_code_expires_at?: string | null
           pairing_code_hash?: string | null
           pin_locked_until?: string | null
           revoked_at?: string | null
@@ -359,6 +361,7 @@ export type Database = {
           label?: string
           last_seen_at?: string | null
           paired_at?: string | null
+          pairing_code_expires_at?: string | null
           pairing_code_hash?: string | null
           pin_locked_until?: string | null
           revoked_at?: string | null
@@ -1065,6 +1068,13 @@ export type Database = {
         Returns: undefined
       }
       staff_business_id: { Args: never; Returns: string }
+      staff_last_used: {
+        Args: { p_business_id: string }
+        Returns: {
+          last_used: string
+          staff_id: string
+        }[]
+      }
       staff_unit_id: { Args: never; Returns: string }
     }
     Enums: {

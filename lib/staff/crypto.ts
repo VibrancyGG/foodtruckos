@@ -21,9 +21,19 @@ export function parseOpaqueToken(token: string | undefined | null) {
 }
 
 // Código corto de emparejamiento (el que el dueño teclea en la tablet), no
-// necesita tanta entropía porque es de un solo uso y expira rápido.
+// necesita tanta entropía porque es de un solo uso y expira rápido. Alfabeto
+// sin 0/1/I/O para que no se confundan al leerlo o copiarlo a mano.
+const PAIRING_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
 export function generatePairingCode() {
-  return randomBytes(4).toString("hex")
+  const bytes = randomBytes(6)
+  let code = ""
+  for (let i = 0; i < 6; i++) code += PAIRING_CODE_ALPHABET[bytes[i] % PAIRING_CODE_ALPHABET.length]
+  return code
+}
+
+export function normalizePairingCode(input: string) {
+  return input.replace(/[^A-Za-z0-9]/g, "").toUpperCase()
 }
 
 export function hashSecret(secret: string) {
