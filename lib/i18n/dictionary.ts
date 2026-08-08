@@ -23,6 +23,9 @@ export type Dictionary = {
     yourNumber: string
     steps: { recibido: string; preparando: string; listo: string; entregado: string }
     titles: { recibido: string; preparando: string; listo: string; entregado: string }
+    subs: { recibido: string; preparando: string; listo: string; entregado: string }
+    wait: (mins: number) => string
+    waitWithAvg: (mins: number, avg: number) => string
     notFound: string
     notFoundSub: string
     backToMenu: string
@@ -30,6 +33,16 @@ export type Dictionary = {
     paid: string
     offline: string
     live: string
+    whatYouOrdered: string
+    total: string
+    taxIncluded: string
+    taxNotIncluded: string
+    bell: string
+    bellOn: string
+    bellHint: string
+    bellHintOff: string
+    bellNote: string
+    bellDenied: string
   }
   kitchen: {
     newColumn: string
@@ -89,6 +102,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         listo: "¡Listo! Pasa por él",
         entregado: "¡Gracias!",
       },
+      subs: {
+        recibido: "En un momento empiezan con él.",
+        preparando: "Te avisamos aquí en cuanto esté.",
+        listo: "Ve a la ventanilla y di tu número.",
+        entregado: "Que lo disfrutes. Aquí estaremos.",
+      },
+      wait: (mins) => `Va ${mins} min`,
+      waitWithAvg: (mins, avg) => `Va ${mins} min · normalmente tardan unos ${avg}`,
       notFound: "No encontramos ese pedido",
       notFoundSub: "El enlace puede estar viejo o el pedido ya se entregó hace rato.",
       backToMenu: "Volver al menú",
@@ -96,6 +117,16 @@ export const dictionary: Record<Lang, Dictionary> = {
       paid: "Ya está pagado",
       offline: "Sin conexión — reintentando",
       live: "En vivo",
+      whatYouOrdered: "Lo que pediste",
+      total: "Total",
+      taxIncluded: "Impuesto incluido",
+      taxNotIncluded: "No incluye impuesto",
+      bell: "Avísame cuando esté listo",
+      bellOn: "Te avisamos ✓",
+      bellHint: "Deja esta pantalla abierta y te avisamos con un sonido. También te llega la notificación si la aceptaste.",
+      bellHintOff: "Sin internet no se actualiza solo. Vuelve a cargar cuando tengas señal.",
+      bellNote: "Te avisamos con un sonido y, si aceptas, con una notificación del navegador.",
+      bellDenied: "No diste permiso de notificación — igual te avisamos con este sonido si dejas la pantalla abierta.",
     },
     kitchen: {
       newColumn: "Nuevas",
@@ -150,6 +181,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         listo: "Ready! Come get it",
         entregado: "Thank you!",
       },
+      subs: {
+        recibido: "They will start on it in a moment.",
+        preparando: "We will tell you here as soon as it is done.",
+        listo: "Head to the window and say your number.",
+        entregado: "Enjoy it. See you next time.",
+      },
+      wait: (mins) => `${mins} min so far`,
+      waitWithAvg: (mins, avg) => `${mins} min so far · usually about ${avg}`,
       notFound: "We could not find that order",
       notFoundSub: "The link may be old, or the order was already picked up a while ago.",
       backToMenu: "Back to the menu",
@@ -157,6 +196,16 @@ export const dictionary: Record<Lang, Dictionary> = {
       paid: "Already paid",
       offline: "Offline — retrying",
       live: "Live",
+      whatYouOrdered: "What you ordered",
+      total: "Total",
+      taxIncluded: "Tax included",
+      taxNotIncluded: "Tax not included",
+      bell: "Tell me when it's ready",
+      bellOn: "We'll tell you ✓",
+      bellHint: "Keep this screen open and we'll play a sound. You'll also get the notification if you allowed it.",
+      bellHintOff: "Without internet this won't update on its own. Reload when you have signal.",
+      bellNote: "We'll tell you with a sound and, if you allow it, a browser notification.",
+      bellDenied: "You didn't allow notifications — we'll still play this sound if you leave the screen open.",
     },
     kitchen: {
       newColumn: "New",
