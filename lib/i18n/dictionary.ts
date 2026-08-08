@@ -19,6 +19,8 @@ export type Dictionary = {
     notes: string
     notesPlaceholder: string
     photoComing: string
+    buildFrom: string
+    buildCta: string
   }
   tracking: {
     title: string
@@ -37,8 +39,6 @@ export type Dictionary = {
     live: string
     whatYouOrdered: string
     total: string
-    taxIncluded: string
-    taxNotIncluded: string
     bell: string
     bellOn: string
     bellHint: string
@@ -90,6 +90,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       notes: "Notas para la cocina",
       notesPlaceholder: "Ej: sin picante, para llevar",
       photoComing: "Foto en camino",
+      buildFrom: "Desde",
+      buildCta: "Empezar",
     },
     tracking: {
       title: "Tu pedido",
@@ -123,8 +125,6 @@ export const dictionary: Record<Lang, Dictionary> = {
       live: "En vivo",
       whatYouOrdered: "Lo que pediste",
       total: "Total",
-      taxIncluded: "Impuesto incluido",
-      taxNotIncluded: "No incluye impuesto",
       bell: "Avísame cuando esté listo",
       bellOn: "Te avisamos ✓",
       bellHint: "Deja esta pantalla abierta y te avisamos con un sonido. También te llega la notificación si la aceptaste.",
@@ -171,6 +171,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       notes: "Notes for the kitchen",
       notesPlaceholder: "e.g. no spice, to go",
       photoComing: "Photo coming",
+      buildFrom: "From",
+      buildCta: "Start",
     },
     tracking: {
       title: "Your order",
@@ -204,8 +206,6 @@ export const dictionary: Record<Lang, Dictionary> = {
       live: "Live",
       whatYouOrdered: "What you ordered",
       total: "Total",
-      taxIncluded: "Tax included",
-      taxNotIncluded: "Tax not included",
       bell: "Tell me when it's ready",
       bellOn: "We'll tell you ✓",
       bellHint: "Keep this screen open and we'll play a sound. You'll also get the notification if you allowed it.",

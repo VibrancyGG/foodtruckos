@@ -218,6 +218,38 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                   const name = lang === "es" ? p.name_es : p.name_en
                   const desc = lang === "es" ? p.description_es : p.description_en
                   const customizable = (groupsByProduct.get(p.id)?.length ?? 0) > 0
+                  const buildYourOwn = (groupsByProduct.get(p.id) ?? []).some((g) => g.required)
+
+                  if (buildYourOwn) {
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => !soldOut && handleTap(p)}
+                        disabled={soldOut}
+                        className="block w-full rounded-xl border-2 border-dashed p-3.5 text-left disabled:opacity-60"
+                        style={{ borderColor: "var(--brand-primary)" }}
+                      >
+                        <div className="uppercase leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--brand-primary)" }}>
+                          {name}
+                        </div>
+                        {desc && (
+                          <div className="mt-1 text-[12.5px] leading-snug" style={{ color: INK_SOFT }}>
+                            {desc}
+                          </div>
+                        )}
+                        {soldOut ? (
+                          <SoldOutTag label={t.menu.soldOut} />
+                        ) : (
+                          <span
+                            className="mt-2.5 inline-block rounded-full px-3.5 py-1.5 text-xs font-bold"
+                            style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+                          >
+                            {p.price > 0 ? `${t.menu.buildFrom} $${p.price.toFixed(2)}` : t.menu.buildCta}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  }
 
                   if (vibrante) {
                     return (
@@ -302,8 +334,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
       )}
 
       <footer className="px-4 pb-8 pt-6 text-center text-xs" style={{ color: INK_SOFT }}>
-        {!data.business.tax_included && <div>{lang === "es" ? "Los precios no incluyen impuesto" : "Prices do not include tax"}</div>}
-        <div className="mt-1.5 opacity-60">FoodTruckOS</div>
+        <div className="opacity-60">FoodTruckOS</div>
       </footer>
 
       {cartCount > 0 && (

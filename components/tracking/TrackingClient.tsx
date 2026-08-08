@@ -120,7 +120,6 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
   const isDone = order.status === "entregado"
   const elapsedMin = Math.max(1, Math.round((now - new Date(order.created_at).getTime()) / 60000))
   const business = order.businesses
-  const taxIncluded = order.tax_included_snapshot
 
   const notifDenied = typeof Notification !== "undefined" && Notification.permission === "denied"
 
@@ -279,12 +278,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
               )
             })}
             <div className="mt-1 flex items-baseline justify-between border-t-2 pt-2.5" style={{ borderColor: LINE }}>
-              <div>
-                <div className="font-extrabold">{t.tracking.total}</div>
-                <div className="text-[11px] font-semibold" style={{ color: INK_SOFT }}>
-                  {taxIncluded ? t.tracking.taxIncluded : t.tracking.taxNotIncluded}
-                </div>
-              </div>
+              <div className="font-extrabold">{t.tracking.total}</div>
               <div style={{ fontFamily: "var(--font-display)", fontSize: 20 }}>${order.total.toFixed(2)}</div>
             </div>
           </div>
