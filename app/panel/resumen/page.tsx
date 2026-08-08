@@ -11,12 +11,7 @@ export default async function PanelResumenPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="mb-1 text-2xl font-black">Cómo va tu negocio</h1>
-      <p className="mb-6 text-sm text-neutral-500">
-        Todas las comparaciones son contra datos reales — si un periodo todavía no tiene ventas, lo decimos en
-        vez de inventar un número.
-      </p>
-      <ResumenScreen data={data} currentYear={new Date().getUTCFullYear()} />
+      <ResumenScreen data={data} />
     </div>
   )
 }

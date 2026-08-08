@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/lib/i18n/dictionary"
+
 type Activity = {
   unitId: string
   unitName: string
@@ -29,13 +31,10 @@ function px(minutes: number) {
   return ((minutes - WINDOW_START) / (WINDOW_END - WINDOW_START)) * 100
 }
 
-export function ActivityRow({ activity }: { activity: Activity }) {
+export function ActivityRow({ activity, t: p }: { activity: Activity; t: Dictionary["panel"]["resumenPage"] }) {
   if (activity.daysWithSales === 0) {
     return (
-      <div className="rounded-lg bg-neutral-50 p-3 text-xs text-neutral-400">
-        <span className="font-bold text-neutral-600">{activity.unitName}</span> — sin órdenes en los últimos 30
-        días.
-      </div>
+      <div className="rounded-lg bg-neutral-50 p-3 text-xs text-neutral-400">{p.noOrdersLast30(activity.unitName)}</div>
     )
   }
 
@@ -48,20 +47,18 @@ export function ActivityRow({ activity }: { activity: Activity }) {
     <div>
       <div className="mb-1 flex items-baseline gap-2">
         <span className="text-sm font-bold">{activity.unitName}</span>
-        <span className="text-xs text-neutral-500">
-          {activity.daysWithSales} día{activity.daysWithSales === 1 ? "" : "s"} con ventas, últimos 30 días
-        </span>
+        <span className="text-xs text-neutral-500">{p.daysWithSales(activity.daysWithSales)}</span>
         {activity.hasPublishedHours ? (
           <span
             className={`ml-auto rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${
               late ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"
             }`}
           >
-            {late ? `abre ${fmtDuration(activity.lateMinutes!)} tarde` : "abre a tiempo"}
+            {late ? p.opensLate(fmtDuration(activity.lateMinutes!)) : p.opensOnTime}
           </span>
         ) : (
           <span className="ml-auto rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-bold text-neutral-500">
-            sin horario publicado
+            {p.noPublishedHours}
           </span>
         )}
       </div>
@@ -77,13 +74,9 @@ export function ActivityRow({ activity }: { activity: Activity }) {
         />
       </svg>
       <div className="mt-1 text-xs text-neutral-500">
-        primera orden <b className="text-neutral-800">{activity.firstOrderAvg}</b> · última{" "}
+        {p.firstOrder} <b className="text-neutral-800">{activity.firstOrderAvg}</b> · {p.lastOrder}{" "}
         <b className="text-neutral-800">{activity.lastOrderAvg}</b>
-        {early && (
-          <span className="ml-1">
-            · cierra {fmtDuration(activity.earlyCloseMinutes!)} antes de lo publicado
-          </span>
-        )}
+        {early && <span className="ml-1">· {p.closesEarly(fmtDuration(activity.earlyCloseMinutes!))}</span>}
       </div>
     </div>
   )

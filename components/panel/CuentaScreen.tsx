@@ -1,17 +1,20 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import Link from "next/link"
 import { requestCancellation } from "@/lib/billing/actions"
 import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
-
-const STATUS_LABEL: Record<string, string> = {
-  trial: "Periodo de prueba",
-  active: "Activa",
-  suspended: "Suspendida",
-  cancelled: "Cancelada",
-}
+import { useLang } from "@/lib/i18n/LangProvider"
 
 export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
+  const { t } = useLang()
+  const p = t.panel.cuentaPage
+  const STATUS_LABEL: Record<string, string> = {
+    trial: p.statusTrial,
+    active: p.statusActive,
+    suspended: p.statusSuspended,
+    cancelled: p.statusCancelled,
+  }
   const [showCancel, setShowCancel] = useState(false)
   const [note, setNote] = useState("")
   const [sent, setSent] = useState(false)
@@ -33,66 +36,50 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
 
   return (
     <div className="max-w-xl space-y-4">
+      <div>
+        <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
+        <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
+      </div>
+
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
-          Tu plan
-        </div>
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.yourPlan}</div>
         <div className="flex items-baseline gap-1.5">
           <span className="text-3xl font-black">${billing.total}</span>
-          <span className="text-sm text-neutral-500">/ mes</span>
+          <span className="text-sm text-neutral-500">{p.perMonth}</span>
         </div>
-        <p className="mt-1 text-sm text-neutral-500">
-          {billing.activeTrucks} truck{billing.activeTrucks === 1 ? "" : "s"} activo
-          {billing.activeTrucks === 1 ? "" : "s"} · ${billing.pricePerTruck} por truck
-        </p>
-        <p className="mt-3 text-xs font-semibold text-green-700">
-          Sin comisión por pedido, nunca.
-        </p>
+        <p className="mt-1 text-sm text-neutral-500">{p.activeTrucks(billing.activeTrucks, billing.pricePerTruck)}</p>
+        <p className="mt-3 text-xs font-semibold text-green-700">{p.noCommission}</p>
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
-          Estado de tu suscripción
-        </div>
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.subscriptionStatus}</div>
         <div className="font-semibold">
-          {STATUS_LABEL[billing.business?.subscription_status ?? ""] ??
-            billing.business?.subscription_status}
+          {STATUS_LABEL[billing.business?.subscription_status ?? ""] ?? billing.business?.subscription_status}
         </div>
-        <p className="mt-1 text-xs text-neutral-500">
-          En esta fase, cambios de plan y facturación los procesa nuestro equipo — nunca
-          automático todavía.
-        </p>
+        <p className="mt-1 text-xs text-neutral-500">{p.billingNote}</p>
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
-          ¿Necesitas más trucks o menos?
-        </div>
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.moreTrucksTitle}</div>
         <p className="text-sm text-neutral-500">
-          Agregar o dar de baja un truck se hace desde{" "}
-          <a href="/panel/trucks" className="font-semibold underline">
-            Trucks
-          </a>{" "}
-          — tu plan se ajusta solo al siguiente ciclo, nunca a la mitad del mes.
+          {p.moreTrucksBody.split(p.trucksLink)[0]}
+          <Link href="/panel/trucks" className="font-semibold underline">
+            {p.trucksLink}
+          </Link>
+          {p.moreTrucksBody.split(p.trucksLink)[1]}
         </p>
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
         {sent ? (
-          <p className="text-sm font-semibold text-green-700">
-            Recibimos tu solicitud. Te contactamos para confirmar la cancelación — nada se
-            cancela todavía.
-          </p>
+          <p className="text-sm font-semibold text-green-700">{p.cancelSent}</p>
         ) : showCancel ? (
           <div className="space-y-2">
-            <p className="text-sm text-neutral-600">
-              Cuéntanos por qué, si quieres — nos ayuda a mejorar. Esto no cancela nada por sí
-              solo; te contactamos para confirmar.
-            </p>
+            <p className="text-sm text-neutral-600">{p.cancelExplain}</p>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Opcional"
+              placeholder={p.notePlaceholder}
               className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
               rows={2}
             />
@@ -103,10 +90,10 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
                 disabled={pending}
                 className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
               >
-                {pending ? "Enviando…" : "Enviar solicitud"}
+                {pending ? p.sendingLabel : p.sendRequest}
               </button>
               <button onClick={() => setShowCancel(false)} className="text-xs text-neutral-500">
-                Cancelar
+                {t.panel.common.cancel}
               </button>
             </div>
           </div>
@@ -115,7 +102,7 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
             onClick={() => setShowCancel(true)}
             className="text-xs font-semibold text-neutral-400 hover:text-red-600"
           >
-            Solicitar cancelación de mi suscripción
+            {p.requestCancellation}
           </button>
         )}
       </div>

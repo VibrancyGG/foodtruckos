@@ -4,14 +4,14 @@ export type DayHours = { open: string; close: string } | null
 
 export type WeeklyHours = Partial<Record<DayKey, DayHours>>
 
-export const DAYS: { key: DayKey; label: string }[] = [
-  { key: "mon", label: "Lun" },
-  { key: "tue", label: "Mar" },
-  { key: "wed", label: "Mié" },
-  { key: "thu", label: "Jue" },
-  { key: "fri", label: "Vie" },
-  { key: "sat", label: "Sáb" },
-  { key: "sun", label: "Dom" },
+export const DAYS: { key: DayKey; label: string; labelEn: string }[] = [
+  { key: "mon", label: "Lun", labelEn: "Mon" },
+  { key: "tue", label: "Mar", labelEn: "Tue" },
+  { key: "wed", label: "Mié", labelEn: "Wed" },
+  { key: "thu", label: "Jue", labelEn: "Thu" },
+  { key: "fri", label: "Vie", labelEn: "Fri" },
+  { key: "sat", label: "Sáb", labelEn: "Sat" },
+  { key: "sun", label: "Dom", labelEn: "Sun" },
 ]
 
 // getDay() de JS: 0=domingo..6=sábado. Lo mapeamos a nuestras llaves lun..dom.

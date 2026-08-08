@@ -12,14 +12,19 @@ import {
   uploadUnitPhoto,
 } from "@/lib/units/actions"
 import { DAYS, parseWeeklyHours, type WeeklyHours, type DayHours } from "@/lib/units/hours"
-
-const PAUSE_OPTIONS = [
-  { label: "1 hora", hours: 1 },
-  { label: "3 horas", hours: 3 },
-  { label: "Hasta que reabra a mano", hours: null },
-]
+import { useLang } from "@/lib/i18n/LangProvider"
 
 export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
+  const { lang, t } = useLang()
+  const p = t.panel.trucksPage
+  const c = t.panel.common
+  const locale = lang === "es" ? "es-MX" : "en-US"
+  const PAUSE_OPTIONS = [
+    { label: p.pause1h, hours: 1 },
+    { label: p.pause3h, hours: 3 },
+    { label: p.pauseManual, hours: null },
+  ]
+
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(unit.name)
   const [alertMinutes, setAlertMinutes] = useState(String(unit.kitchen_alert_minutes))
@@ -50,6 +55,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
   }
 
   function doPause(pauseHours: number | null) {
+    // eslint-disable-next-line react-hooks/purity -- se calcula al hacer clic, no durante el render
     const pausedUntil = pauseHours ? new Date(Date.now() + pauseHours * 60 * 60 * 1000).toISOString() : null
     startTransition(async () => {
       await pauseUnit({ unitId: unit.id, pausedUntil })
@@ -103,7 +109,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
             <img src={photoUrl} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
-              foto
+              {c.noPhoto}
             </div>
           )}
           <input
@@ -126,14 +132,14 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                 className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm font-bold"
               />
               <label className="flex items-center gap-2 text-xs text-neutral-500">
-                Avisar en cocina si no hay actividad por
+                {p.alertLabel}
                 <input
                   value={alertMinutes}
                   onChange={(e) => setAlertMinutes(e.target.value)}
                   inputMode="numeric"
                   className="w-14 rounded border border-neutral-300 px-1.5 py-0.5"
                 />
-                min
+                {p.minSuffix}
               </label>
               <div className="flex gap-2 pt-1">
                 <button
@@ -141,19 +147,17 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                   disabled={pending}
                   className="rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-bold text-white"
                 >
-                  Guardar
+                  {c.save}
                 </button>
                 <button onClick={() => setEditing(false)} className="text-xs text-neutral-500">
-                  Cancelar
+                  {c.cancel}
                 </button>
               </div>
 
               <div className="mt-2 border-t border-neutral-100 pt-2">
                 <div className="mb-1 text-xs font-bold text-neutral-600">
-                  Horario publicado
-                  <span className="ml-1 font-normal text-neutral-400">
-                    — de aquí sale &quot;abrió tarde&quot; en Resumen
-                  </span>
+                  {p.publishedHours}
+                  <span className="ml-1 font-normal text-neutral-400">{p.publishedHoursHint}</span>
                 </div>
                 <div className="space-y-1">
                   {DAYS.map((d) => {
@@ -161,7 +165,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                     const closed = dh === null
                     return (
                       <div key={d.key} className="flex items-center gap-2 text-xs">
-                        <span className="w-8 text-neutral-500">{d.label}</span>
+                        <span className="w-8 text-neutral-500">{lang === "es" ? d.label : d.labelEn}</span>
                         <label className="flex items-center gap-1 text-neutral-500">
                           <input
                             type="checkbox"
@@ -170,7 +174,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                               setDayHours(d.key, e.target.checked ? { open: "11:00", close: "20:00" } : null)
                             }
                           />
-                          abierto
+                          {p.openLabel}
                         </label>
                         {!closed && (
                           <>
@@ -180,7 +184,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                               onChange={(e) => setDayHours(d.key, { ...dh, open: e.target.value })}
                               className="rounded border border-neutral-300 px-1 py-0.5"
                             />
-                            <span className="text-neutral-400">a</span>
+                            <span className="text-neutral-400">{p.toLabel}</span>
                             <input
                               type="time"
                               value={dh.close}
@@ -198,7 +202,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                   disabled={pending}
                   className="mt-2 rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-bold"
                 >
-                  {hoursSaved ? "Guardado ✓" : "Guardar horario"}
+                  {hoursSaved ? p.hoursSaved : p.saveHours}
                 </button>
               </div>
             </div>
@@ -211,13 +215,13 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                     isPaused ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"
                   }`}
                 >
-                  {isPaused ? "Pausado" : "Abierto"}
+                  {isPaused ? p.pausedBadge : p.openBadge}
                 </span>
                 {isPaused && (
                   <span className="text-neutral-500">
                     {unit.paused_until
-                      ? `Reabre ${new Date(unit.paused_until).toLocaleString("es-MX", { weekday: "short", hour: "numeric", minute: "2-digit" })}`
-                      : "Hasta que reabras a mano"}
+                      ? p.reopens(new Date(unit.paused_until).toLocaleString(locale, { weekday: "short", hour: "numeric", minute: "2-digit" }))
+                      : p.untilManualReopen}
                   </span>
                 )}
               </div>
@@ -227,7 +231,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
 
         {!editing && (
           <button onClick={() => setEditing(true)} className="text-xs font-bold text-neutral-600">
-            Editar
+            {c.edit}
           </button>
         )}
       </div>
@@ -241,7 +245,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
             disabled={pending}
             className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white"
           >
-            Reabrir ahora
+            {p.reopenNow}
           </button>
         ) : (
           <div className="relative">
@@ -250,7 +254,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
               disabled={pending}
               className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
             >
-              Pausar
+              {p.pause}
             </button>
             {showPause && (
               <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border border-neutral-200 bg-white p-1 shadow-lg">
@@ -271,12 +275,12 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
         <div className="ml-auto">
           {confirmArchive ? (
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-neutral-500">Se archiva, no se borra. ¿Seguro?</span>
+              <span className="text-neutral-500">{p.confirmArchiveText}</span>
               <button onClick={doArchive} className="font-bold text-red-600">
-                Sí, archivar
+                {p.yesArchive}
               </button>
               <button onClick={() => setConfirmArchive(false)} className="text-neutral-500">
-                Cancelar
+                {c.cancel}
               </button>
             </div>
           ) : (
@@ -284,7 +288,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
               onClick={() => setConfirmArchive(true)}
               className="text-xs font-semibold text-neutral-400 hover:text-red-600"
             >
-              Archivar truck
+              {p.archiveTruck}
             </button>
           )}
         </div>
@@ -294,6 +298,9 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
 }
 
 export function ArchivedTruckRow({ unit }: { unit: OwnerUnitsData["archived"][number] }) {
+  const { lang, t } = useLang()
+  const p = t.panel.trucksPage
+  const locale = lang === "es" ? "es-MX" : "en-US"
   const [pending, startTransition] = useTransition()
   const [gone, setGone] = useState(false)
 
@@ -304,7 +311,7 @@ export function ArchivedTruckRow({ unit }: { unit: OwnerUnitsData["archived"][nu
       <div>
         <div className="text-sm font-semibold text-neutral-600">{unit.name}</div>
         <div className="text-xs text-neutral-400">
-          Archivado {unit.archived_at ? new Date(unit.archived_at).toLocaleDateString("es-MX") : ""}
+          {p.archivedOn(unit.archived_at ? new Date(unit.archived_at).toLocaleDateString(locale) : "")}
         </div>
       </div>
       <button
@@ -317,7 +324,7 @@ export function ArchivedTruckRow({ unit }: { unit: OwnerUnitsData["archived"][nu
         }
         className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
       >
-        Reactivar
+        {p.reactivate}
       </button>
     </div>
   )

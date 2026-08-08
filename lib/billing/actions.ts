@@ -17,7 +17,7 @@ export async function requestCancellation(note: string): Promise<Result> {
   const supabase = await createClient()
   const { error } = await supabase.rpc("request_subscription_cancel", {
     p_business_id: businessId,
-    p_note: note || null,
+    p_note: note || undefined,
   })
 
   if (error) return { ok: false, error: "No se pudo enviar la solicitud" }

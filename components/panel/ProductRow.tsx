@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { updateProduct, retireProduct, toggleSoldOut, uploadProductPhoto } from "@/lib/menu/actions"
+import { useLang } from "@/lib/i18n/LangProvider"
 import { OptionGroupsEditor } from "./OptionGroupsEditor"
 
 export function ProductRow({
@@ -18,6 +19,9 @@ export function ProductRow({
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
 }) {
+  const { lang, t } = useLang()
+  const c = t.panel.common
+  const m = t.panel.menuPage
   const [editing, setEditing] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [nameEs, setNameEs] = useState(product.name_es)
@@ -82,7 +86,7 @@ export function ProductRow({
             <img src={photoUrl} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
-              foto
+              {c.noPhoto}
             </div>
           )}
           <input
@@ -102,13 +106,13 @@ export function ProductRow({
               value={nameEs}
               onChange={(e) => setNameEs(e.target.value)}
               className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm"
-              placeholder="Nombre en español"
+              placeholder={c.nameEsPlaceholder}
             />
             <input
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
               className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm"
-              placeholder="Name in English"
+              placeholder={c.nameEnPlaceholder}
             />
             <input
               value={price}
@@ -119,7 +123,7 @@ export function ProductRow({
           </div>
         ) : (
           <div className="flex-1">
-            <div className="font-semibold">{product.name_es}</div>
+            <div className="font-semibold">{lang === "es" ? product.name_es : product.name_en}</div>
             <div className="text-sm text-neutral-500">${product.price.toFixed(2)}</div>
           </div>
         )}
@@ -132,15 +136,15 @@ export function ProductRow({
                 disabled={pending}
                 className="rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-bold text-white disabled:opacity-60"
               >
-                Guardar
+                {c.save}
               </button>
               <button onClick={() => setEditing(false)} className="text-xs text-neutral-500">
-                Cancelar
+                {c.cancel}
               </button>
             </div>
           ) : (
             <button onClick={() => setEditing(true)} className="text-xs font-bold text-neutral-600">
-              Editar
+              {c.edit}
             </button>
           )}
         </div>
@@ -159,7 +163,8 @@ export function ProductRow({
                 checked={up.sold_out}
                 onChange={(e) => onSoldOutChange(up.id, e.target.checked)}
               />
-              Se acabó{units.length > 1 ? ` · ${u.name}` : ""}
+              {m.soldOut}
+              {units.length > 1 ? ` · ${u.name}` : ""}
             </label>
           )
         })}
@@ -167,12 +172,12 @@ export function ProductRow({
         <div className="ml-auto">
           {confirmRetire ? (
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-neutral-500">¿Seguro? Si solo se acabó hoy, usa el interruptor.</span>
+              <span className="text-neutral-500">{m.confirmRemove}</span>
               <button onClick={retire} className="font-bold text-red-600">
-                Sí, quitar
+                {c.yesRemove}
               </button>
               <button onClick={() => setConfirmRetire(false)} className="text-neutral-500">
-                Cancelar
+                {c.cancel}
               </button>
             </div>
           ) : (
@@ -180,7 +185,7 @@ export function ProductRow({
               onClick={() => setConfirmRetire(true)}
               className="text-xs font-semibold text-neutral-400 hover:text-red-600"
             >
-              Quitar del menú
+              {m.removeFromMenu}
             </button>
           )}
         </div>
@@ -188,7 +193,7 @@ export function ProductRow({
 
       <div className="mt-2 border-t border-neutral-100 pt-2">
         <button onClick={() => setShowOptions((s) => !s)} className="text-xs font-bold text-neutral-500">
-          {showOptions ? "Ocultar" : "Personalización"} ({optionGroups.length})
+          {showOptions ? m.hideOptions : m.showOptions} ({optionGroups.length})
         </button>
         {showOptions && (
           <OptionGroupsEditor productId={product.id} groups={optionGroups} options={options} />

@@ -3,9 +3,11 @@
 import { useMemo, useState } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { createCategory, createProduct } from "@/lib/menu/actions"
+import { useLang } from "@/lib/i18n/LangProvider"
 import { ProductRow } from "./ProductRow"
 
 export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
+  const { t } = useLang()
   const [categories, setCategories] = useState(initial.categories)
   const [showAddCategory, setShowAddCategory] = useState(false)
   const [newCatEs, setNewCatEs] = useState("")
@@ -37,6 +39,11 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="mb-1 text-2xl font-black">{t.panel.menuPage.title}</h1>
+        <p className="mb-2 text-sm text-neutral-500">{t.panel.menuPage.subtitle}</p>
+      </div>
+
       {categories.map((cat) => (
         <CategorySection
           key={cat.id}
@@ -51,7 +58,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
 
       {(productsByCategory.get("sin-categoria")?.length ?? 0) > 0 && (
         <CategorySection
-          category={{ id: "sin-categoria", name_es: "Sin categoría", name_en: "No category" }}
+          category={{ id: "sin-categoria", name_es: t.panel.menuPage.noCategory, name_en: t.panel.menuPage.noCategory }}
           products={productsByCategory.get("sin-categoria") ?? []}
           units={initial.units}
           unitProducts={initial.unitProducts}
@@ -66,13 +73,13 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
             <input
               value={newCatEs}
               onChange={(e) => setNewCatEs(e.target.value)}
-              placeholder="Nombre en español"
+              placeholder={t.panel.common.nameEsPlaceholder}
               className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
             />
             <input
               value={newCatEn}
               onChange={(e) => setNewCatEn(e.target.value)}
-              placeholder="Name in English"
+              placeholder={t.panel.common.nameEnPlaceholder}
               className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
             />
             <div className="flex gap-2">
@@ -81,13 +88,13 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
                 disabled={savingCat}
                 className="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-bold text-white disabled:opacity-60"
               >
-                {savingCat ? "Guardando…" : "Crear categoría"}
+                {savingCat ? t.panel.common.saving : t.panel.menuPage.createCategory}
               </button>
               <button
                 onClick={() => setShowAddCategory(false)}
                 className="rounded-lg px-3 py-1.5 text-sm text-neutral-500"
               >
-                Cancelar
+                {t.panel.common.cancel}
               </button>
             </div>
           </div>
@@ -96,7 +103,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
             onClick={() => setShowAddCategory(true)}
             className="text-sm font-bold text-neutral-600"
           >
-            + Agregar categoría
+            {t.panel.menuPage.addCategory}
           </button>
         )}
       </section>
@@ -119,6 +126,7 @@ function CategorySection({
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
 }) {
+  const { lang, t } = useLang()
   const [showAdd, setShowAdd] = useState(false)
   const [nameEs, setNameEs] = useState("")
   const [nameEn, setNameEn] = useState("")
@@ -147,7 +155,7 @@ function CategorySection({
   return (
     <section>
       <h2 className="mb-2 text-sm font-black uppercase tracking-wide text-neutral-500">
-        {category.name_es}
+        {lang === "es" ? category.name_es : category.name_en}
       </h2>
       <div className="space-y-2">
         {products.map((p) => (
@@ -167,19 +175,19 @@ function CategorySection({
           <input
             value={nameEs}
             onChange={(e) => setNameEs(e.target.value)}
-            placeholder="Nombre en español"
+            placeholder={t.panel.common.nameEsPlaceholder}
             className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
           />
           <input
             value={nameEn}
             onChange={(e) => setNameEn(e.target.value)}
-            placeholder="Name in English"
+            placeholder={t.panel.common.nameEnPlaceholder}
             className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
           />
           <input
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            placeholder="Precio"
+            placeholder={t.panel.menuPage.pricePlaceholder}
             inputMode="decimal"
             className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
           />
@@ -189,10 +197,10 @@ function CategorySection({
               disabled={saving}
               className="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-bold text-white disabled:opacity-60"
             >
-              {saving ? "Guardando…" : "Agregar"}
+              {saving ? t.panel.common.saving : t.panel.common.add}
             </button>
             <button onClick={() => setShowAdd(false)} className="text-sm text-neutral-500">
-              Cancelar
+              {t.panel.common.cancel}
             </button>
           </div>
         </div>
@@ -201,7 +209,7 @@ function CategorySection({
           onClick={() => setShowAdd(true)}
           className="mt-2 text-sm font-bold text-neutral-500"
         >
-          + Agregar platillo
+          {t.panel.menuPage.addProduct}
         </button>
       )}
     </section>

@@ -4,9 +4,17 @@ type TruckRow = { unitId: string; name: string; currentMonth: number; prevMonth:
 
 const COLORS = ["#2A78D6", "#EB6834", "#1BAF7A", "#9B59B6", "#B0700A"]
 
-export function TruckBarChart({ trucks }: { trucks: TruckRow[] }) {
+export function TruckBarChart({
+  trucks,
+  noDataLabel,
+  noPrevLabel,
+}: {
+  trucks: TruckRow[]
+  noDataLabel: string
+  noPrevLabel: string
+}) {
   if (trucks.length === 0) {
-    return <p className="text-sm text-neutral-400">Todavía no hay trucks activos.</p>
+    return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
   const max = Math.max(...trucks.map((t) => t.currentMonth), 1)
 
@@ -24,7 +32,7 @@ export function TruckBarChart({ trucks }: { trucks: TruckRow[] }) {
                 {delta !== null ? (
                   <span className={delta >= 0 ? "text-green-700" : "text-red-600"}>{fmtDelta(delta)}</span>
                 ) : (
-                  <span className="text-neutral-400">sin mes anterior</span>
+                  <span className="text-neutral-400">{noPrevLabel}</span>
                 )}
               </span>
             </div>

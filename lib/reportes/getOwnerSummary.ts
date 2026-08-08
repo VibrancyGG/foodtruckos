@@ -2,11 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { toNumber } from "@/lib/supabase/numeric"
 import { dayKeyFor, parseWeeklyHours } from "@/lib/units/hours"
 
-const MONTH_NAMES = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-]
-
+// Los nombres de mes se calculan del lado del cliente con Intl según el
+// idioma del dueño (useLang) — aquí solo viajan el año y el índice de mes
+// (0-11), nunca texto ya formateado en un solo idioma.
 function monthKey(d: Date) {
   return `${d.getUTCFullYear()}-${d.getUTCMonth()}`
 }
@@ -93,7 +91,6 @@ export async function getOwnerSummary(businessId: string) {
 
   const monthlySeries = Array.from({ length: 12 }, (_, m) => ({
     month: m,
-    label: MONTH_NAMES[m].slice(0, 3),
     currentYear: monthBucket(currentYear, m)?.total ?? null,
     prevYear: monthBucket(currentYear - 1, m)?.total ?? null,
   }))
@@ -187,7 +184,8 @@ export async function getOwnerSummary(businessId: string) {
   })
 
   return {
-    label: `${MONTH_NAMES[currentMonth]} ${currentYear}`,
+    currentMonth,
+    currentYear,
     daysSoFar,
     current: current ? { total: current.total, count: current.count } : { total: 0, count: 0 },
     prev: prev ? { total: prev.total } : null,

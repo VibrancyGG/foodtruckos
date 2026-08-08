@@ -1,6 +1,12 @@
-export function TopProductsChart({ products }: { products: { name: string; quantity: number }[] }) {
+export function TopProductsChart({
+  products,
+  noDataLabel,
+}: {
+  products: { name: string; quantity: number }[]
+  noDataLabel: string
+}) {
   if (products.length === 0) {
-    return <p className="text-sm text-neutral-400">Todavía no hay pedidos este mes.</p>
+    return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
   const max = products[0].quantity
 

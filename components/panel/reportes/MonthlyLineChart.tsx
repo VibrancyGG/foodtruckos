@@ -1,8 +1,19 @@
-import { money } from "@/lib/reportes/format"
+import { money, monthName } from "@/lib/reportes/format"
+import type { Lang } from "@/lib/i18n/dictionary"
 
-type Point = { month: number; label: string; currentYear: number | null; prevYear: number | null }
+type Point = { month: number; currentYear: number | null; prevYear: number | null }
 
-export function MonthlyLineChart({ series, currentYear }: { series: Point[]; currentYear: number }) {
+export function MonthlyLineChart({
+  series,
+  currentYear,
+  lang,
+  noDataLabel,
+}: {
+  series: Point[]
+  currentYear: number
+  lang: Lang
+  noDataLabel: string
+}) {
   const W = 760, H = 220, L = 52, R = 12, T = 14, B = 28
   const w = W - L - R, h = H - T - B
   const values = series.flatMap((p) => [p.currentYear, p.prevYear]).filter((v): v is number => v !== null)
@@ -19,7 +30,7 @@ export function MonthlyLineChart({ series, currentYear }: { series: Point[]; cur
     .filter((s): s is string => s !== null)
 
   if (values.length === 0) {
-    return <p className="text-sm text-neutral-400">Todavía no hay ventas registradas para graficar.</p>
+    return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
 
   return (
@@ -34,7 +45,7 @@ export function MonthlyLineChart({ series, currentYear }: { series: Point[]; cur
       ))}
       {series.map((p, i) => (
         <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={10} fill="#898781">
-          {p.label}
+          {monthName(currentYear, p.month, lang, true)}
         </text>
       ))}
       {prevPath.length > 1 && (

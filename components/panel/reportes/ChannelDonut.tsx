@@ -1,14 +1,26 @@
 import { money } from "@/lib/reportes/format"
 
-export function ChannelDonut({ breakdown }: { breakdown: { qr: number; ventanilla: number } | null }) {
+export function ChannelDonut({
+  breakdown,
+  noDataLabel,
+  byQrLabel,
+  qrLabel,
+  ventanillaLabel,
+}: {
+  breakdown: { qr: number; ventanilla: number } | null
+  noDataLabel: string
+  byQrLabel: string
+  qrLabel: string
+  ventanillaLabel: string
+}) {
   if (!breakdown || breakdown.qr + breakdown.ventanilla === 0) {
-    return <p className="text-sm text-neutral-400">Todavía no hay ventas este mes.</p>
+    return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
   const total = breakdown.qr + breakdown.ventanilla
   const cx = 80, cy = 90, r = 58, sw = 26
   const segments = [
-    { key: "qr", label: "Código QR", value: breakdown.qr, color: "#2A78D6" },
-    { key: "ventanilla", label: "Ventanilla", value: breakdown.ventanilla, color: "#EB6834" },
+    { key: "qr", label: qrLabel, value: breakdown.qr, color: "#2A78D6" },
+    { key: "ventanilla", label: ventanillaLabel, value: breakdown.ventanilla, color: "#EB6834" },
   ]
   let angle = -Math.PI / 2
   const paths = segments.map((s) => {
@@ -36,7 +48,7 @@ export function ChannelDonut({ breakdown }: { breakdown: { qr: number; ventanill
           {Math.round((breakdown.qr / total) * 100)}%
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle" fontSize={11} fill="#898781">
-          por QR
+          {byQrLabel}
         </text>
       </svg>
       <div className="space-y-2 text-sm">

@@ -3,15 +3,21 @@
 import { useState, useTransition } from "react"
 import type { OwnerStaffData } from "@/lib/personal/getOwnerStaff"
 import { createStaff, removeStaff, createDevice, revokeDevice } from "@/lib/personal/actions"
+import { useLang } from "@/lib/i18n/LangProvider"
 
-function unitName(units: OwnerStaffData["units"], unitId: string | null) {
-  if (!unitId) return "Todos los trucks"
+function unitName(units: OwnerStaffData["units"], unitId: string | null, allTrucks: string) {
+  if (!unitId) return allTrucks
   return units.find((u) => u.id === unitId)?.name ?? "—"
 }
 
 export function PersonalScreen({ initial }: { initial: OwnerStaffData }) {
+  const { t } = useLang()
   return (
     <div className="space-y-8">
+      <div>
+        <h1 className="mb-1 text-2xl font-black">{t.panel.personalPage.title}</h1>
+        <p className="mb-2 text-sm text-neutral-500">{t.panel.personalPage.subtitle}</p>
+      </div>
       <StaffSection units={initial.units} staff={initial.staff} removedStaff={initial.removedStaff} />
       <DeviceSection units={initial.units} devices={initial.devices} revokedDevices={initial.revokedDevices} />
     </div>
@@ -27,6 +33,9 @@ function StaffSection({
   staff: OwnerStaffData["staff"]
   removedStaff: OwnerStaffData["removedStaff"]
 }) {
+  const { t } = useLang()
+  const p = t.panel.personalPage
+  const c = t.panel.common
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState("")
   const [pin, setPin] = useState("")
@@ -53,33 +62,31 @@ function StaffSection({
   return (
     <section>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-lg font-bold">Personal</h2>
+        <h2 className="text-lg font-bold">{p.staffTitle}</h2>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
             className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
           >
-            + Agregar persona
+            {p.addPerson}
           </button>
         )}
       </div>
-      <p className="mb-3 text-sm text-neutral-500">
-        Cada persona entra a cocina con su PIN de 4 dígitos. Quitarla corta su acceso al instante.
-      </p>
+      <p className="mb-3 text-sm text-neutral-500">{p.staffHint}</p>
 
       {showForm && (
         <div className="mb-3 space-y-2 rounded-2xl border border-neutral-200 bg-white p-4">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nombre"
+            placeholder={p.namePlaceholder}
             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
           />
           <input
             value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
             inputMode="numeric"
-            placeholder="PIN de 4 dígitos"
+            placeholder={p.pinPlaceholder}
             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
           />
           <select
@@ -87,7 +94,7 @@ function StaffSection({
             onChange={(e) => setUnitId(e.target.value)}
             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
           >
-            <option value="">Todos los trucks</option>
+            <option value="">{p.allTrucks}</option>
             {units.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.name}
@@ -101,10 +108,10 @@ function StaffSection({
               disabled={pending || !name.trim() || pin.length !== 4}
               className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
             >
-              Crear
+              {c.create}
             </button>
             <button onClick={() => setShowForm(false)} className="text-xs text-neutral-500">
-              Cancelar
+              {c.cancel}
             </button>
           </div>
         </div>
@@ -112,10 +119,10 @@ function StaffSection({
 
       <div className="space-y-2">
         {staff.length === 0 && !showForm && (
-          <p className="text-sm text-neutral-400">Todavía no hay personal.</p>
+          <p className="text-sm text-neutral-400">{p.noStaffYet}</p>
         )}
         {staff.map((s) => (
-          <StaffRow key={s.id} staff={s} unitLabel={unitName(units, s.unit_id)} />
+          <StaffRow key={s.id} staff={s} unitLabel={unitName(units, s.unit_id, p.allTrucks)} />
         ))}
       </div>
 
@@ -125,7 +132,7 @@ function StaffSection({
             onClick={() => setShowRemoved((v) => !v)}
             className="text-xs font-bold text-neutral-500 underline"
           >
-            {showRemoved ? "Ocultar" : "Ver"} personal dado de baja ({removedStaff.length})
+            {showRemoved ? p.hideRemoved(removedStaff.length) : p.showRemoved(removedStaff.length)}
           </button>
           {showRemoved && (
             <div className="mt-2 space-y-1">
@@ -149,6 +156,9 @@ function StaffRow({
   staff: OwnerStaffData["staff"][number]
   unitLabel: string
 }) {
+  const { t } = useLang()
+  const p = t.panel.personalPage
+  const c = t.panel.common
   const [confirming, setConfirming] = useState(false)
   const [gone, setGone] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -163,7 +173,7 @@ function StaffRow({
       </div>
       {confirming ? (
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-500">¿Quitar acceso?</span>
+          <span className="text-neutral-500">{p.confirmRemoveAccess}</span>
           <button
             disabled={pending}
             onClick={() =>
@@ -174,15 +184,15 @@ function StaffRow({
             }
             className="font-bold text-red-600"
           >
-            Sí, quitar
+            {c.yesRemove}
           </button>
           <button onClick={() => setConfirming(false)} className="text-neutral-500">
-            Cancelar
+            {c.cancel}
           </button>
         </div>
       ) : (
         <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-neutral-400 hover:text-red-600">
-          Quitar
+          {c.remove}
         </button>
       )}
     </div>
@@ -198,6 +208,9 @@ function DeviceSection({
   devices: OwnerStaffData["devices"]
   revokedDevices: OwnerStaffData["revokedDevices"]
 }) {
+  const { t } = useLang()
+  const p = t.panel.personalPage
+  const c = t.panel.common
   const [showForm, setShowForm] = useState(false)
   const [label, setLabel] = useState("")
   const [unitId, setUnitId] = useState(units[0]?.id ?? "")
@@ -223,34 +236,27 @@ function DeviceSection({
   return (
     <section>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-lg font-bold">Dispositivos</h2>
+        <h2 className="text-lg font-bold">{p.devicesTitle}</h2>
         {!showForm && units.length > 0 && (
           <button
             onClick={() => setShowForm(true)}
             className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
           >
-            + Emparejar tablet
+            {p.pairTablet}
           </button>
         )}
       </div>
-      <p className="mb-3 text-sm text-neutral-500">
-        Cada tablet o celular de cocina se conecta una sola vez con un código. Revocarlo la
-        desconecta al instante.
-      </p>
+      <p className="mb-3 text-sm text-neutral-500">{p.devicesHint}</p>
 
       {newCode && (
         <div className="mb-3 rounded-2xl border border-green-200 bg-green-50 p-4">
-          <p className="mb-1 text-xs font-bold text-green-800">
-            Código de emparejamiento — captúralo ahora, no se vuelve a mostrar
-          </p>
+          <p className="mb-1 text-xs font-bold text-green-800">{p.pairingCodeTitle}</p>
           <p className="mb-2 select-all font-mono text-2xl font-black tracking-widest text-green-900">
             {newCode}
           </p>
-          <p className="mb-2 text-xs text-green-800">
-            En la tablet, abre /cocina y escribe este código.
-          </p>
+          <p className="mb-2 text-xs text-green-800">{p.pairingCodeHint}</p>
           <button onClick={() => setNewCode(null)} className="text-xs font-bold text-green-800 underline">
-            Listo
+            {p.done}
           </button>
         </div>
       )}
@@ -260,7 +266,7 @@ function DeviceSection({
           <input
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            placeholder="Nombre del dispositivo (ej. Tablet cocina)"
+            placeholder={p.deviceNamePlaceholder}
             className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
           />
           <select
@@ -281,10 +287,10 @@ function DeviceSection({
               disabled={pending || !label.trim() || !unitId}
               className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50"
             >
-              Generar código
+              {p.generateCode}
             </button>
             <button onClick={() => setShowForm(false)} className="text-xs text-neutral-500">
-              Cancelar
+              {c.cancel}
             </button>
           </div>
         </div>
@@ -292,10 +298,10 @@ function DeviceSection({
 
       <div className="space-y-2">
         {devices.length === 0 && !showForm && (
-          <p className="text-sm text-neutral-400">Todavía no hay dispositivos.</p>
+          <p className="text-sm text-neutral-400">{p.noDevicesYet}</p>
         )}
         {devices.map((d) => (
-          <DeviceRow key={d.id} device={d} unitLabel={unitName(units, d.unit_id)} />
+          <DeviceRow key={d.id} device={d} unitLabel={unitName(units, d.unit_id, p.allTrucks)} />
         ))}
       </div>
 
@@ -305,7 +311,7 @@ function DeviceSection({
             onClick={() => setShowRevoked((v) => !v)}
             className="text-xs font-bold text-neutral-500 underline"
           >
-            {showRevoked ? "Ocultar" : "Ver"} revocados ({revokedDevices.length})
+            {showRevoked ? p.hideRevoked(revokedDevices.length) : p.showRevoked(revokedDevices.length)}
           </button>
           {showRevoked && (
             <div className="mt-2 space-y-1">
@@ -329,6 +335,8 @@ function DeviceRow({
   device: OwnerStaffData["devices"][number]
   unitLabel: string
 }) {
+  const { t } = useLang()
+  const p = t.panel.personalPage
   const [confirming, setConfirming] = useState(false)
   const [gone, setGone] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -348,13 +356,13 @@ function DeviceRow({
               paired ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
             }`}
           >
-            {paired ? "Emparejado" : "Esperando código"}
+            {paired ? p.pairedBadge : p.waitingCodeBadge}
           </span>
         </div>
       </div>
       {confirming ? (
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-500">¿Revocar?</span>
+          <span className="text-neutral-500">{p.confirmRevoke}</span>
           <button
             disabled={pending}
             onClick={() =>
@@ -365,15 +373,15 @@ function DeviceRow({
             }
             className="font-bold text-red-600"
           >
-            Sí, revocar
+            {p.yesRevoke}
           </button>
           <button onClick={() => setConfirming(false)} className="text-neutral-500">
-            Cancelar
+            {t.panel.common.cancel}
           </button>
         </div>
       ) : (
         <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-neutral-400 hover:text-red-600">
-          Revocar
+          {p.revoke}
         </button>
       )}
     </div>

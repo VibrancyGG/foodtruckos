@@ -19,10 +19,6 @@ export default async function PanelPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="mb-1 text-2xl font-black">Marca</h1>
-      <p className="mb-6 text-sm text-neutral-500">
-        Lo que ve tu cliente cuando escanea el código — cuatro decisiones, ninguna más.
-      </p>
       <MarcaForm
         businessName={business.name}
         initialLogoUrl={business.logo_url}

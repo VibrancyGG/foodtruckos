@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation"
 import { getAdminContext } from "@/lib/auth/getAdminContext"
 import { logoutAction } from "@/lib/auth/actions"
+import { LangProvider } from "@/lib/i18n/LangProvider"
+import { AdminHeader } from "@/components/admin/AdminHeader"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin } = await getAdminContext()
@@ -9,14 +11,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!isAdmin) redirect("/panel")
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
-      <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-        <span className="text-sm font-bold">FoodTruckOS · Admin interno</span>
-        <form action={logoutAction}>
-          <button className="text-xs text-neutral-400 underline">Cerrar sesión</button>
-        </form>
-      </header>
-      <main className="p-4">{children}</main>
-    </div>
+    <LangProvider defaultLang="es">
+      <div className="min-h-screen bg-neutral-950 text-white">
+        <AdminHeader logoutAction={logoutAction} />
+        <main className="p-4">{children}</main>
+      </div>
+    </LangProvider>
   )
 }
