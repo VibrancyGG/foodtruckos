@@ -16,11 +16,11 @@ export const getOwnerContext = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return { user: null, businessId: null, business: null, impersonating: false } as const
+  if (!user) return { user: null, businessId: null, business: null, impersonating: false, suspended: false } as const
 
   const { data: membership } = await supabase
     .from("business_members")
-    .select("business_id, businesses(name, slug)")
+    .select("business_id, businesses(name, slug, subscription_status)")
     .eq("auth_user_id", user.id)
     .maybeSingle()
 
@@ -30,6 +30,11 @@ export const getOwnerContext = cache(async () => {
       businessId: membership.business_id,
       business: membership.businesses,
       impersonating: false,
+      // Suspendido por falta de pago: RLS sigue dejando leer/escribir (la
+      // suspensión no es un problema de permisos), el bloqueo real vive aquí
+      // y en verifyStaffSession/getMenuData — así una sola bandera corta el
+      // panel, cocina y el menú del comensal a la vez.
+      suspended: membership.businesses?.subscription_status === "suspended",
     } as const
   }
 
@@ -54,10 +59,13 @@ export const getOwnerContext = cache(async () => {
           businessId: business.id,
           business: { name: business.name, slug: business.slug },
           impersonating: true,
+          // El admin necesita poder entrar a una cuenta suspendida para
+          // arreglarla — el bloqueo es solo para el dueño real.
+          suspended: false,
         } as const
       }
     }
   }
 
-  return { user, businessId: null, business: null, impersonating: false } as const
+  return { user, businessId: null, business: null, impersonating: false, suspended: false } as const
 })

@@ -30,12 +30,20 @@ export async function getMenuData(qrSlug: string) {
   // Archivado: el QR deja de funcionar de verdad (foodtruckos-datos Regla 3).
   if (unit.status === "archived") return null
 
+  // Negocio suspendido por falta de pago: el QR deja de servir el menú por
+  // completo, igual que un truck archivado — no es un mensaje de "pausado",
+  // es que la suscripción no está vigente.
+  if (business.subscription_status === "suspended") {
+    return { suspended: true as const, paused: false as const, business, unit: { name: unit.name } }
+  }
+
   // Pausado: se reabre solo en cuanto pasa paused_until, sin ningún trabajo
   // de fondo — se compara al momento de leer, no con un job programado.
   if (unit.status === "paused") {
     const stillPaused = !unit.paused_until || new Date(unit.paused_until) > new Date()
     if (stillPaused) {
       return {
+        suspended: false as const,
         paused: true as const,
         business,
         unit: { name: unit.name },
@@ -73,6 +81,7 @@ export async function getMenuData(qrSlug: string) {
     ])
 
   return {
+    suspended: false as const,
     paused: false as const,
     orderPoint: { id: orderPoint.id, label: orderPoint.label },
     unit,
@@ -86,4 +95,4 @@ export async function getMenuData(qrSlug: string) {
 }
 
 export type MenuData = NonNullable<Awaited<ReturnType<typeof getMenuData>>>
-export type ActiveMenuData = Extract<MenuData, { paused: false }>
+export type ActiveMenuData = Extract<MenuData, { paused: false; suspended: false }>

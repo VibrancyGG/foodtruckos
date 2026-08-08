@@ -161,6 +161,8 @@ export type Dictionary = {
     }
     sinAccesoTitle: string
     sinAccesoBody: string
+    suspendedTitle: string
+    suspendedBody: string
     common: {
       save: string
       saving: string
@@ -708,6 +710,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       sinAccesoTitle: "Todavía no tenemos tu cuenta vinculada",
       sinAccesoBody: "Escríbenos a soporte para que te demos acceso al panel de tu negocio.",
+      suspendedTitle: "Cuenta suspendida",
+      suspendedBody: "Tu suscripción no está vigente. El panel, la cocina y el menú de tus clientes están pausados hasta que se resuelva. Contáctanos para reactivarla.",
       common: {
         save: "Guardar",
         saving: "Guardando…",
@@ -1253,6 +1257,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       sinAccesoTitle: "We haven't linked your account yet",
       sinAccesoBody: "Email support so we can give you access to your business panel.",
+      suspendedTitle: "Account suspended",
+      suspendedBody: "Your subscription isn't active. Your panel, kitchen, and customer menu are paused until it's resolved. Contact us to reactivate it.",
       common: {
         save: "Save",
         saving: "Saving…",

@@ -18,6 +18,15 @@ export default async function MenuPage({
 
   if (!data) notFound()
 
+  if (data.suspended) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-2 bg-neutral-950 px-6 text-center text-white">
+        <h1 className="text-xl font-bold">{data.business.name}</h1>
+        <p className="text-neutral-400">Este menú no está disponible por ahora.</p>
+      </div>
+    )
+  }
+
   if (data.paused) {
     const reopenTime = data.pausedUntil
       ? new Date(data.pausedUntil).toLocaleString("es-MX", {

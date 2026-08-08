@@ -19,9 +19,15 @@ async function loadDevice(deviceId: string): Promise<Device | null> {
   const supabase = createServiceClient()
   const { data } = await supabase
     .from("devices")
-    .select("id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until")
+    .select(
+      "id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until, businesses(subscription_status)",
+    )
     .eq("id", deviceId)
     .maybeSingle()
+  if (!data) return null
+  // Negocio suspendido por falta de pago: corta el acceso a cocina igual que
+  // un dispositivo revocado — se revisa en cada llamada, no solo al emparejar.
+  if (data.businesses?.subscription_status === "suspended") return null
   return data
 }
 
