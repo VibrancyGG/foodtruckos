@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -31,6 +32,7 @@ export function KitchenBoard({
   const [pending, setPending] = useState(0)
   const [showVentanilla, setShowVentanilla] = useState(false)
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
+  const [sessionExpired, setSessionExpired] = useState(false)
 
   const refetch = useCallback(async () => {
     const supabase = createClient()
@@ -72,7 +74,7 @@ export function KitchenBoard({
 
     const poll = setInterval(refetch, 10000)
     const drain = setInterval(() => {
-      drainQueue(unitId, () => setPending(pendingCount(unitId)))
+      drainQueue(unitId, () => setPending(pendingCount(unitId)), () => setSessionExpired(true))
       setPending(pendingCount(unitId))
     }, 4000)
 
@@ -86,7 +88,7 @@ export function KitchenBoard({
   function act(body: unknown) {
     enqueueAction(unitId, body)
     setPending(pendingCount(unitId))
-    drainQueue(unitId, () => setPending(pendingCount(unitId)))
+    drainQueue(unitId, () => setPending(pendingCount(unitId)), () => setSessionExpired(true))
   }
 
   function advance(orderId: string) {
@@ -108,6 +110,14 @@ export function KitchenBoard({
 
   return (
     <div className="min-h-screen bg-neutral-900 p-4 text-white">
+      {sessionExpired && (
+        <div className="mb-4 flex items-center justify-between rounded-xl bg-red-900 px-4 py-3 text-sm font-semibold text-red-100">
+          <span>{t.kitchen.sessionExpired}</span>
+          <Link href="/cocina" className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-red-900">
+            {t.kitchen.reenter}
+          </Link>
+        </div>
+      )}
       <header className="mb-4 flex items-center justify-between">
         <div>
           <div className="font-bold">{unitName}</div>

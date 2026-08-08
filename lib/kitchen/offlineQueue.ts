@@ -41,7 +41,7 @@ export function pendingCount(unitToken: string) {
 
 let draining = false
 
-export async function drainQueue(unitToken: string, onChange?: () => void) {
+export async function drainQueue(unitToken: string, onChange?: () => void, onAuthError?: () => void) {
   if (draining) return
   draining = true
   try {
@@ -55,8 +55,17 @@ export async function drainQueue(unitToken: string, onChange?: () => void) {
           body: JSON.stringify(next.body),
         })
         if (!res.ok && res.status >= 500) throw new Error("server error")
-        // 4xx (token inválido, pedido ya avanzado por otra pestaña, etc.) se
-        // descarta: reintentar no lo va a arreglar y bloquearía la cola entera.
+        if (res.status === 401) {
+          // La sesión de personal murió (PIN dado de baja, dispositivo
+          // revocado, expiró) — esto no es que la acción esté mal, es que
+          // nadie va a poder escribir nada hasta volver a entrar. Se deja la
+          // acción en la cola (se reintenta sola en cuanto haya sesión de
+          // nuevo) y se avisa, en vez de descartarla en silencio.
+          onAuthError?.()
+          break
+        }
+        // Otros 4xx (pedido ya avanzado por otra pestaña, etc.) sí se
+        // descartan: reintentar no lo va a arreglar y bloquearía la cola.
         queue = rest
         writeQueue(unitToken, queue)
         onChange?.()

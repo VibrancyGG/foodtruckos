@@ -47,6 +47,8 @@ export type Dictionary = {
     connLive: string
     connOff: string
     queuedActions: (n: number) => string
+    sessionExpired: string
+    reenter: string
   }
 }
 
@@ -111,6 +113,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       connLive: "En vivo",
       connOff: "Sin conexión",
       queuedActions: (n: number) => `${n} acción${n === 1 ? "" : "es"} pendiente${n === 1 ? "" : "s"} de enviar`,
+      sessionExpired: "Tu sesión de personal ya no es válida. Vuelve a entrar con tu PIN.",
+      reenter: "Volver a entrar",
     },
   },
   en: {
@@ -170,6 +174,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       connLive: "Live",
       connOff: "Offline",
       queuedActions: (n: number) => `${n} action${n === 1 ? "" : "s"} pending`,
+      sessionExpired: "Your staff session is no longer valid. Enter your PIN again.",
+      reenter: "Enter again",
     },
   },
 }
