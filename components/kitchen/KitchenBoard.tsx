@@ -15,12 +15,14 @@ export function KitchenBoard({
   unitId,
   businessId,
   unitName,
+  alertMinutes,
   taxIncluded,
   initial,
 }: {
   unitId: string
   businessId: string
   unitName: string
+  alertMinutes: number
   taxIncluded: boolean
   initial: KitchenData
 }) {
@@ -33,6 +35,7 @@ export function KitchenBoard({
   const [showVentanilla, setShowVentanilla] = useState(false)
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
 
   const refetch = useCallback(async () => {
     const supabase = createClient()
@@ -77,11 +80,13 @@ export function KitchenBoard({
       drainQueue(unitId, () => setPending(pendingCount(unitId)), () => setSessionExpired(true))
       setPending(pendingCount(unitId))
     }, 4000)
+    const clock = setInterval(() => setNow(Date.now()), 15000)
 
     return () => {
       supabase.removeChannel(channel)
       clearInterval(poll)
       clearInterval(drain)
+      clearInterval(clock)
     }
   }, [unitId, refetch])
 
@@ -106,6 +111,18 @@ export function KitchenBoard({
   function toggleSoldOut(unitProductId: string, soldOut: boolean) {
     setUnitProducts((ups) => ups.map((up) => (up.id === unitProductId ? { ...up, sold_out: soldOut } : up)))
     act({ action: "soldOut", unitProductId, soldOut })
+  }
+
+  // Color con función, no decoración (foodtruckos-diseno): listo siempre en
+  // verde; en nuevas/preparando, ámbar al pasar el umbral del truck y rojo al
+  // doble — la misma refresca (poll de 10s) mantiene esto al día sin timers
+  // aparte.
+  function cardBg(order: (typeof orders)[number], col: (typeof COLUMNS)[number]) {
+    if (col === "listo") return "bg-green-900"
+    const elapsedMin = (now - new Date(order.created_at).getTime()) / 60000
+    if (elapsedMin >= alertMinutes * 2) return "bg-red-900"
+    if (elapsedMin >= alertMinutes) return "bg-amber-900"
+    return "bg-neutral-700"
   }
 
   return (
@@ -149,7 +166,7 @@ export function KitchenBoard({
               {orders
                 .filter((o) => o.status === col)
                 .map((o) => (
-                  <div key={o.id} className="rounded-lg bg-neutral-700 p-3">
+                  <div key={o.id} className={`rounded-lg p-3 ${cardBg(o, col)}`}>
                     <div className="mb-1 flex items-center justify-between">
                       <span className="text-lg font-black">#{o.folio}</span>
                       <span className="text-xs uppercase text-neutral-400">

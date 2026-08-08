@@ -20,7 +20,11 @@ export default async function CocinaPage() {
   }
 
   const supabase = createServiceClient()
-  const { data: unit } = await supabase.from("units").select("name").eq("id", session.unitId).single()
+  const { data: unit } = await supabase
+    .from("units")
+    .select("name, kitchen_alert_minutes")
+    .eq("id", session.unitId)
+    .single()
 
   const initial = await getKitchenData(session.unitId, session.businessId)
 
@@ -30,6 +34,7 @@ export default async function CocinaPage() {
         unitId={session.unitId}
         businessId={session.businessId}
         unitName={unit?.name ?? ""}
+        alertMinutes={unit?.kitchen_alert_minutes ?? 20}
         taxIncluded={initial.taxIncluded}
         initial={initial}
       />
