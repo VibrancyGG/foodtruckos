@@ -27,6 +27,33 @@ export async function suspendBusiness(businessId: string): Promise<Result> {
   return { ok: true }
 }
 
+// El dueño ya puede reactivar su propio truck archivado en minutos desde su
+// panel (lib/units/actions.ts) — esto solo registra que el equipo lo
+// contactó antes del corte de 2 años, para no perder de vista quién ya
+// recibió el aviso. No borra nada por sí sola.
+export async function markArchiveWarned(unitId: string): Promise<Result> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+  const { data: unit, error } = await supabase
+    .from("units")
+    .update({ archive_warned_at: new Date().toISOString() })
+    .eq("id", unitId)
+    .select("business_id")
+    .single()
+  if (error || !unit) return { ok: false, error: "No se pudo marcar" }
+
+  await supabase.rpc("log_admin_action", {
+    p_business_id: unit.business_id,
+    p_action: "archive_warning_sent",
+    p_entity_type: "unit",
+    p_entity_id: unitId,
+  })
+  revalidatePath("/admin")
+  return { ok: true }
+}
+
 export async function reactivateBusiness(businessId: string): Promise<Result> {
   const { isAdmin } = await getAdminContext()
   if (!isAdmin) return { ok: false, error: "No autorizado" }

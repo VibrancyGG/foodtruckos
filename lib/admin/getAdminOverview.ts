@@ -13,7 +13,7 @@ export async function getAdminOverview() {
       .from("businesses")
       .select("id, name, slug, subscription_status, billing_mode, created_at")
       .order("created_at", { ascending: false }),
-    supabase.from("units").select("id, business_id, name, status, created_at, archived_at"),
+    supabase.from("units").select("id, business_id, name, status, created_at, archived_at, archive_warned_at"),
     supabase
       .from("truck_requests")
       .select("id, business_id, note, created_at")
@@ -63,6 +63,30 @@ export async function getAdminOverview() {
     return { monthsAgo, total: monthsAgo === 0 ? mrr : total }
   })
 
+  // Retención de archivados: se conservan 2 años (foodtruckos-negocio /
+  // brief sección 10); se avisa antes de eliminar, nunca se borra en
+  // silencio. El aviso empieza 2 meses antes del corte para dar tiempo real
+  // de reaccionar, no el mismo día que se cumple el plazo.
+  const RETENTION_CUTOFF_MONTHS = 24
+  const RETENTION_WARN_MONTHS = 22
+  const businessNameByIdForUnits = new Map(rows.map((r) => [r.id, r.name]))
+  const archivedExpiring = unitList
+    .filter((u) => u.status === "archived" && u.archived_at)
+    .map((u) => {
+      const monthsArchived = monthsBetween(new Date(u.archived_at as string), now)
+      return {
+        id: u.id,
+        name: u.name,
+        businessName: businessNameByIdForUnits.get(u.business_id) ?? "—",
+        archivedAt: u.archived_at as string,
+        monthsArchived,
+        overdue: monthsArchived >= RETENTION_CUTOFF_MONTHS,
+        warned: !!u.archive_warned_at,
+      }
+    })
+    .filter((u) => u.monthsArchived >= RETENTION_WARN_MONTHS)
+    .sort((a, b) => b.monthsArchived - a.monthsArchived)
+
   const businessNameByIdForRequests = new Map(rows.map((r) => [r.id, r.name]))
   const pendingRequests = (requests ?? []).map((r) => ({
     ...r,
@@ -87,6 +111,7 @@ export async function getAdminOverview() {
     cartera,
     mrrHistory,
     pendingRequests,
+    archivedExpiring,
     activity: (activity ?? []).map((a) => ({
       ...a,
       businessName: a.business_id ? (businessNameById.get(a.business_id) ?? "—") : "Plataforma",

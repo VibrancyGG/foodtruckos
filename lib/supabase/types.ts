@@ -976,6 +976,7 @@ export type Database = {
       }
       units: {
         Row: {
+          archive_warned_at: string | null
           archived_at: string | null
           brand_color: string | null
           business_id: string
@@ -992,6 +993,7 @@ export type Database = {
           type: string
         }
         Insert: {
+          archive_warned_at?: string | null
           archived_at?: string | null
           brand_color?: string | null
           business_id: string
@@ -1008,6 +1010,7 @@ export type Database = {
           type?: string
         }
         Update: {
+          archive_warned_at?: string | null
           archived_at?: string | null
           brand_color?: string | null
           business_id?: string

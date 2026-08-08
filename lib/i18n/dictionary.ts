@@ -525,6 +525,14 @@ export type Dictionary = {
     actionTruckRequestApproved: string
     actionTruckRequestRejected: string
     actionAdminViewedBusiness: string
+    actionArchiveWarningSent: string
+    archivedExpiryHeader: string
+    archivedExpiryHint: string
+    archivedOn: (date: string) => string
+    retentionOverdue: string
+    retentionMonthsLeft: (n: number) => string
+    archiveContactedBadge: string
+    archiveMarkContacted: string
   }
 }
 
@@ -1077,6 +1085,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionTruckRequestApproved: "Aprobó truck nuevo",
       actionTruckRequestRejected: "Rechazó truck nuevo",
       actionAdminViewedBusiness: "Vio el panel",
+      actionArchiveWarningSent: "Avisó por archivo próximo a vencer",
+      archivedExpiryHeader: "Archivo por vencer",
+      archivedExpiryHint: "Se conservan 2 años; contacta al cliente antes de que se cumpla el plazo. Nada se borra automáticamente.",
+      archivedOn: (date) => `Archivado el ${date}`,
+      retentionOverdue: "Ya cumplió los 2 años",
+      retentionMonthsLeft: (n) => `${n} mes${n === 1 ? "" : "es"} antes del corte`,
+      archiveContactedBadge: "Cliente contactado",
+      archiveMarkContacted: "Marcar contactado",
     },
   },
   en: {
@@ -1624,6 +1640,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionTruckRequestApproved: "Approved a new truck",
       actionTruckRequestRejected: "Rejected a new truck",
       actionAdminViewedBusiness: "Viewed the panel",
+      actionArchiveWarningSent: "Sent a heads-up about archive expiring",
+      archivedExpiryHeader: "Archive expiring soon",
+      archivedExpiryHint: "Kept for 2 years; contact the client before the deadline hits. Nothing is deleted automatically.",
+      archivedOn: (date) => `Archived on ${date}`,
+      retentionOverdue: "Already past 2 years",
+      retentionMonthsLeft: (n) => `${n} month${n === 1 ? "" : "s"} left`,
+      archiveContactedBadge: "Client contacted",
+      archiveMarkContacted: "Mark contacted",
     },
   },
 }

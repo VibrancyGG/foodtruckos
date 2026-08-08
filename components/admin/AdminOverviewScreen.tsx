@@ -5,6 +5,7 @@ import type { AdminOverview } from "@/lib/admin/getAdminOverview"
 import { BusinessRow } from "./BusinessRow"
 import { MrrTrendChart } from "./MrrTrendChart"
 import { PendingRequestRow } from "./PendingRequestRow"
+import { ArchiveExpiryRow } from "./ArchiveExpiryRow"
 
 const CARTERA_COLOR: Record<string, string> = {
   trial: "#1F5FBF",
@@ -13,7 +14,7 @@ const CARTERA_COLOR: Record<string, string> = {
   cancelled: "#71717a",
 }
 
-export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, pendingRequests, activity }: AdminOverview) {
+export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, pendingRequests, archivedExpiring, activity }: AdminOverview) {
   const { lang, t } = useLang()
   const a = t.admin
   const locale = lang === "es" ? "es-MX" : "en-US"
@@ -29,6 +30,7 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
     truck_request_approved: a.actionTruckRequestApproved,
     truck_request_rejected: a.actionTruckRequestRejected,
     admin_viewed_business: a.actionAdminViewedBusiness,
+    archive_warning_sent: a.actionArchiveWarningSent,
   }
   const STATUS_LABEL: Record<string, string> = {
     trial: a.statusTrial,
@@ -122,6 +124,18 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
           </div>
         )}
       </div>
+
+      {archivedExpiring.length > 0 && (
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+          <h2 className="mb-1 text-sm font-bold">{a.archivedExpiryHeader}</h2>
+          <p className="mb-3 text-xs text-neutral-500">{a.archivedExpiryHint}</p>
+          <div>
+            {archivedExpiring.map((u) => (
+              <ArchiveExpiryRow key={u.id} unit={u} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
         <h2 className="mb-3 text-sm font-bold">{a.recentActivity}</h2>
