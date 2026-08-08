@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { enqueueAction, drainQueue, pendingCount } from "@/lib/kitchen/offlineQueue"
+import { useWakeLock } from "@/lib/kitchen/useWakeLock"
 import { VentanillaForm } from "./VentanillaForm"
 import { DaySummaryModal } from "./DaySummaryModal"
 import { SoldOutScreen } from "./SoldOutScreen"
@@ -71,6 +72,8 @@ export function KitchenBoard({
   const [now, setNow] = useState(() => Date.now())
   const [soundOn, setSoundOn] = useState(true)
   const [activeTab, setActiveTab] = useState<Column>("recibido")
+
+  useWakeLock()
   const [todayCount, setTodayCount] = useState(0)
   const knownOrderIds = useRef<Set<string>>(new Set(initial.orders.map((o) => o.id)))
 
