@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
@@ -21,14 +21,66 @@ function monogram(name: string) {
   return words.length > 1 ? (words[0][0] + words[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase()
 }
 
+// Ninguna orden se pierde por mala conexión (regla de oro): el carrito se
+// guarda local antes de intentar enviarlo, para que perder la señal, recargar
+// sin querer o que el navegador libere memoria de fondo no borre el pedido a
+// medio armar. Se limpia solo cuando el pedido ya se confirmó con el servidor.
+const CART_STORAGE_VERSION = 1
+
+function cartStorageKey(orderPointId: string) {
+  return `foodtruckos:cart:${orderPointId}`
+}
+
+function loadStoredCart(orderPointId: string): { cart: CartLine[]; customerName: string } | null {
+  if (typeof window === "undefined") return null
+  try {
+    const raw = window.localStorage.getItem(cartStorageKey(orderPointId))
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (parsed.v !== CART_STORAGE_VERSION || !Array.isArray(parsed.cart)) return null
+    return { cart: parsed.cart, customerName: parsed.customerName ?? "" }
+  } catch {
+    return null
+  }
+}
+
 export function MenuClient({ data }: { data: ActiveMenuData }) {
   const { lang, setLang, t } = useLang()
   const router = useRouter()
+  const storageKey = cartStorageKey(data.orderPoint.id)
   const [cart, setCart] = useState<CartLine[]>([])
   const [customerName, setCustomerName] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
   const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
+  const [hydrated, setHydrated] = useState(false)
+
+  // El carrito guardado se restaura DESPUÉS de montar, nunca en el render
+  // inicial: leerlo durante useState/render produciría un HTML distinto al
+  // que ya mandó el servidor y rompería la hidratación de React.
+  useEffect(() => {
+    const stored = loadStoredCart(data.orderPoint.id)
+    if (stored) {
+      setCart(stored.cart)
+      setCustomerName(stored.customerName)
+    }
+    setHydrated(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo debe correr una vez, al montar
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    try {
+      if (cart.length === 0) {
+        window.localStorage.removeItem(storageKey)
+      } else {
+        window.localStorage.setItem(storageKey, JSON.stringify({ v: CART_STORAGE_VERSION, cart, customerName }))
+      }
+    } catch {
+      // Almacenamiento lleno o bloqueado (modo privado, etc.) — el carrito
+      // sigue funcionando en memoria, solo no sobrevive un cierre de pestaña.
+    }
+  }, [cart, customerName, storageKey, hydrated])
 
   const vibrante = data.business.menu_style !== "tradicional"
 
@@ -122,6 +174,11 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     if ("error" in result) {
       setSendError(true)
       return
+    }
+    try {
+      window.localStorage.removeItem(storageKey)
+    } catch {
+      // no pasa nada si no se pudo limpiar — el pedido ya se confirmó
     }
     router.push(`/orden/${result.orderId}`)
   }
