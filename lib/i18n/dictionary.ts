@@ -17,6 +17,8 @@ export type Dictionary = {
     customerNameLabel: string
     quantity: string
     notes: string
+    notesPlaceholder: string
+    photoComing: string
   }
   tracking: {
     title: string
@@ -86,6 +88,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       customerNameLabel: "Tu nombre (opcional)",
       quantity: "Cantidad",
       notes: "Notas para la cocina",
+      notesPlaceholder: "Ej: sin picante, para llevar",
+      photoComing: "Foto en camino",
     },
     tracking: {
       title: "Tu pedido",
@@ -165,6 +169,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       customerNameLabel: "Your name (optional)",
       quantity: "Quantity",
       notes: "Notes for the kitchen",
+      notesPlaceholder: "e.g. no spice, to go",
+      photoComing: "Photo coming",
     },
     tracking: {
       title: "Your order",

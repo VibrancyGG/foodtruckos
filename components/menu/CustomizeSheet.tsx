@@ -97,7 +97,35 @@ export function CustomizeSheet({
         className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl"
         style={{ background: "#FFFDF9", color: INK }}
       >
-        <div className="px-5 pb-4 pt-5" style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}>
+        <div
+          className="relative h-[150px] overflow-hidden"
+          style={{ background: "var(--brand-primary)" }}
+        >
+          {product.photo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.photo_url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,.12) 0 7px, transparent 7px 14px)" }}
+              />
+              <div
+                className="absolute inset-0 grid place-items-center"
+                style={{ fontFamily: "var(--font-display)", fontSize: 64, color: "var(--brand-on-primary)", opacity: 0.55 }}
+              >
+                {(lang === "es" ? product.name_es : product.name_en)[0]?.toUpperCase()}
+              </div>
+              <span
+                className="absolute left-3.5 top-3.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-white"
+                style={{ background: "rgba(0,0,0,.34)" }}
+              >
+                {t.menu.photoComing}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="px-5 pb-4 pt-4" style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}>
           <h2 className="uppercase leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: 24 }}>
             {lang === "es" ? product.name_es : product.name_en}
           </h2>
@@ -169,6 +197,7 @@ export function CustomizeSheet({
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
+            placeholder={t.menu.notesPlaceholder}
             className="w-full rounded-lg border-2 p-2.5 text-sm"
             style={{ borderColor: LINE, minHeight: 58 }}
           />
