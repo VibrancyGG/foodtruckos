@@ -4,6 +4,7 @@ import { useLang } from "@/lib/i18n/LangProvider"
 import type { AdminOverview } from "@/lib/admin/getAdminOverview"
 import { BusinessRow } from "./BusinessRow"
 import { MrrTrendChart } from "./MrrTrendChart"
+import { PendingRequestRow } from "./PendingRequestRow"
 
 const CARTERA_COLOR: Record<string, string> = {
   trial: "#1F5FBF",
@@ -12,7 +13,7 @@ const CARTERA_COLOR: Record<string, string> = {
   cancelled: "#71717a",
 }
 
-export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, activity }: AdminOverview) {
+export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, pendingRequests, activity }: AdminOverview) {
   const { lang, t } = useLang()
   const a = t.admin
   const locale = lang === "es" ? "es-MX" : "en-US"
@@ -25,6 +26,9 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
     unit_reactivated: a.actionUnitReactivated,
     business_suspended: a.actionBusinessSuspended,
     business_reactivated: a.actionBusinessReactivated,
+    truck_request_approved: a.actionTruckRequestApproved,
+    truck_request_rejected: a.actionTruckRequestRejected,
+    admin_viewed_business: a.actionAdminViewedBusiness,
   }
   const STATUS_LABEL: Record<string, string> = {
     trial: a.statusTrial,
@@ -104,6 +108,19 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+        <h2 className="mb-3 text-sm font-bold">{a.pendingRequestsHeader}</h2>
+        {pendingRequests.length === 0 ? (
+          <p className="text-sm text-neutral-500">{a.noPendingRequests}</p>
+        ) : (
+          <div>
+            {pendingRequests.map((r) => (
+              <PendingRequestRow key={r.id} request={r} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">

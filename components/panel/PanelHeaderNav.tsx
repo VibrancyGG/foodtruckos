@@ -18,16 +18,28 @@ export function PanelHeaderNav({
   businessName,
   showNav,
   logoutAction,
+  impersonating,
+  stopImpersonationAction,
 }: {
   businessName: string
   showNav: boolean
   logoutAction: () => Promise<void>
+  impersonating?: boolean
+  stopImpersonationAction?: () => Promise<void>
 }) {
   const { lang, setLang, t } = useLang()
   const pathname = usePathname()
 
   return (
     <header className="bg-neutral-900 text-white">
+      {impersonating && stopImpersonationAction && (
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-amber-500 px-4 py-1.5 text-xs font-bold text-amber-950">
+          <span>{t.panel.nav.impersonatingBanner(businessName)}</span>
+          <form action={stopImpersonationAction}>
+            <button className="underline">{t.panel.nav.exitImpersonation}</button>
+          </form>
+        </div>
+      )}
       <div className="flex items-center justify-between px-4 py-3">
         <span className="text-sm font-bold">{businessName}</span>
         <div className="flex items-center gap-3">

@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
 import { monthlyTotal } from "@/lib/billing/pricing"
-import { slugify } from "@/lib/utils/slugify"
 
 function monthsBetween(a: Date, b: Date) {
   return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth())
@@ -9,17 +8,20 @@ function monthsBetween(a: Date, b: Date) {
 export async function getAdminOverview() {
   const supabase = await createClient()
 
-  const [{ data: businesses }, { data: units }, { data: orderPoints }] = await Promise.all([
+  const [{ data: businesses }, { data: units }, { data: requests }] = await Promise.all([
     supabase
       .from("businesses")
       .select("id, name, slug, subscription_status, billing_mode, created_at")
       .order("created_at", { ascending: false }),
     supabase.from("units").select("id, business_id, name, status, created_at, archived_at"),
-    supabase.from("order_points").select("unit_id, qr_slug, active").eq("active", true),
+    supabase
+      .from("truck_requests")
+      .select("id, business_id, note, created_at")
+      .eq("status", "pending")
+      .order("created_at"),
   ])
 
   const unitList = units ?? []
-  const opList = orderPoints ?? []
 
   const rows = (businesses ?? []).map((b) => {
     const activeTrucks = unitList.filter((u) => u.business_id === b.id && u.status !== "archived").length
@@ -61,19 +63,12 @@ export async function getAdminOverview() {
     return { monthsAgo, total: monthsAgo === 0 ? mrr : total }
   })
 
-  // "Abrir": el primer truck activo con un QR activo — el enlace real al
-  // menú que ve el comensal, no un panel administrativo aparte.
-  const openLinks = new Map<string, string>()
-  for (const b of rows) {
-    const businessUnits = unitList.filter((u) => u.business_id === b.id && u.status !== "archived")
-    for (const u of businessUnits) {
-      const op = opList.find((o) => o.unit_id === u.id)
-      if (op) {
-        openLinks.set(b.id, `/${b.slug}/${slugify(u.name)}/${op.qr_slug}`)
-        break
-      }
-    }
-  }
+  const businessNameByIdForRequests = new Map(rows.map((r) => [r.id, r.name]))
+  const pendingRequests = (requests ?? []).map((r) => ({
+    ...r,
+    businessName: businessNameByIdForRequests.get(r.business_id) ?? "—",
+    currentTrucks: unitList.filter((u) => u.business_id === r.business_id && u.status !== "archived").length,
+  }))
 
   const { data: activity } = await supabase
     .from("audit_log")
@@ -84,13 +79,14 @@ export async function getAdminOverview() {
   const businessNameById = new Map(rows.map((r) => [r.id, r.name]))
 
   return {
-    businesses: rows.map((r) => ({ ...r, openUrl: openLinks.get(r.id) ?? null })),
+    businesses: rows,
     mrr,
     trucksBilled,
     avgTenureMonths,
     perClientAvg,
     cartera,
     mrrHistory,
+    pendingRequests,
     activity: (activity ?? []).map((a) => ({
       ...a,
       businessName: a.business_id ? (businessNameById.get(a.business_id) ?? "—") : "Plataforma",

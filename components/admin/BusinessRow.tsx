@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { suspendBusiness, reactivateBusiness } from "@/lib/admin/actions"
+import { startImpersonation } from "@/lib/admin/impersonate"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { AdminOverview } from "@/lib/admin/getAdminOverview"
 
@@ -44,19 +45,16 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
       </td>
       <td className="py-2.5 text-right">
         <div className="flex justify-end gap-1.5">
-          {business.subscription_status === "suspended" || !business.openUrl ? (
+          {business.subscription_status === "suspended" ? (
             <span className="cursor-not-allowed rounded-lg border border-neutral-800 px-2.5 py-1 text-xs font-bold text-neutral-600" title={a.openDisabled}>
               {a.openLink}
             </span>
           ) : (
-            <a
-              href={business.openUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-neutral-500"
-            >
-              {a.openLink}
-            </a>
+            <form action={startImpersonation.bind(null, business.id)}>
+              <button className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-neutral-500">
+                {a.openLink}
+              </button>
+            </form>
           )}
           {business.subscription_status === "suspended" ? (
             <button

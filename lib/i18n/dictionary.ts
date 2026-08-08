@@ -156,6 +156,8 @@ export type Dictionary = {
       qr: string
       cuenta: string
       logout: string
+      impersonatingBanner: (businessName: string) => string
+      exitImpersonation: string
     }
     sinAccesoTitle: string
     sinAccesoBody: string
@@ -260,6 +262,17 @@ export type Dictionary = {
       pauseDurRestOfDay: string
       pauseConfirm: string
       pauseReasonLabel: (reason: string) => string
+      requestTruckButton: string
+      requestPending: (date: string) => string
+      requestTruckTitle: string
+      requestTruckBody: string
+      requestTruckPriceLabel: string
+      requestTruckPricePreview: (trucks: number, price: number) => string
+      requestTruckBillingNote: string
+      requestTruckNoteLabel: string
+      requestTruckNotePlaceholder: string
+      requestTruckCancel: string
+      requestTruckSubmit: string
     }
     marcaPage: {
       title: string
@@ -456,6 +469,15 @@ export type Dictionary = {
     openDisabled: string
     payManual: string
     payStripe: string
+    pendingRequestsHeader: string
+    noPendingRequests: string
+    requestApprove: string
+    requestReject: string
+    requestedOn: (date: string) => string
+    currentTrucksLabel: (n: number) => string
+    actionTruckRequestApproved: string
+    actionTruckRequestRejected: string
+    actionAdminViewedBusiness: string
   }
 }
 
@@ -636,6 +658,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         qr: "Códigos QR",
         cuenta: "Cuenta",
         logout: "Cerrar sesión",
+        impersonatingBanner: (businessName) => `Estás viendo el panel de ${businessName} como administrador`,
+        exitImpersonation: "Salir",
       },
       sinAccesoTitle: "Todavía no tenemos tu cuenta vinculada",
       sinAccesoBody: "Escríbenos a soporte para que te demos acceso al panel de tu negocio.",
@@ -743,6 +767,17 @@ export const dictionary: Record<Lang, Dictionary> = {
         pauseDurRestOfDay: "El resto del día",
         pauseConfirm: "Pausar ahora",
         pauseReasonLabel: (reason) => `Motivo: ${reason}`,
+        requestTruckButton: "Pedir un truck nuevo",
+        requestPending: (date) => `Ya pediste un truck nuevo el ${date} — en revisión.`,
+        requestTruckTitle: "Pedir un truck nuevo",
+        requestTruckBody: "Te contactamos para confirmar dónde va a estar y sus horarios. Lo dejamos listo con tu menú, tu marca y su QR para imprimir.",
+        requestTruckPriceLabel: "Con este truck, tu plan sería",
+        requestTruckPricePreview: (trucks, price) => `${trucks} trucks · $${price} por truck`,
+        requestTruckBillingNote: "Se cobra el mes completo desde hoy, sin prorrateo.",
+        requestTruckNoteLabel: "¿Algo que debamos saber? (opcional)",
+        requestTruckNotePlaceholder: "Ubicación, horario, lo que sea útil",
+        requestTruckCancel: "Cancelar",
+        requestTruckSubmit: "Enviar solicitud",
       },
       marcaPage: {
         title: "Marca",
@@ -939,6 +974,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       openDisabled: "Suspendido — reactívalo para verlo",
       payManual: "Manual",
       payStripe: "Stripe",
+      pendingRequestsHeader: "Solicitudes pendientes",
+      noPendingRequests: "Nada pendiente.",
+      requestApprove: "Aprobar y dar de alta",
+      requestReject: "Descartar",
+      requestedOn: (date) => `Pedido el ${date}`,
+      currentTrucksLabel: (n) => `${n} truck${n === 1 ? "" : "s"} activos`,
+      actionTruckRequestApproved: "Aprobó truck nuevo",
+      actionTruckRequestRejected: "Rechazó truck nuevo",
+      actionAdminViewedBusiness: "Vio el panel",
     },
   },
   en: {
@@ -1114,6 +1158,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         qr: "QR codes",
         cuenta: "Account",
         logout: "Log out",
+        impersonatingBanner: (businessName) => `You're viewing ${businessName}'s panel as an admin`,
+        exitImpersonation: "Exit",
       },
       sinAccesoTitle: "We haven't linked your account yet",
       sinAccesoBody: "Email support so we can give you access to your business panel.",
@@ -1221,6 +1267,17 @@ export const dictionary: Record<Lang, Dictionary> = {
         pauseDurRestOfDay: "The rest of the day",
         pauseConfirm: "Pause now",
         pauseReasonLabel: (reason) => `Reason: ${reason}`,
+        requestTruckButton: "Request a new truck",
+        requestPending: (date) => `You requested a new truck on ${date} — under review.`,
+        requestTruckTitle: "Request a new truck",
+        requestTruckBody: "We'll contact you to confirm where it'll be and its hours. We'll set it up with your menu, your brand, and a QR ready to print.",
+        requestTruckPriceLabel: "With this truck, your plan would be",
+        requestTruckPricePreview: (trucks, price) => `${trucks} trucks · $${price} per truck`,
+        requestTruckBillingNote: "Charged for the full month starting today, no proration.",
+        requestTruckNoteLabel: "Anything we should know? (optional)",
+        requestTruckNotePlaceholder: "Location, hours, anything useful",
+        requestTruckCancel: "Cancel",
+        requestTruckSubmit: "Send request",
       },
       marcaPage: {
         title: "Brand",
@@ -1417,6 +1474,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       openDisabled: "Suspended — reactivate it to view",
       payManual: "Manual",
       payStripe: "Stripe",
+      pendingRequestsHeader: "Pending requests",
+      noPendingRequests: "Nothing pending.",
+      requestApprove: "Approve and activate",
+      requestReject: "Dismiss",
+      requestedOn: (date) => `Requested on ${date}`,
+      currentTrucksLabel: (n) => `${n} active truck${n === 1 ? "" : "s"}`,
+      actionTruckRequestApproved: "Approved a new truck",
+      actionTruckRequestRejected: "Rejected a new truck",
+      actionAdminViewedBusiness: "Viewed the panel",
     },
   },
 }

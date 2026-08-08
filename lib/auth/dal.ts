@@ -1,6 +1,9 @@
 import "server-only"
 import { cache } from "react"
+import { cookies } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
+
+export const ADMIN_VIEW_COOKIE = "ft_admin_view"
 
 // Capa de conveniencia DELANTE de RLS, nunca un sustituto (foodtruckos-datos
 // Regla 1): toda pantalla/Server Action del panel llama esto para saber quién
@@ -13,7 +16,7 @@ export const getOwnerContext = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return { user: null, businessId: null } as const
+  if (!user) return { user: null, businessId: null, business: null, impersonating: false } as const
 
   const { data: membership } = await supabase
     .from("business_members")
@@ -21,11 +24,40 @@ export const getOwnerContext = cache(async () => {
     .eq("auth_user_id", user.id)
     .maybeSingle()
 
-  if (!membership) return { user, businessId: null, business: null } as const
+  if (membership) {
+    return {
+      user,
+      businessId: membership.business_id,
+      business: membership.businesses,
+      impersonating: false,
+    } as const
+  }
 
-  return {
-    user,
-    businessId: membership.business_id,
-    business: membership.businesses,
-  } as const
+  // Sin membresía propia: si es admin de plataforma y trae la cookie de "ver
+  // como", le mostramos el panel de ese negocio — es lo que hace real el
+  // botón "Abrir" en Admin interno. La barrera de seguridad de verdad es RLS
+  // (is_platform_admin() ya está en las políticas de escritura/lectura); esta
+  // cookie solo decide qué negocio mostrar, nunca amplía permisos por sí sola.
+  const store = await cookies()
+  const viewingId = store.get(ADMIN_VIEW_COOKIE)?.value
+  if (viewingId) {
+    const { data: isAdmin } = await supabase.rpc("is_platform_admin")
+    if (isAdmin) {
+      const { data: business } = await supabase
+        .from("businesses")
+        .select("id, name, slug")
+        .eq("id", viewingId)
+        .maybeSingle()
+      if (business) {
+        return {
+          user,
+          businessId: business.id,
+          business: { name: business.name, slug: business.slug },
+          impersonating: true,
+        } as const
+      }
+    }
+  }
+
+  return { user, businessId: null, business: null, impersonating: false } as const
 })
