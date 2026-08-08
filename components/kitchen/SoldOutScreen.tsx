@@ -164,13 +164,10 @@ function ToggleSwitch({ checked, onChange, label }: { checked: boolean; onChange
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className="relative h-[34px] w-[58px] flex-none rounded-full"
+      className={`inline-flex h-[34px] w-[58px] flex-none shrink-0 items-center rounded-full p-1 ${checked ? "justify-end" : "justify-start"}`}
       style={{ background: checked ? "#30A46C" : "#4A443C" }}
     >
-      <i
-        className="absolute top-1 h-[26px] w-[26px] rounded-full bg-white transition-transform"
-        style={{ transform: checked ? "translateX(28px)" : "translateX(4px)" }}
-      />
+      <i className="h-[26px] w-[26px] flex-none rounded-full bg-white" />
     </button>
   )
 }

@@ -11,7 +11,6 @@ export async function updateUnit(input: {
   unitId: string
   name: string
   location: string
-  kitchenAlertMinutes: number
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
@@ -20,8 +19,58 @@ export async function updateUnit(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("units")
-    .update({ name: input.name, location: input.location.trim() || null, kitchen_alert_minutes: input.kitchenAlertMinutes })
+    .update({ name: input.name, location: input.location.trim() || null })
     .eq("id", input.unitId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
+  revalidatePath("/panel/trucks")
+  return { ok: true }
+}
+
+// Umbrales de aviso en cocina (ámbar/rojo), compartidos por default y con
+// posibilidad de anularlos por truck (setUnitAlertThresholds). Viven en el
+// negocio, no en cada unidad, para que "para los tres" sea de verdad un solo
+// ajuste — igual que el impuesto.
+export async function updateSharedAlertThresholds(amberMinutes: number, redMinutes: number): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (!(amberMinutes >= 1) || !(redMinutes > amberMinutes)) {
+    return { ok: false, error: "El rojo debe ser mayor que el ámbar" }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("businesses")
+    .update({ default_alert_amber_minutes: amberMinutes, default_alert_red_minutes: redMinutes })
+    .eq("id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
+  revalidatePath("/panel/trucks")
+  return { ok: true }
+}
+
+// null/null = "usa los del negocio" (hereda el default en cada lectura,
+// nunca se copia un valor fijo que luego quede desincronizado si el dueño
+// cambia el default compartido).
+export async function setUnitAlertThresholds(
+  unitId: string,
+  thresholds: { amberMinutes: number; redMinutes: number } | null,
+): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (thresholds && !(thresholds.amberMinutes >= 1 && thresholds.redMinutes > thresholds.amberMinutes)) {
+    return { ok: false, error: "El rojo debe ser mayor que el ámbar" }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("units")
+    .update({
+      alert_amber_minutes: thresholds?.amberMinutes ?? null,
+      alert_red_minutes: thresholds?.redMinutes ?? null,
+    })
+    .eq("id", unitId)
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }
@@ -195,4 +244,20 @@ export async function uploadUnitPhoto(unitId: string, formData: FormData): Promi
 
   revalidatePath("/panel/trucks")
   return { ok: true, publicUrl }
+}
+
+export async function removeUnitPhoto(unitId: string): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("units")
+    .update({ photo_url: null })
+    .eq("id", unitId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo quitar la foto" }
+  revalidatePath("/panel/trucks")
+  return { ok: true }
 }

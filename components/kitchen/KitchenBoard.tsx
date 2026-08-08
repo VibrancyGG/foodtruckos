@@ -45,7 +45,8 @@ export function KitchenBoard({
   businessId,
   unitName,
   staffName,
-  alertMinutes,
+  amberMinutes,
+  redMinutes,
   taxIncluded,
   initial,
 }: {
@@ -53,7 +54,8 @@ export function KitchenBoard({
   businessId: string
   unitName: string
   staffName: string
-  alertMinutes: number
+  amberMinutes: number
+  redMinutes: number
   taxIncluded: boolean
   initial: KitchenData
 }) {
@@ -198,8 +200,8 @@ export function KitchenBoard({
   function level(order: (typeof orders)[number], col: Column): "green" | "red" | "amber" | "nueva" | "" {
     if (col === "listo") return "green"
     const min = (now - new Date(order.created_at).getTime()) / 60000
-    const amber = alertMinutes
-    const red = alertMinutes * 2
+    const amber = amberMinutes
+    const red = redMinutes
     if (col === "recibido") {
       const nuevaA = Math.max(1, Math.round(amber / 2))
       const nuevaR = Math.max(2, Math.round(red / 2))

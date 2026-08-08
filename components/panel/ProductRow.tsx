@@ -88,11 +88,9 @@ export function ProductRow({
           aria-label={m.soldOut}
           disabled={pending}
           onClick={onToggleSoldOut}
-          className={`relative h-[26px] w-[44px] flex-none rounded-full transition-colors ${soldOut ? "bg-neutral-300" : "bg-green-600"}`}
+          className={`inline-flex h-[26px] w-[44px] flex-none shrink-0 items-center rounded-full p-0.5 transition-colors ${soldOut ? "justify-start bg-neutral-300" : "justify-end bg-green-600"}`}
         >
-          <span
-            className={`absolute top-0.5 h-[20px] w-[20px] rounded-full bg-white shadow transition-transform ${soldOut ? "translate-x-0.5" : "translate-x-[21px]"}`}
-          />
+          <span className="h-5 w-5 flex-none rounded-full bg-white shadow" />
         </button>
         <button onClick={openEdit} className="rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-bold text-neutral-700">
           {t.panel.common.edit}

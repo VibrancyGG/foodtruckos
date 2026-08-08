@@ -175,6 +175,8 @@ export type Database = {
           brand_motif: string
           cover_photo_url: string | null
           created_at: string
+          default_alert_amber_minutes: number
+          default_alert_red_minutes: number
           id: string
           logo_url: string | null
           menu_style: string
@@ -189,6 +191,8 @@ export type Database = {
           brand_motif?: string
           cover_photo_url?: string | null
           created_at?: string
+          default_alert_amber_minutes?: number
+          default_alert_red_minutes?: number
           id?: string
           logo_url?: string | null
           menu_style?: string
@@ -203,6 +207,8 @@ export type Database = {
           brand_motif?: string
           cover_photo_url?: string | null
           created_at?: string
+          default_alert_amber_minutes?: number
+          default_alert_red_minutes?: number
           id?: string
           logo_url?: string | null
           menu_style?: string
@@ -976,6 +982,8 @@ export type Database = {
       }
       units: {
         Row: {
+          alert_amber_minutes: number | null
+          alert_red_minutes: number | null
           archive_warned_at: string | null
           archived_at: string | null
           brand_color: string | null
@@ -983,7 +991,6 @@ export type Database = {
           created_at: string
           hours: Json
           id: string
-          kitchen_alert_minutes: number
           location: string | null
           name: string
           pause_reason: string | null
@@ -993,6 +1000,8 @@ export type Database = {
           type: string
         }
         Insert: {
+          alert_amber_minutes?: number | null
+          alert_red_minutes?: number | null
           archive_warned_at?: string | null
           archived_at?: string | null
           brand_color?: string | null
@@ -1000,7 +1009,6 @@ export type Database = {
           created_at?: string
           hours?: Json
           id?: string
-          kitchen_alert_minutes?: number
           location?: string | null
           name: string
           pause_reason?: string | null
@@ -1010,6 +1018,8 @@ export type Database = {
           type?: string
         }
         Update: {
+          alert_amber_minutes?: number | null
+          alert_red_minutes?: number | null
           archive_warned_at?: string | null
           archived_at?: string | null
           brand_color?: string | null
@@ -1017,7 +1027,6 @@ export type Database = {
           created_at?: string
           hours?: Json
           id?: string
-          kitchen_alert_minutes?: number
           location?: string | null
           name?: string
           pause_reason?: string | null

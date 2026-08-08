@@ -233,26 +233,14 @@ export type Dictionary = {
       contactUs: string
       showArchived: string
       hideArchived: string
-      alertLabel: string
       minSuffix: string
-      publishedHours: string
-      publishedHoursHint: string
-      openLabel: string
-      toLabel: string
-      saveHours: string
-      hoursSaved: string
       reopenNow: string
       pause: string
-      pause1h: string
-      pause3h: string
-      pauseManual: string
       pausedBadge: string
       openBadge: string
       reopens: (when: string) => string
       untilManualReopen: string
       archiveTruck: string
-      confirmArchiveText: string
-      yesArchive: string
       archivedOn: (date: string) => string
       reactivate: string
       locationPlaceholder: string
@@ -262,8 +250,49 @@ export type Dictionary = {
       taxAddHint: string
       taxIncluded: string
       taxIncludedHint: string
-      sharedSettingsTitle: string
+      sharedSettingsTitle: (n: number) => string
       sharedSettingsHint: string
+      alertThresholdsLabel: string
+      amberLabel: string
+      redLabel: string
+      alertTipWithData: (avg: number, amber: number, red: number) => string
+      alertTipNoData: (amber: number, red: number) => string
+      horarioLabel: string
+      kitchenAlertsLabel: string
+      ownAlertsTag: string
+      businessAlertsTag: string
+      closedAllWeek: string
+      editNamePhoto: string
+      changeHours: string
+      setOwnAlerts: string
+      removeOwnAlerts: string
+      viewQr: string
+      editTruckHint: string
+      photoLabelTruck: string
+      choosePhoto: string
+      changePhoto: string
+      removePhoto: string
+      photoHintTruck: string
+      nameQuestion: string
+      locationQuestion: string
+      nameRequired: string
+      hoursModalTitle: (name: string) => string
+      hoursModalHint: string
+      applyToAllDays: string
+      applyToAllNeedsOne: string
+      wouldBeLabel: string
+      saveSchedule: string
+      invalidHoursRange: string
+      closedDay: string
+      ownAlertsModalTitle: (name: string) => string
+      ownAlertsModalHint: (amber: number, red: number) => string
+      onlyForLabel: (name: string) => string
+      saveOwnAlerts: string
+      archiveModalTitle: (name: string) => string
+      archiveModalBody: string
+      archiveModalBilling: string
+      confirmArchiveText: string
+      yesArchive: string
       pauseModalTitle: (name: string) => string
       pauseModalExplain: string
       pausePreviewLabel: string
@@ -287,6 +316,7 @@ export type Dictionary = {
       requestTruckBody: string
       requestTruckPriceLabel: string
       requestTruckPricePreview: (trucks: number, price: number) => string
+      requestTruckTotalPreview: (total: number) => string
       requestTruckBillingNote: string
       requestTruckNoteLabel: string
       requestTruckNotePlaceholder: string
@@ -787,32 +817,20 @@ export const dictionary: Record<Lang, Dictionary> = {
         noTrucksExclusiveYet: "Este truck no tiene platillos propios todavía.",
       },
       trucksPage: {
-        title: "Trucks",
-        subtitle: "Pausar cierra el pedido por QR temporalmente y reabre solo. Archivar da de baja sin borrar nada.",
+        title: "Tus trucks",
+        subtitle: "Aquí pausas el servicio cuando se acaba el gas o cambias de turno, ajustas horarios, y decides a partir de cuántos minutos una orden se marca como atrasada en la pantalla de cocina.",
         newTruckNote: "Alta de un truck nuevo: en esta fase la hacemos nosotros a mano, para confirmar ubicación y horarios contigo.",
         contactUs: "Escríbenos",
         showArchived: "Ver",
         hideArchived: "Ocultar",
-        alertLabel: "Avisar en cocina si no hay actividad por",
-        minSuffix: "min",
-        publishedHours: "Horario publicado",
-        publishedHoursHint: "— de aquí sale “abrió tarde” en Resumen",
-        openLabel: "abierto",
-        toLabel: "a",
-        saveHours: "Guardar horario",
-        hoursSaved: "Guardado ✓",
+        minSuffix: "minutos",
         reopenNow: "Reabrir ahora",
-        pause: "Pausar",
-        pause1h: "1 hora",
-        pause3h: "3 horas",
-        pauseManual: "Hasta que reabra a mano",
-        pausedBadge: "Pausado",
+        pause: "Pausar servicio",
+        pausedBadge: "En pausa",
         openBadge: "Abierto",
         reopens: (when) => `Reabre ${when}`,
         untilManualReopen: "Hasta que reabras a mano",
-        archiveTruck: "Archivar truck",
-        confirmArchiveText: "Se archiva, no se borra. ¿Seguro?",
-        yesArchive: "Sí, archivar",
+        archiveTruck: "Dar de baja",
         archivedOn: (date) => `Archivado ${date}`,
         reactivate: "Reactivar",
         locationPlaceholder: "¿Dónde se para normalmente? (opcional)",
@@ -822,8 +840,52 @@ export const dictionary: Record<Lang, Dictionary> = {
         taxAddHint: "El menú muestra el precio y al final se suma el impuesto.",
         taxIncluded: "Ya viene incluido",
         taxIncludedHint: "Lo que ve en el menú es lo que paga. Sin sorpresas al final.",
-        sharedSettingsTitle: "Ajustes para todos tus trucks",
-        sharedSettingsHint: "El impuesto vale para todo el negocio. Cada truck lleva su propio umbral de aviso en cocina.",
+        sharedSettingsTitle: (n) => `Ajustes para los ${n}`,
+        sharedSettingsHint: "Valen para todo el negocio. Cualquier truck puede llevar los suyos si lo necesita.",
+        alertThresholdsLabel: "Cuándo avisar que una orden se está tardando",
+        amberLabel: "Ámbar",
+        redLabel: "Rojo",
+        alertTipWithData: (avg, amber, red) =>
+          `Tu promedio real de los últimos 30 días es de ${avg} minutos por orden. Con estos números, una orden se pone ámbar a los ${amber} y roja a los ${red}. Si los pones muy bajos, todo se ve rojo y el aviso deja de servir.`,
+        alertTipNoData: (amber, red) =>
+          `Todavía no hay suficientes pedidos completados para calcular tu promedio real. Con estos números, una orden se pone ámbar a los ${amber} y roja a los ${red}.`,
+        horarioLabel: "Horario",
+        kitchenAlertsLabel: "Avisos de cocina",
+        ownAlertsTag: "propios",
+        businessAlertsTag: "los del negocio",
+        closedAllWeek: "Cerrado toda la semana",
+        editNamePhoto: "Nombre y foto",
+        changeHours: "Cambiar horario",
+        setOwnAlerts: "Poner avisos propios",
+        removeOwnAlerts: "Quitar avisos propios",
+        viewQr: "Ver su QR",
+        editTruckHint: "Esto es lo que ve tu cliente al escanear el código de este truck.",
+        photoLabelTruck: "Foto del truck",
+        choosePhoto: "Elegir foto",
+        changePhoto: "Cambiar foto",
+        removePhoto: "Quitar",
+        photoHintTruck: "Una foto del truck como se ve por fuera. Sirve para que el cliente confirme que está en el correcto.",
+        nameQuestion: "¿Cómo le dices a este truck?",
+        locationQuestion: "¿Dónde se para normalmente?",
+        nameRequired: "El truck necesita un nombre",
+        hoursModalTitle: (name) => `Horario de ${name}`,
+        hoursModalHint: "Fuera de este horario tu menú avisa que están cerrados. Si un día no abres, apágalo.",
+        applyToAllDays: "Poner este horario todos los días",
+        applyToAllNeedsOne: "Enciende al menos un día primero",
+        wouldBeLabel: "Quedaría:",
+        saveSchedule: "Guardar horario",
+        invalidHoursRange: "Revisa: hay días donde la hora de cierre no va después de la de apertura",
+        closedDay: "Cerrado",
+        ownAlertsModalTitle: (name) => `Avisos propios de ${name}`,
+        ownAlertsModalHint: (amber, red) =>
+          `Úsalo si este truck vende algo que tarda distinto, o si tiene mucha más fila que los otros. Ahora mismo usa los del negocio: ${amber} y ${red} minutos.`,
+        onlyForLabel: (name) => `Solo para ${name}`,
+        saveOwnAlerts: "Guardar",
+        archiveModalTitle: (name) => `¿Dar de baja ${name}?`,
+        archiveModalBody: "Deja de recibir pedidos y su código QR deja de servir. Su información no se borra: sus ventas siguen apareciendo en tus comparaciones, incluso las del año pasado. Lo guardamos dos años por si lo quieres reactivar — y reactivarlo toma minutos, no un alta nueva.",
+        archiveModalBilling: "Dejas de pagarlo desde el siguiente periodo. Este mes ya está cubierto.",
+        confirmArchiveText: "Se archiva, no se borra. ¿Seguro?",
+        yesArchive: "Sí, dar de baja",
         pauseModalTitle: (name) => `Pausar ${name}`,
         pauseModalExplain: "Deja de recibir pedidos y se reabre solo. Tus clientes van a ver esto:",
         pausePreviewLabel: "Lo que ve tu cliente",
@@ -847,7 +909,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         requestTruckBody: "Te contactamos para confirmar dónde va a estar y sus horarios. Lo dejamos listo con tu menú, tu marca y su QR para imprimir.",
         requestTruckPriceLabel: "Con este truck, tu plan sería",
         requestTruckPricePreview: (trucks, price) => `${trucks} trucks · $${price} por truck`,
-        requestTruckBillingNote: "Se cobra el mes completo desde hoy, sin prorrateo.",
+        requestTruckTotalPreview: (total) => `$${total} al mes en total`,
+        requestTruckBillingNote: "Al aprobarlo, tu truck queda activo de inmediato y se cobra el mes completo ese mismo momento — sin importar el día en que lo pidas, nunca prorrateado.",
         requestTruckNoteLabel: "¿Algo que debamos saber? (opcional)",
         requestTruckNotePlaceholder: "Ubicación, horario, lo que sea útil",
         requestTruckCancel: "Cancelar",
@@ -1342,32 +1405,20 @@ export const dictionary: Record<Lang, Dictionary> = {
         noTrucksExclusiveYet: "This truck doesn't have its own items yet.",
       },
       trucksPage: {
-        title: "Trucks",
-        subtitle: "Pausing closes QR ordering temporarily and reopens on its own. Archiving retires it without deleting anything.",
+        title: "Your trucks",
+        subtitle: "Pause service here when you run out of gas or switch shifts, adjust hours, and decide after how many minutes an order gets flagged as late on the kitchen screen.",
         newTruckNote: "Adding a new truck: right now we do it by hand, to confirm location and hours with you.",
         contactUs: "Email us",
         showArchived: "Show",
         hideArchived: "Hide",
-        alertLabel: "Alert the kitchen if there's no activity for",
-        minSuffix: "min",
-        publishedHours: "Published hours",
-        publishedHoursHint: "— this is what “opened late” in Summary is based on",
-        openLabel: "open",
-        toLabel: "to",
-        saveHours: "Save hours",
-        hoursSaved: "Saved ✓",
+        minSuffix: "minutes",
         reopenNow: "Reopen now",
-        pause: "Pause",
-        pause1h: "1 hour",
-        pause3h: "3 hours",
-        pauseManual: "Until reopened by hand",
+        pause: "Pause service",
         pausedBadge: "Paused",
         openBadge: "Open",
         reopens: (when) => `Reopens ${when}`,
         untilManualReopen: "Until you reopen it by hand",
-        archiveTruck: "Archive truck",
-        confirmArchiveText: "This archives it, doesn't delete it. Sure?",
-        yesArchive: "Yes, archive",
+        archiveTruck: "Retire truck",
         archivedOn: (date) => `Archived ${date}`,
         reactivate: "Reactivate",
         locationPlaceholder: "Where does it usually park? (optional)",
@@ -1377,8 +1428,52 @@ export const dictionary: Record<Lang, Dictionary> = {
         taxAddHint: "The menu shows the price and tax is added at the end.",
         taxIncluded: "Already included",
         taxIncludedHint: "What they see on the menu is what they pay. No surprises at the end.",
-        sharedSettingsTitle: "Settings for all your trucks",
-        sharedSettingsHint: "Tax applies to the whole business. Each truck keeps its own kitchen alert threshold.",
+        sharedSettingsTitle: (n) => `Settings for all ${n}`,
+        sharedSettingsHint: "Applies to the whole business. Any truck can use its own if it needs to.",
+        alertThresholdsLabel: "When to flag that an order is taking too long",
+        amberLabel: "Amber",
+        redLabel: "Red",
+        alertTipWithData: (avg, amber, red) =>
+          `Your real average over the last 30 days is ${avg} minutes per order. With these numbers, an order turns amber at ${amber} and red at ${red}. Set them too low and everything looks red — the alert stops being useful.`,
+        alertTipNoData: (amber, red) =>
+          `There aren't enough completed orders yet to calculate your real average. With these numbers, an order turns amber at ${amber} and red at ${red}.`,
+        horarioLabel: "Hours",
+        kitchenAlertsLabel: "Kitchen alerts",
+        ownAlertsTag: "own",
+        businessAlertsTag: "the business's",
+        closedAllWeek: "Closed all week",
+        editNamePhoto: "Name and photo",
+        changeHours: "Change hours",
+        setOwnAlerts: "Set own alerts",
+        removeOwnAlerts: "Remove own alerts",
+        viewQr: "View its QR",
+        editTruckHint: "This is what your customer sees when they scan this truck's code.",
+        photoLabelTruck: "Truck photo",
+        choosePhoto: "Choose photo",
+        changePhoto: "Change photo",
+        removePhoto: "Remove",
+        photoHintTruck: "A photo of the truck as it looks from outside. Helps the customer confirm they're at the right one.",
+        nameQuestion: "What do you call this truck?",
+        locationQuestion: "Where does it usually park?",
+        nameRequired: "The truck needs a name",
+        hoursModalTitle: (name) => `Hours for ${name}`,
+        hoursModalHint: "Outside these hours your menu shows as closed. If you don't open some day, turn it off.",
+        applyToAllDays: "Use these hours every day",
+        applyToAllNeedsOne: "Turn on at least one day first",
+        wouldBeLabel: "This would read:",
+        saveSchedule: "Save hours",
+        invalidHoursRange: "Check: some days have a closing time that isn't after the opening time",
+        closedDay: "Closed",
+        ownAlertsModalTitle: (name) => `Own alerts for ${name}`,
+        ownAlertsModalHint: (amber, red) =>
+          `Use this if this truck sells something that takes different timing, or has a much longer line than the others. Right now it uses the business's: ${amber} and ${red} minutes.`,
+        onlyForLabel: (name) => `Only for ${name}`,
+        saveOwnAlerts: "Save",
+        archiveModalTitle: (name) => `Retire ${name}?`,
+        archiveModalBody: "It stops taking orders and its QR code stops working. Its information isn't deleted: its sales keep showing up in your comparisons, even last year's. We keep it for two years in case you want to reactivate it — and reactivating takes minutes, not a whole new setup.",
+        archiveModalBilling: "You stop paying for it starting next period. This month is already covered.",
+        confirmArchiveText: "This archives it, doesn't delete it. Sure?",
+        yesArchive: "Yes, retire it",
         pauseModalTitle: (name) => `Pause ${name}`,
         pauseModalExplain: "It stops taking orders and reopens on its own. Your customers will see this:",
         pausePreviewLabel: "What your customer sees",
@@ -1402,7 +1497,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         requestTruckBody: "We'll contact you to confirm where it'll be and its hours. We'll set it up with your menu, your brand, and a QR ready to print.",
         requestTruckPriceLabel: "With this truck, your plan would be",
         requestTruckPricePreview: (trucks, price) => `${trucks} trucks · $${price} per truck`,
-        requestTruckBillingNote: "Charged for the full month starting today, no proration.",
+        requestTruckTotalPreview: (total) => `$${total} a month total`,
+        requestTruckBillingNote: "Once approved, your truck goes live right away and you're charged for the full month at that moment — no matter what day you request it, never prorated.",
         requestTruckNoteLabel: "Anything we should know? (optional)",
         requestTruckNotePlaceholder: "Location, hours, anything useful",
         requestTruckCancel: "Cancel",
