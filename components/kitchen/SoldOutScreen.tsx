@@ -31,13 +31,25 @@ export function SoldOutScreen({
   onClose: () => void
 }) {
   const t = dictionary[lang].kitchen
-  const [tab, setTab] = useState<string>(categories[0]?.id ?? "extras")
+  const knownCategoryIds = new Set(categories.map((c) => c.id))
+  // Un platillo sin categoría (o cuya categoría ya no existe) no debe
+  // volverse invisible aquí — se le da una pestaña propia "Sin categoría",
+  // igual que ya hace el panel de Menú, para que siempre haya dónde marcarlo.
+  const uncategorized = products.filter((p) => !p.category_id || !knownCategoryIds.has(p.category_id))
+  const [tab, setTab] = useState<string>(categories[0]?.id ?? (uncategorized.length ? "sin-categoria" : "extras"))
+
+  // Solo las opciones que AGREGAN algo (con costo o no) representan un
+  // ingrediente real que se puede acabar. Las que QUITAN algo (Sin cebolla,
+  // Sin cilantro…) nunca requieren inventario — pedir que no lleve algo
+  // siempre es posible, así que no tiene sentido poder "agotarlas".
+  const soldOutableOptions = options.filter((o) => o.kind === "add")
 
   const soldOutProducts = products.filter((p) => unitProducts.find((up) => up.product_id === p.id)?.sold_out)
-  const soldOutOptions = options.filter((o) => o.sold_out)
+  const soldOutOptions = soldOutableOptions.filter((o) => o.sold_out)
   const totalSoldOut = soldOutProducts.length + soldOutOptions.length
 
-  const catProducts = tab !== "extras" ? products.filter((p) => p.category_id === tab) : []
+  const catProducts =
+    tab === "extras" ? [] : tab === "sin-categoria" ? uncategorized : products.filter((p) => p.category_id === tab)
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col" style={{ background: "#100F0D" }}>
@@ -70,6 +82,16 @@ export function SoldOutScreen({
             </button>
           )
         })}
+        {uncategorized.length > 0 && (
+          <button
+            onClick={() => setTab("sin-categoria")}
+            className="flex-none whitespace-nowrap rounded-full border px-4 py-2.5 text-[13.5px] font-extrabold"
+            style={tab === "sin-categoria" ? { background: "#F6F3ED", color: "#100F0D", borderColor: "#F6F3ED" } : { background: "#232019", color: "#9C948A", borderColor: "#332F29" }}
+          >
+            {t.noCategoryLabel}
+            {uncategorized.some((p) => unitProducts.find((up) => up.product_id === p.id)?.sold_out) ? " ·" : ""}
+          </button>
+        )}
         <button
           onClick={() => setTab("extras")}
           className="flex-none whitespace-nowrap rounded-full border px-4 py-2.5 text-[13.5px] font-extrabold"
@@ -100,11 +122,11 @@ export function SoldOutScreen({
           })}
 
         {tab === "extras" &&
-          (options.length === 0 ? (
+          (soldOutableOptions.length === 0 ? (
             <p className="py-8 text-center text-sm font-semibold text-neutral-500">—</p>
           ) : (
             optionGroups.map((g) => {
-              const groupOptions = options.filter((o) => o.group_id === g.id)
+              const groupOptions = soldOutableOptions.filter((o) => o.group_id === g.id)
               if (groupOptions.length === 0) return null
               const product = products.find((p) => p.id === g.product_id)
               return (

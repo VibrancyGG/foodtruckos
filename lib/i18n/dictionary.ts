@@ -125,6 +125,7 @@ export type Dictionary = {
     anyChange: string
     add: string
     counterFallbackName: string
+    noCategoryLabel: string
     pairTitle: string
     pairSubtitle: string
     pairPlaceholder: string
@@ -530,6 +531,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "¿Algún cambio?",
       add: "Agregar",
       counterFallbackName: "Mostrador",
+      noCategoryLabel: "Sin categoría",
       pairTitle: "Emparejar esta pantalla",
       pairSubtitle: "Pide el código al dueño del negocio.",
       pairPlaceholder: "Código de emparejamiento",
@@ -930,6 +932,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "Any changes?",
       add: "Add",
       counterFallbackName: "Counter",
+      noCategoryLabel: "No category",
       pairTitle: "Pair this screen",
       pairSubtitle: "Ask the business owner for the code.",
       pairPlaceholder: "Pairing code",

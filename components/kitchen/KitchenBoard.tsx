@@ -56,7 +56,7 @@ export function KitchenBoard({
   taxIncluded: boolean
   initial: KitchenData
 }) {
-  const { lang, t } = useLang()
+  const { lang, setLang, t } = useLang()
   const [orders, setOrders] = useState(initial.orders)
   const [items, setItems] = useState(initial.items)
   const [unitProducts, setUnitProducts] = useState(initial.unitProducts)
@@ -240,6 +240,13 @@ export function KitchenBoard({
           {t.kitchen.ordersToday(todayCount)}
         </div>
         {pending > 0 && <span className="text-xs" style={{ color: "#F5A524" }}>{t.kitchen.queuedActions(pending)}</span>}
+        <button
+          onClick={() => setLang(lang === "es" ? "en" : "es")}
+          className="rounded-full border px-2.5 py-1.5 text-xs font-bold"
+          style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+        >
+          {lang === "es" ? "EN" : "ES"}
+        </button>
         <div className="ml-auto flex w-full flex-wrap gap-2 md:w-auto">
           <ToolButton onClick={() => setShowDaySummary(true)} label={t.kitchen.salesButton} />
           <ToolButton onClick={() => setSoundOn((s) => !s)} label={soundOn ? t.kitchen.soundOn : t.kitchen.soundOff} on={soundOn} />
