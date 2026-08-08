@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
+import { getPostLoginRedirect } from "@/lib/auth/actions"
 
 export function LoginForm() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export function LoginForm() {
       setError("Correo o contraseña incorrectos.")
       return
     }
-    router.push("/panel")
+    router.push(await getPostLoginRedirect())
     router.refresh()
   }
 
