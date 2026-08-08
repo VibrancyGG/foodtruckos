@@ -20,6 +20,17 @@ export async function updateProduct(input: {
   if (!(input.price > 0)) return { ok: false, error: "El precio debe ser mayor a cero" }
 
   const supabase = await createClient()
+
+  // Se lee el precio anterior antes de sobrescribirlo — sin esto, el registro
+  // de auditoría solo diría "se cambió el precio", no cuánto era antes
+  // (foodtruckos-datos: auditar modificaciones en precios).
+  const { data: before } = await supabase
+    .from("products")
+    .select("name_es, price")
+    .eq("id", input.productId)
+    .eq("business_id", businessId)
+    .maybeSingle()
+
   const { error } = await supabase
     .from("products")
     .update({
@@ -33,6 +44,18 @@ export async function updateProduct(input: {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }
+
+  if (before && before.price !== input.price) {
+    await supabase.rpc("log_owner_action", {
+      p_business_id: businessId,
+      p_action: "product_price_changed",
+      p_entity_type: "product",
+      p_entity_id: input.productId,
+      p_before: { name: before.name_es, price: before.price },
+      p_after: { name: input.nameEs, price: input.price },
+    })
+  }
+
   revalidatePath("/panel/menu")
   revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
@@ -54,6 +77,14 @@ export async function retireProduct(productId: string): Promise<Result> {
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo quitar del menú" }
+
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "product_retired",
+    p_entity_type: "product",
+    p_entity_id: productId,
+  })
+
   revalidatePath("/panel/menu")
   revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
@@ -221,6 +252,14 @@ export async function createProduct(input: {
     .single()
 
   if (error || !product) return { ok: false, error: "No se pudo crear el platillo" }
+
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "product_created",
+    p_entity_type: "product",
+    p_entity_id: product.id,
+    p_after: { name: input.nameEs, price: input.price },
+  })
 
   const { data: units } = await supabase.from("units").select("id").eq("business_id", businessId).neq("status", "archived")
   if (units && units.length > 0) {
