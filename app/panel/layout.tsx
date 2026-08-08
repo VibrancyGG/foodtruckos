@@ -4,9 +4,10 @@ import { getOwnerContext } from "@/lib/auth/dal"
 import { logoutAction } from "@/lib/auth/actions"
 
 const TABS = [
-  { href: "/panel/marca", label: "Marca" },
+  { href: "/panel/resumen", label: "Resumen" },
   { href: "/panel/menu", label: "Menú" },
   { href: "/panel/trucks", label: "Trucks" },
+  { href: "/panel/marca", label: "Marca" },
   { href: "/panel/personal", label: "Personal" },
   { href: "/panel/qr", label: "Códigos QR" },
   { href: "/panel/cuenta", label: "Cuenta" },

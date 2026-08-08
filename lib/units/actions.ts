@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
+import type { WeeklyHours } from "@/lib/units/hours"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -24,6 +25,26 @@ export async function updateUnit(input: {
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/trucks")
+  return { ok: true }
+}
+
+// El horario publicado es lo que "actividad de venta" (panel Resumen) usa
+// como referencia para saber si un truck abrió tarde o cerró antes — nunca
+// se inventa, si no está capturado simplemente no hay esa comparación.
+export async function updateUnitHours(unitId: string, hours: WeeklyHours): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("units")
+    .update({ hours })
+    .eq("id", unitId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar el horario" }
+  revalidatePath("/panel/trucks")
+  revalidatePath("/panel/resumen")
   return { ok: true }
 }
 

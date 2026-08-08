@@ -4,12 +4,14 @@ import { useState, useTransition } from "react"
 import type { OwnerUnitsData } from "@/lib/units/getOwnerUnits"
 import {
   updateUnit,
+  updateUnitHours,
   pauseUnit,
   reopenUnit,
   archiveUnit,
   reactivateUnit,
   uploadUnitPhoto,
 } from "@/lib/units/actions"
+import { DAYS, parseWeeklyHours, type WeeklyHours, type DayHours } from "@/lib/units/hours"
 
 const PAUSE_OPTIONS = [
   { label: "1 hora", hours: 1 },
@@ -26,6 +28,8 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
   const [confirmArchive, setConfirmArchive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+  const [hours, setHours] = useState<WeeklyHours>(() => parseWeeklyHours(unit.hours))
+  const [hoursSaved, setHoursSaved] = useState(false)
 
   const isPaused = unit.status === "paused"
 
@@ -45,12 +49,27 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
     })
   }
 
-  function doPause(hours: number | null) {
-    const pausedUntil = hours ? new Date(Date.now() + hours * 60 * 60 * 1000).toISOString() : null
+  function doPause(pauseHours: number | null) {
+    const pausedUntil = pauseHours ? new Date(Date.now() + pauseHours * 60 * 60 * 1000).toISOString() : null
     startTransition(async () => {
       await pauseUnit({ unitId: unit.id, pausedUntil })
     })
     setShowPause(false)
+  }
+
+  function setDayHours(key: (typeof DAYS)[number]["key"], value: DayHours) {
+    setHours((h) => ({ ...h, [key]: value }))
+    setHoursSaved(false)
+  }
+
+  function saveHours() {
+    startTransition(async () => {
+      const result = await updateUnitHours(unit.id, hours)
+      if (result.ok) {
+        setHoursSaved(true)
+        setTimeout(() => setHoursSaved(false), 2000)
+      }
+    })
   }
 
   function doReopen() {
@@ -126,6 +145,60 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                 </button>
                 <button onClick={() => setEditing(false)} className="text-xs text-neutral-500">
                   Cancelar
+                </button>
+              </div>
+
+              <div className="mt-2 border-t border-neutral-100 pt-2">
+                <div className="mb-1 text-xs font-bold text-neutral-600">
+                  Horario publicado
+                  <span className="ml-1 font-normal text-neutral-400">
+                    — de aquí sale &quot;abrió tarde&quot; en Resumen
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {DAYS.map((d) => {
+                    const dh = hours[d.key] ?? null
+                    const closed = dh === null
+                    return (
+                      <div key={d.key} className="flex items-center gap-2 text-xs">
+                        <span className="w-8 text-neutral-500">{d.label}</span>
+                        <label className="flex items-center gap-1 text-neutral-500">
+                          <input
+                            type="checkbox"
+                            checked={!closed}
+                            onChange={(e) =>
+                              setDayHours(d.key, e.target.checked ? { open: "11:00", close: "20:00" } : null)
+                            }
+                          />
+                          abierto
+                        </label>
+                        {!closed && (
+                          <>
+                            <input
+                              type="time"
+                              value={dh.open}
+                              onChange={(e) => setDayHours(d.key, { ...dh, open: e.target.value })}
+                              className="rounded border border-neutral-300 px-1 py-0.5"
+                            />
+                            <span className="text-neutral-400">a</span>
+                            <input
+                              type="time"
+                              value={dh.close}
+                              onChange={(e) => setDayHours(d.key, { ...dh, close: e.target.value })}
+                              className="rounded border border-neutral-300 px-1 py-0.5"
+                            />
+                          </>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                <button
+                  onClick={saveHours}
+                  disabled={pending}
+                  className="mt-2 rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-bold"
+                >
+                  {hoursSaved ? "Guardado ✓" : "Guardar horario"}
                 </button>
               </div>
             </div>
