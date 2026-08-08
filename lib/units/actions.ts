@@ -10,6 +10,7 @@ type Result = { ok: true } | { ok: false; error: string }
 export async function updateUnit(input: {
   unitId: string
   name: string
+  location: string
   kitchenAlertMinutes: number
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
@@ -19,9 +20,25 @@ export async function updateUnit(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("units")
-    .update({ name: input.name, kitchen_alert_minutes: input.kitchenAlertMinutes })
+    .update({ name: input.name, location: input.location.trim() || null, kitchen_alert_minutes: input.kitchenAlertMinutes })
     .eq("id", input.unitId)
     .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
+  revalidatePath("/panel/trucks")
+  return { ok: true }
+}
+
+// Impuesto parametrizable por negocio (regla de producto ya tomada): el dueño
+// elige si sus precios de menú ya incluyen el impuesto o si se agrega al
+// total — afecta menú, ticket y reportes por igual, así que vive a nivel de
+// negocio, no por truck.
+export async function updateTax(taxIncluded: boolean): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase.from("businesses").update({ tax_included: taxIncluded }).eq("id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/trucks")
@@ -53,6 +70,7 @@ export async function updateUnitHours(unitId: string, hours: WeeklyHours): Promi
 export async function pauseUnit(input: {
   unitId: string
   pausedUntil: string | null
+  reason: string | null
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
@@ -60,7 +78,7 @@ export async function pauseUnit(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("units")
-    .update({ status: "paused", paused_until: input.pausedUntil })
+    .update({ status: "paused", paused_until: input.pausedUntil, pause_reason: input.reason })
     .eq("id", input.unitId)
     .eq("business_id", businessId)
 
@@ -83,7 +101,7 @@ export async function reopenUnit(unitId: string): Promise<Result> {
   const supabase = await createClient()
   const { error } = await supabase
     .from("units")
-    .update({ status: "active", paused_until: null })
+    .update({ status: "active", paused_until: null, pause_reason: null })
     .eq("id", unitId)
     .eq("business_id", businessId)
 

@@ -183,6 +183,38 @@ export async function getOwnerSummary(businessId: string) {
     }
   })
 
+  // ---- insight: costo estimado de abrir tarde ----
+  // Nunca se inventa un número: la estimación sale de la venta real del mes
+  // dividida entre las horas reales publicadas, nunca de un promedio de
+  // industria ni de una cifra fija. Si falta cualquier dato real (horario,
+  // venta del mes, o el retraso no llega al umbral), no se muestra nada.
+  const LATE_THRESHOLD_MINUTES = 20
+  let lateOpenInsight: { unitName: string; lateMinutes: number; estimatedMonthlyLoss: number } | null = null
+  for (const a of activity) {
+    if (a.lateMinutes === null || a.lateMinutes < LATE_THRESHOLD_MINUTES || !a.hasPublishedHours) continue
+    const truckMonth = perTruck.find((t) => t.unitId === a.unitId)
+    if (!truckMonth || truckMonth.currentMonth <= 0) continue
+
+    const weeklyHours = parseWeeklyHours(unitList.find((u) => u.id === a.unitId)?.hours)
+    const openDays = Object.values(weeklyHours).filter((d): d is { open: string; close: string } => !!d)
+    if (openDays.length === 0) continue
+    const avgOpenMinutesPerDay =
+      openDays.reduce((sum, d) => {
+        const [oh, om] = d.open.split(":").map(Number)
+        const [ch, cm] = d.close.split(":").map(Number)
+        return sum + (ch * 60 + cm - (oh * 60 + om))
+      }, 0) / openDays.length
+    if (avgOpenMinutesPerDay <= 0) continue
+
+    const dailyRate = truckMonth.currentMonth / daysSoFar
+    const hourlyRate = dailyRate / (avgOpenMinutesPerDay / 60)
+    const estimatedMonthlyLoss = hourlyRate * (a.lateMinutes / 60) * 30
+
+    if (!lateOpenInsight || a.lateMinutes > lateOpenInsight.lateMinutes) {
+      lateOpenInsight = { unitName: a.unitName, lateMinutes: Math.round(a.lateMinutes), estimatedMonthlyLoss: Math.round(estimatedMonthlyLoss) }
+    }
+  }
+
   return {
     currentMonth,
     currentYear,
@@ -198,6 +230,7 @@ export async function getOwnerSummary(businessId: string) {
     channelBreakdown,
     topProducts,
     activity,
+    lateOpenInsight,
   }
 }
 

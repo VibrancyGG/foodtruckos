@@ -172,6 +172,7 @@ export type Database = {
         Row: {
           billing_mode: string
           brand_color: string | null
+          brand_motif: string
           cover_photo_url: string | null
           created_at: string
           id: string
@@ -185,6 +186,7 @@ export type Database = {
         Insert: {
           billing_mode?: string
           brand_color?: string | null
+          brand_motif?: string
           cover_photo_url?: string | null
           created_at?: string
           id?: string
@@ -198,6 +200,7 @@ export type Database = {
         Update: {
           billing_mode?: string
           brand_color?: string | null
+          brand_motif?: string
           cover_photo_url?: string | null
           created_at?: string
           id?: string
@@ -933,12 +936,15 @@ export type Database = {
       units: {
         Row: {
           archived_at: string | null
+          brand_color: string | null
           business_id: string
           created_at: string
           hours: Json
           id: string
           kitchen_alert_minutes: number
+          location: string | null
           name: string
+          pause_reason: string | null
           paused_until: string | null
           photo_url: string | null
           status: string
@@ -946,12 +952,15 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          brand_color?: string | null
           business_id: string
           created_at?: string
           hours?: Json
           id?: string
           kitchen_alert_minutes?: number
+          location?: string | null
           name: string
+          pause_reason?: string | null
           paused_until?: string | null
           photo_url?: string | null
           status?: string
@@ -959,12 +968,15 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          brand_color?: string | null
           business_id?: string
           created_at?: string
           hours?: Json
           id?: string
           kitchen_alert_minutes?: number
+          location?: string | null
           name?: string
+          pause_reason?: string | null
           paused_until?: string | null
           photo_url?: string | null
           status?: string

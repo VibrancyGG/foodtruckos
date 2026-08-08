@@ -55,6 +55,7 @@ export async function uploadCoverPhoto(formData: FormData) {
 export async function saveBrandSettings(input: {
   brandColor: string
   menuStyle: "vibrante" | "tradicional"
+  brandMotif: string
 }): Promise<{ ok: boolean; error?: string }> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
@@ -62,11 +63,36 @@ export async function saveBrandSettings(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("businesses")
-    .update({ brand_color: input.brandColor, menu_style: input.menuStyle })
+    .update({ brand_color: input.brandColor, menu_style: input.menuStyle, brand_motif: input.brandMotif })
     .eq("id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }
 
   revalidatePath("/panel")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  return { ok: true }
+}
+
+// Excepción, no una decisión que todos tengan que tomar: normalmente los
+// trucks comparten el color del negocio (units.brand_color = null hereda).
+// Solo si alguno opera con otra marca se le da un color propio aquí.
+export async function updateUnitBrandColor(input: {
+  unitId: string
+  brandColor: string | null
+}): Promise<{ ok: boolean; error?: string }> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("units")
+    .update({ brand_color: input.brandColor })
+    .eq("id", input.unitId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
+
+  revalidatePath("/panel")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }

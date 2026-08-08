@@ -39,33 +39,51 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
         ${business.total}
         {a.perMonth}
       </td>
-      <td className="py-2.5 pr-3 text-xs text-neutral-500">{business.billing_mode}</td>
+      <td className="py-2.5 pr-3 text-xs text-neutral-500">
+        {business.billing_mode === "stripe" ? a.payStripe : a.payManual}
+      </td>
       <td className="py-2.5 text-right">
-        {business.subscription_status === "suspended" ? (
-          <button
-            disabled={pending}
-            onClick={() =>
-              startTransition(async () => {
-                await reactivateBusiness(business.id)
-              })
-            }
-            className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
-          >
-            {a.reactivate}
-          </button>
-        ) : (
-          <button
-            disabled={pending}
-            onClick={() =>
-              startTransition(async () => {
-                await suspendBusiness(business.id)
-              })
-            }
-            className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-red-800 hover:text-red-300"
-          >
-            {a.suspend}
-          </button>
-        )}
+        <div className="flex justify-end gap-1.5">
+          {business.subscription_status === "suspended" || !business.openUrl ? (
+            <span className="cursor-not-allowed rounded-lg border border-neutral-800 px-2.5 py-1 text-xs font-bold text-neutral-600" title={a.openDisabled}>
+              {a.openLink}
+            </span>
+          ) : (
+            <a
+              href={business.openUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-neutral-500"
+            >
+              {a.openLink}
+            </a>
+          )}
+          {business.subscription_status === "suspended" ? (
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  await reactivateBusiness(business.id)
+                })
+              }
+              className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
+            >
+              {a.reactivate}
+            </button>
+          ) : (
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  await suspendBusiness(business.id)
+                })
+              }
+              className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-red-800 hover:text-red-300"
+            >
+              {a.suspend}
+            </button>
+          )}
+        </div>
       </td>
     </tr>
   )

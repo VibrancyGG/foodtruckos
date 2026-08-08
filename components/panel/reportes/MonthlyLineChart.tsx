@@ -1,5 +1,8 @@
+"use client"
+
 import { money, monthName } from "@/lib/reportes/format"
 import type { Lang } from "@/lib/i18n/dictionary"
+import { useChartTooltip, ChartTooltip } from "./ChartTooltip"
 
 type Point = { month: number; currentYear: number | null; prevYear: number | null }
 
@@ -29,11 +32,14 @@ export function MonthlyLineChart({
     .map((p, i) => (p.prevYear !== null ? `${x(i)},${y(p.prevYear)}` : null))
     .filter((s): s is string => s !== null)
 
+  const { tooltip, show, hide } = useChartTooltip()
+
   if (values.length === 0) {
     return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
 
   return (
+    <div data-chart-wrap className="relative">
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Venta mensual" className="w-full">
       {gridValues.map((v, i) => (
         <g key={i}>
@@ -76,6 +82,38 @@ export function MonthlyLineChart({
           {currentYear - 1}
         </text>
       </g>
+      {series.map((p, i) => (
+        <rect
+          key={`hit${i}`}
+          x={x(i) - w / 22}
+          y={T}
+          width={w / 11}
+          height={h}
+          fill="transparent"
+          style={{ cursor: "pointer" }}
+          onMouseMove={(e) =>
+            show(
+              e,
+              <>
+                <b>{monthName(currentYear, p.month, lang)}</b>
+                <br />
+                {currentYear} · <b>{p.currentYear !== null ? money(p.currentYear) : "—"}</b>
+                {p.prevYear !== null && (
+                  <>
+                    <br />
+                    <span className="text-neutral-400">
+                      {currentYear - 1} · {money(p.prevYear)}
+                    </span>
+                  </>
+                )}
+              </>,
+            )
+          }
+          onMouseLeave={hide}
+        />
+      ))}
     </svg>
+    <ChartTooltip tooltip={tooltip} />
+    </div>
   )
 }

@@ -19,17 +19,22 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
   const p = t.panel.trucksPage
   const c = t.panel.common
   const locale = lang === "es" ? "es-MX" : "en-US"
-  const PAUSE_OPTIONS = [
-    { label: p.pause1h, hours: 1 },
-    { label: p.pause3h, hours: 3 },
-    { label: p.pauseManual, hours: null },
+  const PAUSE_REASONS = [p.pauseReason1, p.pauseReason2, p.pauseReason3, p.pauseReason4]
+  const PAUSE_DURATIONS: { label: string; minutes: number | null }[] = [
+    { label: p.pauseDur30, minutes: 30 },
+    { label: p.pauseDur1h, minutes: 60 },
+    { label: p.pauseDur2h, minutes: 120 },
+    { label: p.pauseDurRestOfDay, minutes: null },
   ]
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(unit.name)
+  const [location, setLocation] = useState(unit.location ?? "")
   const [alertMinutes, setAlertMinutes] = useState(String(unit.kitchen_alert_minutes))
   const [photoUrl, setPhotoUrl] = useState(unit.photo_url)
   const [showPause, setShowPause] = useState(false)
+  const [pauseReason, setPauseReason] = useState(PAUSE_REASONS[0])
+  const [pauseDuration, setPauseDuration] = useState(PAUSE_DURATIONS[0])
   const [confirmArchive, setConfirmArchive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
@@ -44,6 +49,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
       const result = await updateUnit({
         unitId: unit.id,
         name,
+        location,
         kitchenAlertMinutes: parseInt(alertMinutes, 10) || 20,
       })
       if (!result.ok) {
@@ -54,11 +60,22 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
     })
   }
 
-  function doPause(pauseHours: number | null) {
-    // eslint-disable-next-line react-hooks/purity -- se calcula al hacer clic, no durante el render
-    const pausedUntil = pauseHours ? new Date(Date.now() + pauseHours * 60 * 60 * 1000).toISOString() : null
+  function openPauseModal() {
+    setPauseReason(PAUSE_REASONS[0])
+    setPauseDuration(PAUSE_DURATIONS[0])
+    setShowPause(true)
+  }
+
+  function pausedUntilTime() {
+    if (pauseDuration.minutes === null) return null
+    // eslint-disable-next-line react-hooks/purity -- se calcula al confirmar, no durante el render
+    return new Date(Date.now() + pauseDuration.minutes * 60 * 1000)
+  }
+
+  function doPause() {
+    const until = pausedUntilTime()
     startTransition(async () => {
-      await pauseUnit({ unitId: unit.id, pausedUntil })
+      await pauseUnit({ unitId: unit.id, pausedUntil: until ? until.toISOString() : null, reason: pauseReason })
     })
     setShowPause(false)
   }
@@ -130,6 +147,12 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm font-bold"
+              />
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={p.locationPlaceholder}
+                className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-xs"
               />
               <label className="flex items-center gap-2 text-xs text-neutral-500">
                 {p.alertLabel}
@@ -209,6 +232,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
           ) : (
             <>
               <div className="font-bold">{unit.name}</div>
+              {unit.location && <div className="text-xs text-neutral-500">{unit.location}</div>}
               <div className="mt-0.5 flex items-center gap-2 text-xs">
                 <span
                   className={`rounded-full px-2 py-0.5 font-semibold ${
@@ -222,6 +246,7 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
                     {unit.paused_until
                       ? p.reopens(new Date(unit.paused_until).toLocaleString(locale, { weekday: "short", hour: "numeric", minute: "2-digit" }))
                       : p.untilManualReopen}
+                    {unit.pause_reason ? ` · ${p.pauseReasonLabel(unit.pause_reason)}` : ""}
                   </span>
                 )}
               </div>
@@ -248,28 +273,13 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
             {p.reopenNow}
           </button>
         ) : (
-          <div className="relative">
-            <button
-              onClick={() => setShowPause((s) => !s)}
-              disabled={pending}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
-            >
-              {p.pause}
-            </button>
-            {showPause && (
-              <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border border-neutral-200 bg-white p-1 shadow-lg">
-                {PAUSE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.label}
-                    onClick={() => doPause(opt.hours)}
-                    className="block w-full rounded-md px-2 py-1.5 text-left text-xs hover:bg-neutral-100"
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <button
+            onClick={openPauseModal}
+            disabled={pending}
+            className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
+          >
+            {p.pause}
+          </button>
         )}
 
         <div className="ml-auto">
@@ -293,6 +303,74 @@ export function TruckRow({ unit }: { unit: OwnerUnitsData["active"][number] }) {
           )}
         </div>
       </div>
+
+      {showPause && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowPause(false)
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
+            <h3 className="mb-1.5 text-xl font-black">{p.pauseModalTitle(unit.name)}</h3>
+            <p className="mb-4 text-sm text-neutral-500">{p.pauseModalExplain}</p>
+
+            <div className="mb-4 rounded-xl bg-neutral-900 p-4 text-white">
+              <div className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-400">{p.pausePreviewLabel}</div>
+              <div className="text-lg font-bold">
+                {pauseDuration.minutes === null
+                  ? p.pausePreviewClosedToday
+                  : p.pausePreviewReturnsAt(
+                      (pausedUntilTime() as Date).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
+                    )}
+              </div>
+            </div>
+
+            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.pauseWhyLabel}</label>
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              {PAUSE_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  aria-pressed={pauseReason === reason}
+                  onClick={() => setPauseReason(reason)}
+                  className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${pauseReason === reason ? "border-neutral-900" : "border-neutral-200"}`}
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
+
+            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.pauseUntilLabel}</label>
+            <div className="mb-5 grid grid-cols-2 gap-2">
+              {PAUSE_DURATIONS.map((dur) => (
+                <button
+                  key={dur.label}
+                  type="button"
+                  aria-pressed={pauseDuration.label === dur.label}
+                  onClick={() => setPauseDuration(dur)}
+                  className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${pauseDuration.label === dur.label ? "border-neutral-900" : "border-neutral-200"}`}
+                >
+                  {dur.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowPause(false)} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
+                {c.cancel}
+              </button>
+              <button
+                onClick={doPause}
+                disabled={pending}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+              >
+                {p.pauseConfirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

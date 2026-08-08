@@ -13,6 +13,18 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
   const [newCatEs, setNewCatEs] = useState("")
   const [newCatEn, setNewCatEn] = useState("")
   const [savingCat, setSavingCat] = useState(false)
+  const [filter, setFilter] = useState<string>("todos")
+
+  // "Solo Truck X" en el prototipo === is_offered:false en los demás trucks.
+  // Sin fila en unit_products para esa unidad se trata como ofrecido — así
+  // funcionan los platillos que ya existían antes de que hubiera varios trucks.
+  function offeredAt(productId: string, unitId: string) {
+    const up = initial.unitProducts.find((x) => x.product_id === productId && x.unit_id === unitId)
+    return up ? up.is_offered !== false : true
+  }
+  function visible(productId: string) {
+    return filter === "todos" || offeredAt(productId, filter)
+  }
 
   const productsByCategory = useMemo(() => {
     const map = new Map<string, typeof initial.products>()
@@ -23,6 +35,13 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
     }
     return map
   }, [initial.products])
+
+  const visibleProducts = initial.products.filter((p) => visible(p.id))
+  const outCount = visibleProducts.filter((p) => {
+    const unitScope = filter === "todos" ? initial.units.map((u) => u.id) : [filter]
+    return unitScope.some((uid) => initial.unitProducts.find((up) => up.product_id === p.id && up.unit_id === uid)?.sold_out)
+  }).length
+  const noPhotoCount = visibleProducts.filter((p) => !p.photo_url).length
 
   async function addCategory() {
     if (!newCatEs.trim() || !newCatEn.trim()) return
@@ -44,11 +63,36 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
         <p className="mb-2 text-sm text-neutral-500">{t.panel.menuPage.subtitle}</p>
       </div>
 
+      {initial.units.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex overflow-hidden rounded-lg border border-neutral-200 bg-white">
+            <button
+              onClick={() => setFilter("todos")}
+              className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === "todos" ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+            >
+              {t.panel.menuPage.allTrucksFilter}
+            </button>
+            {initial.units.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => setFilter(u.id)}
+                className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === u.id ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+              >
+                {u.name}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-neutral-500">
+            {t.panel.menuPage.statsLine(visibleProducts.length, outCount, noPhotoCount)}
+          </span>
+        </div>
+      )}
+
       {categories.map((cat) => (
         <CategorySection
           key={cat.id}
           category={cat}
-          products={productsByCategory.get(cat.id) ?? []}
+          products={(productsByCategory.get(cat.id) ?? []).filter((p) => visible(p.id))}
           units={initial.units}
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
@@ -56,10 +100,10 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
         />
       ))}
 
-      {(productsByCategory.get("sin-categoria")?.length ?? 0) > 0 && (
+      {(productsByCategory.get("sin-categoria")?.filter((p) => visible(p.id)).length ?? 0) > 0 && (
         <CategorySection
           category={{ id: "sin-categoria", name_es: t.panel.menuPage.noCategory, name_en: t.panel.menuPage.noCategory }}
-          products={productsByCategory.get("sin-categoria") ?? []}
+          products={(productsByCategory.get("sin-categoria") ?? []).filter((p) => visible(p.id))}
           units={initial.units}
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
@@ -132,6 +176,8 @@ function CategorySection({
   const [nameEn, setNameEn] = useState("")
   const [price, setPrice] = useState("")
   const [saving, setSaving] = useState(false)
+
+  if (products.length === 0) return null
 
   async function addProduct() {
     const priceNum = parseFloat(price)

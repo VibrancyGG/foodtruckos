@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
-import { updateProduct, retireProduct, toggleSoldOut, uploadProductPhoto } from "@/lib/menu/actions"
+import { updateProduct, retireProduct, toggleSoldOut, toggleOffered, uploadProductPhoto } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { OptionGroupsEditor } from "./OptionGroupsEditor"
 
@@ -59,9 +59,15 @@ export function ProductRow({
     })
   }
 
-  function onSoldOutChange(unitProductId: string, soldOut: boolean) {
+  function onSoldOutChange(unitId: string, soldOut: boolean) {
     startTransition(async () => {
-      await toggleSoldOut({ unitProductId, soldOut })
+      await toggleSoldOut({ productId: product.id, unitId, soldOut })
+    })
+  }
+
+  function onOfferedChange(unitId: string, isOffered: boolean) {
+    startTransition(async () => {
+      await toggleOffered({ productId: product.id, unitId, isOffered })
     })
   }
 
@@ -152,16 +158,39 @@ export function ProductRow({
 
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
 
+      {units.length > 1 && (
+        <div className="mt-3 border-t border-neutral-100 pt-3">
+          <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-neutral-400">{m.whoSellsIt}</div>
+          <div className="flex flex-wrap gap-3">
+            {units.map((u) => {
+              const up = myUnitProducts.find((x) => x.unit_id === u.id)
+              const isOffered = up ? up.is_offered !== false : true
+              return (
+                <label key={u.id} className="flex items-center gap-1.5 text-xs text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={isOffered}
+                    onChange={(e) => onOfferedChange(u.id, e.target.checked)}
+                  />
+                  {u.name}
+                </label>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-neutral-100 pt-3">
         {units.map((u) => {
           const up = myUnitProducts.find((x) => x.unit_id === u.id)
-          if (!up) return null
+          const isOffered = up ? up.is_offered !== false : true
+          if (!isOffered) return null
           return (
             <label key={u.id} className="flex items-center gap-1.5 text-xs text-neutral-600">
               <input
                 type="checkbox"
-                checked={up.sold_out}
-                onChange={(e) => onSoldOutChange(up.id, e.target.checked)}
+                checked={up?.sold_out ?? false}
+                onChange={(e) => onSoldOutChange(u.id, e.target.checked)}
               />
               {m.soldOut}
               {units.length > 1 ? ` · ${u.name}` : ""}

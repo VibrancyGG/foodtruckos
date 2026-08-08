@@ -201,6 +201,9 @@ export type Dictionary = {
       minLabel: string
       maxLabel: string
       requiredLabel: string
+      allTrucksFilter: string
+      statsLine: (total: number, out: number, noPhoto: number) => string
+      whoSellsIt: string
     }
     trucksPage: {
       title: string
@@ -231,6 +234,32 @@ export type Dictionary = {
       yesArchive: string
       archivedOn: (date: string) => string
       reactivate: string
+      locationPlaceholder: string
+      taxTitle: string
+      taxHint: string
+      taxAdd: string
+      taxAddHint: string
+      taxIncluded: string
+      taxIncludedHint: string
+      sharedSettingsTitle: string
+      sharedSettingsHint: string
+      pauseModalTitle: (name: string) => string
+      pauseModalExplain: string
+      pausePreviewLabel: string
+      pausePreviewClosedToday: string
+      pausePreviewReturnsAt: (when: string) => string
+      pauseWhyLabel: string
+      pauseReason1: string
+      pauseReason2: string
+      pauseReason3: string
+      pauseReason4: string
+      pauseUntilLabel: string
+      pauseDur30: string
+      pauseDur1h: string
+      pauseDur2h: string
+      pauseDurRestOfDay: string
+      pauseConfirm: string
+      pauseReasonLabel: (reason: string) => string
     }
     marcaPage: {
       title: string
@@ -258,6 +287,14 @@ export type Dictionary = {
       liveLabel: string
       coverPlaceholder: string
       addPreviewLabel: string
+      motifStep: string
+      motifTitle: string
+      motifHint: string
+      truckOverrideSummary: string
+      truckOverrideBody: string
+      truckOverrideOwn: string
+      truckOverrideRemove: string
+      truckOverrideInherits: string
     }
     personalPage: {
       title: string
@@ -294,6 +331,17 @@ export type Dictionary = {
       subtitle: string
       noActiveTrucks: string
       download: string
+      openMenu: string
+      realTitle: string
+      realBody: string
+      howToTitle: string
+      how1: string
+      how2: string
+      how3: string
+      how4: string
+      printAll: string
+      posterMsg: string
+      posterMsg2: string
     }
     cuentaPage: {
       title: string
@@ -317,6 +365,14 @@ export type Dictionary = {
       statusActive: string
       statusSuspended: string
       statusCancelled: string
+      ladderTitle: string
+      ladderHint: string
+      ladderTrucks: string
+      ladderPerTruck: string
+      ladderMonthly: string
+      ladderFivePlus: string
+      ladderYourPlan: string
+      wantToTalk: string
     }
     resumenPage: {
       title: string
@@ -333,9 +389,12 @@ export type Dictionary = {
       eachTruckIn: (month: string) => string
       whereFrom: string
       topSelling: string
+      piecesThisMonth: string
       salesActivity: string
       salesActivityHint: string
       salesActivityDisclaimer: string
+      lateOpenInsightTitle: (unitName: string, minutes: number) => string
+      lateOpenInsightBody: (amount: string) => string
       noSalesToGraph: string
       noActiveTrucks: string
       noSalesThisMonth: string
@@ -382,6 +441,21 @@ export type Dictionary = {
     actionUnitReactivated: string
     actionBusinessSuspended: string
     actionBusinessReactivated: string
+    kpiActiveBusinesses: string
+    kpiTrucksBilled: string
+    kpiMonthlyRevenue: string
+    kpiAvgTenure: string
+    kpiAvgTenureUnit: string
+    kpiPerClient: string
+    platformHealthHeader: string
+    monthlyRevenuePanelTitle: string
+    thisMonthLabel: string
+    portfolioPanelTitle: string
+    portfolioTotalLabel: (n: number) => string
+    openLink: string
+    openDisabled: string
+    payManual: string
+    payStripe: string
   }
 }
 
@@ -607,6 +681,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         minLabel: "mínimo",
         maxLabel: "máximo",
         requiredLabel: "obligatorio",
+        allTrucksFilter: "Todos los trucks",
+        statsLine: (total, out, noPhoto) =>
+          `${total} platillo${total === 1 ? "" : "s"}` +
+          (out ? ` · ${out} agotado${out === 1 ? "" : "s"}` : "") +
+          (noPhoto ? ` · ${noPhoto} sin foto` : " · todos con foto"),
+        whoSellsIt: "¿Quién lo vende?",
       },
       trucksPage: {
         title: "Trucks",
@@ -637,6 +717,32 @@ export const dictionary: Record<Lang, Dictionary> = {
         yesArchive: "Sí, archivar",
         archivedOn: (date) => `Archivado ${date}`,
         reactivate: "Reactivar",
+        locationPlaceholder: "¿Dónde se para normalmente? (opcional)",
+        taxTitle: "Cómo manejas el impuesto",
+        taxHint: "Afecta el menú, el ticket y tus reportes.",
+        taxAdd: "Se agrega al total",
+        taxAddHint: "El menú muestra el precio y al final se suma el impuesto.",
+        taxIncluded: "Ya viene incluido",
+        taxIncludedHint: "Lo que ve en el menú es lo que paga. Sin sorpresas al final.",
+        sharedSettingsTitle: "Ajustes para todos tus trucks",
+        sharedSettingsHint: "El impuesto vale para todo el negocio. Cada truck lleva su propio umbral de aviso en cocina.",
+        pauseModalTitle: (name) => `Pausar ${name}`,
+        pauseModalExplain: "Deja de recibir pedidos y se reabre solo. Tus clientes van a ver esto:",
+        pausePreviewLabel: "Lo que ve tu cliente",
+        pausePreviewClosedToday: "Hoy ya cerramos",
+        pausePreviewReturnsAt: (when) => `Regresamos a las ${when}`,
+        pauseWhyLabel: "¿Por qué?",
+        pauseReason1: "Se acabó el gas",
+        pauseReason2: "Cambio de turno",
+        pauseReason3: "Se acabó la comida",
+        pauseReason4: "Descanso del personal",
+        pauseUntilLabel: "¿Hasta cuándo?",
+        pauseDur30: "30 minutos",
+        pauseDur1h: "1 hora",
+        pauseDur2h: "2 horas",
+        pauseDurRestOfDay: "El resto del día",
+        pauseConfirm: "Pausar ahora",
+        pauseReasonLabel: (reason) => `Motivo: ${reason}`,
       },
       marcaPage: {
         title: "Marca",
@@ -664,6 +770,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         liveLabel: "En vivo",
         coverPlaceholder: "Tu foto de portada aquí",
         addPreviewLabel: "Agregar",
+        motifStep: "DETALLE",
+        motifTitle: "El dibujo de fondo",
+        motifHint: "Unas líneas discretas en el encabezado, según lo que vendes.",
+        truckOverrideSummary: "¿Un truck con otra marca?",
+        truckOverrideBody: "Normalmente los trucks comparten logo y color, y cada uno lleva su propio nombre y foto. Si alguno opera con otra marca, aquí puedes darle color propio — es una excepción, no algo que tengas que decidir.",
+        truckOverrideOwn: "Color propio",
+        truckOverrideRemove: "Quitar",
+        truckOverrideInherits: "Usa el del negocio",
       },
       personalPage: {
         title: "Personal",
@@ -700,6 +814,17 @@ export const dictionary: Record<Lang, Dictionary> = {
         subtitle: "Uno por truck. Imprímelo y pégalo donde el comensal lo vea al hacer fila.",
         noActiveTrucks: "Todavía no hay ningún truck activo.",
         download: "Descargar para imprimir",
+        openMenu: "Abrir el menú",
+        realTitle: "Estos códigos son de verdad",
+        realBody: "Escanéalos ahorita con la cámara de tu celular para comprobarlo — te van a mandar a la dirección que aparece debajo de cada uno.",
+        howToTitle: "Qué hacer con ellos",
+        how1: "Imprímelos en grande, mínimo del tamaño de una hoja carta. Un QR chiquito no se escanea desde la fila.",
+        how2: "Pégalos donde se vean mientras esperan: la ventanilla, un costado del truck, las mesas si tienes.",
+        how3: "Plastifícalos o mételos en un micaje. Van a aguantar sol, grasa y lluvia.",
+        how4: "No los tapes con nada ni les pegues cosas encima. Si se raya o se despinta, imprime otro — es el mismo código.",
+        printAll: "Imprimir los carteles",
+        posterMsg: "Escanea y pide desde tu celular",
+        posterMsg2: "Scan to order from your phone",
       },
       cuentaPage: {
         title: "Cuenta",
@@ -723,6 +848,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         statusActive: "Activa",
         statusSuspended: "Suspendida",
         statusCancelled: "Cancelada",
+        ladderTitle: "Cómo funciona el precio",
+        ladderHint: "Entre más trucks, menos pagas por cada uno.",
+        ladderTrucks: "Trucks",
+        ladderPerTruck: "Por truck",
+        ladderMonthly: "Al mes",
+        ladderFivePlus: "5 o más",
+        ladderYourPlan: "Tu plan",
+        wantToTalk: "Quiero hablarlo",
       },
       resumenPage: {
         title: "Cómo va tu negocio",
@@ -739,9 +872,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         eachTruckIn: (month) => `Cada truck en ${month}`,
         whereFrom: "De dónde llegan",
         topSelling: "Lo que más se vende",
+        piecesThisMonth: "piezas este mes",
         salesActivity: "Actividad de venta",
         salesActivityHint: "Cuándo entra la primera y la última orden de cada truck",
         salesActivityDisclaimer: "Esto mide cuándo empieza y termina la venta de cada truck. No registra entradas ni salidas de personal, y no sirve para calcular pagos.",
+        lateOpenInsightTitle: (unitName, minutes) => `${unitName} empieza a vender ${minutes} minutos tarde`,
+        lateOpenInsightBody: (amount) => `Al ritmo de venta de esa unidad, esa franja ronda los ${amount} al mes — es una estimación a partir de su venta por hora, no un dato exacto.`,
         noSalesToGraph: "Todavía no hay ventas registradas para graficar.",
         noActiveTrucks: "Todavía no hay trucks activos.",
         noSalesThisMonth: "Todavía no hay ventas este mes.",
@@ -788,6 +924,21 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionUnitReactivated: "Reactivó un truck",
       actionBusinessSuspended: "Negocio suspendido",
       actionBusinessReactivated: "Negocio reactivado",
+      kpiActiveBusinesses: "Negocios activos",
+      kpiTrucksBilled: "Trucks facturados",
+      kpiMonthlyRevenue: "Ingreso mensual",
+      kpiAvgTenure: "Meses de permanencia",
+      kpiAvgTenureUnit: "promedio",
+      kpiPerClient: "Por cliente",
+      platformHealthHeader: "Cómo va la plataforma",
+      monthlyRevenuePanelTitle: "Ingreso mensual",
+      thisMonthLabel: "este mes",
+      portfolioPanelTitle: "Tu cartera hoy",
+      portfolioTotalLabel: (n) => `${n} negocio${n === 1 ? "" : "s"} en total`,
+      openLink: "Abrir",
+      openDisabled: "Suspendido — reactívalo para verlo",
+      payManual: "Manual",
+      payStripe: "Stripe",
     },
   },
   en: {
@@ -1008,6 +1159,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         minLabel: "minimum",
         maxLabel: "maximum",
         requiredLabel: "required",
+        allTrucksFilter: "All trucks",
+        statsLine: (total, out, noPhoto) =>
+          `${total} item${total === 1 ? "" : "s"}` +
+          (out ? ` · ${out} sold out` : "") +
+          (noPhoto ? ` · ${noPhoto} without a photo` : " · all with photos"),
+        whoSellsIt: "Who sells it?",
       },
       trucksPage: {
         title: "Trucks",
@@ -1038,6 +1195,32 @@ export const dictionary: Record<Lang, Dictionary> = {
         yesArchive: "Yes, archive",
         archivedOn: (date) => `Archived ${date}`,
         reactivate: "Reactivate",
+        locationPlaceholder: "Where does it usually park? (optional)",
+        taxTitle: "How you handle tax",
+        taxHint: "Affects the menu, the ticket, and your reports.",
+        taxAdd: "Added to the total",
+        taxAddHint: "The menu shows the price and tax is added at the end.",
+        taxIncluded: "Already included",
+        taxIncludedHint: "What they see on the menu is what they pay. No surprises at the end.",
+        sharedSettingsTitle: "Settings for all your trucks",
+        sharedSettingsHint: "Tax applies to the whole business. Each truck keeps its own kitchen alert threshold.",
+        pauseModalTitle: (name) => `Pause ${name}`,
+        pauseModalExplain: "It stops taking orders and reopens on its own. Your customers will see this:",
+        pausePreviewLabel: "What your customer sees",
+        pausePreviewClosedToday: "We're closed for today",
+        pausePreviewReturnsAt: (when) => `Back at ${when}`,
+        pauseWhyLabel: "Why?",
+        pauseReason1: "Ran out of gas",
+        pauseReason2: "Shift change",
+        pauseReason3: "Ran out of food",
+        pauseReason4: "Staff break",
+        pauseUntilLabel: "Until when?",
+        pauseDur30: "30 minutes",
+        pauseDur1h: "1 hour",
+        pauseDur2h: "2 hours",
+        pauseDurRestOfDay: "The rest of the day",
+        pauseConfirm: "Pause now",
+        pauseReasonLabel: (reason) => `Reason: ${reason}`,
       },
       marcaPage: {
         title: "Brand",
@@ -1065,6 +1248,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         liveLabel: "Live",
         coverPlaceholder: "Your cover photo here",
         addPreviewLabel: "Add",
+        motifStep: "DETAIL",
+        motifTitle: "Background artwork",
+        motifHint: "A few discreet lines in the header, based on what you sell.",
+        truckOverrideSummary: "A truck with a different brand?",
+        truckOverrideBody: "Normally your trucks share the same logo and color, and each keeps its own name and photo. If one operates under a different brand, you can give it its own color here — it's an exception, not something you have to decide.",
+        truckOverrideOwn: "Own color",
+        truckOverrideRemove: "Remove",
+        truckOverrideInherits: "Uses the business color",
       },
       personalPage: {
         title: "Staff",
@@ -1101,6 +1292,17 @@ export const dictionary: Record<Lang, Dictionary> = {
         subtitle: "One per truck. Print it and post it where the customer sees it while in line.",
         noActiveTrucks: "No active trucks yet.",
         download: "Download to print",
+        openMenu: "Open the menu",
+        realTitle: "These codes are real",
+        realBody: "Scan them right now with your phone's camera to check — they'll take you to the address shown under each one.",
+        howToTitle: "What to do with them",
+        how1: "Print them big, at least letter-size. A tiny QR doesn't scan from the line.",
+        how2: "Post them where people see them while waiting: the window, the side of the truck, the tables if you have any.",
+        how3: "Laminate them or put them in a sleeve. They'll take sun, grease, and rain.",
+        how4: "Don't cover them with anything. If one gets scratched or faded, print another — it's the same code.",
+        printAll: "Print the posters",
+        posterMsg: "Escanea y pide desde tu celular",
+        posterMsg2: "Scan to order from your phone",
       },
       cuentaPage: {
         title: "Account",
@@ -1124,6 +1326,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         statusActive: "Active",
         statusSuspended: "Suspended",
         statusCancelled: "Cancelled",
+        ladderTitle: "How pricing works",
+        ladderHint: "The more trucks, the less you pay per truck.",
+        ladderTrucks: "Trucks",
+        ladderPerTruck: "Per truck",
+        ladderMonthly: "Monthly",
+        ladderFivePlus: "5 or more",
+        ladderYourPlan: "Your plan",
+        wantToTalk: "I want to talk about it",
       },
       resumenPage: {
         title: "How your business is doing",
@@ -1140,9 +1350,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         eachTruckIn: (month) => `Each truck in ${month}`,
         whereFrom: "Where sales come from",
         topSelling: "Best sellers",
+        piecesThisMonth: "units this month",
         salesActivity: "Sales activity",
         salesActivityHint: "When the first and last order of each truck come in",
         salesActivityDisclaimer: "This measures when each truck's selling starts and ends. It doesn't log staff clock-ins or clock-outs, and it's not used to calculate pay.",
+        lateOpenInsightTitle: (unitName, minutes) => `${unitName} starts selling ${minutes} minutes late`,
+        lateOpenInsightBody: (amount) => `At that unit's sales pace, that gap runs about ${amount} a month — an estimate from its hourly sales rate, not an exact figure.`,
         noSalesToGraph: "No sales recorded yet to graph.",
         noActiveTrucks: "No active trucks yet.",
         noSalesThisMonth: "No sales yet this month.",
@@ -1189,6 +1402,21 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionUnitReactivated: "Reactivated a truck",
       actionBusinessSuspended: "Business suspended",
       actionBusinessReactivated: "Business reactivated",
+      kpiActiveBusinesses: "Active businesses",
+      kpiTrucksBilled: "Trucks billed",
+      kpiMonthlyRevenue: "Monthly revenue",
+      kpiAvgTenure: "Months of tenure",
+      kpiAvgTenureUnit: "average",
+      kpiPerClient: "Per client",
+      platformHealthHeader: "How the platform is doing",
+      monthlyRevenuePanelTitle: "Monthly revenue",
+      thisMonthLabel: "this month",
+      portfolioPanelTitle: "Your portfolio today",
+      portfolioTotalLabel: (n) => `${n} business${n === 1 ? "" : "es"} total`,
+      openLink: "Open",
+      openDisabled: "Suspended — reactivate it to view",
+      payManual: "Manual",
+      payStripe: "Stripe",
     },
   },
 }

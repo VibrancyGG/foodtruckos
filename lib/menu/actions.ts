@@ -49,8 +49,15 @@ export async function retireProduct(productId: string): Promise<Result> {
   return { ok: true }
 }
 
+// Sin fila en unit_products, un platillo se trata como ofrecido y no
+// agotado (así funcionan los que ya existían antes de que hubiera varios
+// trucks, o antes de que se diera de alta un truck nuevo). Por eso estas dos
+// acciones hacen upsert por (unit_id, product_id) en vez de exigir un id de
+// fila que puede no existir todavía — si el dueño toca el switch, la fila se
+// crea en ese momento con el valor que acaba de elegir.
 export async function toggleSoldOut(input: {
-  unitProductId: string
+  productId: string
+  unitId: string
   soldOut: boolean
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
@@ -59,9 +66,35 @@ export async function toggleSoldOut(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("unit_products")
-    .update({ sold_out: input.soldOut })
-    .eq("id", input.unitProductId)
-    .eq("business_id", businessId)
+    .upsert(
+      { business_id: businessId, unit_id: input.unitId, product_id: input.productId, sold_out: input.soldOut },
+      { onConflict: "unit_id,product_id" },
+    )
+
+  if (error) return { ok: false, error: "No se pudo actualizar" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
+// Exclusividad por truck: el menú es compartido por default, y el dueño
+// apaga is_offered en los trucks donde ESE platillo no aplica — no es lo
+// mismo que "se acabó" (sold_out), que se revierte solo y no cambia el menú
+// base.
+export async function toggleOffered(input: {
+  productId: string
+  unitId: string
+  isOffered: boolean
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("unit_products")
+    .upsert(
+      { business_id: businessId, unit_id: input.unitId, product_id: input.productId, is_offered: input.isOffered },
+      { onConflict: "unit_id,product_id" },
+    )
 
   if (error) return { ok: false, error: "No se pudo actualizar" }
   revalidatePath("/panel/menu")

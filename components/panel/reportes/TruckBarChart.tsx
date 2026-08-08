@@ -1,4 +1,7 @@
+"use client"
+
 import { money, pctDelta, fmtDelta } from "@/lib/reportes/format"
+import { useChartTooltip, ChartTooltip } from "./ChartTooltip"
 
 type TruckRow = { unitId: string; name: string; currentMonth: number; prevMonth: number | null }
 
@@ -13,13 +16,15 @@ export function TruckBarChart({
   noDataLabel: string
   noPrevLabel: string
 }) {
+  const max = Math.max(...trucks.map((t) => t.currentMonth), 1)
+  const { tooltip, show, hide } = useChartTooltip()
+
   if (trucks.length === 0) {
     return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
-  const max = Math.max(...trucks.map((t) => t.currentMonth), 1)
 
   return (
-    <div className="space-y-4">
+    <div data-chart-wrap className="relative space-y-4">
       {trucks.map((t, i) => {
         const widthPct = (t.currentMonth / max) * 100
         const delta = t.prevMonth !== null ? pctDelta(t.currentMonth, t.prevMonth) : null
@@ -36,7 +41,23 @@ export function TruckBarChart({
                 )}
               </span>
             </div>
-            <div className="h-5 w-full rounded bg-neutral-100">
+            <div
+              className="h-5 w-full cursor-pointer rounded bg-neutral-100"
+              onMouseMove={(e) =>
+                show(
+                  e,
+                  <>
+                    <b>{t.name}</b>
+                    <br />
+                    {money(t.currentMonth)}
+                    {t.prevMonth !== null && (
+                      <span className="text-neutral-400"> · {money(t.prevMonth)}</span>
+                    )}
+                  </>,
+                )
+              }
+              onMouseLeave={hide}
+            >
               <div
                 className="h-5 rounded"
                 style={{ width: `${Math.max(widthPct, 2)}%`, background: COLORS[i % COLORS.length] }}
@@ -45,6 +66,7 @@ export function TruckBarChart({
           </div>
         )
       })}
+      <ChartTooltip tooltip={tooltip} />
     </div>
   )
 }

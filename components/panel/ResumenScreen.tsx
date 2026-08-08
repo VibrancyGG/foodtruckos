@@ -92,7 +92,7 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           <div className="mb-3 text-xs font-bold uppercase tracking-wide text-neutral-500">{p.topSelling}</div>
-          <TopProductsChart products={data.topProducts} noDataLabel={p.noOrdersThisMonth} />
+          <TopProductsChart products={data.topProducts} noDataLabel={p.noOrdersThisMonth} piecesLabel={p.piecesThisMonth} />
         </div>
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -103,6 +103,16 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
               <ActivityRow key={a.unitId} activity={a} t={p} />
             ))}
           </div>
+          {data.lateOpenInsight && (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3.5">
+              <div className="mb-1 text-sm font-extrabold text-amber-900">
+                {p.lateOpenInsightTitle(data.lateOpenInsight.unitName, data.lateOpenInsight.lateMinutes)}
+              </div>
+              <p className="text-xs leading-relaxed text-amber-800">
+                {p.lateOpenInsightBody(money(data.lateOpenInsight.estimatedMonthlyLoss))}
+              </p>
+            </div>
+          )}
           <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">{p.salesActivityDisclaimer}</p>
         </div>
       </div>

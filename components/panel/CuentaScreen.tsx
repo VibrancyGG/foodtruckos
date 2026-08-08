@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import Link from "next/link"
 import { requestCancellation } from "@/lib/billing/actions"
 import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
+import { pricePerTruck } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
 
 export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
@@ -52,6 +53,36 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.ladderTitle}</div>
+        <p className="mb-3 text-xs text-neutral-500">{p.ladderHint}</p>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-neutral-200 text-left text-[11px] font-bold uppercase tracking-wide text-neutral-400">
+              <th className="pb-2 font-bold">{p.ladderTrucks}</th>
+              <th className="pb-2 font-bold">{p.ladderPerTruck}</th>
+              <th className="pb-2 font-bold">{p.ladderMonthly}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[1, 2, 3, 4, 5].map((n) => {
+              const isCurrent = n === billing.activeTrucks
+              const price = pricePerTruck(n)
+              return (
+                <tr key={n} className={`border-b border-neutral-100 last:border-0 ${isCurrent ? "bg-green-50 font-bold" : ""}`}>
+                  <td className="py-2">
+                    {n === 5 ? p.ladderFivePlus : n}
+                    {isCurrent && <span className="ml-2 rounded-full bg-green-700 px-2 py-0.5 text-[10px] font-bold text-white">{p.ladderYourPlan}</span>}
+                  </td>
+                  <td className="py-2">${price}</td>
+                  <td className="py-2">${n * price}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.subscriptionStatus}</div>
         <div className="font-semibold">
           {STATUS_LABEL[billing.business?.subscription_status ?? ""] ?? billing.business?.subscription_status}
@@ -84,7 +115,7 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
               rows={2}
             />
             {error && <p className="text-xs text-red-600">{error}</p>}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={send}
                 disabled={pending}
@@ -92,6 +123,12 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
               >
                 {pending ? p.sendingLabel : p.sendRequest}
               </button>
+              <a
+                href="mailto:jetgosolutions@gmail.com?subject=Quiero%20hablarlo"
+                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold text-neutral-700"
+              >
+                {p.wantToTalk}
+              </a>
               <button onClick={() => setShowCancel(false)} className="text-xs text-neutral-500">
                 {t.panel.common.cancel}
               </button>

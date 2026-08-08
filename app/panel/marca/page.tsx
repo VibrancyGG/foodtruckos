@@ -9,11 +9,19 @@ export default async function PanelPage() {
   if (!businessId) redirect("/panel/sin-acceso")
 
   const supabase = await createClient()
-  const { data: business } = await supabase
-    .from("businesses")
-    .select("name, slug, logo_url, cover_photo_url, brand_color, menu_style")
-    .eq("id", businessId)
-    .single()
+  const [{ data: business }, { data: units }] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("name, slug, logo_url, cover_photo_url, brand_color, menu_style, brand_motif")
+      .eq("id", businessId)
+      .single(),
+    supabase
+      .from("units")
+      .select("id, name, brand_color")
+      .eq("business_id", businessId)
+      .neq("status", "archived")
+      .order("created_at"),
+  ])
 
   if (!business) redirect("/panel/sin-acceso")
 
@@ -25,6 +33,8 @@ export default async function PanelPage() {
         initialCoverUrl={business.cover_photo_url}
         initialColor={business.brand_color || "#D62828"}
         initialStyle={business.menu_style}
+        initialMotif={business.brand_motif}
+        units={units ?? []}
       />
     </div>
   )

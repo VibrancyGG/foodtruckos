@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react"
 import { PALETTE } from "@/lib/branding/palette"
 import { onColorFor } from "@/lib/branding/color"
-import { uploadLogo, uploadCoverPhoto, saveBrandSettings } from "@/lib/media/actions"
+import { MOTIFS, isBrandMotif, type BrandMotif } from "@/lib/branding/motifs"
+import { uploadLogo, uploadCoverPhoto, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 
 type MenuStyle = "vibrante" | "tradicional"
+type UnitBrand = { id: string; name: string; brand_color: string | null }
 
 export function MarcaForm({
   businessName,
@@ -14,12 +16,16 @@ export function MarcaForm({
   initialCoverUrl,
   initialColor,
   initialStyle,
+  initialMotif,
+  units,
 }: {
   businessName: string
   initialLogoUrl: string | null
   initialCoverUrl: string | null
   initialColor: string
   initialStyle: string
+  initialMotif: string
+  units: UnitBrand[]
 }) {
   const { t } = useLang()
   const p = t.panel.marcaPage
@@ -30,6 +36,7 @@ export function MarcaForm({
   const [style, setStyle] = useState<MenuStyle>(
     initialStyle === "tradicional" ? "tradicional" : "vibrante",
   )
+  const [motif, setMotif] = useState<BrandMotif>(isBrandMotif(initialMotif) ? initialMotif : "tacos")
   const [dirty, setDirty] = useState(false)
   const [saving, startSaving] = useTransition()
   const [saved, setSaved] = useState(false)
@@ -39,7 +46,7 @@ export function MarcaForm({
   function save() {
     setSaved(false)
     startSaving(async () => {
-      const result = await saveBrandSettings({ brandColor: color, menuStyle: style })
+      const result = await saveBrandSettings({ brandColor: color, menuStyle: style, brandMotif: motif })
       if (result.ok) {
         setDirty(false)
         setSaved(true)
@@ -144,6 +151,50 @@ export function MarcaForm({
           </div>
         </section>
 
+        <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <span className="text-[11px] font-black tracking-wide text-neutral-400">{p.motifStep}</span>
+          <h2 className="mb-1 font-bold">{p.motifTitle}</h2>
+          <p className="mb-4 text-sm text-neutral-500">{p.motifHint}</p>
+          <div className="flex flex-wrap gap-2.5">
+            {(Object.entries(MOTIFS) as [BrandMotif, (typeof MOTIFS)[BrandMotif]][]).map(([key, m]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={motif === key}
+                onClick={() => {
+                  setMotif(key)
+                  setDirty(true)
+                }}
+                className={`flex items-center gap-2 rounded-xl border-2 px-3.5 py-2 text-sm font-bold ${motif === key ? "border-neutral-900" : "border-neutral-200"}`}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                  dangerouslySetInnerHTML={{ __html: m.ic }}
+                />
+                {m.name}
+              </button>
+            ))}
+          </div>
+
+          {units.length > 1 && (
+            <details className="mt-4 border-t border-neutral-200 pt-3.5">
+              <summary className="cursor-pointer text-sm font-bold text-neutral-600">{p.truckOverrideSummary}</summary>
+              <p className="mt-2.5 text-xs leading-relaxed text-neutral-500">{p.truckOverrideBody}</p>
+              <div className="mt-2 space-y-0.5">
+                {units.map((u) => (
+                  <TruckBrandOverrideRow key={u.id} unit={u} businessColor={color} />
+                ))}
+              </div>
+            </details>
+          )}
+        </section>
+
         <div className="sticky bottom-4 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg">
           <span className="text-sm text-neutral-500">
             {saving ? c.saving : saved ? c.saved : dirty ? p.unsavedLabel : p.noChangesLabel}
@@ -164,14 +215,29 @@ export function MarcaForm({
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">{p.liveLabel}</span>
         </div>
         <div className="overflow-hidden rounded-[28px] border-[10px] border-neutral-900 bg-white">
-          <div className="flex items-center gap-2 px-3 py-3" style={{ background: color, color: onColor }}>
+          <div className="relative flex items-center gap-2 overflow-hidden px-3 py-3" style={{ background: color, color: onColor }}>
+            <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
+              <defs>
+                <pattern id="marcaPreviewMotif" width="90" height="90" patternUnits="userSpaceOnUse">
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    dangerouslySetInnerHTML={{ __html: MOTIFS[motif].pat }}
+                  />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#marcaPreviewMotif)" />
+            </svg>
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+              <img src={logoUrl} alt="" className="relative z-10 h-8 w-8 rounded-full object-cover" />
             ) : (
-              <div className="h-8 w-8 rounded-full bg-white/25" />
+              <div className="relative z-10 h-8 w-8 rounded-full bg-white/25" />
             )}
-            <div className="text-sm font-bold">{businessName}</div>
+            <div className="relative z-10 text-sm font-bold">{businessName}</div>
           </div>
           {coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -199,6 +265,60 @@ export function MarcaForm({
           </div>
         </div>
       </aside>
+    </div>
+  )
+}
+
+function TruckBrandOverrideRow({ unit, businessColor }: { unit: UnitBrand; businessColor: string }) {
+  const { t } = useLang()
+  const p = t.panel.marcaPage
+  const [color, setColor] = useState(unit.brand_color)
+  const [open, setOpen] = useState(false)
+  const [pending, startTransition] = useTransition()
+
+  function setUnitColor(next: string | null) {
+    setColor(next)
+    setOpen(false)
+    startTransition(async () => {
+      await updateUnitBrandColor({ unitId: unit.id, brandColor: next })
+    })
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 border-b border-neutral-100 py-3 last:border-0">
+      <span
+        className="h-7 w-7 flex-none rounded-lg border border-neutral-200"
+        style={{ background: color ?? businessColor }}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-bold">{unit.name}</div>
+        <div className="text-xs text-neutral-500">
+          {color ? `${p.truckOverrideOwn}: ${PALETTE.find((pt) => pt.hex === color)?.name ?? color}` : p.truckOverrideInherits}
+        </div>
+      </div>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => (color ? setUnitColor(null) : setOpen((s) => !s))}
+        className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
+      >
+        {color ? p.truckOverrideRemove : p.truckOverrideOwn}
+      </button>
+      {open && (
+        <div className="flex w-full flex-wrap gap-1.5 pt-1">
+          {PALETTE.map((pt) => (
+            <button
+              key={pt.hex}
+              type="button"
+              title={pt.name}
+              aria-pressed={color === pt.hex}
+              onClick={() => setUnitColor(pt.hex)}
+              className="h-7 w-7 rounded-lg border-2"
+              style={{ background: pt.hex, borderColor: color === pt.hex ? "#1A1512" : "transparent" }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

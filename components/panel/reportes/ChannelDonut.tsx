@@ -1,4 +1,7 @@
+"use client"
+
 import { money } from "@/lib/reportes/format"
+import { useChartTooltip, ChartTooltip } from "./ChartTooltip"
 
 export function ChannelDonut({
   breakdown,
@@ -13,6 +16,8 @@ export function ChannelDonut({
   qrLabel: string
   ventanillaLabel: string
 }) {
+  const { tooltip, show, hide } = useChartTooltip()
+
   if (!breakdown || breakdown.qr + breakdown.ventanilla === 0) {
     return <p className="text-sm text-neutral-400">{noDataLabel}</p>
   }
@@ -33,16 +38,39 @@ export function ChannelDonut({
     const p0 = a0 + gap / 2
     const p1 = a1 - gap / 2
     const large = a1 - a0 > Math.PI ? 1 : 0
-    const x0 = cx + r * Math.cos(p0), y0 = cy + r * Math.sin(p0)
-    const x1 = cx + r * Math.cos(p1), y1 = cy + r * Math.sin(p1)
+    // toFixed evita un desajuste de hidratación: Math.cos/sin pueden diferir
+    // en el último bit entre el motor del servidor y el del navegador.
+    const x0 = (cx + r * Math.cos(p0)).toFixed(4), y0 = (cy + r * Math.sin(p0)).toFixed(4)
+    const x1 = (cx + r * Math.cos(p1)).toFixed(4), y1 = (cy + r * Math.sin(p1)).toFixed(4)
     return { ...s, d: `M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}` }
   })
 
   return (
-    <div className="flex items-center gap-6">
+    <div data-chart-wrap className="relative flex items-center gap-6">
       <svg viewBox="0 0 160 180" role="img" aria-label="Ventas por canal" className="h-40 w-40 flex-none">
         {paths.map(
-          (p) => p && <path key={p.key} d={p.d} fill="none" stroke={p.color} strokeWidth={sw} />,
+          (p) =>
+            p && (
+              <path
+                key={p.key}
+                d={p.d}
+                fill="none"
+                stroke={p.color}
+                strokeWidth={sw}
+                style={{ cursor: "pointer" }}
+                onMouseMove={(e) =>
+                  show(
+                    e,
+                    <>
+                      <b>{p.label}</b>
+                      <br />
+                      <b>{money(p.value)}</b> <span className="text-neutral-400">· {Math.round((p.value / total) * 100)}%</span>
+                    </>,
+                  )
+                }
+                onMouseLeave={hide}
+              />
+            ),
         )}
         <text x={cx} y={cy - 4} textAnchor="middle" fontSize={20} fontWeight={800} fill="#0B0B0B">
           {Math.round((breakdown.qr / total) * 100)}%
@@ -60,6 +88,7 @@ export function ChannelDonut({
           </div>
         ))}
       </div>
+      <ChartTooltip tooltip={tooltip} />
     </div>
   )
 }
