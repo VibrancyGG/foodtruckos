@@ -44,6 +44,8 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           products={productsByCategory.get(cat.id) ?? []}
           units={initial.units}
           unitProducts={initial.unitProducts}
+          optionGroups={initial.optionGroups}
+          options={initial.options}
         />
       ))}
 
@@ -53,6 +55,8 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           products={productsByCategory.get("sin-categoria") ?? []}
           units={initial.units}
           unitProducts={initial.unitProducts}
+          optionGroups={initial.optionGroups}
+          options={initial.options}
         />
       )}
 
@@ -105,11 +109,15 @@ function CategorySection({
   products,
   units,
   unitProducts,
+  optionGroups,
+  options,
 }: {
   category: { id: string; name_es: string; name_en: string }
   products: OwnerMenuData["products"]
   units: OwnerMenuData["units"]
   unitProducts: OwnerMenuData["unitProducts"]
+  optionGroups: OwnerMenuData["optionGroups"]
+  options: OwnerMenuData["options"]
 }) {
   const [showAdd, setShowAdd] = useState(false)
   const [nameEs, setNameEs] = useState("")
@@ -143,7 +151,14 @@ function CategorySection({
       </h2>
       <div className="space-y-2">
         {products.map((p) => (
-          <ProductRow key={p.id} product={p} units={units} unitProducts={unitProducts} />
+          <ProductRow
+            key={p.id}
+            product={p}
+            units={units}
+            unitProducts={unitProducts}
+            optionGroups={optionGroups.filter((g) => g.product_id === p.id)}
+            options={options}
+          />
         ))}
       </div>
 

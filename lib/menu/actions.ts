@@ -136,6 +136,110 @@ export async function createProduct(input: {
   return { ok: true }
 }
 
+// Grupos y opciones de personalización ("¿le agregamos algo?" / "¿le
+// quitamos algo?") — configuración de menú, no historial de pedidos: un
+// pedido ya hecho guarda su propia copia en order_items.customizations_snapshot
+// (Regla 2), así que borrar un grupo u opción de aquí nunca corrompe un
+// pedido pasado.
+
+export async function createOptionGroup(input: {
+  productId: string
+  nameEs: string
+  nameEn: string
+  required: boolean
+  minSelect: number
+  maxSelect: number
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
+
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from("product_option_groups")
+    .select("id", { count: "exact", head: true })
+    .eq("product_id", input.productId)
+
+  const { error } = await supabase.from("product_option_groups").insert({
+    business_id: businessId,
+    product_id: input.productId,
+    group_name_es: input.nameEs,
+    group_name_en: input.nameEn,
+    required: input.required,
+    min_select: input.minSelect,
+    max_select: input.maxSelect,
+    sort_order: count ?? 0,
+  })
+
+  if (error) return { ok: false, error: "No se pudo crear el grupo" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
+export async function deleteOptionGroup(groupId: string): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("product_option_groups")
+    .delete()
+    .eq("id", groupId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo eliminar" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
+export async function createOption(input: {
+  groupId: string
+  nameEs: string
+  nameEn: string
+  priceDelta: number
+  kind: "add" | "remove"
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
+
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from("product_options")
+    .select("id", { count: "exact", head: true })
+    .eq("group_id", input.groupId)
+
+  const { error } = await supabase.from("product_options").insert({
+    business_id: businessId,
+    group_id: input.groupId,
+    option_name_es: input.nameEs,
+    option_name_en: input.nameEn,
+    price_delta: input.kind === "remove" ? 0 : input.priceDelta,
+    kind: input.kind,
+    sort_order: count ?? 0,
+  })
+
+  if (error) return { ok: false, error: "No se pudo crear la opción" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
+export async function deleteOption(optionId: string): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("product_options")
+    .delete()
+    .eq("id", optionId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo eliminar" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
 type UploadResult = { ok: false; error: string } | { ok: true; publicUrl: string }
 
 export async function uploadProductPhoto(

@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
 import type { ActiveMenuData } from "@/lib/menu/getMenuData"
 import { displayFont } from "@/lib/fonts"
+import { CustomizeSheet } from "./CustomizeSheet"
 
 type CartLine = CartItemInput & { key: string }
 
@@ -27,6 +28,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [customerName, setCustomerName] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
+  const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
 
   const vibrante = data.business.menu_style !== "tradicional"
 
@@ -34,6 +36,15 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     const map = new Map(data.unitProducts.map((up) => [up.product_id, up]))
     return map
   }, [data.unitProducts])
+
+  const groupsByProduct = useMemo(() => {
+    const map = new Map<string, typeof data.optionGroups>()
+    for (const g of data.optionGroups) {
+      if (!map.has(g.product_id)) map.set(g.product_id, [])
+      map.get(g.product_id)!.push(g)
+    }
+    return map
+  }, [data.optionGroups])
 
   const productsByCategory = useMemo(() => {
     const groups = new Map<string | null, typeof data.products>()
@@ -66,6 +77,23 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         },
       ]
     })
+  }
+
+  // Un platillo con extras/quita siempre abre la hoja de personalización,
+  // aunque sea para confirmar sin elegir nada — cada combinación distinta se
+  // agrega como su propia línea, nunca se fusiona con otra (a diferencia del
+  // "agregar rápido" de un platillo sin opciones).
+  function handleTap(product: (typeof data.products)[number]) {
+    if ((groupsByProduct.get(product.id)?.length ?? 0) > 0) {
+      setCustomizing(product)
+    } else {
+      addToCart(product)
+    }
+  }
+
+  function addCustomizedToCart(line: CartItemInput) {
+    setCart((c) => [...c, { ...line, key: `${line.productId}-${Date.now()}` }])
+    setCustomizing(null)
   }
 
   function changeQty(key: string, delta: number) {
@@ -189,6 +217,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                   const soldOut = up?.sold_out === true
                   const name = lang === "es" ? p.name_es : p.name_en
                   const desc = lang === "es" ? p.description_es : p.description_en
+                  const customizable = (groupsByProduct.get(p.id)?.length ?? 0) > 0
 
                   if (vibrante) {
                     return (
@@ -218,10 +247,11 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                             </div>
                           )}
                           {soldOut && <SoldOutTag label={t.menu.soldOut} />}
+                          {!soldOut && customizable && <CustomizableTag lang={lang} />}
                         </div>
                         <div className="flex flex-none flex-col items-end gap-2">
                           <div style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>${p.price.toFixed(2)}</div>
-                          <AddButton disabled={soldOut} onClick={() => addToCart(p)} label={t.menu.addToCart} />
+                          <AddButton disabled={soldOut} onClick={() => handleTap(p)} label={t.menu.addToCart} />
                         </div>
                       </div>
                     )
@@ -243,7 +273,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                         <span className="flex-none" style={{ fontFamily: "var(--font-display)", fontSize: 17 }}>
                           ${p.price.toFixed(2)}
                         </span>
-                        <AddButton disabled={soldOut} onClick={() => addToCart(p)} label={t.menu.addToCart} small />
+                        <AddButton disabled={soldOut} onClick={() => handleTap(p)} label={t.menu.addToCart} small />
                       </div>
                       {desc && (
                         <div className="mt-1 truncate text-xs" style={{ color: INK_SOFT }}>
@@ -251,6 +281,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                         </div>
                       )}
                       {soldOut && <SoldOutTag label={t.menu.soldOut} />}
+                      {!soldOut && customizable && <CustomizableTag lang={lang} />}
                     </div>
                   )
                 })}
@@ -259,6 +290,16 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           )
         })}
       </div>
+
+      {customizing && (
+        <CustomizeSheet
+          product={customizing}
+          groups={groupsByProduct.get(customizing.id) ?? []}
+          options={data.options}
+          onClose={() => setCustomizing(null)}
+          onAdd={addCustomizedToCart}
+        />
+      )}
 
       <footer className="px-4 pb-8 pt-6 text-center text-xs" style={{ color: INK_SOFT }}>
         {!data.business.tax_included && <div>{lang === "es" ? "Los precios no incluyen impuesto" : "Prices do not include tax"}</div>}
@@ -270,8 +311,28 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           <div className="mx-auto max-w-lg space-y-2.5">
             <div className="max-h-36 space-y-2 overflow-y-auto">
               {cart.map((l) => (
-                <div key={l.key} className="flex items-center justify-between text-sm text-white">
-                  <span className="truncate pr-2">{l.productName}</span>
+                <div key={l.key} className="flex items-center justify-between gap-2 text-sm text-white">
+                  <div className="min-w-0 pr-2">
+                    <div className="truncate">{l.productName}</div>
+                    {l.customizations.length > 0 && (
+                      <div className="mt-0.5 flex flex-wrap gap-1">
+                        {l.customizations.map((c, i) => (
+                          <span
+                            key={i}
+                            className="rounded px-1.5 py-0.5 text-[10px] font-bold"
+                            style={
+                              c.kind === "add"
+                                ? { background: "#1F3D2A", color: "#8BE9B0" }
+                                : { background: "#3A1E1F", color: "#FFB3B5" }
+                            }
+                          >
+                            {c.kind === "add" ? "+ " : "− "}
+                            {c.optionName}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex flex-none items-center gap-2">
                     <button
                       onClick={() => changeQty(l.key, -1)}
@@ -321,6 +382,17 @@ function SoldOutTag({ label }: { label: string }) {
   return (
     <span className="mt-1.5 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: INK }}>
       {label}
+    </span>
+  )
+}
+
+function CustomizableTag({ lang }: { lang: "es" | "en" }) {
+  return (
+    <span
+      className="mt-1.5 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+      style={{ background: LINE, color: INK_SOFT }}
+    >
+      {lang === "es" ? "Personalizable" : "Customizable"}
     </span>
   )
 }

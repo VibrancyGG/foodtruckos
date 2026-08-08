@@ -3,17 +3,23 @@
 import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { updateProduct, retireProduct, toggleSoldOut, uploadProductPhoto } from "@/lib/menu/actions"
+import { OptionGroupsEditor } from "./OptionGroupsEditor"
 
 export function ProductRow({
   product,
   units,
   unitProducts,
+  optionGroups,
+  options,
 }: {
   product: OwnerMenuData["products"][number]
   units: OwnerMenuData["units"]
   unitProducts: OwnerMenuData["unitProducts"]
+  optionGroups: OwnerMenuData["optionGroups"]
+  options: OwnerMenuData["options"]
 }) {
   const [editing, setEditing] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
   const [nameEs, setNameEs] = useState(product.name_es)
   const [nameEn, setNameEn] = useState(product.name_en)
   const [price, setPrice] = useState(String(product.price))
@@ -178,6 +184,15 @@ export function ProductRow({
             </button>
           )}
         </div>
+      </div>
+
+      <div className="mt-2 border-t border-neutral-100 pt-2">
+        <button onClick={() => setShowOptions((s) => !s)} className="text-xs font-bold text-neutral-500">
+          {showOptions ? "Ocultar" : "Personalización"} ({optionGroups.length})
+        </button>
+        {showOptions && (
+          <OptionGroupsEditor productId={product.id} groups={optionGroups} options={options} />
+        )}
       </div>
     </div>
   )

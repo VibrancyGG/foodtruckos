@@ -127,14 +127,31 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
 
         <div className="rounded-xl border border-neutral-200 p-4">
           <h3 className="mb-2 text-sm font-bold uppercase text-neutral-500">{t.tracking.title}</h3>
-          {initial.items.map((item) => (
-            <div key={item.id} className="flex justify-between py-1 text-sm">
-              <span>
-                {item.quantity}× {item.product_name_snapshot}
-              </span>
-              <span>${item.line_total.toFixed(2)}</span>
-            </div>
-          ))}
+          {initial.items.map((item) => {
+            const customizations =
+              (item.customizations_snapshot as { optionName: string; kind: string }[] | null) ?? []
+            return (
+              <div key={item.id} className="py-1 text-sm">
+                <div className="flex justify-between">
+                  <span>
+                    {item.quantity}× {item.product_name_snapshot}
+                  </span>
+                  <span>${item.line_total.toFixed(2)}</span>
+                </div>
+                {customizations.length > 0 && (
+                  <div className="ml-3 text-xs text-neutral-500">
+                    {customizations.map((c, i) => (
+                      <div key={i}>
+                        {c.kind === "add" ? "+ " : "− "}
+                        {c.optionName}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {item.notes && <div className="ml-3 text-xs italic text-neutral-500">&quot;{item.notes}&quot;</div>}
+              </div>
+            )
+          })}
         </div>
       </div>
     </BrandProvider>

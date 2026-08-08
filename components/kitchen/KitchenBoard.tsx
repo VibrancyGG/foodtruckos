@@ -177,11 +177,30 @@ export function KitchenBoard({
                     <div className="mb-2 space-y-0.5 text-sm">
                       {items
                         .filter((i) => i.order_id === o.id)
-                        .map((i) => (
-                          <div key={i.id}>
-                            {i.quantity}× {i.product_name_snapshot}
-                          </div>
-                        ))}
+                        .map((i) => {
+                          const customizations =
+                            (i.customizations_snapshot as
+                              | { groupName: string; optionName: string; kind: string }[]
+                              | null) ?? []
+                          return (
+                            <div key={i.id}>
+                              <div>
+                                {i.quantity}× {i.product_name_snapshot}
+                              </div>
+                              {customizations.length > 0 && (
+                                <div className="ml-3 text-xs text-neutral-400">
+                                  {customizations.map((c, idx) => (
+                                    <div key={idx}>
+                                      {c.kind === "add" ? "+ " : "− "}
+                                      {c.optionName}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {i.notes && <div className="ml-3 text-xs italic text-neutral-400">&quot;{i.notes}&quot;</div>}
+                            </div>
+                          )
+                        })}
                     </div>
                     {col === "listo" ? (
                       askPayFor === o.id ? (
