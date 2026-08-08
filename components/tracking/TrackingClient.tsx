@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { BrandProvider } from "@/lib/branding/BrandProvider"
+import { displayFont } from "@/lib/fonts"
 import type { OrderWithItems } from "@/lib/orders/getOrder"
 
 const STEPS = ["recibido", "preparando", "listo", "entregado"] as const
@@ -85,7 +86,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
 
   return (
     <BrandProvider brandColor={initial.order.businesses?.brand_color ?? null}>
-      <div className="mx-auto max-w-lg p-4">
+      <div className={`${displayFont.variable} mx-auto max-w-lg p-4`}>
         <div
           className="mb-4 flex items-center justify-between rounded-full px-3 py-1 text-xs font-semibold"
           style={{ background: online ? "#E6F4EA" : "#FBE9E7", color: online ? "#1B5E20" : "#B71C1C" }}
@@ -94,10 +95,14 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
         </div>
 
         <div className="mb-1 text-sm text-neutral-500">{t.tracking.yourNumber}</div>
-        <div className="mb-6 text-5xl font-black">{order.folio}</div>
+        <div className="mb-6 leading-none" style={{ fontFamily: "var(--font-display)", fontSize: 64 }}>
+          {order.folio}
+        </div>
 
         <div className={`mb-6 rounded-2xl p-6 text-center ${stepIndex === 2 ? "animate-pulse" : ""}`} style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}>
-          <div className="text-lg font-bold">{t.tracking.titles[order.status as keyof typeof t.tracking.titles] ?? order.status}</div>
+          <div className="uppercase tracking-wide" style={{ fontFamily: "var(--font-display)", fontSize: 19 }}>
+            {t.tracking.titles[order.status as keyof typeof t.tracking.titles] ?? order.status}
+          </div>
         </div>
 
         <div className="mb-6 flex justify-between">

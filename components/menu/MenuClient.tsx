@@ -5,8 +5,20 @@ import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
 import type { ActiveMenuData } from "@/lib/menu/getMenuData"
+import { displayFont } from "@/lib/fonts"
 
 type CartLine = CartItemInput & { key: string }
+
+const LINE = "#E4DCD0"
+const INK = "#1A1512"
+const INK_SOFT = "#6B615A"
+const PANEL = "#FFFDF9"
+const SOLD = "#9A8F86"
+
+function monogram(name: string) {
+  const words = name.trim().split(/\s+/)
+  return words.length > 1 ? (words[0][0] + words[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase()
+}
 
 export function MenuClient({ data }: { data: ActiveMenuData }) {
   const { lang, setLang, t } = useLang()
@@ -15,6 +27,8 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [customerName, setCustomerName] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
+
+  const vibrante = data.business.menu_style !== "tradicional"
 
   const offeredByUnit = useMemo(() => {
     const map = new Map(data.unitProducts.map((up) => [up.product_id, up]))
@@ -85,64 +99,158 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   }
 
   return (
-    <div className="mx-auto max-w-lg pb-40">
+    <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
       <header
-        className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 text-[var(--brand-on-primary)]"
-        style={{ background: "var(--brand-primary)" }}
+        className="relative overflow-hidden px-4 pb-5 pt-4"
+        style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
       >
-        <div className="flex items-center gap-2">
-          {data.business.logo_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={data.business.logo_url}
-              alt=""
-              className="h-9 w-9 rounded-full object-cover"
-            />
-          )}
-          <div>
-            <div className="font-bold">{data.business.name}</div>
-            <div className="text-xs opacity-90">{data.unit.name}</div>
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.14]"
+          style={{ backgroundImage: "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 14px)" }}
+        />
+        <div className="relative flex items-center gap-3">
+          <div
+            className="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full"
+            style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)" }}
+          >
+            {data.business.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={data.business.logo_url} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
+            )}
           </div>
+          <div className="min-w-0 flex-1">
+            <h1
+              className="truncate uppercase leading-[0.95] tracking-tight"
+              style={{ fontFamily: "var(--font-display)", fontSize: 27 }}
+            >
+              {data.business.name}
+            </h1>
+            <div className="mt-0.5 text-xs font-medium opacity-90">{data.unit.name}</div>
+          </div>
+          <button
+            className="flex-none rounded-full border border-current px-3 py-1 text-xs font-semibold"
+            onClick={() => setLang(lang === "es" ? "en" : "es")}
+          >
+            {lang === "es" ? "EN" : "ES"}
+          </button>
         </div>
-        <button
-          className="rounded-full border border-current px-3 py-1 text-xs font-semibold"
-          onClick={() => setLang(lang === "es" ? "en" : "es")}
-        >
-          {lang === "es" ? "EN" : "ES"}
-        </button>
+        <div className="relative mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-semibold">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }}
+          />
+          {lang === "es" ? "Abierto" : "Open"}
+        </div>
+        <div
+          className="absolute inset-x-0 bottom-0 h-1.5"
+          style={{ backgroundImage: "repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 14px, transparent 14px 28px)" }}
+        />
       </header>
 
-      <div className="space-y-6 p-4">
+      <nav
+        className="sticky top-0 z-10 flex gap-2 overflow-x-auto border-b px-4 py-2.5"
+        style={{ background: PANEL, borderColor: LINE, scrollbarWidth: "none" }}
+      >
+        {data.categories.map((cat) => (
+          <a
+            key={cat.id}
+            href={`#cat-${cat.id}`}
+            className="flex-none rounded-full border px-3.5 py-1.5 text-xs font-semibold"
+            style={{ borderColor: LINE, color: INK_SOFT }}
+          >
+            {lang === "es" ? cat.name_es : cat.name_en}
+          </a>
+        ))}
+      </nav>
+
+      <div className="space-y-7 px-4 pt-5">
         {[...productsByCategory.entries()].map(([catId, products]) => {
           const category = data.categories.find((c) => c.id === catId)
           return (
-            <section key={catId ?? "sin-categoria"}>
+            <section key={catId ?? "sin-categoria"} id={category ? `cat-${category.id}` : undefined}>
               {category && (
-                <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-500">
-                  {lang === "es" ? category.name_es : category.name_en}
-                </h2>
+                <div className="mb-2.5 flex items-baseline gap-2 border-t-4 pt-2" style={{ borderColor: "var(--brand-primary)" }}>
+                  <h2
+                    className="uppercase tracking-wide"
+                    style={{ fontFamily: "var(--font-display)", fontSize: 22, lineHeight: 1 }}
+                  >
+                    {lang === "es" ? category.name_es : category.name_en}
+                  </h2>
+                  <span className="text-[11px] font-semibold" style={{ color: INK_SOFT }}>
+                    {products.length}
+                  </span>
+                </div>
               )}
-              <div className="space-y-2">
+              <div className={vibrante ? "space-y-2.5" : ""}>
                 {products.map((p) => {
                   const up = offeredByUnit.get(p.id)
                   const soldOut = up?.sold_out === true
-                  return (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 p-3"
-                    >
-                      <div>
-                        <div className="font-semibold">{lang === "es" ? p.name_es : p.name_en}</div>
-                        <div className="text-sm text-neutral-500">${p.price.toFixed(2)}</div>
-                      </div>
-                      <button
-                        disabled={soldOut}
-                        onClick={() => addToCart(p)}
-                        className="rounded-full px-4 py-2 text-sm font-bold text-[var(--brand-on-primary)] disabled:opacity-40"
-                        style={{ background: soldOut ? "#9C948A" : "var(--brand-primary)" }}
+                  const name = lang === "es" ? p.name_es : p.name_en
+                  const desc = lang === "es" ? p.description_es : p.description_en
+
+                  if (vibrante) {
+                    return (
+                      <div
+                        key={p.id}
+                        className="flex items-start gap-3 rounded-xl border p-3"
+                        style={{ borderColor: LINE, opacity: soldOut ? 0.65 : 1 }}
                       >
-                        {soldOut ? t.menu.soldOut : t.menu.addToCart}
-                      </button>
+                        <div
+                          className="grid h-[68px] w-[68px] flex-none place-items-center overflow-hidden rounded-md"
+                          style={{ background: soldOut ? SOLD : "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+                        >
+                          {p.photo_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <span style={{ fontFamily: "var(--font-display)", fontSize: 30 }}>{name[0]}</span>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="uppercase leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: 19 }}>
+                            {name}
+                          </div>
+                          {desc && (
+                            <div className="mt-1 text-[13px] leading-snug" style={{ color: INK_SOFT }}>
+                              {desc}
+                            </div>
+                          )}
+                          {soldOut && <SoldOutTag label={t.menu.soldOut} />}
+                        </div>
+                        <div className="flex flex-none flex-col items-end gap-2">
+                          <div style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>${p.price.toFixed(2)}</div>
+                          <AddButton disabled={soldOut} onClick={() => addToCart(p)} label={t.menu.addToCart} />
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  return (
+                    <div key={p.id} className="border-b py-2.5" style={{ borderColor: LINE, opacity: soldOut ? 0.65 : 1 }}>
+                      <div className="flex items-baseline gap-2">
+                        <span
+                          className="flex-none uppercase"
+                          style={{ fontFamily: "var(--font-display)", fontSize: 18, maxWidth: "62%" }}
+                        >
+                          {name}
+                        </span>
+                        <span
+                          className="-translate-y-1 flex-1 border-b border-dotted"
+                          style={{ borderColor: LINE, minWidth: 12 }}
+                        />
+                        <span className="flex-none" style={{ fontFamily: "var(--font-display)", fontSize: 17 }}>
+                          ${p.price.toFixed(2)}
+                        </span>
+                        <AddButton disabled={soldOut} onClick={() => addToCart(p)} label={t.menu.addToCart} small />
+                      </div>
+                      {desc && (
+                        <div className="mt-1 truncate text-xs" style={{ color: INK_SOFT }}>
+                          {desc}
+                        </div>
+                      )}
+                      {soldOut && <SoldOutTag label={t.menu.soldOut} />}
                     </div>
                   )
                 })}
@@ -152,19 +260,30 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         })}
       </div>
 
+      <footer className="px-4 pb-8 pt-6 text-center text-xs" style={{ color: INK_SOFT }}>
+        {!data.business.tax_included && <div>{lang === "es" ? "Los precios no incluyen impuesto" : "Prices do not include tax"}</div>}
+        <div className="mt-1.5 opacity-60">FoodTruckOS</div>
+      </footer>
+
       {cartCount > 0 && (
-        <div className="fixed inset-x-0 bottom-0 border-t border-neutral-200 bg-white p-4 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
-          <div className="mx-auto max-w-lg space-y-3">
-            <div className="max-h-40 space-y-2 overflow-y-auto">
+        <div className="fixed inset-x-0 bottom-0 p-3" style={{ background: INK }}>
+          <div className="mx-auto max-w-lg space-y-2.5">
+            <div className="max-h-36 space-y-2 overflow-y-auto">
               {cart.map((l) => (
-                <div key={l.key} className="flex items-center justify-between text-sm">
-                  <span>{l.productName}</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => changeQty(l.key, -1)} className="h-6 w-6 rounded-full border">
+                <div key={l.key} className="flex items-center justify-between text-sm text-white">
+                  <span className="truncate pr-2">{l.productName}</span>
+                  <div className="flex flex-none items-center gap-2">
+                    <button
+                      onClick={() => changeQty(l.key, -1)}
+                      className="grid h-6 w-6 place-items-center rounded border border-white/30 font-bold"
+                    >
                       −
                     </button>
-                    <span>{l.quantity}</span>
-                    <button onClick={() => changeQty(l.key, 1)} className="h-6 w-6 rounded-full border">
+                    <span style={{ fontFamily: "var(--font-display)" }}>{l.quantity}</span>
+                    <button
+                      onClick={() => changeQty(l.key, 1)}
+                      className="grid h-6 w-6 place-items-center rounded border border-white/30 font-bold"
+                    >
                       +
                     </button>
                   </div>
@@ -175,18 +294,17 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder={t.menu.customerNameLabel}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border-2 px-3 py-2 text-sm"
+              style={{ background: "#fff", color: INK, borderColor: "#3A332C" }}
             />
             {sendError && (
-              <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">
-                {t.menu.sendError}
-              </div>
+              <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{t.menu.sendError}</div>
             )}
             <button
               onClick={handleCheckout}
               disabled={sending}
-              className="w-full rounded-xl py-3 font-bold text-[var(--brand-on-primary)] disabled:opacity-60"
-              style={{ background: "var(--brand-primary)" }}
+              className="w-full rounded-lg py-3 uppercase tracking-wide disabled:opacity-60"
+              style={{ fontFamily: "var(--font-display)", fontSize: 18, background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
             >
               {sending
                 ? t.menu.sending
@@ -196,5 +314,38 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         </div>
       )}
     </div>
+  )
+}
+
+function SoldOutTag({ label }: { label: string }) {
+  return (
+    <span className="mt-1.5 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white" style={{ background: INK }}>
+      {label}
+    </span>
+  )
+}
+
+function AddButton({
+  onClick,
+  disabled,
+  label,
+  small,
+}: {
+  onClick: () => void
+  disabled: boolean
+  label: string
+  small?: boolean
+}) {
+  const size = small ? "h-7 w-7 text-base" : "h-9 w-9 text-lg"
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={label}
+      className={`grid flex-none place-items-center rounded-full font-bold disabled:cursor-not-allowed ${size}`}
+      style={{ background: disabled ? "#D8D2C8" : "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+    >
+      +
+    </button>
   )
 }
