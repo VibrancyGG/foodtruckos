@@ -10,6 +10,8 @@ export async function updateProduct(input: {
   productId: string
   nameEs: string
   nameEn: string
+  descriptionEs: string
+  descriptionEn: string
   price: number
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
@@ -20,12 +22,19 @@ export async function updateProduct(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("products")
-    .update({ name_es: input.nameEs, name_en: input.nameEn, price: input.price })
+    .update({
+      name_es: input.nameEs,
+      name_en: input.nameEn,
+      description_es: input.descriptionEs.trim() || null,
+      description_en: input.descriptionEn.trim() || null,
+      price: input.price,
+    })
     .eq("id", input.productId)
     .eq("business_id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -46,6 +55,7 @@ export async function retireProduct(productId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo quitar del menú" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -76,28 +86,74 @@ export async function toggleSoldOut(input: {
   return { ok: true }
 }
 
-// Exclusividad por truck: el menú es compartido por default, y el dueño
-// apaga is_offered en los trucks donde ESE platillo no aplica — no es lo
-// mismo que "se acabó" (sold_out), que se revierte solo y no cambia el menú
-// base.
-export async function toggleOffered(input: {
+// "Se acabó hoy" puede tocar varios trucks a la vez cuando el dueño está
+// viendo "Todos los trucks" — un solo interruptor, pero afecta a cada truck
+// que sí vende ese platillo (nunca a uno que ya lo tiene excluido).
+export async function setSoldOutForUnits(input: {
   productId: string
-  unitId: string
-  isOffered: boolean
+  soldOut: boolean
+  unitIds: string[]
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (input.unitIds.length === 0) return { ok: true }
 
   const supabase = await createClient()
   const { error } = await supabase
     .from("unit_products")
     .upsert(
-      { business_id: businessId, unit_id: input.unitId, product_id: input.productId, is_offered: input.isOffered },
+      input.unitIds.map((unitId) => ({
+        business_id: businessId,
+        unit_id: unitId,
+        product_id: input.productId,
+        sold_out: input.soldOut,
+      })),
       { onConflict: "unit_id,product_id" },
     )
 
   if (error) return { ok: false, error: "No se pudo actualizar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  return { ok: true }
+}
+
+// Exclusividad: como en el prototipo, es una elección única — "Todos" o
+// "Solo un truck", nunca un subconjunto arbitrario. exclusiveUnitId=null
+// vuelve a ofrecerlo en todos (borra las exclusiones); si se pasa un id,
+// ese truck queda con is_offered=true (o sin fila, que es lo mismo) y todos
+// los demás quedan en false.
+export async function setProductExclusivity(input: {
+  productId: string
+  businessUnitIds: string[]
+  exclusiveUnitId: string | null
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+
+  if (input.exclusiveUnitId === null) {
+    const { error } = await supabase
+      .from("unit_products")
+      .update({ is_offered: true })
+      .eq("business_id", businessId)
+      .eq("product_id", input.productId)
+    if (error) return { ok: false, error: "No se pudo actualizar" }
+  } else {
+    const rows = input.businessUnitIds.map((unitId) => ({
+      business_id: businessId,
+      unit_id: unitId,
+      product_id: input.productId,
+      is_offered: unitId === input.exclusiveUnitId,
+    }))
+    const { error } = await supabase
+      .from("unit_products")
+      .upsert(rows, { onConflict: "unit_id,product_id" })
+    if (error) return { ok: false, error: "No se pudo actualizar" }
+  }
+
+  revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -124,19 +180,25 @@ export async function createCategory(input: {
 
   if (error) return { ok: false, error: "No se pudo crear la categoría" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
 // Un platillo nuevo se ofrece en todos los trucks del negocio por default —
 // "menú base compartido, con posibilidad de exclusivo por truck" (brief) —
-// el dueño desactiva unit_products.is_offered después si quiere excluirlo
-// de una unidad específica; no se le pide elegir truck por truck al crearlo.
+// salvo que el dueño ya elija "Solo Truck X" al crearlo, en cuyo caso queda
+// excluido de los demás desde el primer momento.
+type CreateProductResult = { ok: false; error: string } | { ok: true; productId: string }
+
 export async function createProduct(input: {
   categoryId: string
   nameEs: string
   nameEn: string
+  descriptionEs: string
+  descriptionEn: string
   price: number
-}): Promise<Result> {
+  exclusiveUnitId: string | null
+}): Promise<CreateProductResult> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
   if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
@@ -151,6 +213,8 @@ export async function createProduct(input: {
       category_id: input.categoryId,
       name_es: input.nameEs,
       name_en: input.nameEn,
+      description_es: input.descriptionEs.trim() || null,
+      description_en: input.descriptionEn.trim() || null,
       price: input.price,
     })
     .select("id")
@@ -158,15 +222,21 @@ export async function createProduct(input: {
 
   if (error || !product) return { ok: false, error: "No se pudo crear el platillo" }
 
-  const { data: units } = await supabase.from("units").select("id").eq("business_id", businessId)
+  const { data: units } = await supabase.from("units").select("id").eq("business_id", businessId).neq("status", "archived")
   if (units && units.length > 0) {
-    await supabase
-      .from("unit_products")
-      .insert(units.map((u) => ({ business_id: businessId, unit_id: u.id, product_id: product.id })))
+    await supabase.from("unit_products").insert(
+      units.map((u) => ({
+        business_id: businessId,
+        unit_id: u.id,
+        product_id: product.id,
+        is_offered: input.exclusiveUnitId === null || u.id === input.exclusiveUnitId,
+      })),
+    )
   }
 
   revalidatePath("/panel/menu")
-  return { ok: true }
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  return { ok: true, productId: product.id }
 }
 
 // Grupos y opciones de personalización ("¿le agregamos algo?" / "¿le
@@ -307,5 +377,6 @@ export async function uploadProductPhoto(
   if (updateError) return { ok: false, error: "La imagen se subió pero no se pudo guardar" }
 
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true, publicUrl }
 }

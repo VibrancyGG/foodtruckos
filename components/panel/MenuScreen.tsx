@@ -2,18 +2,17 @@
 
 import { useMemo, useState } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
-import { createCategory, createProduct } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { ProductRow } from "./ProductRow"
+import { ProductModal } from "./menu/ProductModal"
+import { CategoryModal } from "./menu/CategoryModal"
 
 export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
   const { t } = useLang()
-  const [categories, setCategories] = useState(initial.categories)
-  const [showAddCategory, setShowAddCategory] = useState(false)
-  const [newCatEs, setNewCatEs] = useState("")
-  const [newCatEn, setNewCatEn] = useState("")
-  const [savingCat, setSavingCat] = useState(false)
+  const m = t.panel.menuPage
   const [filter, setFilter] = useState<string>("todos")
+  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [showAddCategory, setShowAddCategory] = useState(false)
 
   // "Solo Truck X" en el prototipo === is_offered:false en los demás trucks.
   // Sin fila en unit_products para esa unidad se trata como ofrecido — así
@@ -42,53 +41,51 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
     return unitScope.some((uid) => initial.unitProducts.find((up) => up.product_id === p.id && up.unit_id === uid)?.sold_out)
   }).length
   const noPhotoCount = visibleProducts.filter((p) => !p.photo_url).length
+  const scopeName = filter === "todos" ? null : (initial.units.find((u) => u.id === filter)?.name ?? null)
 
-  async function addCategory() {
-    if (!newCatEs.trim() || !newCatEn.trim()) return
-    setSavingCat(true)
-    const result = await createCategory({ nameEs: newCatEs, nameEn: newCatEn })
-    setSavingCat(false)
-    if (result.ok) {
-      setCategories((c) => [...c, { id: `temp-${Date.now()}`, business_id: "", name_es: newCatEs, name_en: newCatEn, sort_order: c.length }])
-      setNewCatEs("")
-      setNewCatEn("")
-      setShowAddCategory(false)
-    }
-  }
+  const defaultCategoryId = initial.categories[0]?.id ?? ""
+  const defaultExclusiveUnitId = filter === "todos" ? null : filter
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-1 text-2xl font-black">{t.panel.menuPage.title}</h1>
-        <p className="mb-2 text-sm text-neutral-500">{t.panel.menuPage.subtitle}</p>
+        <h1 className="mb-1 text-2xl font-black">{m.title}</h1>
+        <p className="mb-2 text-sm text-neutral-500">{m.subtitle}</p>
       </div>
 
-      {initial.units.length > 1 && (
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex overflow-hidden rounded-lg border border-neutral-200 bg-white">
-            <button
-              onClick={() => setFilter("todos")}
-              className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === "todos" ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
-            >
-              {t.panel.menuPage.allTrucksFilter}
-            </button>
-            {initial.units.map((u) => (
+      <div className="flex flex-wrap items-center gap-2.5">
+        {initial.units.length > 1 && (
+          <>
+            <div className="flex overflow-hidden rounded-lg border border-neutral-200 bg-white">
               <button
-                key={u.id}
-                onClick={() => setFilter(u.id)}
-                className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === u.id ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+                onClick={() => setFilter("todos")}
+                className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === "todos" ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
               >
-                {u.name}
+                {m.allTrucksFilter}
               </button>
-            ))}
-          </div>
-          <span className="text-xs text-neutral-500">
-            {t.panel.menuPage.statsLine(visibleProducts.length, outCount, noPhotoCount)}
-          </span>
-        </div>
-      )}
+              {initial.units.map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => setFilter(u.id)}
+                  className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === u.id ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+                >
+                  {u.name}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-neutral-500">{m.statsLine(visibleProducts.length, outCount, noPhotoCount, scopeName)}</span>
+          </>
+        )}
+        <button
+          onClick={() => setShowAddProduct(true)}
+          disabled={initial.categories.length === 0}
+          className="ml-auto rounded-lg bg-neutral-900 px-3 py-2 text-xs font-bold text-white disabled:opacity-40"
+        >
+          {m.addProduct}
+        </button>
+      </div>
 
-      {categories.map((cat) => (
+      {initial.categories.map((cat) => (
         <CategorySection
           key={cat.id}
           category={cat}
@@ -97,60 +94,43 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
           options={initial.options}
+          filter={filter}
         />
       ))}
 
       {(productsByCategory.get("sin-categoria")?.filter((p) => visible(p.id)).length ?? 0) > 0 && (
         <CategorySection
-          category={{ id: "sin-categoria", name_es: t.panel.menuPage.noCategory, name_en: t.panel.menuPage.noCategory }}
+          category={{ id: "sin-categoria", name_es: m.noCategory, name_en: m.noCategory }}
           products={(productsByCategory.get("sin-categoria") ?? []).filter((p) => visible(p.id))}
           units={initial.units}
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
           options={initial.options}
+          filter={filter}
         />
       )}
 
-      <section className="rounded-2xl border border-dashed border-neutral-300 p-4">
-        {showAddCategory ? (
-          <div className="space-y-2">
-            <input
-              value={newCatEs}
-              onChange={(e) => setNewCatEs(e.target.value)}
-              placeholder={t.panel.common.nameEsPlaceholder}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-            />
-            <input
-              value={newCatEn}
-              onChange={(e) => setNewCatEn(e.target.value)}
-              placeholder={t.panel.common.nameEnPlaceholder}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={addCategory}
-                disabled={savingCat}
-                className="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-bold text-white disabled:opacity-60"
-              >
-                {savingCat ? t.panel.common.saving : t.panel.menuPage.createCategory}
-              </button>
-              <button
-                onClick={() => setShowAddCategory(false)}
-                className="rounded-lg px-3 py-1.5 text-sm text-neutral-500"
-              >
-                {t.panel.common.cancel}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowAddCategory(true)}
-            className="text-sm font-bold text-neutral-600"
-          >
-            {t.panel.menuPage.addCategory}
-          </button>
-        )}
-      </section>
+      {filter !== "todos" && visibleProducts.length === 0 && (
+        <div className="rounded-2xl border border-neutral-200 bg-white p-7 text-center text-sm font-semibold text-neutral-400">
+          {m.noTrucksExclusiveYet}
+        </div>
+      )}
+
+      <button onClick={() => setShowAddCategory(true)} className="text-sm font-bold text-neutral-600">
+        {m.addCategory}
+      </button>
+
+      {showAddProduct && (
+        <ProductModal
+          mode="add"
+          categories={initial.categories}
+          units={initial.units}
+          defaultCategoryId={defaultCategoryId}
+          defaultExclusiveUnitId={defaultExclusiveUnitId}
+          onClose={() => setShowAddProduct(false)}
+        />
+      )}
+      {showAddCategory && <CategoryModal onClose={() => setShowAddCategory(false)} />}
     </div>
   )
 }
@@ -162,6 +142,7 @@ function CategorySection({
   unitProducts,
   optionGroups,
   options,
+  filter,
 }: {
   category: { id: string; name_es: string; name_en: string }
   products: OwnerMenuData["products"]
@@ -169,95 +150,31 @@ function CategorySection({
   unitProducts: OwnerMenuData["unitProducts"]
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
+  filter: string
 }) {
-  const { lang, t } = useLang()
-  const [showAdd, setShowAdd] = useState(false)
-  const [nameEs, setNameEs] = useState("")
-  const [nameEn, setNameEn] = useState("")
-  const [price, setPrice] = useState("")
-  const [saving, setSaving] = useState(false)
+  const { lang } = useLang()
 
   if (products.length === 0) return null
 
-  async function addProduct() {
-    const priceNum = parseFloat(price)
-    if (!nameEs.trim() || !nameEn.trim() || !(priceNum > 0)) return
-    setSaving(true)
-    const result = await createProduct({
-      categoryId: category.id,
-      nameEs,
-      nameEn,
-      price: priceNum,
-    })
-    setSaving(false)
-    if (result.ok) {
-      setNameEs("")
-      setNameEn("")
-      setPrice("")
-      setShowAdd(false)
-    }
-  }
-
   return (
-    <section>
-      <h2 className="mb-2 text-sm font-black uppercase tracking-wide text-neutral-500">
-        {lang === "es" ? category.name_es : category.name_en}
-      </h2>
-      <div className="space-y-2">
+    <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+      <div className="flex items-center gap-2.5 border-b border-neutral-100 px-4 py-3">
+        <h2 className="text-sm font-black">{lang === "es" ? category.name_es : category.name_en}</h2>
+        <span className="text-xs font-bold text-neutral-400">{products.length}</span>
+      </div>
+      <div>
         {products.map((p) => (
           <ProductRow
             key={p.id}
             product={p}
             units={units}
             unitProducts={unitProducts}
-            optionGroups={optionGroups.filter((g) => g.product_id === p.id)}
+            optionGroups={optionGroups}
             options={options}
+            filter={filter}
           />
         ))}
       </div>
-
-      {showAdd ? (
-        <div className="mt-2 space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
-          <input
-            value={nameEs}
-            onChange={(e) => setNameEs(e.target.value)}
-            placeholder={t.panel.common.nameEsPlaceholder}
-            className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
-          />
-          <input
-            value={nameEn}
-            onChange={(e) => setNameEn(e.target.value)}
-            placeholder={t.panel.common.nameEnPlaceholder}
-            className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
-          />
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder={t.panel.menuPage.pricePlaceholder}
-            inputMode="decimal"
-            className="w-full rounded-lg border border-neutral-300 px-3 py-1.5 text-sm"
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={addProduct}
-              disabled={saving}
-              className="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-bold text-white disabled:opacity-60"
-            >
-              {saving ? t.panel.common.saving : t.panel.common.add}
-            </button>
-            <button onClick={() => setShowAdd(false)} className="text-sm text-neutral-500">
-              {t.panel.common.cancel}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowAdd(true)}
-          className="mt-2 text-sm font-bold text-neutral-500"
-        >
-          {t.panel.menuPage.addProduct}
-        </button>
-      )}
     </section>
   )
 }

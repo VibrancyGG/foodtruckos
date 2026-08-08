@@ -17,7 +17,7 @@ export async function getOwnerMenu(businessId: string) {
         .eq("business_id", businessId)
         .eq("status", "active")
         .order("created_at"),
-      supabase.from("units").select("id, name").eq("business_id", businessId),
+      supabase.from("units").select("id, name").eq("business_id", businessId).neq("status", "archived"),
       supabase.from("unit_products").select("*").eq("business_id", businessId),
       supabase
         .from("product_option_groups")

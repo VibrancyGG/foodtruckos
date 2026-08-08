@@ -204,8 +204,25 @@ export type Dictionary = {
       maxLabel: string
       requiredLabel: string
       allTrucksFilter: string
-      statsLine: (total: number, out: number, noPhoto: number) => string
+      statsLine: (total: number, out: number, noPhoto: number, scopeName: string | null) => string
       whoSellsIt: string
+      noPhotoShort: string
+      formError: string
+      editModalHint: string
+      addModalHint: string
+      photoLabel: string
+      photoHint: string
+      descriptionEsPlaceholder: string
+      descriptionEnPlaceholder: string
+      whichCategoryLabel: string
+      exclusivityAll: string
+      exclusivityAllHint: string
+      exclusivityOnly: (truckName: string) => string
+      exclusivityOnlyHint: string
+      noPhotoYetHint: string
+      addProductSubmit: string
+      addCategoryHint: string
+      noTrucksExclusiveYet: string
     }
     trucksPage: {
       title: string
@@ -706,11 +723,28 @@ export const dictionary: Record<Lang, Dictionary> = {
         maxLabel: "máximo",
         requiredLabel: "obligatorio",
         allTrucksFilter: "Todos los trucks",
-        statsLine: (total, out, noPhoto) =>
-          `${total} platillo${total === 1 ? "" : "s"}` +
+        statsLine: (total, out, noPhoto, scopeName) =>
+          (scopeName ? `${total} platillo${total === 1 ? "" : "s"} se venden en ${scopeName}` : `${total} platillo${total === 1 ? "" : "s"} en total`) +
           (out ? ` · ${out} agotado${out === 1 ? "" : "s"}` : "") +
           (noPhoto ? ` · ${noPhoto} sin foto` : " · todos con foto"),
         whoSellsIt: "¿Quién lo vende?",
+        noPhotoShort: "Falta\nfoto",
+        formError: "Revisa el nombre y el precio",
+        editModalHint: "Los cambios se ven en el menú de tus clientes de inmediato.",
+        addModalHint: "Aparece en el menú de tus clientes en cuanto lo guardes.",
+        photoLabel: "Foto del platillo",
+        photoHint: "Tómale la foto al platillo tal como sale de tu cocina. Nunca ponemos la foto de otro plato.",
+        descriptionEsPlaceholder: "Descripción en español",
+        descriptionEnPlaceholder: "Descripción en inglés",
+        whichCategoryLabel: "¿En qué parte del menú?",
+        exclusivityAll: "Todos",
+        exclusivityAllHint: "Va en el menú base",
+        exclusivityOnly: (truckName: string) => `Solo ${truckName}`,
+        exclusivityOnlyHint: "Exclusivo de esa unidad",
+        noPhotoYetHint: "Si todavía no tienes la foto, guárdalo sin ella: en el menú se muestra un espacio marcado y la agregas cuando puedas. Nunca ponemos la imagen de otro plato.",
+        addProductSubmit: "Agregar al menú",
+        addCategoryHint: "Los platillos que agregues después podrán ir aquí.",
+        noTrucksExclusiveYet: "Este truck no tiene platillos propios todavía.",
       },
       trucksPage: {
         title: "Trucks",
@@ -1206,11 +1240,28 @@ export const dictionary: Record<Lang, Dictionary> = {
         maxLabel: "maximum",
         requiredLabel: "required",
         allTrucksFilter: "All trucks",
-        statsLine: (total, out, noPhoto) =>
-          `${total} item${total === 1 ? "" : "s"}` +
+        statsLine: (total, out, noPhoto, scopeName) =>
+          (scopeName ? `${total} item${total === 1 ? "" : "s"} sold at ${scopeName}` : `${total} item${total === 1 ? "" : "s"} total`) +
           (out ? ` · ${out} sold out` : "") +
           (noPhoto ? ` · ${noPhoto} without a photo` : " · all with photos"),
         whoSellsIt: "Who sells it?",
+        noPhotoShort: "No\nphoto",
+        formError: "Check the name and the price",
+        editModalHint: "Changes show up in your customers' menu right away.",
+        addModalHint: "It shows up in your customers' menu as soon as you save it.",
+        photoLabel: "Photo of the dish",
+        photoHint: "Take the photo of the dish exactly as it leaves your kitchen. We never use another dish's photo.",
+        descriptionEsPlaceholder: "Description in Spanish",
+        descriptionEnPlaceholder: "Description in English",
+        whichCategoryLabel: "Which part of the menu?",
+        exclusivityAll: "All",
+        exclusivityAllHint: "Goes in the base menu",
+        exclusivityOnly: (truckName: string) => `Only ${truckName}`,
+        exclusivityOnlyHint: "Exclusive to that unit",
+        noPhotoYetHint: "If you don't have the photo yet, save it without one: the menu shows a marked space and you can add it later. We never use another dish's image.",
+        addProductSubmit: "Add to menu",
+        addCategoryHint: "Items you add later can go here.",
+        noTrucksExclusiveYet: "This truck doesn't have its own items yet.",
       },
       trucksPage: {
         title: "Trucks",

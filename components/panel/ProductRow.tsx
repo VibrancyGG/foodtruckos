@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
-import { updateProduct, retireProduct, toggleSoldOut, toggleOffered, uploadProductPhoto } from "@/lib/menu/actions"
+import { setSoldOutForUnits, toggleSoldOut } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
-import { OptionGroupsEditor } from "./OptionGroupsEditor"
+import { ProductModal } from "./menu/ProductModal"
 
 export function ProductRow({
   product,
@@ -12,222 +12,104 @@ export function ProductRow({
   unitProducts,
   optionGroups,
   options,
+  filter,
 }: {
   product: OwnerMenuData["products"][number]
   units: OwnerMenuData["units"]
   unitProducts: OwnerMenuData["unitProducts"]
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
+  filter: string
 }) {
   const { lang, t } = useLang()
-  const c = t.panel.common
   const m = t.panel.menuPage
   const [editing, setEditing] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
-  const [nameEs, setNameEs] = useState(product.name_es)
-  const [nameEn, setNameEn] = useState(product.name_en)
-  const [price, setPrice] = useState(String(product.price))
-  const [photoUrl, setPhotoUrl] = useState(product.photo_url)
-  const [error, setError] = useState<string | null>(null)
-  const [confirmRetire, setConfirmRetire] = useState(false)
-  const [removed, setRemoved] = useState(false)
   const [pending, startTransition] = useTransition()
 
   const myUnitProducts = unitProducts.filter((up) => up.product_id === product.id)
+  const isOfferedOn = (unitId: string) => {
+    const up = myUnitProducts.find((x) => x.unit_id === unitId)
+    return up ? up.is_offered !== false : true
+  }
+  const offeredUnits = units.filter((u) => isOfferedOn(u.id))
+  const exclusiveUnitId = offeredUnits.length === 1 && offeredUnits.length < units.length ? offeredUnits[0].id : null
 
-  function save() {
-    setError(null)
+  const scopedUnits = filter === "todos" ? offeredUnits : offeredUnits.filter((u) => u.id === filter)
+  const soldOut = scopedUnits.length > 0 && scopedUnits.every((u) => myUnitProducts.find((x) => x.unit_id === u.id)?.sold_out)
+
+  function onToggleSoldOut() {
+    const nextValue = !soldOut
     startTransition(async () => {
-      const result = await updateProduct({
-        productId: product.id,
-        nameEs,
-        nameEn,
-        price: parseFloat(price),
-      })
-      if (!result.ok) {
-        setError(result.error)
-        return
+      if (filter === "todos") {
+        await setSoldOutForUnits({ productId: product.id, soldOut: nextValue, unitIds: offeredUnits.map((u) => u.id) })
+      } else {
+        await toggleSoldOut({ productId: product.id, unitId: filter, soldOut: nextValue })
       }
-      setEditing(false)
     })
   }
 
-  function retire() {
-    startTransition(async () => {
-      const result = await retireProduct(product.id)
-      if (result.ok) setRemoved(true)
-    })
+  function openEdit() {
+    setEditing(true)
+  }
+  function closeEdit() {
+    setEditing(false)
   }
 
-  function onSoldOutChange(unitId: string, soldOut: boolean) {
-    startTransition(async () => {
-      await toggleSoldOut({ productId: product.id, unitId, soldOut })
-    })
-  }
-
-  function onOfferedChange(unitId: string, isOffered: boolean) {
-    startTransition(async () => {
-      await toggleOffered({ productId: product.id, unitId, isOffered })
-    })
-  }
-
-  function onPhotoPick(file: File) {
-    setPhotoUrl(URL.createObjectURL(file))
-    const formData = new FormData()
-    formData.set("file", file)
-    startTransition(async () => {
-      const result = await uploadProductPhoto(product.id, formData)
-      if (result.ok) setPhotoUrl(result.publicUrl)
-    })
-  }
-
-  if (removed) return null
+  const exclusiveUnitName = exclusiveUnitId ? units.find((u) => u.id === exclusiveUnitId)?.name : null
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-3">
-      <div className="flex items-center gap-3">
-        <label className="h-12 w-12 flex-none cursor-pointer overflow-hidden rounded-lg bg-neutral-100">
-          {photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
-              {c.noPhoto}
-            </div>
-          )}
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) onPhotoPick(file)
-            }}
-          />
-        </label>
-
-        {editing ? (
-          <div className="flex-1 space-y-1.5">
-            <input
-              value={nameEs}
-              onChange={(e) => setNameEs(e.target.value)}
-              className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm"
-              placeholder={c.nameEsPlaceholder}
-            />
-            <input
-              value={nameEn}
-              onChange={(e) => setNameEn(e.target.value)}
-              className="w-full rounded-lg border border-neutral-300 px-2 py-1 text-sm"
-              placeholder={c.nameEnPlaceholder}
-            />
-            <input
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              inputMode="decimal"
-              className="w-24 rounded-lg border border-neutral-300 px-2 py-1 text-sm"
-            />
-          </div>
+    <div className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 border-t border-neutral-100 px-4 py-3 first:border-t-0 ${soldOut ? "opacity-60" : ""}`}>
+      <div className="h-11 w-11 flex-none overflow-hidden rounded-lg bg-neutral-100">
+        {product.photo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={product.photo_url} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex-1">
-            <div className="font-semibold">{lang === "es" ? product.name_es : product.name_en}</div>
-            <div className="text-sm text-neutral-500">${product.price.toFixed(2)}</div>
-          </div>
+          <div className="flex h-full w-full items-center justify-center text-center text-[9px] leading-tight text-neutral-400">{m.noPhotoShort}</div>
         )}
-
-        <div className="flex flex-none flex-col items-end gap-1">
-          {editing ? (
-            <div className="flex gap-2">
-              <button
-                onClick={save}
-                disabled={pending}
-                className="rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-bold text-white disabled:opacity-60"
-              >
-                {c.save}
-              </button>
-              <button onClick={() => setEditing(false)} className="text-xs text-neutral-500">
-                {c.cancel}
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => setEditing(true)} className="text-xs font-bold text-neutral-600">
-              {c.edit}
-            </button>
-          )}
-        </div>
       </div>
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-
-      {units.length > 1 && (
-        <div className="mt-3 border-t border-neutral-100 pt-3">
-          <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-neutral-400">{m.whoSellsIt}</div>
-          <div className="flex flex-wrap gap-3">
-            {units.map((u) => {
-              const up = myUnitProducts.find((x) => x.unit_id === u.id)
-              const isOffered = up ? up.is_offered !== false : true
-              return (
-                <label key={u.id} className="flex items-center gap-1.5 text-xs text-neutral-600">
-                  <input
-                    type="checkbox"
-                    checked={isOffered}
-                    onChange={(e) => onOfferedChange(u.id, e.target.checked)}
-                  />
-                  {u.name}
-                </label>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-neutral-100 pt-3">
-        {units.map((u) => {
-          const up = myUnitProducts.find((x) => x.unit_id === u.id)
-          const isOffered = up ? up.is_offered !== false : true
-          if (!isOffered) return null
-          return (
-            <label key={u.id} className="flex items-center gap-1.5 text-xs text-neutral-600">
-              <input
-                type="checkbox"
-                checked={up?.sold_out ?? false}
-                onChange={(e) => onSoldOutChange(u.id, e.target.checked)}
-              />
-              {m.soldOut}
-              {units.length > 1 ? ` · ${u.name}` : ""}
-            </label>
-          )
-        })}
-
-        <div className="ml-auto">
-          {confirmRetire ? (
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-neutral-500">{m.confirmRemove}</span>
-              <button onClick={retire} className="font-bold text-red-600">
-                {c.yesRemove}
-              </button>
-              <button onClick={() => setConfirmRetire(false)} className="text-neutral-500">
-                {c.cancel}
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmRetire(true)}
-              className="text-xs font-semibold text-neutral-400 hover:text-red-600"
-            >
-              {m.removeFromMenu}
-            </button>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="truncate font-semibold">{lang === "es" ? product.name_es : product.name_en}</span>
+          {exclusiveUnitName && (
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">{m.exclusivityOnly(exclusiveUnitName)}</span>
           )}
+          {soldOut && <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">{m.soldOut}</span>}
         </div>
+        <div className="truncate text-xs text-neutral-500">{lang === "es" ? product.description_es : product.description_en}</div>
       </div>
 
-      <div className="mt-2 border-t border-neutral-100 pt-2">
-        <button onClick={() => setShowOptions((s) => !s)} className="text-xs font-bold text-neutral-500">
-          {showOptions ? m.hideOptions : m.showOptions} ({optionGroups.length})
+      <div className="text-sm font-bold tabular-nums">${product.price.toFixed(2)}</div>
+
+      <div className="flex items-center gap-2">
+        <button
+          role="switch"
+          aria-checked={soldOut}
+          aria-label={m.soldOut}
+          disabled={pending}
+          onClick={onToggleSoldOut}
+          className={`relative h-[26px] w-[44px] flex-none rounded-full transition-colors ${soldOut ? "bg-neutral-300" : "bg-green-600"}`}
+        >
+          <span
+            className={`absolute top-0.5 h-[20px] w-[20px] rounded-full bg-white shadow transition-transform ${soldOut ? "translate-x-0.5" : "translate-x-[21px]"}`}
+          />
         </button>
-        {showOptions && (
-          <OptionGroupsEditor productId={product.id} groups={optionGroups} options={options} />
-        )}
+        <button onClick={openEdit} className="rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-bold text-neutral-700">
+          {t.panel.common.edit}
+        </button>
       </div>
+
+      {editing && (
+        <ProductModal
+          mode="edit"
+          product={product}
+          units={units}
+          currentExclusiveUnitId={exclusiveUnitId}
+          optionGroups={optionGroups.filter((g) => g.product_id === product.id)}
+          options={options}
+          onClose={closeEdit}
+        />
+      )}
     </div>
   )
 }
