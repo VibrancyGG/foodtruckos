@@ -7,7 +7,15 @@ import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
 import { pricePerTruck } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
 
-export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
+export function CuentaScreen({
+  billing,
+  ownerEmail,
+  signInMethod,
+}: {
+  billing: OwnerBillingData
+  ownerEmail: string
+  signInMethod: "google" | "password"
+}) {
   const { t } = useLang()
   const p = t.panel.cuentaPage
   const STATUS_LABEL: Record<string, string> = {
@@ -16,6 +24,7 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
     suspended: p.statusSuspended,
     cancelled: p.statusCancelled,
   }
+  const [showConsequences, setShowConsequences] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const [note, setNote] = useState("")
   const [sent, setSent] = useState(false)
@@ -102,6 +111,34 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
       </div>
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.howYouPayTitle}</div>
+        <p className="mb-2 text-xs text-neutral-400">{p.howYouPayHint}</p>
+        <p className="text-sm leading-relaxed text-neutral-600">
+          {billing.business?.billing_mode === "stripe" ? p.howYouPayStripe : p.howYouPayManual}
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{p.yourDataTitle}</div>
+        <p className="mb-3 text-xs text-neutral-400">{p.yourDataHint}</p>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-2">
+            <span className="text-neutral-500">{p.businessLabel}</span>
+            <span className="font-semibold">{billing.business?.name}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-2">
+            <span className="text-neutral-500">{p.emailLabel}</span>
+            <span className="font-semibold">{ownerEmail}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-neutral-500">{p.signInLabel}</span>
+            <span className="font-semibold">{signInMethod === "google" ? p.signInGoogle : p.signInPassword}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-5">
+        <div className="mb-1 text-sm font-bold">{p.leaveTitle}</div>
         {sent ? (
           <p className="text-sm font-semibold text-green-700">{p.cancelSent}</p>
         ) : showCancel ? (
@@ -136,13 +173,54 @@ export function CuentaScreen({ billing }: { billing: OwnerBillingData }) {
           </div>
         ) : (
           <button
-            onClick={() => setShowCancel(true)}
+            onClick={() => setShowConsequences(true)}
             className="text-xs font-semibold text-neutral-400 hover:text-red-600"
           >
             {p.requestCancellation}
           </button>
         )}
       </div>
+
+      {showConsequences && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5"
+          onClick={(e) => e.target === e.currentTarget && setShowConsequences(false)}
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
+            <h3 className="mb-1.5 text-xl font-black">{p.cancelConsequencesTitle}</h3>
+            <p className="mb-3 text-sm text-neutral-500">{p.cancelConsequencesIntro}</p>
+            <ul className="mb-4 list-disc space-y-2 pl-5 text-sm text-neutral-600">
+              <li>{p.cancelConsequence1(billing.activeTrucks)}</li>
+              <li>{p.cancelConsequence2}</li>
+              <li>{p.cancelConsequence3}</li>
+              <li>{p.cancelConsequence4}</li>
+            </ul>
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => setShowConsequences(false)}
+                className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500"
+              >
+                {p.cancelKeepGoing}
+              </button>
+              <a
+                href="mailto:jetgosolutions@gmail.com?subject=Quiero%20hablarlo"
+                className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-bold text-neutral-700"
+              >
+                {p.wantToTalk}
+              </a>
+              <button
+                onClick={() => {
+                  setShowConsequences(false)
+                  setShowCancel(true)
+                }}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white"
+              >
+                {p.cancelContinue}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

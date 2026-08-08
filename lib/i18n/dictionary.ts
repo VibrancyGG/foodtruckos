@@ -332,6 +332,7 @@ export type Dictionary = {
       step2: string
       chooseColorTitle: string
       chooseColorHint: string
+      contrastConfirm: (colorName: string, ratio: string) => string
       step3: string
       coverTitle: string
       coverHint: string
@@ -463,6 +464,26 @@ export type Dictionary = {
       ladderFivePlus: string
       ladderYourPlan: string
       wantToTalk: string
+      howYouPayTitle: string
+      howYouPayHint: string
+      howYouPayManual: string
+      howYouPayStripe: string
+      yourDataTitle: string
+      yourDataHint: string
+      businessLabel: string
+      emailLabel: string
+      signInLabel: string
+      signInGoogle: string
+      signInPassword: string
+      leaveTitle: string
+      cancelConsequencesTitle: string
+      cancelConsequencesIntro: string
+      cancelConsequence1: (n: number) => string
+      cancelConsequence2: string
+      cancelConsequence3: string
+      cancelConsequence4: string
+      cancelKeepGoing: string
+      cancelContinue: string
     }
     resumenPage: {
       title: string
@@ -925,6 +946,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         step2: "2 · TU COLOR",
         chooseColorTitle: "Elige tu color",
         chooseColorHint: "Diez colores probados bajo el sol. Cualquiera funciona — no hay forma de elegir mal.",
+        contrastConfirm: (colorName, ratio) => `${colorName} · el texto se ajusta solo y queda en ${ratio}:1 de contraste. Se lee bajo el sol.`,
         step3: "3 · TU PORTADA",
         coverTitle: "Foto de portada",
         coverHint: "La foto de tu truck o de tu comida, arriba del menú. Es opcional.",
@@ -1056,6 +1078,26 @@ export const dictionary: Record<Lang, Dictionary> = {
         ladderFivePlus: "5 o más",
         ladderYourPlan: "Tu plan",
         wantToTalk: "Quiero hablarlo",
+        howYouPayTitle: "Cómo pagas hoy",
+        howYouPayHint: "Fase piloto",
+        howYouPayManual: "Te mandamos el recibo por correo y lo pagas por transferencia. El cobro automático con tarjeta llega en una fase futura; cuando esté, lo activas desde aquí y dejas de recibir el correo.",
+        howYouPayStripe: "Se cobra automático a tu tarjeta guardada cada mes — no tienes que hacer nada.",
+        yourDataTitle: "Tus datos",
+        yourDataHint: "Lo que sale en el recibo",
+        businessLabel: "Negocio",
+        emailLabel: "Correo",
+        signInLabel: "Entras con",
+        signInGoogle: "Cuenta de Google",
+        signInPassword: "Correo y contraseña",
+        leaveTitle: "¿Te quieres ir?",
+        cancelConsequencesTitle: "¿Cancelar tu suscripción?",
+        cancelConsequencesIntro: "Antes de que decidas, esto es lo que va a pasar:",
+        cancelConsequence1: (n) => `Tus ${n} truck${n === 1 ? "" : "s"} siguen funcionando hasta que termine el periodo que ya pagaste.`,
+        cancelConsequence2: "Después, tus códigos QR dejan de abrir el menú.",
+        cancelConsequence3: "Tu información no se borra. Ventas, menú y marca se guardan dos años. Si regresas, reactivar toma minutos.",
+        cancelConsequence4: "No te cobramos nada más. No hay penalización.",
+        cancelKeepGoing: "Mejor no",
+        cancelContinue: "Sí, quiero cancelar",
       },
       resumenPage: {
         title: "Cómo va tu negocio",
@@ -1513,6 +1555,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         step2: "2 · YOUR COLOR",
         chooseColorTitle: "Choose your color",
         chooseColorHint: "Ten colors tested in direct sunlight. Any of them works — there's no wrong choice.",
+        contrastConfirm: (colorName, ratio) => `${colorName} · the text adjusts itself and stays at a ${ratio}:1 contrast ratio. Readable in direct sun.`,
         step3: "3 · YOUR COVER PHOTO",
         coverTitle: "Cover photo",
         coverHint: "A photo of your truck or your food, above the menu. Optional.",
@@ -1644,6 +1687,26 @@ export const dictionary: Record<Lang, Dictionary> = {
         ladderFivePlus: "5 or more",
         ladderYourPlan: "Your plan",
         wantToTalk: "I want to talk about it",
+        howYouPayTitle: "How you pay today",
+        howYouPayHint: "Pilot phase",
+        howYouPayManual: "We email you the receipt and you pay by bank transfer. Automatic card billing is coming in a future phase; once it's ready, you'll turn it on from here and stop getting the email.",
+        howYouPayStripe: "Your saved card is charged automatically every month — nothing to do on your end.",
+        yourDataTitle: "Your info",
+        yourDataHint: "What shows up on your receipt",
+        businessLabel: "Business",
+        emailLabel: "Email",
+        signInLabel: "You sign in with",
+        signInGoogle: "Google account",
+        signInPassword: "Email and password",
+        leaveTitle: "Want to leave?",
+        cancelConsequencesTitle: "Cancel your subscription?",
+        cancelConsequencesIntro: "Before you decide, here's exactly what happens:",
+        cancelConsequence1: (n) => `Your ${n} truck${n === 1 ? "" : "s"} keep working until the period you already paid for ends.`,
+        cancelConsequence2: "After that, your QR codes stop opening the menu.",
+        cancelConsequence3: "Your information isn't deleted. Sales, menu, and brand are kept for two years. If you come back, reactivating takes minutes.",
+        cancelConsequence4: "We don't charge you anything else. No penalty.",
+        cancelKeepGoing: "Never mind",
+        cancelContinue: "Yes, I want to cancel",
       },
       resumenPage: {
         title: "How your business is doing",

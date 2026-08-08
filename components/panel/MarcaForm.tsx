@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { PALETTE } from "@/lib/branding/palette"
-import { onColorFor } from "@/lib/branding/color"
+import { onColorFor, contrastRatio } from "@/lib/branding/color"
 import { MOTIFS, isBrandMotif, type BrandMotif } from "@/lib/branding/motifs"
 import { uploadLogo, uploadCoverPhoto, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -104,6 +104,15 @@ export function MarcaForm({
                 )}
               </button>
             ))}
+          </div>
+          <div className="mt-3.5 flex items-start gap-2 rounded-lg bg-green-50 p-3 text-xs font-semibold text-green-800">
+            <span aria-hidden="true">✓</span>
+            <span>
+              {p.contrastConfirm(
+                PALETTE.find((pt) => pt.hex === color)?.name ?? color,
+                contrastRatio(color, onColor).toFixed(1),
+              )}
+            </span>
           </div>
         </section>
 
