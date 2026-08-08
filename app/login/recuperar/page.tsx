@@ -13,7 +13,7 @@ export default function RecuperarPage() {
     setSending(true)
     const supabase = createClient()
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
     })
     setSending(false)
     setSent(true) // se muestra igual exista o no la cuenta, para no filtrar qué correos están registrados
