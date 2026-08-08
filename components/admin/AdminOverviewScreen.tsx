@@ -156,6 +156,15 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
           ))}
         </div>
       </div>
+
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5 text-sm leading-relaxed text-neutral-400">
+        <p>
+          <span className="font-bold text-neutral-200">{a.billingNoteTitle}</span> {a.billingNoteBody}
+        </p>
+        <p className="mt-3">
+          <span className="font-bold text-neutral-200">{a.billingRuleTitle}</span> {a.billingRuleBody}
+        </p>
+      </div>
     </div>
   )
 }

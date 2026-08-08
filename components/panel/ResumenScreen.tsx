@@ -62,6 +62,17 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
               {data.yearToDatePrev ? money(data.yearToDatePrev.total) : p.noData}
             </span>
           </div>
+          <div className="mt-1.5 flex items-baseline justify-between text-sm">
+            <span className="text-neutral-500">{p.yearDelta}</span>
+            {(() => {
+              const yearDelta = data.yearToDatePrev ? pctDelta(data.yearToDate.total, data.yearToDatePrev.total) : null
+              return yearDelta !== null ? (
+                <span className={`font-bold ${yearDelta >= 0 ? "text-green-700" : "text-red-600"}`}>{fmtDelta(yearDelta)}</span>
+              ) : (
+                <span className="font-bold text-neutral-300">{p.noData}</span>
+              )
+            })()}
+          </div>
         </div>
       </div>
 

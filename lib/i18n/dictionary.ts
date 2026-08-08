@@ -494,6 +494,7 @@ export type Dictionary = {
       avgPerDay: string
       yearAccrued: string
       samePeriod: (year: number) => string
+      yearDelta: string
       noData: string
       monthlySales: string
       vsLabel: (a: number, b: number) => string
@@ -584,6 +585,10 @@ export type Dictionary = {
     retentionMonthsLeft: (n: number) => string
     archiveContactedBadge: string
     archiveMarkContacted: string
+    billingNoteTitle: string
+    billingNoteBody: string
+    billingRuleTitle: string
+    billingRuleBody: string
   }
 }
 
@@ -1108,6 +1113,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         avgPerDay: "promedio por día",
         yearAccrued: "Año acumulado",
         samePeriod: (year) => `Mismo periodo ${year}`,
+        yearDelta: "Diferencia",
         noData: "sin datos",
         monthlySales: "Venta mes a mes",
         vsLabel: (a, b) => `${a} contra ${b}`,
@@ -1198,6 +1204,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       retentionMonthsLeft: (n) => `${n} mes${n === 1 ? "" : "es"} antes del corte`,
       archiveContactedBadge: "Cliente contactado",
       archiveMarkContacted: "Marcar contactado",
+      billingNoteTitle: "Cobro automático:",
+      billingNoteBody:
+        "en Fase 1 la suscripción se cobra fuera del sistema y aquí solo se registra el estado. Cada cliente ya lleva marcado si cobra por transferencia manual o si tiene Stripe conectado, para no tener que rehacer la tabla cuando se active — la conexión en sí entra en Fase 2. Hasta entonces, suspender por falta de pago es una acción manual.",
+      billingRuleTitle: "Regla de facturación:",
+      billingRuleBody:
+        "los cambios de trucks aplican al siguiente periodo, nunca a mitad de mes. Aprobar una solicitud aquí agenda el cambio; no toca el cobro del mes en curso. Dar de baja un truck archiva su información dos años; no la borra.",
     },
   },
   en: {
@@ -1717,6 +1729,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         avgPerDay: "average per day",
         yearAccrued: "Year to date",
         samePeriod: (year) => `Same period ${year}`,
+        yearDelta: "Difference",
         noData: "no data",
         monthlySales: "Sales month by month",
         vsLabel: (a, b) => `${a} vs. ${b}`,
@@ -1807,6 +1820,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       retentionMonthsLeft: (n) => `${n} month${n === 1 ? "" : "s"} left`,
       archiveContactedBadge: "Client contacted",
       archiveMarkContacted: "Mark contacted",
+      billingNoteTitle: "Automatic billing:",
+      billingNoteBody:
+        "in Phase 1, subscriptions are billed outside the system and this only records the status. Every client is already marked as manual transfer or Stripe-connected, so the table won't need rework once it's activated — the actual connection lands in Phase 2. Until then, suspending for non-payment is a manual action.",
+      billingRuleTitle: "Billing rule:",
+      billingRuleBody:
+        "truck changes apply to the next billing period, never mid-month. Approving a request here schedules the change; it doesn't touch this month's charge. Removing a truck archives its data for two years; it doesn't delete it.",
     },
   },
 }
