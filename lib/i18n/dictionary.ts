@@ -637,6 +637,13 @@ export type Dictionary = {
     firstUnitLocationLabel: string
     actionBusinessSignupApproved: string
     actionBusinessSignupRejected: string
+    actionProductRetired: string
+    actionProductCreated: string
+    actionStaffCreated: string
+    actionStaffPinReset: string
+    actionStaffRemoved: string
+    actionDeviceCreated: string
+    actionDeviceRevoked: string
     billingNoteTitle: string
     billingNoteBody: string
     billingRuleTitle: string
@@ -1308,6 +1315,13 @@ export const dictionary: Record<Lang, Dictionary> = {
       firstUnitLocationLabel: "Ubicación",
       actionBusinessSignupApproved: "Activó negocio nuevo",
       actionBusinessSignupRejected: "Rechazó solicitud de negocio",
+      actionProductRetired: "Quitó un platillo del menú",
+      actionProductCreated: "Agregó un platillo",
+      actionStaffCreated: "Agregó personal",
+      actionStaffPinReset: "Restableció un PIN",
+      actionStaffRemoved: "Quitó personal",
+      actionDeviceCreated: "Emparejó un dispositivo",
+      actionDeviceRevoked: "Revocó un dispositivo",
       billingNoteTitle: "Cobro automático:",
       billingNoteBody:
         "en Fase 1 la suscripción se cobra fuera del sistema y aquí solo se registra el estado. Cada cliente ya lleva marcado si cobra por transferencia manual o si tiene Stripe conectado, para no tener que rehacer la tabla cuando se active — la conexión en sí entra en Fase 2. Hasta entonces, suspender por falta de pago es una acción manual.",
@@ -1976,6 +1990,13 @@ export const dictionary: Record<Lang, Dictionary> = {
       firstUnitLocationLabel: "Location",
       actionBusinessSignupApproved: "Activated new business",
       actionBusinessSignupRejected: "Rejected business request",
+      actionProductRetired: "Removed a dish from the menu",
+      actionProductCreated: "Added a dish",
+      actionStaffCreated: "Added staff",
+      actionStaffPinReset: "Reset a PIN",
+      actionStaffRemoved: "Removed staff",
+      actionDeviceCreated: "Paired a device",
+      actionDeviceRevoked: "Revoked a device",
       billingNoteTitle: "Automatic billing:",
       billingNoteBody:
         "in Phase 1, subscriptions are billed outside the system and this only records the status. Every client is already marked as manual transfer or Stripe-connected, so the table won't need rework once it's activated — the actual connection lands in Phase 2. Until then, suspending for non-payment is a manual action.",

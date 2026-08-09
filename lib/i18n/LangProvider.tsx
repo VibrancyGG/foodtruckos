@@ -23,6 +23,9 @@ export function LangProvider({
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY) as Lang | null
+      // Se lee después de montar (nunca en el render inicial) para no romper
+      // la hidratación: el servidor no conoce el idioma guardado del cliente.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved === "es" || saved === "en") setLangState(saved)
     } catch {
       // localStorage puede no estar disponible; se queda en el idioma por defecto.

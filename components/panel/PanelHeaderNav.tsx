@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -29,6 +30,15 @@ export function PanelHeaderNav({
 }) {
   const { lang, setLang, t } = useLang()
   const pathname = usePathname()
+  const activeRef = useRef<HTMLAnchorElement>(null)
+
+  // En móvil la barra de pestañas es más ancha que la pantalla (se desliza
+  // horizontal, mismo patrón que los chips de categoría en cocina) — sin
+  // esto, entrar directo a una pestaña de la derecha (QR, Cuenta) la deja
+  // fuera de vista y no queda claro en cuál estás parado.
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest", inline: "center" })
+  }, [pathname])
 
   return (
     <header className="bg-neutral-900 text-white">
@@ -55,19 +65,26 @@ export function PanelHeaderNav({
         </div>
       </div>
       {showNav && (
-        <nav className="flex gap-1 overflow-x-auto px-4">
-          {TABS.map((tab) => (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`whitespace-nowrap rounded-t-lg px-3 py-2 text-sm font-semibold hover:bg-neutral-800 hover:text-white ${
-                pathname?.startsWith(tab.href) ? "bg-neutral-800 text-white" : "text-neutral-300"
-              }`}
-            >
-              {t.panel.nav[tab.key]}
-            </Link>
-          ))}
-        </nav>
+        <div className="relative">
+          <nav className="flex gap-1 overflow-x-auto px-4">
+            {TABS.map((tab) => {
+              const active = pathname?.startsWith(tab.href)
+              return (
+                <Link
+                  key={tab.href}
+                  ref={active ? activeRef : undefined}
+                  href={tab.href}
+                  className={`whitespace-nowrap rounded-t-lg px-3 py-2 text-sm font-semibold hover:bg-neutral-800 hover:text-white ${
+                    active ? "bg-neutral-800 text-white" : "text-neutral-300"
+                  }`}
+                >
+                  {t.panel.nav[tab.key]}
+                </Link>
+              )
+            })}
+          </nav>
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-neutral-900 to-transparent sm:hidden" />
+        </div>
       )}
     </header>
   )

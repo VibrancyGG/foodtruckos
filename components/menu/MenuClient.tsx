@@ -61,6 +61,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   useEffect(() => {
     const stored = loadStoredCart(data.orderPoint.id)
     if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restaurar carrito post-montaje, ver comentario arriba
       setCart(stored.cart)
       setCustomerName(stored.customerName)
     }

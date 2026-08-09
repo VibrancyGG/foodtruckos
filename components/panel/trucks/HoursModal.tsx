@@ -65,7 +65,7 @@ export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][n
             return (
               <div
                 key={d.key}
-                className={`flex items-center gap-3 border-b border-neutral-100 px-3 py-2.5 last:border-b-0 ${closed ? "bg-neutral-50" : ""}`}
+                className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-neutral-100 px-3 py-2.5 last:border-b-0 ${closed ? "bg-neutral-50" : ""}`}
               >
                 <button
                   type="button"

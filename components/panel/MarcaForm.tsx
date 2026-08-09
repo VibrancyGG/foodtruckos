@@ -230,7 +230,7 @@ export function MarcaForm({
         </div>
       </div>
 
-      <aside className="lg:sticky lg:top-4">
+      <aside className="order-first sticky top-0 z-10 -mx-4 bg-neutral-50 px-4 pb-3 lg:order-none lg:static lg:top-4 lg:mx-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:sticky">
         <div className="mb-2 flex items-center justify-between text-xs font-bold text-neutral-500">
           <span>{p.previewLabel}</span>
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">{p.liveLabel}</span>

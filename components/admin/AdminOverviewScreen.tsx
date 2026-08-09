@@ -20,7 +20,7 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
   const a = t.admin
   const locale = lang === "es" ? "es-MX" : "en-US"
   const ACTION_LABEL: Record<string, string> = {
-    price_change: a.actionPriceChange,
+    product_price_changed: a.actionPriceChange,
     subscription_cancel_requested: a.actionCancelRequested,
     unit_paused: a.actionUnitPaused,
     unit_reopened: a.actionUnitReopened,
@@ -34,6 +34,13 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
     archive_warning_sent: a.actionArchiveWarningSent,
     business_signup_approved: a.actionBusinessSignupApproved,
     business_signup_rejected: a.actionBusinessSignupRejected,
+    product_retired: a.actionProductRetired,
+    product_created: a.actionProductCreated,
+    staff_created: a.actionStaffCreated,
+    staff_pin_reset: a.actionStaffPinReset,
+    staff_removed: a.actionStaffRemoved,
+    device_created: a.actionDeviceCreated,
+    device_revoked: a.actionDeviceRevoked,
   }
   const STATUS_LABEL: Record<string, string> = {
     trial: a.statusTrial,
