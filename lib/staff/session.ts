@@ -112,6 +112,7 @@ type VerifiedStaffSession = {
   staffId: string
   deviceId: string
   sessionId: string
+  role: string
 }
 
 // Se llama en CADA acción de cocina, no solo al refrescar la cookie — es lo
@@ -140,7 +141,7 @@ export async function verifyStaffSession(
 
   const { data: staff } = await supabase
     .from("staff")
-    .select("id, active, business_id, unit_id")
+    .select("id, active, business_id, unit_id, role")
     .eq("id", session.staff_id)
     .maybeSingle()
 
@@ -154,6 +155,7 @@ export async function verifyStaffSession(
     staffId: staff.id,
     deviceId: device.id,
     sessionId: session.id,
+    role: staff.role,
   }
 }
 

@@ -49,6 +49,7 @@ export function KitchenBoard({
   redMinutes,
   taxIncluded,
   initial,
+  onBack,
 }: {
   unitId: string
   businessId: string
@@ -58,6 +59,7 @@ export function KitchenBoard({
   redMinutes: number
   taxIncluded: boolean
   initial: KitchenData
+  onBack?: () => void
 }) {
   const { lang, setLang, t } = useLang()
   const [orders, setOrders] = useState(initial.orders)
@@ -231,6 +233,15 @@ export function KitchenBoard({
       )}
 
       <header className="flex flex-none flex-wrap items-center gap-3.5 border-b px-4.5 py-3" style={{ background: "#1B1917", borderColor: "#332F29" }}>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="rounded-full border px-2.5 py-1.5 text-xs font-bold"
+            style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+          >
+            {t.kitchen.backToTrucks}
+          </button>
+        )}
         <div className="text-[15px] font-bold tracking-tight">
           {unitName} {staffName && <span className="font-semibold text-neutral-400">· {staffName}</span>}
         </div>

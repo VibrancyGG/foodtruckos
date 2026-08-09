@@ -145,6 +145,23 @@ export type Dictionary = {
     errLocked: string
     errInvalidPin: string
     errConnection: string
+    backToTrucks: string
+    trucksOverviewTitle: string
+    trucksOverviewSubtitle: string
+    trucksOverviewSalesToday: string
+    truckNewLabel: string
+    truckPrepLabel: string
+    truckReadyLabel: string
+    truckOldestLabel: string
+    truckUnpaidLabel: string
+    truckUnpaidNone: string
+    truckSalesTodayLabel: string
+    truckPausedPill: string
+    truckOpenPill: string
+    viewTruckBoard: string
+    attentionNeededTitle: string
+    attentionNeededEmpty: string
+    trucksOverviewDisclaimer: string
   }
   panel: {
     nav: {
@@ -793,6 +810,23 @@ export const dictionary: Record<Lang, Dictionary> = {
       errLocked: "Demasiados intentos, espera un momento",
       errInvalidPin: "PIN incorrecto",
       errConnection: "No se pudo conectar",
+      backToTrucks: "← Trucks",
+      trucksOverviewTitle: "Los trucks, ahora",
+      trucksOverviewSubtitle: "Cómo va cada uno en este momento",
+      trucksOverviewSalesToday: "Venta de hoy, todos los trucks",
+      truckNewLabel: "Nuevas",
+      truckPrepLabel: "Preparando",
+      truckReadyLabel: "Listas",
+      truckOldestLabel: "La más antigua",
+      truckUnpaidLabel: "Por cobrar",
+      truckUnpaidNone: "ninguna",
+      truckSalesTodayLabel: "Venta de hoy",
+      truckPausedPill: "En pausa",
+      truckOpenPill: "Abierto",
+      viewTruckBoard: "Ver su tablero",
+      attentionNeededTitle: "Requieren atención",
+      attentionNeededEmpty: "Nada pasado de tiempo. Todos los trucks van al día.",
+      trucksOverviewDisclaimer: "Se actualiza cada vez que entras a esta pantalla.",
     },
     panel: {
       nav: {
@@ -1444,6 +1478,23 @@ export const dictionary: Record<Lang, Dictionary> = {
       errLocked: "Too many attempts, wait a moment",
       errInvalidPin: "Incorrect PIN",
       errConnection: "Could not connect",
+      backToTrucks: "← Trucks",
+      trucksOverviewTitle: "The trucks, right now",
+      trucksOverviewSubtitle: "How each one is doing at this moment",
+      trucksOverviewSalesToday: "Today's sales, all trucks",
+      truckNewLabel: "New",
+      truckPrepLabel: "Prepping",
+      truckReadyLabel: "Ready",
+      truckOldestLabel: "Oldest one",
+      truckUnpaidLabel: "Unpaid",
+      truckUnpaidNone: "none",
+      truckSalesTodayLabel: "Sales today",
+      truckPausedPill: "Paused",
+      truckOpenPill: "Open",
+      viewTruckBoard: "View its board",
+      attentionNeededTitle: "Need attention",
+      attentionNeededEmpty: "Nothing running late. All trucks are on track.",
+      trucksOverviewDisclaimer: "Refreshes every time you open this screen.",
     },
     panel: {
       nav: {
