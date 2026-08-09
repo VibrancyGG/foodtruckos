@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createServiceClient } from "@/lib/supabase/service"
 import { toNumber } from "@/lib/supabase/numeric"
 
 const OPEN_STATUSES = ["recibido", "preparando", "listo"]
@@ -9,8 +9,14 @@ const OPEN_STATUSES = ["recibido", "preparando", "listo"]
 // Todo sale de datos reales del momento; "en línea" no se calcula porque no
 // hay una señal confiable de conexión por truck todavía (foodtruckos-datos
 // Regla: nunca inventar un número).
+//
+// Llave de servicio, no el cliente público: la política pública de `units`
+// solo deja ver trucks con status='active' — un truck en pausa (el caso que
+// justo esta pantalla existe para mostrar) desaparecería de la lista en vez
+// de aparecer con su etiqueta "En pausa". El personal nunca pasa por RLS de
+// todos modos (lib/staff/session.ts ya verificó la sesión a mano).
 export async function getTrucksOverview(businessId: string) {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
   const startOfDay = new Date()
   startOfDay.setHours(0, 0, 0, 0)
 
