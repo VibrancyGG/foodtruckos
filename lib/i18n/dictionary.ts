@@ -160,6 +160,8 @@ export type Dictionary = {
       exitImpersonation: string
     }
     signupRequestPage: {
+      accountConfirmedBadge: string
+      oneStepLeft: string
       title: string
       intro: string
       businessNameLabel: string
@@ -173,6 +175,7 @@ export type Dictionary = {
       pendingTitle: string
       pendingBody: (businessName: string, city: string) => string
       pendingSince: (date: string) => string
+      pendingNoActionNeeded: string
     }
     suspendedTitle: string
     suspendedBody: string
@@ -795,8 +798,10 @@ export const dictionary: Record<Lang, Dictionary> = {
         exitImpersonation: "Salir",
       },
       signupRequestPage: {
+        accountConfirmedBadge: "Tu cuenta ya está confirmada",
+        oneStepLeft: "Solo falta este paso para quedar en revisión.",
         title: "Cuéntanos de tu negocio",
-        intro: "Tu cuenta ya está creada. Con estos datos revisamos tu solicitud y activamos tu panel.",
+        intro: "Con estos datos revisamos tu solicitud y activamos tu panel — no necesitas hacer nada más después de enviarla.",
         businessNameLabel: "Nombre del negocio",
         cityLabel: "Ciudad",
         phoneLabel: "Teléfono (opcional)",
@@ -808,6 +813,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         pendingTitle: "Tu solicitud está en revisión",
         pendingBody: (businessName, city) => `Recibimos la solicitud de "${businessName}" en ${city}. Te contactamos pronto para activar tu panel.`,
         pendingSince: (date) => `Enviada el ${date}`,
+        pendingNoActionNeeded: "No necesitas hacer nada más — en cuanto la aprobemos vas a poder entrar directo a tu panel con esta misma cuenta.",
       },
       suspendedTitle: "Cuenta suspendida",
       suspendedBody: "Tu suscripción no está vigente. El panel, la cocina y el menú de tus clientes están pausados hasta que se resuelva. Contáctanos para reactivarla.",
@@ -1433,8 +1439,10 @@ export const dictionary: Record<Lang, Dictionary> = {
         exitImpersonation: "Exit",
       },
       signupRequestPage: {
+        accountConfirmedBadge: "Your account is already confirmed",
+        oneStepLeft: "Just this step left before it goes under review.",
         title: "Tell us about your business",
-        intro: "Your account is already created. With this info we review your request and activate your panel.",
+        intro: "With this info we review your request and activate your panel — nothing else to do after you send it.",
         businessNameLabel: "Business name",
         cityLabel: "City",
         phoneLabel: "Phone (optional)",
@@ -1446,6 +1454,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         pendingTitle: "Your request is under review",
         pendingBody: (businessName, city) => `We received the request for "${businessName}" in ${city}. We'll reach out soon to activate your panel.`,
         pendingSince: (date) => `Sent on ${date}`,
+        pendingNoActionNeeded: "Nothing else to do — once we approve it you'll be able to go straight into your panel with this same account.",
       },
       suspendedTitle: "Account suspended",
       suspendedBody: "Your subscription isn't active. Your panel, kitchen, and customer menu are paused until it's resolved. Contact us to reactivate it.",
