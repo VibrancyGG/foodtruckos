@@ -413,6 +413,7 @@ export type Dictionary = {
       roleEncargadoHint: string
       whichTruckLabel: string
       allTrucks: string
+      truckArchivedSuffix: string
       createPin: string
       pinRevealTitle: string
       pinRevealHint: (name: string) => string
@@ -1091,6 +1092,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         roleEncargadoHint: "También ve las ventas de su truck",
         whichTruckLabel: "¿En qué truck?",
         allTrucks: "Todos los trucks",
+        truckArchivedSuffix: " (dado de baja)",
         createPin: "Crear su PIN",
         pinRevealTitle: "Listo, ya puede entrar",
         pinRevealHint: (name) => `Este es el PIN de ${name}. Anótalo o mándaselo — no lo podemos volver a mostrar después, así que captúralo ahora.`,
@@ -1766,6 +1768,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         roleEncargadoHint: "Also sees their truck's sales",
         whichTruckLabel: "Which truck?",
         allTrucks: "All trucks",
+        truckArchivedSuffix: " (archived)",
         createPin: "Create their PIN",
         pinRevealTitle: "Done, they can enter now",
         pinRevealHint: (name) => `This is ${name}'s PIN. Write it down or send it to them — we can't show it again after this, so capture it now.`,

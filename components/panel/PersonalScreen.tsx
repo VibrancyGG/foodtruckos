@@ -7,9 +7,11 @@ import { useLang } from "@/lib/i18n/LangProvider"
 import { AddStaffModal } from "./personal/AddStaffModal"
 import { AddDeviceModal } from "./personal/AddDeviceModal"
 
-function unitName(units: OwnerStaffData["units"], unitId: string | null, allTrucks: string) {
+function unitName(units: OwnerStaffData["units"], unitId: string | null, allTrucks: string, archivedSuffix: string) {
   if (!unitId) return allTrucks
-  return units.find((u) => u.id === unitId)?.name ?? "—"
+  const unit = units.find((u) => u.id === unitId)
+  if (!unit) return "—"
+  return unit.status === "archived" ? `${unit.name}${archivedSuffix}` : unit.name
 }
 
 function daysAgo(iso: string) {
@@ -30,18 +32,20 @@ export function PersonalScreen({ initial }: { initial: OwnerStaffData }) {
         <div className="mb-1 text-sm font-black text-green-900">{p.selfServiceTitle}</div>
         <p className="text-sm leading-relaxed text-green-800">{p.selfServiceBody}</p>
       </div>
-      <StaffSection units={initial.units} staff={initial.staff} removedStaff={initial.removedStaff} />
-      <DeviceSection units={initial.units} devices={initial.devices} revokedDevices={initial.revokedDevices} />
+      <StaffSection units={initial.units} assignableUnits={initial.assignableUnits} staff={initial.staff} removedStaff={initial.removedStaff} />
+      <DeviceSection units={initial.units} assignableUnits={initial.assignableUnits} devices={initial.devices} revokedDevices={initial.revokedDevices} />
     </div>
   )
 }
 
 function StaffSection({
   units,
+  assignableUnits,
   staff,
   removedStaff,
 }: {
   units: OwnerStaffData["units"]
+  assignableUnits: OwnerStaffData["assignableUnits"]
   staff: OwnerStaffData["staff"]
   removedStaff: OwnerStaffData["removedStaff"]
 }) {
@@ -66,7 +70,7 @@ function StaffSection({
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
         {staff.length === 0 && <p className="p-4 text-sm text-neutral-400">{p.noStaffYet}</p>}
         {staff.map((s) => (
-          <StaffRow key={s.id} staff={s} unitLabel={unitName(units, s.unit_id, p.allTrucks)} />
+          <StaffRow key={s.id} staff={s} unitLabel={unitName(units, s.unit_id, p.allTrucks, p.truckArchivedSuffix)} />
         ))}
       </div>
 
@@ -90,7 +94,7 @@ function StaffSection({
         </div>
       )}
 
-      {showAdd && <AddStaffModal units={units} onClose={() => setShowAdd(false)} />}
+      {showAdd && <AddStaffModal units={assignableUnits} onClose={() => setShowAdd(false)} />}
     </section>
   )
 }
@@ -235,10 +239,12 @@ function StaffRow({
 
 function DeviceSection({
   units,
+  assignableUnits,
   devices,
   revokedDevices,
 }: {
   units: OwnerStaffData["units"]
+  assignableUnits: OwnerStaffData["assignableUnits"]
   devices: OwnerStaffData["devices"]
   revokedDevices: OwnerStaffData["revokedDevices"]
 }) {
@@ -251,7 +257,7 @@ function DeviceSection({
     <section>
       <div className="mb-1 flex items-center justify-between">
         <h2 className="text-lg font-bold">{p.devicesTitle}</h2>
-        {units.length > 0 && (
+        {assignableUnits.length > 0 && (
           <button
             onClick={() => setShowAdd(true)}
             className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
@@ -265,7 +271,7 @@ function DeviceSection({
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
         {devices.length === 0 && <p className="p-4 text-sm text-neutral-400">{p.noDevicesYet}</p>}
         {devices.map((d) => (
-          <DeviceRow key={d.id} device={d} unitLabel={unitName(units, d.unit_id, p.allTrucks)} />
+          <DeviceRow key={d.id} device={d} unitLabel={unitName(units, d.unit_id, p.allTrucks, p.truckArchivedSuffix)} />
         ))}
       </div>
 
@@ -289,7 +295,7 @@ function DeviceSection({
         </div>
       )}
 
-      {showAdd && <AddDeviceModal units={units} onClose={() => setShowAdd(false)} />}
+      {showAdd && <AddDeviceModal units={assignableUnits} onClose={() => setShowAdd(false)} />}
     </section>
   )
 }

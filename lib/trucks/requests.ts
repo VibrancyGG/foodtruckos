@@ -69,6 +69,7 @@ export async function approveTruckRequest(requestId: string): Promise<Result> {
     .from("units")
     .select("id", { count: "exact", head: true })
     .eq("business_id", request.business_id)
+    .neq("status", "archived")
 
   const { error: unitError } = await supabase.from("units").insert({
     business_id: request.business_id,
@@ -91,6 +92,11 @@ export async function approveTruckRequest(requestId: string): Promise<Result> {
   })
 
   revalidatePath("/admin")
+  // El truck nuevo se factura de inmediato (ver comentario arriba) — sin
+  // esto, Trucks/Cuenta del dueño podían quedarse con el conteo viejo
+  // cacheado hasta su siguiente navegación que invalidara la ruta.
+  revalidatePath("/panel/trucks")
+  revalidatePath("/panel/cuenta")
   return { ok: true }
 }
 

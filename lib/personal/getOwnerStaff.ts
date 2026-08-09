@@ -14,7 +14,10 @@ export async function getOwnerStaff(businessId: string) {
       .select("id, unit_id, label, paired_at, revoked_at, last_seen_at, created_at")
       .eq("business_id", businessId)
       .order("created_at"),
-    supabase.from("units").select("id, name").eq("business_id", businessId).neq("status", "archived"),
+    // Todos los trucks, incluidos los dados de baja: el personal/dispositivo
+    // de un truck archivado debe seguir mostrando su nombre real (no "—")
+    // aunque ya no se le pueda asignar nada nuevo — ver assignableUnits.
+    supabase.from("units").select("id, name, status").eq("business_id", businessId),
     // Se calcula de device_sessions reales (nunca se inventa la actividad de
     // turno) — ver staff_last_used, una función de base de datos porque
     // device_sessions no tiene RLS propia (solo la toca el cliente de
@@ -32,6 +35,7 @@ export async function getOwnerStaff(businessId: string) {
     devices: (devices ?? []).filter((d) => !d.revoked_at),
     revokedDevices: (devices ?? []).filter((d) => d.revoked_at),
     units: units ?? [],
+    assignableUnits: (units ?? []).filter((u) => u.status !== "archived"),
   }
 }
 

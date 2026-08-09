@@ -31,11 +31,12 @@ export async function getOwnerSummary(businessId: string) {
   const windowStart = new Date(Date.UTC(currentYear - 1, 0, 1))
 
   const [{ data: units }, { data: orders }] = await Promise.all([
-    supabase
-      .from("units")
-      .select("id, name, hours")
-      .eq("business_id", businessId)
-      .neq("status", "archived"),
+    // Sin filtro de status: un truck archivado se sigue facturando/mostrando
+    // en Trucks/Cuenta que no, pero su venta pasada es historia real (Regla
+    // 2, nunca se destruye) — si aquí se excluyera, la suma de perTruck ya
+    // no cuadraría contra el total del negocio en cuanto algún truck viejo
+    // se diera de baja a media temporada.
+    supabase.from("units").select("id, name, hours").eq("business_id", businessId),
     supabase
       .from("orders")
       .select("id, unit_id, channel, status, total, created_at")

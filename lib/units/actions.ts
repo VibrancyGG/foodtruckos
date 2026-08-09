@@ -186,7 +186,12 @@ export async function archiveUnit(unitId: string): Promise<Result> {
     p_entity_type: "unit",
     p_entity_id: unitId,
   })
+  // Archivar cambia cuántos trucks se facturan y cuáles se pueden asignar a
+  // personal/dispositivos nuevos — sin esto, Cuenta y Personal podían
+  // quedarse con el conteo/lista vieja cacheados.
   revalidatePath("/panel/trucks")
+  revalidatePath("/panel/cuenta")
+  revalidatePath("/panel/personal")
   return { ok: true }
 }
 
@@ -209,6 +214,8 @@ export async function reactivateUnit(unitId: string): Promise<Result> {
     p_entity_id: unitId,
   })
   revalidatePath("/panel/trucks")
+  revalidatePath("/panel/cuenta")
+  revalidatePath("/panel/personal")
   return { ok: true }
 }
 
