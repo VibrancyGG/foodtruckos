@@ -33,7 +33,7 @@ export function BusinessSignupRequestRow({ request }: { request: AdminOverview["
   return (
     <div className="border-b border-neutral-800 py-3 last:border-0">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 basis-full sm:basis-auto">
           <div className="font-semibold">{request.business_name}</div>
           <div className="text-xs text-neutral-500">
             {request.city} · {request.contact_email}

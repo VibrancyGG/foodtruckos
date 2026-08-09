@@ -16,7 +16,7 @@ export function PendingRequestRow({ request }: { request: AdminOverview["pending
 
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-neutral-800 py-3 last:border-0">
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 basis-full sm:basis-auto">
         <div className="font-semibold">{request.businessName}</div>
         <div className="text-xs text-neutral-500">
           {a.requestedOn(new Date(request.created_at).toLocaleDateString(locale))} · {a.currentTrucksLabel(request.currentTrucks)}
