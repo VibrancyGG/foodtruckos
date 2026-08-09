@@ -1,13 +1,16 @@
-"use client"
+import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
+import { getMyPendingBusinessSignupRequest } from "@/lib/business/signupRequests"
+import { SinAccesoScreen } from "@/components/panel/SinAccesoScreen"
 
-import { useLang } from "@/lib/i18n/LangProvider"
+export default async function SinAccesoPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
 
-export default function SinAccesoPage() {
-  const { t } = useLang()
-  return (
-    <div className="mx-auto max-w-md rounded-2xl bg-white p-6 text-center">
-      <h1 className="mb-2 text-lg font-bold">{t.panel.sinAccesoTitle}</h1>
-      <p className="text-sm text-neutral-600">{t.panel.sinAccesoBody}</p>
-    </div>
-  )
+  const pendingRequest = await getMyPendingBusinessSignupRequest()
+
+  return <SinAccesoScreen pendingRequest={pendingRequest} />
 }

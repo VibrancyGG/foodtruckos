@@ -8,7 +8,7 @@ function monthsBetween(a: Date, b: Date) {
 export async function getAdminOverview() {
   const supabase = await createClient()
 
-  const [{ data: businesses }, { data: units }, { data: requests }] = await Promise.all([
+  const [{ data: businesses }, { data: units }, { data: requests }, { data: businessSignups }] = await Promise.all([
     supabase
       .from("businesses")
       .select("id, name, slug, subscription_status, billing_mode, created_at")
@@ -17,6 +17,11 @@ export async function getAdminOverview() {
     supabase
       .from("truck_requests")
       .select("id, business_id, note, created_at")
+      .eq("status", "pending")
+      .order("created_at"),
+    supabase
+      .from("business_signup_requests")
+      .select("id, business_name, city, phone, note, contact_email, created_at")
       .eq("status", "pending")
       .order("created_at"),
   ])
@@ -111,6 +116,7 @@ export async function getAdminOverview() {
     cartera,
     mrrHistory,
     pendingRequests,
+    pendingBusinessSignups: businessSignups ?? [],
     archivedExpiring,
     activity: (activity ?? []).map((a) => ({
       ...a,

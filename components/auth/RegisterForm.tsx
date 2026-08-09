@@ -1,17 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { getPostLoginRedirect } from "@/lib/auth/actions"
 
-export function LoginForm() {
-  const router = useRouter()
+export function RegisterForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
 
   async function withGoogle() {
     const supabase = createClient()
@@ -26,14 +24,34 @@ export function LoginForm() {
     setSending(true)
     setError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
     setSending(false)
     if (error) {
-      setError("Correo o contraseña incorrectos.")
+      setError(error.message.includes("already registered") ? "Ese correo ya tiene una cuenta." : "No se pudo crear tu cuenta.")
       return
     }
-    router.push(await getPostLoginRedirect())
-    router.refresh()
+    if (data.session) {
+      window.location.href = "/panel"
+      return
+    }
+    setSent(true)
+  }
+
+  if (sent) {
+    return (
+      <div className="w-full max-w-sm space-y-3 text-center">
+        <p className="text-sm text-neutral-200">
+          Te mandamos un correo a <b>{email}</b> para confirmar tu cuenta. Ábrelo para continuar.
+        </p>
+        <Link href="/login" className="block text-xs text-neutral-400 underline">
+          Volver a entrar
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -63,9 +81,10 @@ export function LoginForm() {
         <input
           type="password"
           required
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
+          placeholder="Contraseña (mínimo 8 caracteres)"
           className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
         />
         {error && <p className="text-sm text-red-400">{error}</p>}
@@ -74,19 +93,13 @@ export function LoginForm() {
           disabled={sending}
           className="w-full rounded-lg bg-neutral-100 py-2.5 text-sm font-bold text-neutral-900 disabled:opacity-60"
         >
-          {sending ? "Entrando…" : "Entrar"}
+          {sending ? "Creando cuenta…" : "Crear cuenta"}
         </button>
       </form>
 
-      <div className="flex items-center justify-center gap-3 text-xs text-neutral-400">
-        <Link href="/login/recuperar" className="underline">
-          Olvidé mi contraseña
-        </Link>
-        <span className="text-neutral-700">·</span>
-        <Link href="/login/registro" className="underline">
-          Regístrate
-        </Link>
-      </div>
+      <Link href="/login" className="block text-center text-xs text-neutral-400 underline">
+        Ya tengo cuenta, entrar
+      </Link>
     </div>
   )
 }

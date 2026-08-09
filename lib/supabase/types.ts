@@ -168,6 +168,59 @@ export type Database = {
           },
         ]
       }
+      business_signup_requests: {
+        Row: {
+          auth_user_id: string
+          business_name: string
+          city: string
+          contact_email: string
+          created_at: string
+          id: string
+          note: string | null
+          phone: string | null
+          resolved_at: string | null
+          resolved_business_id: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          auth_user_id: string
+          business_name: string
+          city: string
+          contact_email: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          phone?: string | null
+          resolved_at?: string | null
+          resolved_business_id?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          auth_user_id?: string
+          business_name?: string
+          city?: string
+          contact_email?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          phone?: string | null
+          resolved_at?: string | null
+          resolved_business_id?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_signup_requests_resolved_business_id_fkey"
+            columns: ["resolved_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           billing_mode: string

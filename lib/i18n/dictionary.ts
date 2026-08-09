@@ -159,8 +159,21 @@ export type Dictionary = {
       impersonatingBanner: (businessName: string) => string
       exitImpersonation: string
     }
-    sinAccesoTitle: string
-    sinAccesoBody: string
+    signupRequestPage: {
+      title: string
+      intro: string
+      businessNameLabel: string
+      cityLabel: string
+      phoneLabel: string
+      noteLabel: string
+      notePlaceholder: string
+      submit: string
+      sending: string
+      sent: string
+      pendingTitle: string
+      pendingBody: (businessName: string, city: string) => string
+      pendingSince: (date: string) => string
+    }
     suspendedTitle: string
     suspendedBody: string
     common: {
@@ -585,6 +598,15 @@ export type Dictionary = {
     retentionMonthsLeft: (n: number) => string
     archiveContactedBadge: string
     archiveMarkContacted: string
+    businessSignupsHeader: string
+    noBusinessSignups: string
+    businessSignupApprove: string
+    businessSignupApproving: string
+    businessSignupConfirm: string
+    firstUnitNameLabel: string
+    firstUnitLocationLabel: string
+    actionBusinessSignupApproved: string
+    actionBusinessSignupRejected: string
     billingNoteTitle: string
     billingNoteBody: string
     billingRuleTitle: string
@@ -772,8 +794,21 @@ export const dictionary: Record<Lang, Dictionary> = {
         impersonatingBanner: (businessName) => `Estás viendo el panel de ${businessName} como administrador`,
         exitImpersonation: "Salir",
       },
-      sinAccesoTitle: "Todavía no tenemos tu cuenta vinculada",
-      sinAccesoBody: "Escríbenos a soporte para que te demos acceso al panel de tu negocio.",
+      signupRequestPage: {
+        title: "Cuéntanos de tu negocio",
+        intro: "Tu cuenta ya está creada. Con estos datos revisamos tu solicitud y activamos tu panel.",
+        businessNameLabel: "Nombre del negocio",
+        cityLabel: "Ciudad",
+        phoneLabel: "Teléfono (opcional)",
+        noteLabel: "Algo más que debamos saber (opcional)",
+        notePlaceholder: "Ej: cuántos trucks, en qué ubicaciones",
+        submit: "Enviar solicitud",
+        sending: "Enviando…",
+        sent: "Listo, recibimos tu solicitud. Te contactamos pronto para activar tu panel.",
+        pendingTitle: "Tu solicitud está en revisión",
+        pendingBody: (businessName, city) => `Recibimos la solicitud de "${businessName}" en ${city}. Te contactamos pronto para activar tu panel.`,
+        pendingSince: (date) => `Enviada el ${date}`,
+      },
       suspendedTitle: "Cuenta suspendida",
       suspendedBody: "Tu suscripción no está vigente. El panel, la cocina y el menú de tus clientes están pausados hasta que se resuelva. Contáctanos para reactivarla.",
       common: {
@@ -1204,6 +1239,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       retentionMonthsLeft: (n) => `${n} mes${n === 1 ? "" : "es"} antes del corte`,
       archiveContactedBadge: "Cliente contactado",
       archiveMarkContacted: "Marcar contactado",
+      businessSignupsHeader: "Nuevos negocios",
+      noBusinessSignups: "Nada pendiente.",
+      businessSignupApprove: "Aprobar y activar",
+      businessSignupApproving: "Activando…",
+      businessSignupConfirm: "Confirmar alta",
+      firstUnitNameLabel: "Nombre del primer truck",
+      firstUnitLocationLabel: "Ubicación",
+      actionBusinessSignupApproved: "Activó negocio nuevo",
+      actionBusinessSignupRejected: "Rechazó solicitud de negocio",
       billingNoteTitle: "Cobro automático:",
       billingNoteBody:
         "en Fase 1 la suscripción se cobra fuera del sistema y aquí solo se registra el estado. Cada cliente ya lleva marcado si cobra por transferencia manual o si tiene Stripe conectado, para no tener que rehacer la tabla cuando se active — la conexión en sí entra en Fase 2. Hasta entonces, suspender por falta de pago es una acción manual.",
@@ -1388,8 +1432,21 @@ export const dictionary: Record<Lang, Dictionary> = {
         impersonatingBanner: (businessName) => `You're viewing ${businessName}'s panel as an admin`,
         exitImpersonation: "Exit",
       },
-      sinAccesoTitle: "We haven't linked your account yet",
-      sinAccesoBody: "Email support so we can give you access to your business panel.",
+      signupRequestPage: {
+        title: "Tell us about your business",
+        intro: "Your account is already created. With this info we review your request and activate your panel.",
+        businessNameLabel: "Business name",
+        cityLabel: "City",
+        phoneLabel: "Phone (optional)",
+        noteLabel: "Anything else we should know (optional)",
+        notePlaceholder: "E.g. how many trucks, which locations",
+        submit: "Send request",
+        sending: "Sending…",
+        sent: "Got it, we received your request. We'll reach out soon to activate your panel.",
+        pendingTitle: "Your request is under review",
+        pendingBody: (businessName, city) => `We received the request for "${businessName}" in ${city}. We'll reach out soon to activate your panel.`,
+        pendingSince: (date) => `Sent on ${date}`,
+      },
       suspendedTitle: "Account suspended",
       suspendedBody: "Your subscription isn't active. Your panel, kitchen, and customer menu are paused until it's resolved. Contact us to reactivate it.",
       common: {
@@ -1820,6 +1877,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       retentionMonthsLeft: (n) => `${n} month${n === 1 ? "" : "s"} left`,
       archiveContactedBadge: "Client contacted",
       archiveMarkContacted: "Mark contacted",
+      businessSignupsHeader: "New businesses",
+      noBusinessSignups: "Nothing pending.",
+      businessSignupApprove: "Approve and activate",
+      businessSignupApproving: "Activating…",
+      businessSignupConfirm: "Confirm setup",
+      firstUnitNameLabel: "First truck's name",
+      firstUnitLocationLabel: "Location",
+      actionBusinessSignupApproved: "Activated new business",
+      actionBusinessSignupRejected: "Rejected business request",
       billingNoteTitle: "Automatic billing:",
       billingNoteBody:
         "in Phase 1, subscriptions are billed outside the system and this only records the status. Every client is already marked as manual transfer or Stripe-connected, so the table won't need rework once it's activated — the actual connection lands in Phase 2. Until then, suspending for non-payment is a manual action.",
