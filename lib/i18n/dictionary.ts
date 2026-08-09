@@ -366,6 +366,7 @@ export type Dictionary = {
       liveLabel: string
       coverPlaceholder: string
       addPreviewLabel: string
+      previewNoProducts: string
       motifStep: string
       motifTitle: string
       motifHint: string
@@ -1010,6 +1011,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         liveLabel: "En vivo",
         coverPlaceholder: "Tu foto de portada aquí",
         addPreviewLabel: "Agregar",
+        previewNoProducts: "Tus platillos aparecerán aquí en cuanto los agregues en Menú.",
         motifStep: "DETALLE",
         motifTitle: "El dibujo de fondo",
         motifHint: "Unas líneas discretas en el encabezado, según lo que vendes.",
@@ -1651,6 +1653,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         liveLabel: "Live",
         coverPlaceholder: "Your cover photo here",
         addPreviewLabel: "Add",
+        previewNoProducts: "Your dishes will show up here once you add them in Menu.",
         motifStep: "DETAIL",
         motifTitle: "Background artwork",
         motifHint: "A few discreet lines in the header, based on what you sell.",

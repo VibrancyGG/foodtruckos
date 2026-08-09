@@ -1,13 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { getPostLoginRedirect } from "@/lib/auth/actions"
 
 export function LoginForm() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [sending, setSending] = useState(false)
@@ -32,8 +30,11 @@ export function LoginForm() {
       setError("Correo o contraseña incorrectos.")
       return
     }
-    router.push(await getPostLoginRedirect())
-    router.refresh()
+    // Navegación completa, no router.push(): el cliente escribe la cookie de
+    // sesión en un listener asíncrono (onAuthStateChange), así que empujar la
+    // ruta de inmediato puede ganarle a esa escritura y el Server Component
+    // de destino todavía no ve la sesión — obligando a recargar a mano.
+    window.location.href = await getPostLoginRedirect()
   }
 
   return (

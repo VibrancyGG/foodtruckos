@@ -6,9 +6,19 @@ import { onColorFor, contrastRatio } from "@/lib/branding/color"
 import { MOTIFS, isBrandMotif, type BrandMotif } from "@/lib/branding/motifs"
 import { uploadLogo, uploadCoverPhoto, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { toNumber } from "@/lib/supabase/numeric"
 
 type MenuStyle = "vibrante" | "tradicional"
 type UnitBrand = { id: string; name: string; brand_color: string | null }
+type PreviewProduct = {
+  id: string
+  name_es: string
+  name_en: string | null
+  description_es: string | null
+  description_en: string | null
+  price: number
+  photo_url: string | null
+}
 
 export function MarcaForm({
   businessName,
@@ -18,6 +28,7 @@ export function MarcaForm({
   initialStyle,
   initialMotif,
   units,
+  previewProducts,
 }: {
   businessName: string
   initialLogoUrl: string | null
@@ -26,8 +37,9 @@ export function MarcaForm({
   initialStyle: string
   initialMotif: string
   units: UnitBrand[]
+  previewProducts: PreviewProduct[]
 }) {
-  const { t } = useLang()
+  const { lang, t } = useLang()
   const p = t.panel.marcaPage
   const c = t.panel.common
   const [logoUrl, setLogoUrl] = useState(initialLogoUrl)
@@ -256,21 +268,60 @@ export function MarcaForm({
               {p.coverPlaceholder}
             </div>
           )}
-          <div className="space-y-2 p-3">
-            {[1, 2].map((i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg border border-neutral-200 p-2">
-                <div>
-                  <div className="h-2.5 w-24 rounded bg-neutral-800" />
-                  <div className="mt-1.5 h-2 w-10 rounded bg-neutral-300" />
-                </div>
-                <div
-                  className="rounded-full px-2.5 py-1 text-[10px] font-bold"
-                  style={{ background: color, color: onColor }}
-                >
-                  {p.addPreviewLabel}
-                </div>
-              </div>
-            ))}
+          {previewProducts.length === 0 ? (
+            <p className="p-4 text-center text-xs text-neutral-400">{p.previewNoProducts}</p>
+          ) : style === "vibrante" ? (
+            <div className="divide-y divide-neutral-200">
+              {previewProducts.map((prod) => {
+                const name = (lang === "es" ? prod.name_es : prod.name_en) || prod.name_es
+                const desc = (lang === "es" ? prod.description_es : prod.description_en) || ""
+                return (
+                  <div key={prod.id} className="grid grid-cols-[44px_1fr_auto] items-start gap-2.5 p-2.5">
+                    {prod.photo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={prod.photo_url} alt="" className="h-11 w-11 rounded-sm object-cover" />
+                    ) : (
+                      <div
+                        className="grid h-11 w-11 place-items-center rounded-sm text-sm font-black"
+                        style={{ background: color, color: onColor }}
+                      >
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="truncate text-xs font-bold uppercase text-neutral-900">{name}</div>
+                      {desc && <div className="mt-0.5 line-clamp-2 text-[10px] text-neutral-500">{desc}</div>}
+                    </div>
+                    <div className="whitespace-nowrap text-xs font-black text-neutral-900">${toNumber(prod.price).toFixed(2)}</div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="divide-y divide-neutral-200">
+              {previewProducts.map((prod) => {
+                const name = (lang === "es" ? prod.name_es : prod.name_en) || prod.name_es
+                const desc = (lang === "es" ? prod.description_es : prod.description_en) || ""
+                return (
+                  <div key={prod.id} className="p-2.5">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="flex-none text-xs font-bold uppercase text-neutral-900">{name}</span>
+                      <span className="-translate-y-1 flex-1 border-b border-dotted border-neutral-300" />
+                      <span className="whitespace-nowrap text-xs font-black text-neutral-900">${toNumber(prod.price).toFixed(2)}</span>
+                    </div>
+                    {desc && <div className="mt-0.5 text-[10px] text-neutral-500">{desc}</div>}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          <div className="p-2.5">
+            <div
+              className="rounded-lg py-2 text-center text-xs font-black uppercase"
+              style={{ background: color, color: onColor }}
+            >
+              {p.addPreviewLabel}
+            </div>
           </div>
         </div>
       </aside>
