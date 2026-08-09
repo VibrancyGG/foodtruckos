@@ -73,7 +73,7 @@ export async function getTrucksOverview(businessId: string) {
       .filter((o) => o.unit_id === u.id && o.status === "entregado" && o.payment_status === "pagada")
       .reduce((s, o) => s + o.total, 0)
 
-    const paused = !!u.paused_until && new Date(u.paused_until) > new Date()
+    const paused = u.status === "paused"
 
     return {
       id: u.id,
