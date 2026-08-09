@@ -379,6 +379,8 @@ export type Dictionary = {
     personalPage: {
       title: string
       subtitle: string
+      selfServiceTitle: string
+      selfServiceBody: string
       staffTitle: string
       addPerson: string
       staffHint: string
@@ -403,6 +405,13 @@ export type Dictionary = {
       showRemoved: (n: number) => string
       hideRemoved: (n: number) => string
       confirmRemoveAccess: string
+      resetPin: string
+      resettingPin: string
+      confirmResetPin: string
+      yesReset: string
+      pinResetTitle: string
+      pinResetHint: (name: string) => string
+      pinMaskedLabel: string
       usedToday: string
       usedYesterday: string
       usedDaysAgo: (n: number) => string
@@ -1024,6 +1033,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       personalPage: {
         title: "Personal",
         subtitle: "Tu personal no necesita correo ni contraseña. La tablet del truck se conecta una vez y se queda conectada; cada persona entra con su PIN de cuatro dígitos.",
+        selfServiceTitle: "Esto lo manejas tú, cuando quieras",
+        selfServiceBody: "Entra alguien nuevo, le creas un PIN. Se va, lo borras y deja de funcionar en ese momento. Se pierde una tablet, revocas su acceso desde aquí. No tienes que avisarnos ni esperar a nadie.",
         staffTitle: "Personas",
         addPerson: "Agregar persona",
         staffHint: "Cada quien con su PIN, para saber quién atendió cada orden.",
@@ -1048,6 +1059,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         showRemoved: (n) => `Ver personal dado de baja (${n})`,
         hideRemoved: (n) => `Ocultar personal dado de baja (${n})`,
         confirmRemoveAccess: "Su PIN deja de servir de inmediato. ¿Quitar?",
+        resetPin: "Restablecer PIN",
+        resettingPin: "Restableciendo…",
+        confirmResetPin: "Su PIN actual deja de servir. ¿Restablecer?",
+        yesReset: "Sí, restablecer",
+        pinResetTitle: "Listo, tiene un PIN nuevo",
+        pinResetHint: (name) => `Este es el nuevo PIN de ${name}. El anterior ya no funciona. Anótalo o mándaselo — no lo podemos volver a mostrar después.`,
+        pinMaskedLabel: "••••",
         usedToday: "usó su PIN hoy",
         usedYesterday: "usó su PIN ayer",
         usedDaysAgo: (n) => `usó su PIN hace ${n} días`,
@@ -1666,6 +1684,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       personalPage: {
         title: "Staff",
         subtitle: "Your staff doesn't need an email or a password. The truck's tablet connects once and stays connected; each person enters with their four-digit PIN.",
+        selfServiceTitle: "You handle this yourself, whenever you want",
+        selfServiceBody: "Someone new starts, you create their PIN. They leave, you delete it and it stops working right then. Lost a tablet? Revoke its access here. No need to tell us or wait on anyone.",
         staffTitle: "People",
         addPerson: "Add person",
         staffHint: "Each person with their own PIN, so you know who handled each order.",
@@ -1690,6 +1710,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         showRemoved: (n) => `Show removed staff (${n})`,
         hideRemoved: (n) => `Hide removed staff (${n})`,
         confirmRemoveAccess: "Their PIN stops working right away. Remove?",
+        resetPin: "Reset PIN",
+        resettingPin: "Resetting…",
+        confirmResetPin: "Their current PIN stops working. Reset?",
+        yesReset: "Yes, reset",
+        pinResetTitle: "Done, they have a new PIN",
+        pinResetHint: (name) => `This is ${name}'s new PIN. The old one no longer works. Write it down or send it — we can't show it again after this.`,
+        pinMaskedLabel: "••••",
         usedToday: "used their PIN today",
         usedYesterday: "used their PIN yesterday",
         usedDaysAgo: (n) => `used their PIN ${n} days ago`,

@@ -85,6 +85,37 @@ export async function createStaff(input: {
   return { ok: true, pin }
 }
 
+type ResetPinResult = { ok: true; pin: string } | { ok: false; error: string }
+
+// Nunca hay "ver PIN": el hash no se puede revertir a propósito. Restablecer
+// genera uno nuevo para la MISMA persona (conserva nombre, rol y truck) y lo
+// revela una sola vez, igual que al darla de alta — resuelve "se me olvidó el
+// PIN" sin tener que guardar el PIN en ninguna forma recuperable.
+export async function resetStaffPin(staffId: string): Promise<ResetPinResult> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const pin = await generateUniquePin(supabase, businessId)
+  if (!pin) return { ok: false, error: "No se pudo generar un PIN, intenta de nuevo" }
+
+  const pinHash = await bcrypt.hash(pepperedPin(pin), 10)
+  const { error } = await supabase
+    .from("staff")
+    .update({ pin_hash: pinHash })
+    .eq("id", staffId)
+    .eq("business_id", businessId)
+  if (error) return { ok: false, error: "No se pudo restablecer" }
+
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: "staff_pin_reset",
+    p_entity_type: "staff",
+    p_entity_id: staffId,
+  })
+  return { ok: true, pin }
+}
+
 export async function removeStaff(staffId: string): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }

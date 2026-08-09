@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import type { OwnerStaffData } from "@/lib/personal/getOwnerStaff"
-import { removeStaff, revokeDevice } from "@/lib/personal/actions"
+import { removeStaff, revokeDevice, resetStaffPin } from "@/lib/personal/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { AddStaffModal } from "./personal/AddStaffModal"
 import { AddDeviceModal } from "./personal/AddDeviceModal"
@@ -19,11 +19,16 @@ function daysAgo(iso: string) {
 
 export function PersonalScreen({ initial }: { initial: OwnerStaffData }) {
   const { t } = useLang()
+  const p = t.panel.personalPage
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="mb-1 text-2xl font-black">{t.panel.personalPage.title}</h1>
-        <p className="mb-2 text-sm text-neutral-500">{t.panel.personalPage.subtitle}</p>
+        <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
+        <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
+      </div>
+      <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
+        <div className="mb-1 text-sm font-black text-green-900">{p.selfServiceTitle}</div>
+        <p className="text-sm leading-relaxed text-green-800">{p.selfServiceBody}</p>
       </div>
       <StaffSection units={initial.units} staff={initial.staff} removedStaff={initial.removedStaff} />
       <DeviceSection units={initial.units} devices={initial.devices} revokedDevices={initial.revokedDevices} />
@@ -106,9 +111,11 @@ function StaffRow({
   const { t } = useLang()
   const p = t.panel.personalPage
   const c = t.panel.common
-  const [confirming, setConfirming] = useState(false)
+  const [confirming, setConfirming] = useState<"remove" | "reset" | null>(null)
   const [gone, setGone] = useState(false)
   const [pending, startTransition] = useTransition()
+  const [reveal, setReveal] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   if (gone) return null
 
@@ -140,29 +147,87 @@ function StaffRow({
           )}
         </div>
       </div>
-      {confirming ? (
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-500">{p.confirmRemoveAccess}</span>
-          <button
-            disabled={pending}
-            onClick={() =>
-              startTransition(async () => {
-                const result = await removeStaff(staff.id)
-                if (result.ok) setGone(true)
-              })
-            }
-            className="font-bold text-red-600"
-          >
-            {c.yesRemove}
-          </button>
-          <button onClick={() => setConfirming(false)} className="text-neutral-500">
-            {c.cancel}
-          </button>
+
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-lg font-black tracking-[0.2em] text-neutral-300">{p.pinMaskedLabel}</span>
+
+        {confirming === "reset" ? (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-neutral-500">{p.confirmResetPin}</span>
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  setError(null)
+                  const result = await resetStaffPin(staff.id)
+                  if (!result.ok) {
+                    setError(result.error)
+                    setConfirming(null)
+                    return
+                  }
+                  setReveal(result.pin)
+                  setConfirming(null)
+                })
+              }
+              className="font-bold text-neutral-900"
+            >
+              {p.yesReset}
+            </button>
+            <button onClick={() => setConfirming(null)} className="text-neutral-500">
+              {c.cancel}
+            </button>
+          </div>
+        ) : confirming === "remove" ? (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-neutral-500">{p.confirmRemoveAccess}</span>
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  const result = await removeStaff(staff.id)
+                  if (result.ok) setGone(true)
+                })
+              }
+              className="font-bold text-red-600"
+            >
+              {c.yesRemove}
+            </button>
+            <button onClick={() => setConfirming(null)} className="text-neutral-500">
+              {c.cancel}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 text-xs font-semibold">
+            <button onClick={() => setConfirming("reset")} className="text-neutral-500 hover:text-neutral-900">
+              {p.resetPin}
+            </button>
+            <button onClick={() => setConfirming("remove")} className="text-neutral-400 hover:text-red-600">
+              {c.remove}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {error && <p className="w-full text-xs text-red-600">{error}</p>}
+
+      {reveal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
+            <h3 className="mb-1.5 text-xl font-black">{p.pinResetTitle}</h3>
+            <p className="mb-4 text-sm text-neutral-500">{p.pinResetHint(staff.name)}</p>
+            <div className="mb-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
+              <div className="select-all font-mono text-4xl font-black tracking-[0.3em] text-neutral-900">{reveal}</div>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setReveal(null)}
+                className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white"
+              >
+                {p.understood}
+              </button>
+            </div>
+          </div>
         </div>
-      ) : (
-        <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-neutral-400 hover:text-red-600">
-          {c.remove}
-        </button>
       )}
     </div>
   )
