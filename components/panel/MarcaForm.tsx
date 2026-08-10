@@ -294,26 +294,16 @@ export function MarcaForm({
             {/* Mismo tratamiento que el header real (MenuClient/TrackingClient):
                 misma tipografía, mismo mayúsculas, misma proporción logo/texto
                 — para que "así lo verá tu cliente" no mienta. */}
-            {headerStyle === "black" ? (
-              logoUrl ? (
-                // Montado directo sobre el negro, sin plato — para logos
-                // transparentes o de lienzo oscuro.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="" className="relative z-10 h-12 w-12 flex-none object-contain" />
-              ) : (
-                <div className="relative z-10 h-10 w-10 flex-none rounded-full bg-white/10" />
-              )
-            ) : logoUrl ? (
-              // El logo es un sello (aro de texto + ícono), pensado para verse
-              // grande — "cover" en un círculo chico lo recorta y deja ver el
-              // lienzo del PNG como un aro oscuro. Una placa blanca + "contain"
-              // deja el sello completo montado sobre su propia placa.
-              <div className="relative z-10 grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-full bg-white" style={{ boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={logoUrl} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
-              </div>
+            {logoUrl ? (
+              // Montado directo sobre el header, sin placa — adopta el fondo
+              // (color de marca o negro), igual que en el menú real.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="" className="relative z-10 h-12 w-12 flex-none object-contain" />
             ) : (
-              <div className="relative z-10 h-10 w-10 flex-none rounded-full bg-white/25" />
+              <div
+                className="relative z-10 h-10 w-10 flex-none rounded-full"
+                style={{ background: headerStyle === "black" ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.25)" }}
+              />
             )}
             <div
               className="relative z-10 truncate uppercase leading-[0.95] tracking-tight"

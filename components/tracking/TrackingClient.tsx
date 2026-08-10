@@ -134,30 +134,21 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
               : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }
           }
         >
-          {business?.header_style === "black" ? (
-            business?.logo_url ? (
-              // Mismo criterio que MenuClient: montado directo sobre el negro,
-              // sin plato, para logos transparentes o de lienzo oscuro.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={business.logo_url} alt="" className="h-14 w-14 flex-none object-contain" />
-            ) : (
-              <div className="grid h-11 w-11 flex-none place-items-center rounded-full bg-white/10">
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
-              </div>
-            )
+          {business?.logo_url ? (
+            // Mismo criterio que MenuClient: montado directo sobre el header,
+            // sin placa — adopta el fondo (color de marca o negro).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={business.logo_url} alt="" className="h-12 w-12 flex-none object-contain" />
           ) : (
             <div
-              className="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full"
-              style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
+              className="grid h-11 w-11 flex-none place-items-center rounded-full"
+              style={
+                business?.header_style === "black"
+                  ? { background: "rgba(255,255,255,0.1)" }
+                  : { background: "var(--brand-on-primary)", color: "var(--brand-primary)" }
+              }
             >
-              {business?.logo_url ? (
-                // Mismo criterio que MenuClient: el logo es un sello, "contain"
-                // con margen evita el aro oscuro que dejaba "cover" a este tamaño.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
-              ) : (
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
-              )}
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
             </div>
           )}
           <div className="min-w-0 flex-1">

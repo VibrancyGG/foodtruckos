@@ -197,33 +197,19 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           style={{ backgroundImage: "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 14px)" }}
         />
         <div className="relative flex items-center gap-3">
-          {blackHeader ? (
-            data.business.logo_url ? (
-              // Logo montado directo sobre el negro, sin plato — pensado para
-              // PNGs transparentes o con lienzo oscuro que se funden con el
-              // fondo, en vez de forzarlo dentro de una moneda.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={data.business.logo_url} alt="" className="h-[72px] w-[72px] flex-none object-contain" />
-            ) : (
-              <div className="grid h-14 w-14 flex-none place-items-center rounded-full bg-white/10">
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
-              </div>
-            )
+          {data.business.logo_url ? (
+            // Montado directo sobre el header, sin placa — el logo adopta el
+            // fondo del encabezado (color de marca o negro). Si el PNG es
+            // transparente se funde; si trae su propio lienzo, ese lienzo se
+            // ve, y es justo lo que se espera al subir un logo así.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={data.business.logo_url} alt="" className="h-16 w-16 flex-none object-contain" />
           ) : (
             <div
-              className="grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-full"
-              style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
+              className="grid h-14 w-14 flex-none place-items-center rounded-full"
+              style={blackHeader ? { background: "rgba(255,255,255,0.1)" } : { background: "var(--brand-on-primary)", color: "var(--brand-primary)" }}
             >
-              {data.business.logo_url ? (
-                // El logo es un sello (aro de texto alrededor de un ícono) pensado
-                // para verse grande — "cover" a este tamaño lo recorta y deja ver
-                // el lienzo del PNG como un aro oscuro. "contain" con margen deja
-                // el sello completo, montado sobre su propia placa.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={data.business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
-              ) : (
-                <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
-              )}
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
             </div>
           )}
           <div className="min-w-0 flex-1">
