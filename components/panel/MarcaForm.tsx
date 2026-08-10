@@ -7,6 +7,7 @@ import { MOTIFS, isBrandMotif, type BrandMotif } from "@/lib/branding/motifs"
 import { uploadLogo, uploadCoverPhoto, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { toNumber } from "@/lib/supabase/numeric"
+import { displayFont } from "@/lib/fonts"
 
 type MenuStyle = "vibrante" | "tradicional"
 type UnitBrand = { id: string; name: string; brand_color: string | null }
@@ -270,9 +271,9 @@ export function MarcaForm({
           <span>{p.previewLabel}</span>
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">{p.liveLabel}</span>
         </div>
-        <div className="overflow-hidden rounded-[28px] border-[10px] border-neutral-900 bg-white">
+        <div className={`${displayFont.variable} overflow-hidden rounded-[28px] border-[10px] border-neutral-900 bg-white`}>
           <div
-            className="relative flex items-center gap-2 overflow-hidden px-3 py-3"
+            className="relative flex items-center gap-2.5 overflow-hidden px-3 py-3.5"
             style={headerStyle === "black" ? { background: "#0A0A0A", color: "#fff" } : { background: color, color: onColor }}
           >
             <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
@@ -290,28 +291,36 @@ export function MarcaForm({
               </defs>
               <rect width="100%" height="100%" fill="url(#marcaPreviewMotif)" />
             </svg>
+            {/* Mismo tratamiento que el header real (MenuClient/TrackingClient):
+                misma tipografía, mismo mayúsculas, misma proporción logo/texto
+                — para que "así lo verá tu cliente" no mienta. */}
             {headerStyle === "black" ? (
               logoUrl ? (
                 // Montado directo sobre el negro, sin plato — para logos
                 // transparentes o de lienzo oscuro.
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="" className="relative z-10 h-11 w-11 flex-none object-contain" />
+                <img src={logoUrl} alt="" className="relative z-10 h-12 w-12 flex-none object-contain" />
               ) : (
-                <div className="relative z-10 h-9 w-9 rounded-full bg-white/10" />
+                <div className="relative z-10 h-10 w-10 flex-none rounded-full bg-white/10" />
               )
             ) : logoUrl ? (
               // El logo es un sello (aro de texto + ícono), pensado para verse
               // grande — "cover" en un círculo chico lo recorta y deja ver el
               // lienzo del PNG como un aro oscuro. Una placa blanca + "contain"
               // deja el sello completo montado sobre su propia placa.
-              <div className="relative z-10 grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-full bg-white" style={{ boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}>
+              <div className="relative z-10 grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-full bg-white" style={{ boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={logoUrl} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
               </div>
             ) : (
-              <div className="relative z-10 h-9 w-9 rounded-full bg-white/25" />
+              <div className="relative z-10 h-10 w-10 flex-none rounded-full bg-white/25" />
             )}
-            <div className="relative z-10 text-sm font-bold">{businessName}</div>
+            <div
+              className="relative z-10 truncate uppercase leading-[0.95] tracking-tight"
+              style={{ fontFamily: "var(--font-display)", fontSize: 19 }}
+            >
+              {businessName}
+            </div>
           </div>
           {coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
