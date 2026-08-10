@@ -76,6 +76,42 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
         </div>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <div className="mb-2.5 text-xs font-bold uppercase tracking-wide text-amber-800">{p.pendingCollectionTitle}</div>
+          <div className="space-y-2.5">
+            <div>
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-bold text-amber-900">{p.pendingInProgressLabel}</span>
+                <span className="text-lg font-black tracking-tight text-amber-900">{money(data.pendingInProgress.total)}</span>
+              </div>
+              <p className="text-xs leading-relaxed text-amber-700">
+                {data.pendingInProgress.count > 0 ? `${data.pendingInProgress.count} · ${p.pendingInProgressHint}` : p.pendingInProgressHint}
+              </p>
+            </div>
+            <div className="border-t border-amber-200 pt-2.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-bold text-amber-900">{p.pendingDeliveredLabel}</span>
+                <span className="text-lg font-black tracking-tight text-amber-900">{money(data.pendingDelivered.total)}</span>
+              </div>
+              <p className="text-xs leading-relaxed text-amber-700">
+                {data.pendingDelivered.count > 0 ? `${data.pendingDelivered.count} · ${p.pendingDeliveredHint}` : p.pendingDeliveredHint}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="flex items-baseline justify-between">
+            <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">{p.noShowLabel}</span>
+            <span className="text-2xl font-black tracking-tight text-neutral-700">
+              {data.noShow.count > 0 ? data.noShow.count : p.noneLabel}
+            </span>
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-neutral-500">{p.noShowHint}</p>
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-500">{p.monthlySales}</div>
         <p className="mb-3 text-xs text-neutral-400">{p.vsLabel(data.currentYear, data.currentYear - 1)}</p>

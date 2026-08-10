@@ -16,6 +16,7 @@ type Body =
   | { action: "advance"; orderId: string }
   | { action: "regress"; orderId: string }
   | { action: "deliver"; orderId: string; paid: boolean }
+  | { action: "cancel"; orderId: string }
   | { action: "soldOut"; unitProductId: string; soldOut: boolean }
   | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
   | {
@@ -120,6 +121,30 @@ export async function POST(req: NextRequest) {
       actor_id: session.staffId,
     })
     return NextResponse.json({ status: "entregado" })
+  }
+
+  if (body.action === "cancel") {
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id, status, unit_id")
+      .eq("id", body.orderId)
+      .eq("unit_id", unit.id)
+      .maybeSingle()
+    if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
+    if (order.status === "entregado" || order.status === "cancelado") {
+      return NextResponse.json({ error: "Ese pedido ya no se puede cancelar" }, { status: 400 })
+    }
+
+    await supabase.from("orders").update({ status: "cancelado" }).eq("id", order.id)
+    await supabase.from("order_status_events").insert({
+      business_id: unit.business_id,
+      order_id: order.id,
+      from_status: order.status,
+      to_status: "cancelado",
+      actor_type: "staff",
+      actor_id: session.staffId,
+    })
+    return NextResponse.json({ status: "cancelado" })
   }
 
   if (body.action === "soldOut") {

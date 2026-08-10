@@ -6,6 +6,7 @@ import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
 import type { ActiveMenuData } from "@/lib/menu/getMenuData"
 import { displayFont } from "@/lib/fonts"
+import { MOTIFS, isBrandMotif } from "@/lib/branding/motifs"
 import { CustomizeSheet } from "./CustomizeSheet"
 
 type CartLine = CartItemInput & { key: string }
@@ -185,6 +186,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   }
 
   const blackHeader = data.business.header_style === "black"
+  const motif = isBrandMotif(data.business.brand_motif) ? data.business.brand_motif : "tacos"
 
   return (
     <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
@@ -192,10 +194,21 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         className="relative overflow-hidden px-4 pb-5 pt-4"
         style={blackHeader ? { background: "#0A0A0A", color: "#fff" } : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
       >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.14]"
-          style={{ backgroundImage: "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 14px)" }}
-        />
+        <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
+          <defs>
+            <pattern id="menuHeaderMotif" width="90" height="90" patternUnits="userSpaceOnUse">
+              <g
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                dangerouslySetInnerHTML={{ __html: MOTIFS[motif].pat }}
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#menuHeaderMotif)" />
+        </svg>
         <div className="relative flex items-center gap-3">
           {data.business.logo_url ? (
             // Montado directo sobre el header, sin placa — el logo adopta el

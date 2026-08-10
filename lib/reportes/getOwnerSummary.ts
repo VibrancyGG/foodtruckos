@@ -30,7 +30,7 @@ export async function getOwnerSummary(businessId: string) {
 
   const windowStart = new Date(Date.UTC(currentYear - 1, 0, 1))
 
-  const [{ data: units }, { data: orders }] = await Promise.all([
+  const [{ data: units }, { data: allOrders }] = await Promise.all([
     // Sin filtro de status: un truck archivado se sigue facturando/mostrando
     // en Trucks/Cuenta que no, pero su venta pasada es historia real (Regla
     // 2, nunca se destruye) — si aquí se excluyera, la suma de perTruck ya
@@ -39,16 +39,50 @@ export async function getOwnerSummary(businessId: string) {
     supabase.from("units").select("id, name, hours").eq("business_id", businessId),
     supabase
       .from("orders")
-      .select("id, unit_id, channel, status, total, created_at")
+      .select("id, unit_id, channel, status, payment_status, total, created_at")
       .eq("business_id", businessId)
-      .neq("status", "cancelado")
       .gte("created_at", windowStart.toISOString())
       .order("created_at"),
   ])
 
   const unitList = units ?? []
-  const orderList = (orders ?? []).map((o) => ({ ...o, total: toNumber(o.total), created_at: new Date(o.created_at) }))
+  const allOrderList = (allOrders ?? []).map((o) => ({ ...o, total: toNumber(o.total), created_at: new Date(o.created_at) }))
+
+  // Una venta es efectiva solo cuando se cobró (foodtruckos-negocio Regla 3):
+  // el dinero entró de verdad. Toda comparación de "venta" en este reporte —
+  // el total, el mes a mes, por truck, por canal, lo más vendido, la
+  // actividad — se calcula únicamente sobre pedidos pagados. Un pedido
+  // recibido/preparando/listo/entregado sin cobrar no es venta todavía; un
+  // pedido cancelado (el cliente nunca llegó) nunca lo fue.
+  const orderList = allOrderList.filter((o) => o.payment_status === "pagada")
   const orderIds = orderList.map((o) => o.id)
+
+  // Pendiente de cobro: pedido real que todavía no se cobra — no cuenta como
+  // venta, pero el dueño necesita verlo aparte para saber cuánto dinero le
+  // falta por entrar. Separado en dos, porque son riesgos distintos: uno
+  // sigue en curso (todavía puede cobrarse al entregar), el otro ya salió de
+  // cocina sin que nadie cobrara.
+  const pendingInProgressOrders = allOrderList.filter(
+    (o) => o.status !== "cancelado" && o.status !== "entregado" && o.payment_status !== "pagada",
+  )
+  const pendingInProgress = {
+    total: pendingInProgressOrders.reduce((s, o) => s + o.total, 0),
+    count: pendingInProgressOrders.length,
+  }
+  const pendingDeliveredOrders = allOrderList.filter((o) => o.status === "entregado" && o.payment_status !== "pagada")
+  const pendingDelivered = {
+    total: pendingDeliveredOrders.reduce((s, o) => s + o.total, 0),
+    count: pendingDeliveredOrders.length,
+  }
+
+  // No recogidas: el cliente ordenó y nunca llegó por su pedido — cocina lo
+  // cancela (app/api/kitchen/route.ts, acción "cancel") y aquí queda como
+  // historia, nunca como venta.
+  const noShowOrders = allOrderList.filter((o) => o.status === "cancelado")
+  const noShow = {
+    total: noShowOrders.reduce((s, o) => s + o.total, 0),
+    count: noShowOrders.length,
+  }
 
   const { data: items } = orderIds.length
     ? await supabase.from("order_items").select("order_id, product_name_snapshot, quantity").in("order_id", orderIds)
@@ -232,6 +266,9 @@ export async function getOwnerSummary(businessId: string) {
     topProducts,
     activity,
     lateOpenInsight,
+    pendingInProgress,
+    pendingDelivered,
+    noShow,
   }
 }
 

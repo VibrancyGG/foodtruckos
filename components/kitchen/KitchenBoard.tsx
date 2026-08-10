@@ -72,6 +72,7 @@ export function KitchenBoard({
   const [showSoldOut, setShowSoldOut] = useState(false)
   const [showDaySummary, setShowDaySummary] = useState(false)
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
+  const [askCancelFor, setAskCancelFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [now, setNow] = useState(() => Date.now())
   const [soundOn, setSoundOn] = useState(true)
@@ -182,6 +183,12 @@ export function KitchenBoard({
     act({ action: "deliver", orderId, paid })
     setAskPayFor(null)
     setTodayCount((n) => n + 1)
+  }
+
+  function cancelOrder(orderId: string) {
+    setOrders((os) => os.filter((o) => o.id !== orderId))
+    act({ action: "cancel", orderId })
+    setAskCancelFor(null)
   }
 
   function toggleSoldOut(unitProductId: string, soldOut: boolean) {
@@ -417,6 +424,31 @@ export function KitchenBoard({
                         )
                       ) : (
                         <CtaButton onClick={() => advance(o.id)} kind={NEXT_CTA[col]} label={col === "recibido" ? t.kitchen.start : t.kitchen.ready} />
+                      )}
+                      {askCancelFor === o.id ? (
+                        <div className="mt-2 flex gap-1.5">
+                          <button
+                            onClick={() => cancelOrder(o.id)}
+                            className="flex-1 rounded-lg py-2 text-xs font-extrabold"
+                            style={{ background: "#5C1A1D", color: "#FFB3B5" }}
+                          >
+                            {t.kitchen.confirmCancelOrder}
+                          </button>
+                          <button
+                            onClick={() => setAskCancelFor(null)}
+                            className="flex-1 rounded-lg py-2 text-xs font-bold"
+                            style={{ background: "#232019", color: "#9C948A" }}
+                          >
+                            {t.kitchen.keepOrder}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setAskCancelFor(o.id)}
+                          className="mt-2 w-full text-center text-[12px] font-bold text-neutral-500"
+                        >
+                          {t.kitchen.cancelOrder}
+                        </button>
                       )}
                     </article>
                   )

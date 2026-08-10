@@ -87,6 +87,9 @@ export type Dictionary = {
     unpaidBadge: string
     paidBadge: string
     collectBadge: string
+    cancelOrder: string
+    confirmCancelOrder: string
+    keepOrder: string
     ventanillaSubtitle: string
     notesLabel: string
     notesHint: string
@@ -574,6 +577,14 @@ export type Dictionary = {
       lastOrder: string
       closesEarly: (dur: string) => string
       noOrdersLast30: (name: string) => string
+      pendingCollectionTitle: string
+      pendingInProgressLabel: string
+      pendingInProgressHint: string
+      pendingDeliveredLabel: string
+      pendingDeliveredHint: string
+      noShowLabel: string
+      noShowHint: string
+      noneLabel: string
     }
   }
   admin: {
@@ -766,6 +777,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       extrasTitle: "Extras y opciones",
       unpaidBadge: "Por cobrar",
       paidBadge: "Pagado",
+      cancelOrder: "El cliente no llegó / cancelar",
+      confirmCancelOrder: "Sí, cancelar — no se cobró",
+      keepOrder: "No, mantener la orden",
       collectBadge: "Cobrar",
       ventanillaSubtitle: "Para quien llegó sin celular. Entra al mismo tablero y al mismo registro de ventas.",
       notesLabel: "Nota",
@@ -1260,6 +1274,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         lastOrder: "última",
         closesEarly: (dur) => `cierra ${dur} antes de lo publicado`,
         noOrdersLast30: (name) => `${name} — sin órdenes en los últimos 30 días.`,
+        pendingCollectionTitle: "Pendiente de cobro",
+        pendingInProgressLabel: "En curso, sin cobrar",
+        pendingInProgressHint: "Todavía en cocina — puede cobrarse al entregar.",
+        pendingDeliveredLabel: "Entregados sin cobrar",
+        pendingDeliveredHint: "Ya salieron de cocina y nadie cobró. Revísalos con tu personal.",
+        noShowLabel: "No recogidas",
+        noShowHint: "El cliente ordenó y nunca llegó por su pedido. Nunca fue una venta — queda aquí solo como historia.",
+        noneLabel: "ninguna",
       },
     },
     admin: {
@@ -1450,6 +1472,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       unpaidBadge: "Unpaid",
       paidBadge: "Paid",
       collectBadge: "Collect",
+      cancelOrder: "Customer never showed / cancel",
+      confirmCancelOrder: "Yes, cancel — nothing was charged",
+      keepOrder: "No, keep the order",
       ventanillaSubtitle: "For someone who walked up without a phone. Enters the same board and the same sales record.",
       notesLabel: "Note",
       notesHint: "tap the usual ones or write it",
@@ -1943,6 +1968,14 @@ export const dictionary: Record<Lang, Dictionary> = {
         lastOrder: "last",
         closesEarly: (dur) => `closes ${dur} before published`,
         noOrdersLast30: (name) => `${name} — no orders in the last 30 days.`,
+        pendingCollectionTitle: "Pending collection",
+        pendingInProgressLabel: "In progress, unpaid",
+        pendingInProgressHint: "Still in the kitchen — can still be charged at pickup.",
+        pendingDeliveredLabel: "Delivered without charging",
+        pendingDeliveredHint: "Already left the kitchen and no one charged for it. Follow up with your staff.",
+        noShowLabel: "No-shows",
+        noShowHint: "The customer ordered and never came to pick it up. Never a sale — kept here only as a record.",
+        noneLabel: "none",
       },
     },
     admin: {
