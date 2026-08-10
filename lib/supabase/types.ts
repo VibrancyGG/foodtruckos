@@ -230,6 +230,7 @@ export type Database = {
           created_at: string
           default_alert_amber_minutes: number
           default_alert_red_minutes: number
+          header_style: string
           id: string
           logo_url: string | null
           menu_style: string
@@ -246,6 +247,7 @@ export type Database = {
           created_at?: string
           default_alert_amber_minutes?: number
           default_alert_red_minutes?: number
+          header_style?: string
           id?: string
           logo_url?: string | null
           menu_style?: string
@@ -262,6 +264,7 @@ export type Database = {
           created_at?: string
           default_alert_amber_minutes?: number
           default_alert_red_minutes?: number
+          header_style?: string
           id?: string
           logo_url?: string | null
           menu_style?: string

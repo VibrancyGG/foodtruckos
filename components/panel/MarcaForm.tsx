@@ -27,6 +27,7 @@ export function MarcaForm({
   initialColor,
   initialStyle,
   initialMotif,
+  initialHeaderStyle,
   units,
   previewProducts,
 }: {
@@ -36,6 +37,7 @@ export function MarcaForm({
   initialColor: string
   initialStyle: string
   initialMotif: string
+  initialHeaderStyle: "color" | "black"
   units: UnitBrand[]
   previewProducts: PreviewProduct[]
 }) {
@@ -49,6 +51,7 @@ export function MarcaForm({
     initialStyle === "tradicional" ? "tradicional" : "vibrante",
   )
   const [motif, setMotif] = useState<BrandMotif>(isBrandMotif(initialMotif) ? initialMotif : "tacos")
+  const [headerStyle, setHeaderStyle] = useState<"color" | "black">(initialHeaderStyle)
   const [dirty, setDirty] = useState(false)
   const [saving, startSaving] = useTransition()
   const [saved, setSaved] = useState(false)
@@ -58,7 +61,7 @@ export function MarcaForm({
   function save() {
     setSaved(false)
     startSaving(async () => {
-      const result = await saveBrandSettings({ brandColor: color, menuStyle: style, brandMotif: motif })
+      const result = await saveBrandSettings({ brandColor: color, menuStyle: style, brandMotif: motif, headerStyle })
       if (result.ok) {
         setDirty(false)
         setSaved(true)
@@ -216,6 +219,38 @@ export function MarcaForm({
           )}
         </section>
 
+        <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+          <span className="text-[11px] font-black tracking-wide text-neutral-400">{p.headerStyleStep}</span>
+          <h2 className="mb-1 font-bold">{p.headerStyleTitle}</h2>
+          <p className="mb-4 text-sm text-neutral-500">{p.headerStyleHint}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              aria-pressed={headerStyle === "color"}
+              onClick={() => {
+                setHeaderStyle("color")
+                setDirty(true)
+              }}
+              className={`rounded-xl border-2 p-3.5 text-left ${headerStyle === "color" ? "border-neutral-900" : "border-neutral-200"}`}
+            >
+              <div className="font-bold">{p.headerStyleColor}</div>
+              <div className="text-xs text-neutral-500">{p.headerStyleColorHint}</div>
+            </button>
+            <button
+              type="button"
+              aria-pressed={headerStyle === "black"}
+              onClick={() => {
+                setHeaderStyle("black")
+                setDirty(true)
+              }}
+              className={`rounded-xl border-2 p-3.5 text-left ${headerStyle === "black" ? "border-neutral-900" : "border-neutral-200"}`}
+            >
+              <div className="font-bold">{p.headerStyleBlack}</div>
+              <div className="text-xs text-neutral-500">{p.headerStyleBlackHint}</div>
+            </button>
+          </div>
+        </section>
+
         <div className="sticky bottom-4 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg">
           <span className="text-sm text-neutral-500">
             {saving ? c.saving : saved ? c.saved : dirty ? p.unsavedLabel : p.noChangesLabel}
@@ -236,7 +271,10 @@ export function MarcaForm({
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">{p.liveLabel}</span>
         </div>
         <div className="overflow-hidden rounded-[28px] border-[10px] border-neutral-900 bg-white">
-          <div className="relative flex items-center gap-2 overflow-hidden px-3 py-3" style={{ background: color, color: onColor }}>
+          <div
+            className="relative flex items-center gap-2 overflow-hidden px-3 py-3"
+            style={headerStyle === "black" ? { background: "#0A0A0A", color: "#fff" } : { background: color, color: onColor }}
+          >
             <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
               <defs>
                 <pattern id="marcaPreviewMotif" width="90" height="90" patternUnits="userSpaceOnUse">
@@ -252,7 +290,16 @@ export function MarcaForm({
               </defs>
               <rect width="100%" height="100%" fill="url(#marcaPreviewMotif)" />
             </svg>
-            {logoUrl ? (
+            {headerStyle === "black" ? (
+              logoUrl ? (
+                // Montado directo sobre el negro, sin plato — para logos
+                // transparentes o de lienzo oscuro.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="" className="relative z-10 h-11 w-11 flex-none object-contain" />
+              ) : (
+                <div className="relative z-10 h-9 w-9 rounded-full bg-white/10" />
+              )
+            ) : logoUrl ? (
               // El logo es un sello (aro de texto + ícono), pensado para verse
               // grande — "cover" en un círculo chico lo recorta y deja ver el
               // lienzo del PNG como un aro oscuro. Una placa blanca + "contain"

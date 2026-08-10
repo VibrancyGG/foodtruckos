@@ -40,7 +40,7 @@ export async function getOrderWithItems(orderId: string) {
 
   const { data: order } = await supabase
     .from("orders")
-    .select("*, units(name), businesses(name, brand_color, logo_url)")
+    .select("*, units(name), businesses(name, brand_color, logo_url, header_style)")
     .eq("id", orderId)
     .maybeSingle()
 

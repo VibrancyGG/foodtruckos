@@ -56,6 +56,7 @@ export async function saveBrandSettings(input: {
   brandColor: string
   menuStyle: "vibrante" | "tradicional"
   brandMotif: string
+  headerStyle: "color" | "black"
 }): Promise<{ ok: boolean; error?: string }> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
@@ -63,7 +64,12 @@ export async function saveBrandSettings(input: {
   const supabase = await createClient()
   const { error } = await supabase
     .from("businesses")
-    .update({ brand_color: input.brandColor, menu_style: input.menuStyle, brand_motif: input.brandMotif })
+    .update({
+      brand_color: input.brandColor,
+      menu_style: input.menuStyle,
+      brand_motif: input.brandMotif,
+      header_style: input.headerStyle,
+    })
     .eq("id", businessId)
 
   if (error) return { ok: false, error: "No se pudo guardar" }

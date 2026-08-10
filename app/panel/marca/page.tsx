@@ -12,7 +12,7 @@ export default async function PanelPage() {
   const [{ data: business }, { data: units }, { data: products }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("name, slug, logo_url, cover_photo_url, brand_color, menu_style, brand_motif")
+      .select("name, slug, logo_url, cover_photo_url, brand_color, menu_style, brand_motif, header_style")
       .eq("id", businessId)
       .single(),
     supabase
@@ -41,6 +41,7 @@ export default async function PanelPage() {
         initialColor={business.brand_color || "#D62828"}
         initialStyle={business.menu_style}
         initialMotif={business.brand_motif}
+        initialHeaderStyle={business.header_style === "black" ? "black" : "color"}
         units={units ?? []}
         previewProducts={products ?? []}
       />

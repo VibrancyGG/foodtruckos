@@ -184,32 +184,48 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     router.push(`/orden/${result.orderId}`)
   }
 
+  const blackHeader = data.business.header_style === "black"
+
   return (
     <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
       <header
         className="relative overflow-hidden px-4 pb-5 pt-4"
-        style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+        style={blackHeader ? { background: "#0A0A0A", color: "#fff" } : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
       >
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.14]"
           style={{ backgroundImage: "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 14px)" }}
         />
         <div className="relative flex items-center gap-3">
-          <div
-            className="grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-full"
-            style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
-          >
-            {data.business.logo_url ? (
-              // El logo es un sello (aro de texto alrededor de un ícono) pensado
-              // para verse grande — "cover" a este tamaño lo recorta y deja ver
-              // el lienzo del PNG como un aro oscuro. "contain" con margen deja
-              // el sello completo, montado sobre su propia placa.
+          {blackHeader ? (
+            data.business.logo_url ? (
+              // Logo montado directo sobre el negro, sin plato — pensado para
+              // PNGs transparentes o con lienzo oscuro que se funden con el
+              // fondo, en vez de forzarlo dentro de una moneda.
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={data.business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
+              <img src={data.business.logo_url} alt="" className="h-[72px] w-[72px] flex-none object-contain" />
             ) : (
-              <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
-            )}
-          </div>
+              <div className="grid h-14 w-14 flex-none place-items-center rounded-full bg-white/10">
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
+              </div>
+            )
+          ) : (
+            <div
+              className="grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-full"
+              style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
+            >
+              {data.business.logo_url ? (
+                // El logo es un sello (aro de texto alrededor de un ícono) pensado
+                // para verse grande — "cover" a este tamaño lo recorta y deja ver
+                // el lienzo del PNG como un aro oscuro. "contain" con margen deja
+                // el sello completo, montado sobre su propia placa.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={data.business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
+              ) : (
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
+              )}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <h1
               className="truncate uppercase leading-[0.95] tracking-tight"
@@ -226,7 +242,9 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
             {lang === "es" ? "EN" : "ES"}
           </button>
         </div>
-        <div className="relative mt-3.5 inline-flex items-center gap-1.5 rounded-full bg-black/20 px-3 py-1 text-xs font-semibold">
+        <div
+          className={`relative mt-3.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${blackHeader ? "bg-white/15" : "bg-black/20"}`}
+        >
           <span
             className="h-1.5 w-1.5 rounded-full"
             style={{ background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }}
@@ -235,7 +253,11 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         </div>
         <div
           className="absolute inset-x-0 bottom-0 h-1.5"
-          style={{ backgroundImage: "repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 14px, transparent 14px 28px)" }}
+          style={{
+            backgroundImage: blackHeader
+              ? "repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 14px, transparent 14px 28px)"
+              : "repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 14px, transparent 14px 28px)",
+          }}
         />
       </header>
 

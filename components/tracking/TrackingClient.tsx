@@ -128,21 +128,38 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
       <div className={`${displayFont.variable} mx-auto max-w-lg pb-8`} style={{ background: "#FFFDF9", color: INK, minHeight: "100vh" }}>
         <header
           className="flex items-center gap-3 px-4 py-3.5"
-          style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+          style={
+            business?.header_style === "black"
+              ? { background: "#0A0A0A", color: "#fff" }
+              : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }
+          }
         >
-          <div
-            className="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full"
-            style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
-          >
-            {business?.logo_url ? (
-              // Mismo criterio que MenuClient: el logo es un sello, "contain"
-              // con margen evita el aro oscuro que dejaba "cover" a este tamaño.
+          {business?.header_style === "black" ? (
+            business?.logo_url ? (
+              // Mismo criterio que MenuClient: montado directo sobre el negro,
+              // sin plato, para logos transparentes o de lienzo oscuro.
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
+              <img src={business.logo_url} alt="" className="h-14 w-14 flex-none object-contain" />
             ) : (
-              <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
-            )}
-          </div>
+              <div className="grid h-11 w-11 flex-none place-items-center rounded-full bg-white/10">
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
+              </div>
+            )
+          ) : (
+            <div
+              className="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full"
+              style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
+            >
+              {business?.logo_url ? (
+                // Mismo criterio que MenuClient: el logo es un sello, "contain"
+                // con margen evita el aro oscuro que dejaba "cover" a este tamaño.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
+              ) : (
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
+              )}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <h1 className="truncate uppercase leading-none" style={{ fontFamily: "var(--font-display)", fontSize: 17 }}>
               {business?.name}
@@ -151,7 +168,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
           </div>
           <div
             className="flex flex-none items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
-            style={{ background: "rgba(0,0,0,.22)" }}
+            style={{ background: business?.header_style === "black" ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.22)" }}
           >
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: online ? "#4ADE80" : "#FF8A80" }} />
             {online ? t.tracking.live : t.tracking.offline}

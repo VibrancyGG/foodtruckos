@@ -387,6 +387,13 @@ export type Dictionary = {
       motifStep: string
       motifTitle: string
       motifHint: string
+      headerStyleStep: string
+      headerStyleTitle: string
+      headerStyleHint: string
+      headerStyleColor: string
+      headerStyleColorHint: string
+      headerStyleBlack: string
+      headerStyleBlackHint: string
       truckOverrideSummary: string
       truckOverrideBody: string
       truckOverrideOwn: string
@@ -1066,6 +1073,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         motifStep: "DETALLE",
         motifTitle: "El dibujo de fondo",
         motifHint: "Unas líneas discretas en el encabezado, según lo que vendes.",
+        headerStyleStep: "DETALLE",
+        headerStyleTitle: "El encabezado",
+        headerStyleHint: "Cómo se muestra tu logo arriba del menú.",
+        headerStyleColor: "Color de marca",
+        headerStyleColorHint: "Tu logo va sobre una placa, con el color que elegiste.",
+        headerStyleBlack: "Negro, logo montado",
+        headerStyleBlackHint: "Encabezado negro, tu logo va directo encima — ideal si tu logo ya tiene fondo oscuro o es transparente.",
         truckOverrideSummary: "¿Un truck con otra marca?",
         truckOverrideBody: "Normalmente los trucks comparten logo y color, y cada uno lleva su propio nombre y foto. Si alguno opera con otra marca, aquí puedes darle color propio — es una excepción, no algo que tengas que decidir.",
         truckOverrideOwn: "Color propio",
@@ -1742,6 +1756,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         motifStep: "DETAIL",
         motifTitle: "Background artwork",
         motifHint: "A few discreet lines in the header, based on what you sell.",
+        headerStyleStep: "DETAIL",
+        headerStyleTitle: "The header",
+        headerStyleHint: "How your logo shows above the menu.",
+        headerStyleColor: "Brand color",
+        headerStyleColorHint: "Your logo sits on a plate, in the color you picked.",
+        headerStyleBlack: "Black, logo mounted",
+        headerStyleBlackHint: "Black header, your logo sits right on top — great if your logo already has a dark or transparent background.",
         truckOverrideSummary: "A truck with a different brand?",
         truckOverrideBody: "Normally your trucks share the same logo and color, and each keeps its own name and photo. If one operates under a different brand, you can give it its own color here — it's an exception, not something you have to decide.",
         truckOverrideOwn: "Own color",
