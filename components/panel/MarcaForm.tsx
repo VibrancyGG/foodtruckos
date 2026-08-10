@@ -253,10 +253,16 @@ export function MarcaForm({
               <rect width="100%" height="100%" fill="url(#marcaPreviewMotif)" />
             </svg>
             {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="relative z-10 h-8 w-8 rounded-full object-cover" />
+              // El logo es un sello (aro de texto + ícono), pensado para verse
+              // grande — "cover" en un círculo chico lo recorta y deja ver el
+              // lienzo del PNG como un aro oscuro. Una placa blanca + "contain"
+              // deja el sello completo montado sobre su propia placa.
+              <div className="relative z-10 grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-full bg-white" style={{ boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={logoUrl} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
+              </div>
             ) : (
-              <div className="relative z-10 h-8 w-8 rounded-full bg-white/25" />
+              <div className="relative z-10 h-9 w-9 rounded-full bg-white/25" />
             )}
             <div className="relative z-10 text-sm font-bold">{businessName}</div>
           </div>

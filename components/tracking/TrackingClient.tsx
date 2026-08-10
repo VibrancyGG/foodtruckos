@@ -131,12 +131,14 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
           style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
         >
           <div
-            className="grid h-9 w-9 flex-none place-items-center overflow-hidden rounded-full"
-            style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)" }}
+            className="grid h-11 w-11 flex-none place-items-center overflow-hidden rounded-full"
+            style={{ background: "var(--brand-on-primary)", color: "var(--brand-primary)", boxShadow: "0 0 0 2px rgba(255,255,255,0.5)" }}
           >
             {business?.logo_url ? (
+              // Mismo criterio que MenuClient: el logo es un sello, "contain"
+              // con margen evita el aro oscuro que dejaba "cover" a este tamaño.
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={business.logo_url} alt="" className="h-full w-full object-cover" />
+              <img src={business.logo_url} alt="" className="h-[88%] w-[88%] rounded-full object-contain" />
             ) : (
               <span style={{ fontFamily: "var(--font-display)", fontSize: 15 }}>{monogram(business?.name ?? "FT")}</span>
             )}
