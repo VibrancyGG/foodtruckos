@@ -187,6 +187,12 @@ export type Dictionary = {
       impersonatingBanner: (businessName: string) => string
       exitImpersonation: string
     }
+    truckApprovalBanner: {
+      title: string
+      body: (unitName: string) => string
+      cta: string
+      dismiss: string
+    }
     signupRequestPage: {
       accountConfirmedBadge: string
       oneStepLeft: string
@@ -434,6 +440,8 @@ export type Dictionary = {
       roleEncargadoHint: string
       whichTruckLabel: string
       allTrucks: string
+      encargadoAllTrucksHint: string
+      deviceUnitHint: string
       truckArchivedSuffix: string
       createPin: string
       pinRevealTitle: string
@@ -490,6 +498,9 @@ export type Dictionary = {
       openMenu: string
       realTitle: string
       realBody: string
+      viewKitchenTitle: string
+      viewKitchenBody: string
+      viewKitchenCta: string
       howToTitle: string
       how1: string
       how2: string
@@ -935,6 +946,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         impersonatingBanner: (businessName) => `Estás viendo el panel de ${businessName} como administrador`,
         exitImpersonation: "Salir",
       },
+      truckApprovalBanner: {
+        title: "¡Tu truck nuevo ya está aprobado!",
+        body: (unitName) => `${unitName} ya está activo — ve a Trucks para configurar su horario y su marca.`,
+        cta: "Configurarlo ahora",
+        dismiss: "Ya lo vi",
+      },
       signupRequestPage: {
         accountConfirmedBadge: "Tu cuenta ya está confirmada",
         oneStepLeft: "Solo falta este paso para quedar en revisión.",
@@ -1188,6 +1205,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         roleEncargadoHint: "También ve las ventas de su truck",
         whichTruckLabel: "¿En qué truck?",
         allTrucks: "Todos los trucks",
+        encargadoAllTrucksHint: "El encargado ve y puede operar todos los trucks del negocio — no se elige uno solo.",
+        deviceUnitHint: "Es el truck donde empieza este dispositivo al emparejarse. Si quien entra con su PIN es un encargado, de todos modos va a poder ver y operar los demás trucks.",
         truckArchivedSuffix: " (dado de baja)",
         createPin: "Crear su PIN",
         pinRevealTitle: "Listo, ya puede entrar",
@@ -1244,6 +1263,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         openMenu: "Abrir el menú",
         realTitle: "Estos códigos son de verdad",
         realBody: "Escanéalos ahorita con la cámara de tu celular para comprobarlo — te van a mandar a la dirección que aparece debajo de cada uno.",
+        viewKitchenTitle: "¿Cómo va la cocina ahora mismo?",
+        viewKitchenBody: "Mira en vivo cuántas órdenes tiene cada truck, sin tener que pedirle el celular a nadie.",
+        viewKitchenCta: "Ver cocina en vivo",
         howToTitle: "Qué hacer con ellos",
         how1: "Imprímelos en grande, mínimo del tamaño de una hoja carta. Un QR chiquito no se escanea desde la fila.",
         how2: "Pégalos donde se vean mientras esperan: la ventanilla, un costado del truck, las mesas si tienes.",
@@ -1686,6 +1708,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         impersonatingBanner: (businessName) => `You're viewing ${businessName}'s panel as an admin`,
         exitImpersonation: "Exit",
       },
+      truckApprovalBanner: {
+        title: "Your new truck is approved!",
+        body: (unitName) => `${unitName} is now active — go to Trucks to set up its hours and branding.`,
+        cta: "Set it up now",
+        dismiss: "Got it",
+      },
       signupRequestPage: {
         accountConfirmedBadge: "Your account is already confirmed",
         oneStepLeft: "Just this step left before it goes under review.",
@@ -1939,6 +1967,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         roleEncargadoHint: "Also sees their truck's sales",
         whichTruckLabel: "Which truck?",
         allTrucks: "All trucks",
+        encargadoAllTrucksHint: "The manager sees and can operate every truck in the business — there's no single one to pick.",
+        deviceUnitHint: "This is the truck this device starts on once paired. If whoever signs in with their PIN is a manager, they'll still be able to see and operate the other trucks.",
         truckArchivedSuffix: " (archived)",
         createPin: "Create their PIN",
         pinRevealTitle: "Done, they can enter now",
@@ -1995,6 +2025,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         openMenu: "Open the menu",
         realTitle: "These codes are real",
         realBody: "Scan them right now with your phone's camera to check — they'll take you to the address shown under each one.",
+        viewKitchenTitle: "How's the kitchen doing right now?",
+        viewKitchenBody: "See live how many orders each truck has, without asking anyone for their phone.",
+        viewKitchenCta: "View live kitchen",
         howToTitle: "What to do with them",
         how1: "Print them big, at least letter-size. A tiny QR doesn't scan from the line.",
         how2: "Post them where people see them while waiting: the window, the side of the truck, the tables if you have any.",

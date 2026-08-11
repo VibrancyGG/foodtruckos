@@ -20,7 +20,7 @@ export const getOwnerContext = cache(async () => {
 
   const { data: membership } = await supabase
     .from("business_members")
-    .select("business_id, businesses(name, slug, subscription_status)")
+    .select("business_id, businesses(name, slug, subscription_status, logo_url)")
     .eq("auth_user_id", user.id)
     .maybeSingle()
 
@@ -50,14 +50,14 @@ export const getOwnerContext = cache(async () => {
     if (isAdmin) {
       const { data: business } = await supabase
         .from("businesses")
-        .select("id, name, slug")
+        .select("id, name, slug, logo_url")
         .eq("id", viewingId)
         .maybeSingle()
       if (business) {
         return {
           user,
           businessId: business.id,
-          business: { name: business.name, slug: business.slug },
+          business: { name: business.name, slug: business.slug, logo_url: business.logo_url },
           impersonating: true,
           // El admin necesita poder entrar a una cuenta suspendida para
           // arreglarla — el bloqueo es solo para el dueño real.

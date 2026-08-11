@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useRef, useState, useTransition } from "react"
 import {
   createProduct,
   updateProduct,
@@ -55,6 +55,19 @@ export function ProductModal(props: EditProps | AddProps) {
   const [showOptions, setShowOptions] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+  const descEsRef = useRef<HTMLTextAreaElement>(null)
+  const descEnRef = useRef<HTMLTextAreaElement>(null)
+
+  // Se ajusta al abrir el modal también, no solo al escribir — sin esto una
+  // descripción larga ya guardada aparece recortada hasta el primer tecleo.
+  useEffect(() => {
+    for (const ref of [descEsRef, descEnRef]) {
+      const el = ref.current
+      if (!el) continue
+      el.style.height = "auto"
+      el.style.height = `${el.scrollHeight}px`
+    }
+  }, [])
 
   function onPhotoPick(file: File) {
     setPhotoFile(file)
@@ -176,9 +189,29 @@ export function ProductModal(props: EditProps | AddProps) {
         <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
 
         <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.descriptionEsPlaceholder}</label>
-        <input value={descEs} onChange={(e) => setDescEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
+        <textarea
+          ref={descEsRef}
+          value={descEs}
+          onChange={(e) => {
+            setDescEs(e.target.value)
+            e.target.style.height = "auto"
+            e.target.style.height = `${e.target.scrollHeight}px`
+          }}
+          rows={2}
+          className="mb-3 w-full resize-none overflow-hidden rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+        />
         <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.descriptionEnPlaceholder}</label>
-        <input value={descEn} onChange={(e) => setDescEn(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
+        <textarea
+          ref={descEnRef}
+          value={descEn}
+          onChange={(e) => {
+            setDescEn(e.target.value)
+            e.target.style.height = "auto"
+            e.target.style.height = `${e.target.scrollHeight}px`
+          }}
+          rows={2}
+          className="mb-3 w-full resize-none overflow-hidden rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+        />
 
         <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.pricePlaceholder}</label>
         <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" className="mb-4 w-28 rounded-lg border border-neutral-300 px-3 py-2 text-sm" />

@@ -190,6 +190,12 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
 
   return (
     <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
+      {data.unit.photo_url && (
+        // Foto de portada del truck, la que el dueño sube en Trucks — no
+        // tenía dónde mostrarse en el menú del comensal hasta ahora.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={data.unit.photo_url} alt="" className="h-40 w-full object-cover" />
+      )}
       <header
         className="relative overflow-hidden px-4 pb-5 pt-4"
         style={blackHeader ? { background: "#0A0A0A", color: "#fff" } : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}

@@ -13,14 +13,15 @@ const PREV: Record<string, string> = { preparando: "recibido", listo: "preparand
 const TAX_RATE = 0.08625
 
 type Body =
-  | { action: "advance"; orderId: string }
-  | { action: "regress"; orderId: string }
-  | { action: "deliver"; orderId: string; paid: boolean }
-  | { action: "cancel"; orderId: string }
-  | { action: "soldOut"; unitProductId: string; soldOut: boolean }
+  | { action: "advance"; orderId: string; unitId?: string }
+  | { action: "regress"; orderId: string; unitId?: string }
+  | { action: "deliver"; orderId: string; paid: boolean; unitId?: string }
+  | { action: "cancel"; orderId: string; unitId?: string }
+  | { action: "soldOut"; unitProductId: string; soldOut: boolean; unitId?: string }
   | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
   | {
       action: "ventanilla"
+      unitId?: string
       taxIncluded: boolean
       paidNow: boolean
       orderNotes?: string
@@ -46,10 +47,29 @@ export async function POST(req: NextRequest) {
   if (!session) {
     return NextResponse.json({ error: "Sesión de personal no válida" }, { status: 401 })
   }
-  const unit = { id: session.unitId, business_id: session.businessId }
 
   const body = (await req.json()) as Body
   const supabase = createServiceClient()
+
+  // El Encargado es el único rol que puede operar un truck distinto al que
+  // trae su dispositivo emparejado (foodtruckos-accesos) — cocina y
+  // ventanilla siempre se quedan con el de su sesión, sin importar qué
+  // unitId venga en el body, porque su rol verificado no lo permite. El
+  // truck "prestado" también se confirma contra la base (mismo negocio),
+  // nunca se confía en el id solo porque lo mandó el cliente.
+  let resolvedUnitId = session.unitId
+  if ("unitId" in body && body.unitId && body.unitId !== session.unitId) {
+    if (session.role === "encargado") {
+      const { data: targetUnit } = await supabase
+        .from("units")
+        .select("id")
+        .eq("id", body.unitId)
+        .eq("business_id", session.businessId)
+        .maybeSingle()
+      if (targetUnit) resolvedUnitId = targetUnit.id
+    }
+  }
+  const unit = { id: resolvedUnitId, business_id: session.businessId }
 
   if (body.action === "advance") {
     const { data: order } = await supabase

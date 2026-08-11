@@ -9,6 +9,7 @@ import { KitchenBoard } from "@/components/kitchen/KitchenBoard"
 import { EncargadoBoard } from "@/components/kitchen/EncargadoBoard"
 import { PairDeviceForm } from "@/components/kitchen/PairDeviceForm"
 import { EnterPinForm } from "@/components/kitchen/EnterPinForm"
+import { AutoRefresh } from "@/components/panel/AutoRefresh"
 
 export default async function CocinaPage() {
   const jar = await cookies()
@@ -27,7 +28,7 @@ export default async function CocinaPage() {
     supabase.from("staff").select("name").eq("id", session.staffId).single(),
     supabase
       .from("businesses")
-      .select("default_alert_amber_minutes, default_alert_red_minutes")
+      .select("default_alert_amber_minutes, default_alert_red_minutes, logo_url")
       .eq("id", session.businessId)
       .single(),
   ])
@@ -43,6 +44,7 @@ export default async function CocinaPage() {
     const overview = await getTrucksOverview(session.businessId)
     return (
       <LangProvider defaultLang="es">
+        <AutoRefresh intervalMs={15000} />
         <EncargadoBoard
           overview={overview}
           ownUnitId={session.unitId}
@@ -53,6 +55,7 @@ export default async function CocinaPage() {
           redMinutes={redMinutes}
           taxIncluded={initial.taxIncluded}
           initial={initial}
+          logoUrl={business?.logo_url}
         />
       </LangProvider>
     )
@@ -69,6 +72,7 @@ export default async function CocinaPage() {
         redMinutes={redMinutes}
         taxIncluded={initial.taxIncluded}
         initial={initial}
+        logoUrl={business?.logo_url}
       />
     </LangProvider>
   )

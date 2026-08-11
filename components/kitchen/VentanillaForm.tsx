@@ -40,6 +40,7 @@ export function VentanillaForm({
   lang,
   onClose,
   onCreated,
+  unitId,
 }: {
   categories: KitchenData["categories"]
   products: KitchenData["products"]
@@ -50,6 +51,7 @@ export function VentanillaForm({
   lang: Lang
   onClose: () => void
   onCreated: () => void
+  unitId?: string
 }) {
   const t = dictionary[lang].kitchen
   const [cat, setCat] = useState<string | null>(categories[0]?.id ?? null)
@@ -122,6 +124,7 @@ export function VentanillaForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "ventanilla",
+          unitId,
           taxIncluded,
           paidNow,
           orderNotes: orderNotesText() || undefined,

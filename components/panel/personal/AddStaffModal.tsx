@@ -24,6 +24,19 @@ export function AddStaffModal({ units, onClose }: { units: Unit[]; onClose: () =
     { id: "encargado", label: p.roleEncargado, hint: p.roleEncargadoHint },
   ]
 
+  function selectRole(next: StaffRole) {
+    setRole(next)
+    // Encargado siempre ve todos los trucks — no es una opción, es lo que
+    // define al rol. Cocina y ventanilla siempre son de un solo truck; si
+    // venían de "encargado" (unitId null), se les asigna el primero para
+    // que nunca quede un cajero "de todos los trucks" por accidente.
+    if (next === "encargado") {
+      setUnitId(null)
+    } else if (unitId === null) {
+      setUnitId(units[0]?.id ?? null)
+    }
+  }
+
   function submit() {
     setError(null)
     if (!name.trim()) {
@@ -90,7 +103,7 @@ export function AddStaffModal({ units, onClose }: { units: Unit[]; onClose: () =
               key={r.id}
               type="button"
               aria-pressed={role === r.id}
-              onClick={() => setRole(r.id)}
+              onClick={() => selectRole(r.id)}
               className={`rounded-lg border-2 p-2.5 text-left ${role === r.id ? "border-neutral-900" : "border-neutral-200"}`}
             >
               <div className="text-xs font-bold">{r.label}</div>
@@ -99,31 +112,27 @@ export function AddStaffModal({ units, onClose }: { units: Unit[]; onClose: () =
           ))}
         </div>
 
-        {units.length > 1 && (
-          <>
-            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.whichTruckLabel}</label>
-            <div className="mb-4 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                aria-pressed={unitId === null}
-                onClick={() => setUnitId(null)}
-                className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${unitId === null ? "border-neutral-900" : "border-neutral-200"}`}
-              >
-                {p.allTrucks}
-              </button>
-              {units.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  aria-pressed={unitId === u.id}
-                  onClick={() => setUnitId(u.id)}
-                  className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${unitId === u.id ? "border-neutral-900" : "border-neutral-200"}`}
-                >
-                  {u.name}
-                </button>
-              ))}
-            </div>
-          </>
+        {role === "encargado" ? (
+          <div className="mb-4 rounded-lg bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-600">{p.encargadoAllTrucksHint}</div>
+        ) : (
+          units.length > 1 && (
+            <>
+              <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.whichTruckLabel}</label>
+              <div className="mb-4 grid grid-cols-2 gap-2">
+                {units.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    aria-pressed={unitId === u.id}
+                    onClick={() => setUnitId(u.id)}
+                    className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${unitId === u.id ? "border-neutral-900" : "border-neutral-200"}`}
+                  >
+                    {u.name}
+                  </button>
+                ))}
+              </div>
+            </>
+          )
         )}
 
         {error && <p className="mb-3 text-xs text-red-600">{error}</p>}

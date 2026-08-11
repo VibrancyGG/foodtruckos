@@ -958,8 +958,10 @@ export type Database = {
           created_at: string
           id: string
           note: string | null
+          owner_acknowledged_at: string | null
           resolved_at: string | null
           resolved_by: string | null
+          resolved_unit_id: string | null
           status: string
         }
         Insert: {
@@ -967,8 +969,10 @@ export type Database = {
           created_at?: string
           id?: string
           note?: string | null
+          owner_acknowledged_at?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          resolved_unit_id?: string | null
           status?: string
         }
         Update: {
@@ -976,8 +980,10 @@ export type Database = {
           created_at?: string
           id?: string
           note?: string | null
+          owner_acknowledged_at?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
+          resolved_unit_id?: string | null
           status?: string
         }
         Relationships: [
@@ -986,6 +992,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "truck_requests_resolved_unit_id_fkey"
+            columns: ["resolved_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]

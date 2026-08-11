@@ -102,6 +102,7 @@ export function AddDeviceModal({ units, onClose }: { units: Unit[]; onClose: () 
             </button>
           ))}
         </div>
+        <p className="mb-4 text-[11px] leading-relaxed text-neutral-400">{p.deviceUnitHint}</p>
 
         {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
 

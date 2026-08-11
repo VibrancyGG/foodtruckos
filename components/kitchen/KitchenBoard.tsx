@@ -50,6 +50,9 @@ export function KitchenBoard({
   taxIncluded,
   initial,
   onBack,
+  backHref,
+  readOnly = false,
+  logoUrl,
 }: {
   unitId: string
   businessId: string
@@ -60,6 +63,9 @@ export function KitchenBoard({
   taxIncluded: boolean
   initial: KitchenData
   onBack?: () => void
+  backHref?: string
+  readOnly?: boolean
+  logoUrl?: string | null
 }) {
   const { lang, setLang, t } = useLang()
   const [orders, setOrders] = useState(initial.orders)
@@ -160,8 +166,12 @@ export function KitchenBoard({
     }
   }, [unitId, businessId, refetch, fetchTodayCount])
 
-  function act(body: unknown) {
-    enqueueAction(unitId, body)
+  function act(body: Record<string, unknown>) {
+    // El Encargado puede operar un truck que no es el de su dispositivo
+    // emparejado (foodtruckos-accesos) — el servidor solo lo honra si el rol
+    // verificado en la sesión es "encargado" y el truck es del mismo negocio
+    // (verifyStaffSession vuelve a comprobarlo, nunca confía en esto solo).
+    enqueueAction(unitId, { ...body, unitId })
     setPending(pendingCount(unitId))
     drainQueue(unitId, () => setPending(pendingCount(unitId)), () => setSessionExpired(true))
   }
@@ -249,6 +259,19 @@ export function KitchenBoard({
             {t.kitchen.backToTrucks}
           </button>
         )}
+        {!onBack && backHref && (
+          <Link
+            href={backHref}
+            className="rounded-full border px-2.5 py-1.5 text-xs font-bold"
+            style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+          >
+            {t.kitchen.backToTrucks}
+          </Link>
+        )}
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="" className="h-7 w-7 flex-none object-contain" />
+        )}
         <div className="text-[15px] font-bold tracking-tight">
           {unitName} {staffName && <span className="font-semibold text-neutral-400">· {staffName}</span>}
         </div>
@@ -272,9 +295,13 @@ export function KitchenBoard({
         </button>
         <div className="ml-auto flex w-full flex-wrap gap-2 md:w-auto">
           <ToolButton onClick={() => setShowDaySummary(true)} label={t.kitchen.salesButton} />
-          <ToolButton onClick={() => setSoundOn((s) => !s)} label={soundOn ? t.kitchen.soundOn : t.kitchen.soundOff} on={soundOn} />
-          <ToolButton onClick={() => setShowSoldOut(true)} label={t.kitchen.soldOutToggle} />
-          <ToolButton onClick={() => setShowVentanilla(true)} label={t.kitchen.newVentanillaOrder} />
+          {!readOnly && (
+            <>
+              <ToolButton onClick={() => setSoundOn((s) => !s)} label={soundOn ? t.kitchen.soundOn : t.kitchen.soundOff} on={soundOn} />
+              <ToolButton onClick={() => setShowSoldOut(true)} label={t.kitchen.soldOutToggle} />
+              <ToolButton onClick={() => setShowVentanilla(true)} label={t.kitchen.newVentanillaOrder} />
+            </>
+          )}
         </div>
       </header>
 
@@ -327,7 +354,7 @@ export function KitchenBoard({
                         <span className="text-[19px] font-extrabold leading-none tabular-nums" style={{ color: AGE_TEXT_COLOR[lv] }}>
                           {ageLabel(o)}
                         </span>
-                        {HAS_BACK[col] && (
+                        {!readOnly && HAS_BACK[col] && (
                           <button
                             onClick={() => regress(o.id)}
                             aria-label={t.kitchen.back}
@@ -409,7 +436,7 @@ export function KitchenBoard({
                           <span>${o.total.toFixed(2)}</span>
                         </div>
                       )}
-                      {col === "listo" ? (
+                      {!readOnly && (col === "listo" ? (
                         askPayFor === o.id ? (
                           <div className="mt-2.5 space-y-1.5">
                             <button onClick={() => deliver(o.id, true)} className="w-full rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
@@ -424,8 +451,8 @@ export function KitchenBoard({
                         )
                       ) : (
                         <CtaButton onClick={() => advance(o.id)} kind={NEXT_CTA[col]} label={col === "recibido" ? t.kitchen.start : t.kitchen.ready} />
-                      )}
-                      {askCancelFor === o.id ? (
+                      ))}
+                      {!readOnly && (askCancelFor === o.id ? (
                         <div className="mt-2 flex gap-1.5">
                           <button
                             onClick={() => cancelOrder(o.id)}
@@ -449,7 +476,7 @@ export function KitchenBoard({
                         >
                           {t.kitchen.cancelOrder}
                         </button>
-                      )}
+                      ))}
                     </article>
                   )
                 })}
@@ -468,6 +495,7 @@ export function KitchenBoard({
           options={options}
           taxIncluded={taxIncluded}
           lang={lang}
+          unitId={unitId}
           onClose={() => setShowVentanilla(false)}
           onCreated={() => {
             setShowVentanilla(false)

@@ -10,17 +10,25 @@ export function TrucksOverviewBoard({
   staffName,
   ownUnitId,
   onViewTruck,
+  allowViewAll = false,
+  logoUrl,
 }: {
   overview: TrucksOverview
   staffName: string
   ownUnitId: string
   onViewTruck: (unitId: string) => void
+  allowViewAll?: boolean
+  logoUrl?: string | null
 }) {
   const { lang, setLang, t } = useLang()
 
   return (
     <div className="flex h-screen flex-col overflow-y-auto" style={{ background: "#100F0D", color: "#F6F3ED" }}>
       <header className="flex flex-none flex-wrap items-center gap-3.5 border-b px-4.5 py-3" style={{ background: "#1B1917", borderColor: "#332F29" }}>
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="" className="h-7 w-7 flex-none object-contain" />
+        )}
         <div className="text-[15px] font-bold tracking-tight">
           {t.kitchen.trucksOverviewTitle} {staffName && <span className="font-semibold text-neutral-400">· {staffName}</span>}
         </div>
@@ -99,7 +107,7 @@ export function TrucksOverviewBoard({
                 </div>
               </div>
 
-              {truck.id === ownUnitId && (
+              {(allowViewAll || truck.id === ownUnitId) && (
                 <button
                   onClick={() => onViewTruck(truck.id)}
                   className="mt-4 rounded-lg py-2.5 text-sm font-extrabold"

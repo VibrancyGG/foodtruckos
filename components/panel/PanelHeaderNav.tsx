@@ -17,12 +17,14 @@ const TABS = [
 
 export function PanelHeaderNav({
   businessName,
+  logoUrl,
   showNav,
   logoutAction,
   impersonating,
   stopImpersonationAction,
 }: {
   businessName: string
+  logoUrl?: string | null
   showNav: boolean
   logoutAction: () => Promise<void>
   impersonating?: boolean
@@ -41,7 +43,7 @@ export function PanelHeaderNav({
   }, [pathname])
 
   return (
-    <header className="bg-neutral-900 text-white">
+    <header className="bg-neutral-900 text-white print:hidden">
       {impersonating && stopImpersonationAction && (
         <div className="flex flex-wrap items-center justify-between gap-2 bg-amber-500 px-4 py-1.5 text-xs font-bold text-amber-950">
           <span>{t.panel.nav.impersonatingBanner(businessName)}</span>
@@ -51,7 +53,13 @@ export function PanelHeaderNav({
         </div>
       )}
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-sm font-bold">{businessName}</span>
+        <span className="flex items-center gap-2 text-sm font-bold">
+          {logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="h-6 w-6 flex-none rounded-full object-contain" />
+          )}
+          {businessName}
+        </span>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setLang(lang === "es" ? "en" : "es")}

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useLang } from "@/lib/i18n/LangProvider"
 
 type QrCode = { unitName: string; label: string; url: string; qrDataUrl: string }
@@ -25,6 +26,16 @@ export function QrScreen({
         <div className="mb-5 rounded-2xl border border-green-200 bg-green-50 p-4">
           <div className="text-sm font-bold text-green-900">{p.realTitle}</div>
           <p className="mt-1 text-xs text-green-800">{p.realBody}</p>
+        </div>
+
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
+          <div>
+            <div className="text-sm font-bold">{p.viewKitchenTitle}</div>
+            <p className="mt-0.5 text-xs text-neutral-500">{p.viewKitchenBody}</p>
+          </div>
+          <Link href="/panel/cocina" className="flex-none rounded-lg bg-neutral-900 px-4 py-2 text-xs font-bold text-white">
+            {p.viewKitchenCta}
+          </Link>
         </div>
       </div>
 

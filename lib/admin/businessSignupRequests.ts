@@ -57,12 +57,26 @@ export async function approveBusinessSignup(
     .insert({ business_id: business.id, auth_user_id: request.auth_user_id, role: "owner" })
   if (memberError) return { ok: false, error: "El negocio se creó pero no se pudo vincular al dueño" }
 
-  const { error: unitError } = await supabase.from("units").insert({
+  const unitName = input.unitName.trim() || "Truck 1"
+  const { data: newUnit, error: unitError } = await supabase
+    .from("units")
+    .insert({
+      business_id: business.id,
+      name: unitName,
+      location: input.unitLocation.trim() || null,
+    })
+    .select("id")
+    .single()
+  if (unitError || !newUnit) return { ok: false, error: "El negocio se creó pero no se pudo dar de alta el primer truck" }
+
+  // Igual que en approveTruckRequest: sin order_point el truck no tiene QR
+  // ni forma de recibir pedidos — nunca queda a medias.
+  const { error: orderPointError } = await supabase.from("order_points").insert({
     business_id: business.id,
-    name: input.unitName.trim() || "Truck 1",
-    location: input.unitLocation.trim() || null,
+    unit_id: newUnit.id,
+    qr_slug: `${slug}-${slugify(unitName)}`,
   })
-  if (unitError) return { ok: false, error: "El negocio se creó pero no se pudo dar de alta el primer truck" }
+  if (orderPointError) return { ok: false, error: "El negocio se creó pero no se pudo generar el código QR del truck" }
 
   const { error: reqError } = await supabase
     .from("business_signup_requests")

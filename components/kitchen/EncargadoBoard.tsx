@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { KitchenBoard } from "./KitchenBoard"
 import { TrucksOverviewBoard } from "./TrucksOverviewBoard"
 import type { TrucksOverview } from "@/lib/kitchen/getTrucksOverview"
@@ -19,6 +20,7 @@ export function EncargadoBoard({
   redMinutes,
   taxIncluded,
   initial,
+  logoUrl,
 }: {
   overview: TrucksOverview
   ownUnitId: string
@@ -29,7 +31,9 @@ export function EncargadoBoard({
   redMinutes: number
   taxIncluded: boolean
   initial: KitchenData
+  logoUrl?: string | null
 }) {
+  const router = useRouter()
   const [viewingUnitId, setViewingUnitId] = useState<string | null>(null)
 
   if (viewingUnitId === ownUnitId) {
@@ -44,6 +48,7 @@ export function EncargadoBoard({
         taxIncluded={taxIncluded}
         initial={initial}
         onBack={() => setViewingUnitId(null)}
+        logoUrl={logoUrl}
       />
     )
   }
@@ -53,7 +58,9 @@ export function EncargadoBoard({
       overview={overview}
       staffName={staffName}
       ownUnitId={ownUnitId}
-      onViewTruck={(unitId) => setViewingUnitId(unitId)}
+      allowViewAll
+      onViewTruck={(unitId) => (unitId === ownUnitId ? setViewingUnitId(unitId) : router.push(`/cocina/truck/${unitId}`))}
+      logoUrl={logoUrl}
     />
   )
 }
