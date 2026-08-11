@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import { LangProvider } from "@/lib/i18n/LangProvider"
+import { AuthShell } from "@/components/auth/AuthShell"
 import { RegisterForm } from "@/components/auth/RegisterForm"
 
 export default async function RegistroPage() {
@@ -11,9 +13,10 @@ export default async function RegistroPage() {
   if (user) redirect("/panel")
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-neutral-950 px-6 text-white">
-      <h1 className="text-xl font-black">FoodTruckOS</h1>
-      <RegisterForm />
-    </div>
+    <LangProvider defaultLang="es">
+      <AuthShell>
+        <RegisterForm />
+      </AuthShell>
+    </LangProvider>
   )
 }

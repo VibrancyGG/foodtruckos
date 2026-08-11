@@ -668,6 +668,52 @@ export type Dictionary = {
     billingRuleTitle: string
     billingRuleBody: string
   }
+  auth: {
+    signatureEyebrow: string
+    signatureHeadline: string
+    signatureBody: string
+    ticketNew: string
+    ticketPrep: string
+    ticketReady: string
+    loginTitle: string
+    loginSubtitle: string
+    googleButton: string
+    dividerLabel: string
+    emailLabel: string
+    emailPlaceholder: string
+    passwordLabel: string
+    passwordPlaceholder: string
+    orGoogleLabel: string
+    signInButton: string
+    signingIn: string
+    invalidCredentials: string
+    tryMagicLinkHint: string
+    magicLinkButton: string
+    sendingMagicLink: string
+    magicLinkSentTitle: string
+    magicLinkSentBody: (email: string) => string
+    magicLinkError: string
+    forgotPassword: string
+    noAccountYet: string
+    registerLink: string
+    registerTitle: string
+    registerSubtitle: string
+    freeTrialNote: string
+    businessNameLabel: string
+    businessNamePlaceholder: string
+    cityLabel: string
+    cityPlaceholder: string
+    phoneLabel: string
+    phonePlaceholder: string
+    registerEmailHint: string
+    requestButton: string
+    sendingRequest: string
+    requestError: string
+    requestSentTitle: string
+    requestSentBody: (email: string) => string
+    alreadyHaveAccount: string
+    backToLogin: string
+  }
 }
 
 // Solo texto de interfaz (botones, estados, mensajes). Los nombres y
@@ -1367,6 +1413,52 @@ export const dictionary: Record<Lang, Dictionary> = {
       billingRuleBody:
         "los cambios de trucks aplican al siguiente periodo, nunca a mitad de mes. Aprobar una solicitud aquí agenda el cambio; no toca el cobro del mes en curso. Dar de baja un truck archiva su información dos años; no la borra.",
     },
+    auth: {
+      signatureEyebrow: "Cocina en vivo",
+      signatureHeadline: "De la orden a la ventanilla, sin perder ni una.",
+      signatureBody: "Cada pedido que llega por QR o en ventanilla aparece al instante en la pantalla de cocina — así lo ve tu equipo ahora mismo.",
+      ticketNew: "Nueva",
+      ticketPrep: "Preparando",
+      ticketReady: "Lista",
+      loginTitle: "Entra a tu panel",
+      loginSubtitle: "Para dueños y equipo de FoodTruckOS.",
+      googleButton: "Continuar con Google",
+      dividerLabel: "o con tu correo",
+      orGoogleLabel: "o continúa con Google",
+      emailLabel: "Correo",
+      emailPlaceholder: "tu@negocio.com",
+      passwordLabel: "Contraseña",
+      passwordPlaceholder: "Tu contraseña",
+      signInButton: "Entrar",
+      signingIn: "Entrando…",
+      invalidCredentials: "Ese correo y contraseña no coinciden con ninguna cuenta.",
+      tryMagicLinkHint: "¿Entraste antes con un enlace por correo? Pide uno nuevo abajo — no hace falta contraseña.",
+      magicLinkButton: "Enviarme un enlace de acceso",
+      sendingMagicLink: "Enviando…",
+      magicLinkSentTitle: "Revisa tu correo",
+      magicLinkSentBody: (email) => `Te mandamos un enlace de acceso a ${email}. Ábrelo desde este mismo dispositivo para entrar.`,
+      magicLinkError: "No pudimos enviar el enlace. Intenta de nuevo en un momento.",
+      forgotPassword: "Olvidé mi contraseña",
+      noAccountYet: "¿Tu negocio todavía no está en FoodTruckOS?",
+      registerLink: "Solicita tu acceso",
+      registerTitle: "Solicita tu acceso",
+      registerSubtitle: "Cuéntanos de tu negocio y te contactamos para activar tu panel — no se necesita tarjeta ni contraseña ahora mismo.",
+      freeTrialNote: "Empiezas con una prueba gratuita; el cobro arranca hasta que decidas seguir.",
+      businessNameLabel: "Nombre del negocio",
+      businessNamePlaceholder: "Ej: Taquería El Buen Sazón",
+      cityLabel: "Ciudad",
+      cityPlaceholder: "Ej: El Reno, OK",
+      phoneLabel: "Teléfono (opcional)",
+      phonePlaceholder: "Para contactarte más rápido",
+      registerEmailHint: "Te mandamos un enlace a este correo para confirmar la solicitud — sin contraseña que recordar.",
+      requestButton: "Enviar solicitud",
+      sendingRequest: "Enviando…",
+      requestError: "No pudimos enviar tu solicitud. Intenta de nuevo en un momento.",
+      requestSentTitle: "Ya casi — revisa tu correo",
+      requestSentBody: (email) => `Te mandamos un enlace de confirmación a ${email}. Ábrelo para dejar registrada tu solicitud, y nuestro equipo te contacta pronto para activar tu panel.`,
+      alreadyHaveAccount: "¿Ya tienes cuenta?",
+      backToLogin: "Entrar",
+    },
   },
   en: {
     menu: {
@@ -2060,6 +2152,52 @@ export const dictionary: Record<Lang, Dictionary> = {
       billingRuleTitle: "Billing rule:",
       billingRuleBody:
         "truck changes apply to the next billing period, never mid-month. Approving a request here schedules the change; it doesn't touch this month's charge. Removing a truck archives its data for two years; it doesn't delete it.",
+    },
+    auth: {
+      signatureEyebrow: "Live kitchen",
+      signatureHeadline: "From the order to the window, without losing one.",
+      signatureBody: "Every order placed by QR or at the counter shows up instantly on the kitchen screen — this is what your team sees right now.",
+      ticketNew: "New",
+      ticketPrep: "Cooking",
+      ticketReady: "Ready",
+      loginTitle: "Sign in to your panel",
+      loginSubtitle: "For FoodTruckOS owners and staff.",
+      googleButton: "Continue with Google",
+      dividerLabel: "or with your email",
+      orGoogleLabel: "or continue with Google",
+      emailLabel: "Email",
+      emailPlaceholder: "you@yourbusiness.com",
+      passwordLabel: "Password",
+      passwordPlaceholder: "Your password",
+      signInButton: "Sign in",
+      signingIn: "Signing in…",
+      invalidCredentials: "That email and password don't match any account.",
+      tryMagicLinkHint: "Did you sign in before with an emailed link? Request a new one below — no password needed.",
+      magicLinkButton: "Email me a sign-in link",
+      sendingMagicLink: "Sending…",
+      magicLinkSentTitle: "Check your email",
+      magicLinkSentBody: (email) => `We sent a sign-in link to ${email}. Open it on this same device to continue.`,
+      magicLinkError: "We couldn't send the link. Try again in a moment.",
+      forgotPassword: "Forgot my password",
+      noAccountYet: "Is your business not on FoodTruckOS yet?",
+      registerLink: "Request access",
+      registerTitle: "Request access",
+      registerSubtitle: "Tell us about your business and we'll reach out to set up your panel — no card or password needed right now.",
+      freeTrialNote: "You start with a free trial; billing only kicks in once you decide to continue.",
+      businessNameLabel: "Business name",
+      businessNamePlaceholder: "e.g. Golden State Tacos",
+      cityLabel: "City",
+      cityPlaceholder: "e.g. El Reno, OK",
+      phoneLabel: "Phone (optional)",
+      phonePlaceholder: "So we can reach you faster",
+      registerEmailHint: "We'll send a link to this email to confirm the request — no password to remember.",
+      requestButton: "Send request",
+      sendingRequest: "Sending…",
+      requestError: "We couldn't send your request. Try again in a moment.",
+      requestSentTitle: "Almost there — check your email",
+      requestSentBody: (email) => `We sent a confirmation link to ${email}. Open it to log your request, and our team will reach out soon to set up your panel.`,
+      alreadyHaveAccount: "Already have an account?",
+      backToLogin: "Sign in",
     },
   },
 }
