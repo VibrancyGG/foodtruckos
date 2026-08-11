@@ -21,6 +21,14 @@ export type Dictionary = {
     photoComing: string
     buildFrom: string
     buildCta: string
+    closedTitle: string
+    closedBody: (unitName: string) => string
+    reopensAt: (time: string) => string
+    tryLaterHint: string
+    notAvailableTitle: string
+    notAvailableBody: string
+    openNowLabel: string
+    closedNowLabel: string
   }
   tracking: {
     title: string
@@ -274,6 +282,8 @@ export type Dictionary = {
       pause: string
       pausedBadge: string
       openBadge: string
+      closedByHoursBadge: string
+      opensAtBadge: (time: string) => string
       reopens: (when: string) => string
       untilManualReopen: string
       archiveTruck: string
@@ -413,6 +423,7 @@ export type Dictionary = {
       staffHint: string
       whoLabel: string
       namePlaceholder: string
+      nameMissingError: string
       addStaffHint: string
       whatWillDoLabel: string
       roleCocina: string
@@ -741,6 +752,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       photoComing: "Foto en camino",
       buildFrom: "Desde",
       buildCta: "Empezar",
+      closedTitle: "Cerrado por ahora",
+      closedBody: (unitName) => `${unitName} no está tomando pedidos en este momento.`,
+      reopensAt: (time) => `Reabre ${time}.`,
+      tryLaterHint: "Vuelve a intentar más tarde.",
+      notAvailableTitle: "Menú no disponible",
+      notAvailableBody: "Este menú no está disponible por ahora.",
+      openNowLabel: "Abierto",
+      closedNowLabel: "Cerrado",
     },
     tracking: {
       title: "Tu pedido",
@@ -1014,6 +1033,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         pause: "Pausar servicio",
         pausedBadge: "En pausa",
         openBadge: "Abierto",
+        closedByHoursBadge: "Cerrado",
+        opensAtBadge: (time) => `Abre ${time}`,
         reopens: (when) => `Reabre ${when}`,
         untilManualReopen: "Hasta que reabras a mano",
         archiveTruck: "Dar de baja",
@@ -1156,6 +1177,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         staffHint: "Cada quien con su PIN, para saber quién atendió cada orden.",
         whoLabel: "¿Cómo se llama?",
         namePlaceholder: "Nombre y apellido",
+        nameMissingError: "Falta el nombre",
         addStaffHint: "Le vamos a crear un PIN de cuatro dígitos. Solo eso necesita para entrar.",
         whatWillDoLabel: "¿Qué va a hacer?",
         roleCocina: "Cocina",
@@ -1482,6 +1504,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       photoComing: "Photo coming",
       buildFrom: "From",
       buildCta: "Start",
+      closedTitle: "Closed right now",
+      closedBody: (unitName) => `${unitName} isn't taking orders at the moment.`,
+      reopensAt: (time) => `Reopens ${time}.`,
+      tryLaterHint: "Please try again later.",
+      notAvailableTitle: "Menu unavailable",
+      notAvailableBody: "This menu isn't available right now.",
+      openNowLabel: "Open",
+      closedNowLabel: "Closed",
     },
     tracking: {
       title: "Your order",
@@ -1754,6 +1784,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         pause: "Pause service",
         pausedBadge: "Paused",
         openBadge: "Open",
+        closedByHoursBadge: "Closed",
+        opensAtBadge: (time) => `Opens ${time}`,
         reopens: (when) => `Reopens ${when}`,
         untilManualReopen: "Until you reopen it by hand",
         archiveTruck: "Retire truck",
@@ -1896,6 +1928,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         staffHint: "Each person with their own PIN, so you know who handled each order.",
         whoLabel: "What's their name?",
         namePlaceholder: "First and last name",
+        nameMissingError: "Name is required",
         addStaffHint: "We'll create a four-digit PIN for them. That's all they need to enter.",
         whatWillDoLabel: "What will they do?",
         roleCocina: "Kitchen",

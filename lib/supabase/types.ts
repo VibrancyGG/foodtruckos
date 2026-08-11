@@ -238,6 +238,7 @@ export type Database = {
           slug: string
           subscription_status: string
           tax_included: boolean
+          timezone: string
         }
         Insert: {
           billing_mode?: string
@@ -255,6 +256,7 @@ export type Database = {
           slug: string
           subscription_status?: string
           tax_included?: boolean
+          timezone?: string
         }
         Update: {
           billing_mode?: string
@@ -272,6 +274,7 @@ export type Database = {
           slug?: string
           subscription_status?: string
           tax_included?: boolean
+          timezone?: string
         }
         Relationships: []
       }

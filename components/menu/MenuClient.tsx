@@ -246,9 +246,13 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         >
           <span
             className="h-1.5 w-1.5 rounded-full"
-            style={{ background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }}
+            style={
+              data.openStatus.open
+                ? { background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }
+                : { background: "#9CA3AF", boxShadow: "0 0 0 3px rgba(156,163,175,.28)" }
+            }
           />
-          {lang === "es" ? "Abierto" : "Open"}
+          {data.openStatus.open ? t.menu.openNowLabel : t.menu.closedNowLabel}
         </div>
         <div
           className="absolute inset-x-0 bottom-0 h-1.5"

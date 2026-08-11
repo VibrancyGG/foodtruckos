@@ -27,7 +27,7 @@ export function AddStaffModal({ units, onClose }: { units: Unit[]; onClose: () =
   function submit() {
     setError(null)
     if (!name.trim()) {
-      setError(t.panel.menuPage.formError)
+      setError(p.nameMissingError)
       return
     }
     startTransition(async () => {

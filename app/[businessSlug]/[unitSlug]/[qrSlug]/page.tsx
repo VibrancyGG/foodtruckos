@@ -3,6 +3,7 @@ import { getMenuData } from "@/lib/menu/getMenuData"
 import { LangProvider } from "@/lib/i18n/LangProvider"
 import { BrandProvider } from "@/lib/branding/BrandProvider"
 import { MenuClient } from "@/components/menu/MenuClient"
+import { PausedScreen } from "@/components/menu/PausedScreen"
 import { slugify } from "@/lib/utils/slugify"
 
 // El qr_slug es la clave real; businessSlug/unitSlug en la URL son cosméticos.
@@ -20,29 +21,31 @@ export default async function MenuPage({
 
   if (data.suspended) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-2 bg-neutral-950 px-6 text-center text-white">
-        <h1 className="text-xl font-bold">{data.business.name}</h1>
-        <p className="text-neutral-400">Este menú no está disponible por ahora.</p>
-      </div>
+      <LangProvider defaultLang="es">
+        <PausedScreen businessName={data.business.name} notAvailable />
+      </LangProvider>
     )
   }
 
   if (data.paused) {
     const reopenTime = data.pausedUntil
       ? new Date(data.pausedUntil).toLocaleString("es-MX", {
+          timeZone: data.business.timezone,
           weekday: "long",
           hour: "numeric",
           minute: "2-digit",
         })
       : null
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-2 bg-neutral-950 px-6 text-center text-white">
-        <h1 className="text-xl font-bold">{data.business.name}</h1>
-        <p className="text-neutral-400">
-          {data.unit.name} está cerrado por ahora.
-          {reopenTime ? ` Reabre ${reopenTime}.` : " Vuelve a intentar más tarde."}
-        </p>
-      </div>
+      <LangProvider defaultLang="es">
+        <PausedScreen
+          businessName={data.business.name}
+          unitName={data.unit.name}
+          logoUrl={data.business.logo_url}
+          brandColor={data.business.brand_color}
+          reopenTime={reopenTime}
+        />
+      </LangProvider>
     )
   }
 

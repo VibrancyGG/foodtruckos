@@ -26,7 +26,61 @@ export function parseWeeklyHours(raw: unknown): WeeklyHours {
   return raw as WeeklyHours
 }
 
-function formatClock(t: string): string {
+const EN_TO_KEY: Record<string, DayKey> = {
+  Sun: "sun",
+  Mon: "mon",
+  Tue: "tue",
+  Wed: "wed",
+  Thu: "thu",
+  Fri: "fri",
+  Sat: "sat",
+}
+
+// La hora y el día "de ahora" siempre se leen en la zona horaria real del
+// negocio (Intl.DateTimeFormat con timeZone explícito) — nunca en la del
+// servidor (UTC en Vercel) ni la del navegador de quien mira la pantalla.
+// Sin esto, un comensal en otra zona horaria (o el render en el servidor)
+// ve un horario de apertura que no corresponde al truck real.
+function nowInTimezone(timezone: string, now: Date): { dayKey: DayKey; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(now)
+
+  const weekday = parts.find((p) => p.type === "weekday")?.value ?? "Sun"
+  let hour = Number(parts.find((p) => p.type === "hour")?.value ?? "0")
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? "0")
+  if (hour === 24) hour = 0 // algunos entornos formatean medianoche como "24"
+
+  return { dayKey: EN_TO_KEY[weekday] ?? "sun", minutes: hour * 60 + minute }
+}
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number)
+  return h * 60 + m
+}
+
+export type OpenStatus = { open: boolean; opensAt: string | null; closesAt: string | null }
+
+// Solo dice la verdad de los horarios publicados — nunca sustituye la pausa
+// manual del dueño, que sigue siendo la señal más fuerte (foodtruckos-diseno:
+// avanzar/pausar toma un solo toque y siempre gana sobre cualquier cálculo).
+export function isOpenNow(hours: WeeklyHours, timezone: string, now: Date = new Date()): OpenStatus {
+  const { dayKey, minutes } = nowInTimezone(timezone, now)
+  const today = hours[dayKey]
+  if (today) {
+    const open = toMinutes(today.open)
+    const close = toMinutes(today.close)
+    const withinToday = close > open ? minutes >= open && minutes < close : minutes >= open || minutes < close
+    if (withinToday) return { open: true, opensAt: null, closesAt: today.close }
+  }
+  return { open: false, opensAt: today ? today.open : null, closesAt: null }
+}
+
+export function formatClock(t: string): string {
   const [hStr, mStr] = t.split(":")
   const h = Number(hStr)
   const m = Number(mStr)

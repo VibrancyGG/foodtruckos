@@ -138,7 +138,7 @@ export function TrucksScreen({
       </div>
 
       {initial.active.map((u) => (
-        <TruckRow key={u.id} unit={u} businessAmber={amber} businessRed={red} />
+        <TruckRow key={u.id} unit={u} businessAmber={amber} businessRed={red} timezone={initial.timezone} />
       ))}
 
       <div className="rounded-2xl border border-dashed border-neutral-300 p-4">

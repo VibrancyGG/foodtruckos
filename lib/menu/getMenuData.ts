@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { toNumber } from "@/lib/supabase/numeric"
+import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 
 // Resuelve SIEMPRE por qr_slug (la clave real y única del punto de pedido).
 // businessSlug/unitSlug en la URL son cosméticos, no autoritativos — si no
@@ -86,6 +87,7 @@ export async function getMenuData(qrSlug: string) {
     orderPoint: { id: orderPoint.id, label: orderPoint.label },
     unit,
     business,
+    openStatus: isOpenNow(parseWeeklyHours(unit.hours), business.timezone),
     categories: categories ?? [],
     products: (products ?? []).map((p) => ({ ...p, price: toNumber(p.price) })),
     unitProducts: unitProducts ?? [],

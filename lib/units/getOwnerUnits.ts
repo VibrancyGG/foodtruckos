@@ -10,7 +10,7 @@ export async function getOwnerUnits(businessId: string) {
     supabase.from("units").select("*").eq("business_id", businessId).order("created_at"),
     supabase
       .from("businesses")
-      .select("tax_included, default_alert_amber_minutes, default_alert_red_minutes")
+      .select("tax_included, default_alert_amber_minutes, default_alert_red_minutes, timezone")
       .eq("id", businessId)
       .single(),
     supabase
@@ -42,6 +42,7 @@ export async function getOwnerUnits(businessId: string) {
     taxIncluded: business?.tax_included ?? false,
     defaultAlertAmberMinutes: business?.default_alert_amber_minutes ?? 8,
     defaultAlertRedMinutes: business?.default_alert_red_minutes ?? 15,
+    timezone: business?.timezone ?? "America/Chicago",
     avgPrepMinutes,
   }
 }

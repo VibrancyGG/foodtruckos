@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import Link from "next/link"
 import type { OwnerUnitsData } from "@/lib/units/getOwnerUnits"
 import { pauseUnit, reopenUnit, reactivateUnit, setUnitAlertThresholds } from "@/lib/units/actions"
-import { parseWeeklyHours, summarizeHours } from "@/lib/units/hours"
+import { parseWeeklyHours, summarizeHours, isOpenNow, formatClock } from "@/lib/units/hours"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { EditTruckModal } from "./trucks/EditTruckModal"
 import { HoursModal } from "./trucks/HoursModal"
@@ -15,10 +15,12 @@ export function TruckRow({
   unit,
   businessAmber,
   businessRed,
+  timezone,
 }: {
   unit: OwnerUnitsData["active"][number]
   businessAmber: number
   businessRed: number
+  timezone: string
 }) {
   const { lang, t } = useLang()
   const p = t.panel.trucksPage
@@ -46,7 +48,10 @@ export function TruckRow({
   const hasOwnAlerts = unit.alert_amber_minutes !== null && unit.alert_red_minutes !== null
   const amber = unit.alert_amber_minutes ?? businessAmber
   const red = unit.alert_red_minutes ?? businessRed
-  const summary = summarizeHours(parseWeeklyHours(unit.hours), lang)
+  const weeklyHours = parseWeeklyHours(unit.hours)
+  const summary = summarizeHours(weeklyHours, lang)
+  const openStatus = isOpenNow(weeklyHours, timezone)
+  const showingClosed = isPaused || !openStatus.open
 
   if (archived) return null
 
@@ -99,10 +104,20 @@ export function TruckRow({
             {unit.name}
             <span
               className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                isPaused ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"
+                isPaused
+                  ? "bg-amber-100 text-amber-700"
+                  : showingClosed
+                    ? "bg-neutral-100 text-neutral-500"
+                    : "bg-green-100 text-green-700"
               }`}
             >
-              {isPaused ? p.pausedBadge : p.openBadge}
+              {isPaused
+                ? p.pausedBadge
+                : showingClosed
+                  ? openStatus.opensAt
+                    ? p.opensAtBadge(formatClock(openStatus.opensAt))
+                    : p.closedByHoursBadge
+                  : p.openBadge}
             </span>
           </div>
           {unit.location && <div className="text-xs text-neutral-500">{unit.location}</div>}
@@ -113,7 +128,14 @@ export function TruckRow({
         <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
           <div className="mb-0.5 font-bold">
             {unit.paused_until
-              ? p.reopens(new Date(unit.paused_until).toLocaleString(locale, { weekday: "short", hour: "numeric", minute: "2-digit" }))
+              ? p.reopens(
+                  new Date(unit.paused_until).toLocaleString(locale, {
+                    timeZone: timezone,
+                    weekday: "short",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  }),
+                )
               : p.untilManualReopen}
           </div>
           {unit.pause_reason && <div>{p.pauseReasonLabel(unit.pause_reason)}</div>}
@@ -198,7 +220,7 @@ export function TruckRow({
                 {pauseDuration.minutes === null
                   ? p.pausePreviewClosedToday
                   : p.pausePreviewReturnsAt(
-                      (pausedUntilTime() as Date).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
+                      (pausedUntilTime() as Date).toLocaleTimeString(locale, { timeZone: timezone, hour: "numeric", minute: "2-digit" }),
                     )}
               </div>
             </div>
