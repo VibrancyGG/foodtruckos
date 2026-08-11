@@ -169,6 +169,8 @@ export type Dictionary = {
     truckSalesTodayLabel: string
     truckPausedPill: string
     truckOpenPill: string
+    truckClosedPill: string
+    truckOpensAtPill: (time: string) => string
     viewTruckBoard: string
     attentionNeededTitle: string
     attentionNeededEmpty: string
@@ -928,6 +930,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       truckSalesTodayLabel: "Venta de hoy",
       truckPausedPill: "En pausa",
       truckOpenPill: "Abierto",
+      truckClosedPill: "Cerrado",
+      truckOpensAtPill: (time) => `Abre ${time}`,
       viewTruckBoard: "Ver su tablero",
       attentionNeededTitle: "Requieren atención",
       attentionNeededEmpty: "Nada pasado de tiempo. Todos los trucks van al día.",
@@ -1690,6 +1694,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       truckSalesTodayLabel: "Sales today",
       truckPausedPill: "Paused",
       truckOpenPill: "Open",
+      truckClosedPill: "Closed",
+      truckOpensAtPill: (time) => `Opens ${time}`,
       viewTruckBoard: "View its board",
       attentionNeededTitle: "Need attention",
       attentionNeededEmpty: "Nothing running late. All trucks are on track.",

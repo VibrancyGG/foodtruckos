@@ -2,6 +2,7 @@
 
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { TrucksOverview } from "@/lib/kitchen/getTrucksOverview"
+import { formatClock } from "@/lib/units/hours"
 
 const LEVEL_COLOR: Record<string, string> = { amber: "#F5A524", red: "#E5484D" }
 
@@ -64,9 +65,21 @@ export function TrucksOverviewBoard({
                 <h2 className="text-lg font-black tracking-tight">{truck.name}</h2>
                 <span
                   className="rounded-full px-2.5 py-0.5 text-[11px] font-bold"
-                  style={truck.paused ? { background: "#3A2E1A", color: "#F5A524" } : { background: "#1C3327", color: "#4ADE80" }}
+                  style={
+                    truck.paused
+                      ? { background: "#3A2E1A", color: "#F5A524" }
+                      : !truck.openNow
+                        ? { background: "#232019", color: "#9C948A" }
+                        : { background: "#1C3327", color: "#4ADE80" }
+                  }
                 >
-                  {truck.paused ? t.kitchen.truckPausedPill : t.kitchen.truckOpenPill}
+                  {truck.paused
+                    ? t.kitchen.truckPausedPill
+                    : !truck.openNow
+                      ? truck.opensAt
+                        ? t.kitchen.truckOpensAtPill(formatClock(truck.opensAt))
+                        : t.kitchen.truckClosedPill
+                      : t.kitchen.truckOpenPill}
                 </span>
               </div>
               {truck.location && <p className="mt-0.5 text-xs font-medium text-neutral-400">{truck.location}</p>}

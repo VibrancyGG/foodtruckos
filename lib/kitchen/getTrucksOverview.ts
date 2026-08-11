@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/service"
 import { toNumber } from "@/lib/supabase/numeric"
+import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 
 const OPEN_STATUSES = ["recibido", "preparando", "listo"]
 
@@ -23,13 +24,13 @@ export async function getTrucksOverview(businessId: string) {
   const [{ data: units }, { data: business }, { data: orders }] = await Promise.all([
     supabase
       .from("units")
-      .select("id, name, location, status, paused_until, alert_amber_minutes, alert_red_minutes")
+      .select("id, name, location, status, paused_until, hours, alert_amber_minutes, alert_red_minutes")
       .eq("business_id", businessId)
       .neq("status", "archived")
       .order("created_at"),
     supabase
       .from("businesses")
-      .select("default_alert_amber_minutes, default_alert_red_minutes")
+      .select("default_alert_amber_minutes, default_alert_red_minutes, timezone")
       .eq("id", businessId)
       .single(),
     supabase
@@ -74,12 +75,19 @@ export async function getTrucksOverview(businessId: string) {
       .reduce((s, o) => s + o.total, 0)
 
     const paused = u.status === "paused"
+    // Igual que en Trucks (TruckRow) y en el menú del comensal: "abierto" se
+    // calcula de verdad contra el horario publicado, no solo del estado
+    // manual — sin esto esta pantalla decía "Abierto" aunque el truck ya
+    // hubiera cerrado por horario, sin que nadie lo hubiera pausado a mano.
+    const openStatus = isOpenNow(parseWeeklyHours(u.hours), business?.timezone ?? "America/Chicago")
 
     return {
       id: u.id,
       name: u.name,
       location: u.location,
       paused,
+      openNow: openStatus.open,
+      opensAt: openStatus.opensAt,
       nuevas,
       preparando,
       listas,
