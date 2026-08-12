@@ -10,6 +10,7 @@ import { SuspendedNotice } from "@/components/panel/SuspendedNotice"
 import { TruckApprovalBanner } from "@/components/panel/TruckApprovalBanner"
 import { OnboardingProvider } from "@/components/panel/onboarding/OnboardingProvider"
 import { OnboardingTour } from "@/components/panel/onboarding/OnboardingTour"
+import { panelDisplayFont, panelBodyFont } from "@/lib/fonts"
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const { user, businessId, business, impersonating, suspended } = await getOwnerContext()
@@ -36,7 +37,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   return (
     <LangProvider defaultLang="es">
       <OnboardingProvider shouldAutoStart={shouldAutoStart}>
-        <div className="min-h-screen bg-neutral-100">
+        <div className={`${panelDisplayFont.variable} ${panelBodyFont.variable} min-h-screen bg-panel-bg font-[family-name:var(--font-panel-body)] text-panel-ink`}>
           <PanelHeaderNav
             businessName={businessId && business ? business.name : "FoodTruckOS"}
             logoUrl={businessId && business ? business.logo_url : null}
@@ -48,7 +49,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           {approvedRequest && approvedRequest.unitName && (
             <TruckApprovalBanner requestId={approvedRequest.id} unitName={approvedRequest.unitName} />
           )}
-          <main className="p-4">{suspended ? <SuspendedNotice /> : children}</main>
+          <main className="p-4 sm:p-6">
+            <div className="panel-animate-in mx-auto max-w-6xl">{suspended ? <SuspendedNotice /> : children}</div>
+          </main>
         </div>
         {!impersonating && <OnboardingTour />}
       </OnboardingProvider>

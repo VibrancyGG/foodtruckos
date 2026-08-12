@@ -12,6 +12,9 @@ import { useLang } from "@/lib/i18n/LangProvider"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { OptionGroupsEditor } from "../OptionGroupsEditor"
 import { TranslateFieldActions } from "../TranslateFieldActions"
+import { Modal } from "../ui/Modal"
+import { Button } from "../ui/Button"
+import { inputClass, labelClass, cardSelectClass } from "../ui/tokens"
 
 type Unit = { id: string; name: string }
 type Category = { id: string; name_es: string; name_en: string }
@@ -190,10 +193,11 @@ export function ProductModal(props: EditProps | AddProps) {
   ]
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-        <h3 className="mb-1.5 text-xl font-black">{props.mode === "edit" ? (lang === "es" ? props.product.name_es : props.product.name_en) : m.addProduct}</h3>
-        <p className="mb-4 text-sm text-neutral-500">{props.mode === "edit" ? m.editModalHint : m.addModalHint}</p>
+    <Modal size="md" scroll>
+      <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">
+        {props.mode === "edit" ? (lang === "es" ? props.product.name_es : props.product.name_en) : m.addProduct}
+      </h3>
+      <p className="mb-4 text-sm text-panel-ink-soft">{props.mode === "edit" ? m.editModalHint : m.addModalHint}</p>
 
         <Section accent="neutral" title={m.photoLabel}>
           <div className="flex items-center gap-3">
@@ -206,7 +210,7 @@ export function ProductModal(props: EditProps | AddProps) {
               )}
             </div>
             <div>
-              <label className="cursor-pointer rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-bold">
+              <label className="cursor-pointer rounded-lg border border-panel-line bg-panel-surface px-3 py-1.5 text-xs font-bold transition-colors hover:border-panel-brand hover:text-panel-brand">
                 {c.chooseImage}
                 <input
                   type="file"
@@ -226,18 +230,18 @@ export function ProductModal(props: EditProps | AddProps) {
 
         <Section accent="blue" title={m.nameAndDescriptionTitle}>
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
+            <label className={labelClass}>{c.nameEsPlaceholder}</label>
             <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
           </div>
-          <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm" />
+          <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className={`${inputClass} mb-3`} />
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
+            <label className={labelClass}>{c.nameEnPlaceholder}</label>
             <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
           </div>
-          <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm" />
+          <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className={`${inputClass} mb-3`} />
 
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-xs font-bold text-neutral-500">{m.descriptionEsPlaceholder}</label>
+            <label className={labelClass}>{m.descriptionEsPlaceholder}</label>
             <TranslateFieldActions sourceValue={descEn} setTarget={setDescEs} direction="en-es" />
           </div>
           <textarea
@@ -249,10 +253,10 @@ export function ProductModal(props: EditProps | AddProps) {
               e.target.style.height = `${e.target.scrollHeight}px`
             }}
             rows={2}
-            className="mb-3 w-full resize-none overflow-hidden rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
+            className={`${inputClass} mb-3 resize-none overflow-hidden`}
           />
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-xs font-bold text-neutral-500">{m.descriptionEnPlaceholder}</label>
+            <label className={labelClass}>{m.descriptionEnPlaceholder}</label>
             <TranslateFieldActions sourceValue={descEs} setTarget={setDescEn} direction="es-en" allowCopy />
           </div>
           <textarea
@@ -264,19 +268,14 @@ export function ProductModal(props: EditProps | AddProps) {
               e.target.style.height = `${e.target.scrollHeight}px`
             }}
             rows={2}
-            className="w-full resize-none overflow-hidden rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
+            className={`${inputClass} resize-none overflow-hidden`}
           />
         </Section>
 
         <Section accent="green" title={m.pricePlaceholder}>
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            inputMode="decimal"
-            className="mb-3 w-28 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
-          />
+          <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" className={`${inputClass} mb-3 w-28`} />
 
-          <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.whichCategoryLabel}</label>
+          <label className={labelClass}>{m.whichCategoryLabel}</label>
           <div className="grid grid-cols-2 gap-2">
             {props.categories.map((cat) => (
               <button
@@ -284,7 +283,7 @@ export function ProductModal(props: EditProps | AddProps) {
                 type="button"
                 aria-pressed={categoryId === cat.id}
                 onClick={() => setCategoryId(cat.id)}
-                className={`rounded-lg border-2 bg-white p-2.5 text-left text-xs font-bold ${categoryId === cat.id ? "border-neutral-900" : "border-neutral-200"}`}
+                className={`${cardSelectClass(categoryId === cat.id)} text-xs font-bold`}
               >
                 {lang === "es" ? cat.name_es : cat.name_en}
               </button>
@@ -301,10 +300,10 @@ export function ProductModal(props: EditProps | AddProps) {
                   type="button"
                   aria-pressed={exclusiveUnitId === opt.id}
                   onClick={() => setExclusiveUnitId(opt.id)}
-                  className={`rounded-lg border-2 bg-white p-2.5 text-left ${exclusiveUnitId === opt.id ? "border-neutral-900" : "border-neutral-200"}`}
+                  className={cardSelectClass(exclusiveUnitId === opt.id)}
                 >
                   <div className="text-xs font-bold">{opt.label}</div>
-                  <div className="text-[11px] text-neutral-500">{opt.hint}</div>
+                  <div className="text-[11px] text-panel-ink-soft">{opt.hint}</div>
                 </button>
               ))}
             </div>
@@ -322,41 +321,36 @@ export function ProductModal(props: EditProps | AddProps) {
           </Section>
         )}
 
-        {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
+      {error && <p className="mb-3 text-xs text-rose-600">{error}</p>}
 
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            {props.mode === "edit" &&
-              (confirmRetire ? (
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-neutral-500">{m.confirmRemove}</span>
-                  <button onClick={retire} className="font-bold text-red-600">
-                    {c.yesRemove}
-                  </button>
-                  <button onClick={() => setConfirmRetire(false)} className="text-neutral-500">
-                    {c.cancel}
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => setConfirmRetire(true)} className="text-xs font-bold text-red-600">
-                  {m.removeFromMenu}
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          {props.mode === "edit" &&
+            (confirmRetire ? (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-panel-ink-soft">{m.confirmRemove}</span>
+                <button onClick={retire} className="font-bold text-rose-600">
+                  {c.yesRemove}
                 </button>
-              ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-              {c.cancel}
-            </button>
-            <button
-              onClick={submit}
-              disabled={pending}
-              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-            >
-              {pending ? c.saving : props.mode === "edit" ? c.save : m.addProductSubmit}
-            </button>
-          </div>
+                <button onClick={() => setConfirmRetire(false)} className="text-panel-ink-soft">
+                  {c.cancel}
+                </button>
+              </div>
+            ) : (
+              <Button variant="danger" onClick={() => setConfirmRetire(true)} className="text-xs">
+                {m.removeFromMenu}
+              </Button>
+            ))}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onClose} className="px-3 py-2">
+            {c.cancel}
+          </Button>
+          <Button onClick={submit} disabled={pending}>
+            {pending ? c.saving : props.mode === "edit" ? c.save : m.addProductSubmit}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

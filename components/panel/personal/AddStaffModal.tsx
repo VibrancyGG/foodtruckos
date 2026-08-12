@@ -3,6 +3,9 @@
 import { useState, useTransition } from "react"
 import { createStaff, type StaffRole } from "@/lib/personal/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { Modal } from "../ui/Modal"
+import { Button } from "../ui/Button"
+import { inputClass, labelClass, cardSelectClass } from "../ui/tokens"
 
 type Unit = { id: string; name: string }
 
@@ -56,100 +59,87 @@ export function AddStaffModal({ units, onClose }: { units: Unit[]; onClose: () =
 
   if (reveal) {
     return (
-      <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-        <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-          <h3 className="mb-1.5 text-xl font-black">{p.pinRevealTitle}</h3>
-          <p className="mb-4 text-sm text-neutral-500">{p.pinRevealHint(reveal.name)}</p>
-          <div className="mb-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
-            <div className="select-all font-mono text-4xl font-black tracking-[0.3em] text-neutral-900">
-              {reveal.pin}
-            </div>
-            <div className="mt-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
-              {p.pinRevealLabel(reveal.name, reveal.truck)}
-            </div>
+      <Modal size="sm">
+        <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.pinRevealTitle}</h3>
+        <p className="mb-4 text-sm text-panel-ink-soft">{p.pinRevealHint(reveal.name)}</p>
+        <div className="mb-4 rounded-xl border border-dashed border-panel-line bg-panel-bg p-6 text-center">
+          <div className="select-all font-[family-name:var(--font-panel-display)] text-4xl font-bold tracking-[0.3em] text-panel-ink">
+            {reveal.pin}
           </div>
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white"
-            >
-              {p.understood}
-            </button>
+          <div className="mt-2 text-xs font-bold uppercase tracking-wide text-panel-ink/40">
+            {p.pinRevealLabel(reveal.name, reveal.truck)}
           </div>
         </div>
-      </div>
+        <div className="flex justify-end">
+          <Button onClick={onClose}>{p.understood}</Button>
+        </div>
+      </Modal>
     )
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-        <h3 className="mb-1.5 text-xl font-black">{p.addPerson}</h3>
-        <p className="mb-4 text-sm text-neutral-500">{p.addStaffHint}</p>
+    <Modal size="md" scroll>
+      <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.addPerson}</h3>
+      <p className="mb-4 text-sm text-panel-ink-soft">{p.addStaffHint}</p>
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.whoLabel}</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={p.namePlaceholder}
-          autoFocus
-          className="mb-4 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-        />
+      <label className={labelClass}>{p.whoLabel}</label>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder={p.namePlaceholder}
+        autoFocus
+        className={`${inputClass} mb-4`}
+      />
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.whatWillDoLabel}</label>
-        <div className="mb-4 grid grid-cols-2 gap-2">
-          {roles.map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              aria-pressed={role === r.id}
-              onClick={() => selectRole(r.id)}
-              className={`rounded-lg border-2 p-2.5 text-left ${role === r.id ? "border-neutral-900" : "border-neutral-200"}`}
-            >
-              <div className="text-xs font-bold">{r.label}</div>
-              <div className="text-[11px] text-neutral-500">{r.hint}</div>
-            </button>
-          ))}
-        </div>
-
-        {role === "encargado" ? (
-          <div className="mb-4 rounded-lg bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-600">{p.encargadoAllTrucksHint}</div>
-        ) : (
-          units.length > 1 && (
-            <>
-              <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.whichTruckLabel}</label>
-              <div className="mb-4 grid grid-cols-2 gap-2">
-                {units.map((u) => (
-                  <button
-                    key={u.id}
-                    type="button"
-                    aria-pressed={unitId === u.id}
-                    onClick={() => setUnitId(u.id)}
-                    className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${unitId === u.id ? "border-neutral-900" : "border-neutral-200"}`}
-                  >
-                    {u.name}
-                  </button>
-                ))}
-              </div>
-            </>
-          )
-        )}
-
-        {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-            {c.cancel}
-          </button>
+      <label className={labelClass}>{p.whatWillDoLabel}</label>
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        {roles.map((r) => (
           <button
-            onClick={submit}
-            disabled={pending}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+            key={r.id}
+            type="button"
+            aria-pressed={role === r.id}
+            onClick={() => selectRole(r.id)}
+            className={cardSelectClass(role === r.id)}
           >
-            {pending ? c.saving : p.createPin}
+            <div className="text-xs font-bold text-panel-ink">{r.label}</div>
+            <div className="text-[11px] text-panel-ink-soft">{r.hint}</div>
           </button>
-        </div>
+        ))}
       </div>
-    </div>
+
+      {role === "encargado" ? (
+        <div className="mb-4 rounded-lg bg-panel-bg p-3 text-xs leading-relaxed text-panel-ink-soft">{p.encargadoAllTrucksHint}</div>
+      ) : (
+        units.length > 1 && (
+          <>
+            <label className={labelClass}>{p.whichTruckLabel}</label>
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              {units.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  aria-pressed={unitId === u.id}
+                  onClick={() => setUnitId(u.id)}
+                  className={`${cardSelectClass(unitId === u.id)} text-xs font-bold text-panel-ink`}
+                >
+                  {u.name}
+                </button>
+              ))}
+            </div>
+          </>
+        )
+      )}
+
+      {error && <p className="mb-3 text-xs text-rose-600">{error}</p>}
+
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" onClick={onClose} className="px-3 py-2">
+          {c.cancel}
+        </Button>
+        <Button onClick={submit} disabled={pending}>
+          {pending ? c.saving : p.createPin}
+        </Button>
+      </div>
+    </Modal>
   )
 }

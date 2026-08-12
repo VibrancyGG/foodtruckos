@@ -6,6 +6,8 @@ import { removeStaff, revokeDevice, resetStaffPin } from "@/lib/personal/actions
 import { useLang } from "@/lib/i18n/LangProvider"
 import { AddStaffModal } from "./personal/AddStaffModal"
 import { AddDeviceModal } from "./personal/AddDeviceModal"
+import { Modal } from "./ui/Modal"
+import { Button } from "./ui/Button"
 
 function unitName(units: OwnerStaffData["units"], unitId: string | null, allTrucks: string, archivedSuffix: string) {
   if (!unitId) return allTrucks
@@ -24,13 +26,13 @@ export function PersonalScreen({ initial }: { initial: OwnerStaffData }) {
   const p = t.panel.personalPage
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
-        <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
+      <div className="panel-animate-in">
+        <h1 className="mb-1 font-[family-name:var(--font-panel-display)] text-2xl font-bold text-panel-ink">{p.title}</h1>
+        <p className="mb-2 text-sm text-panel-ink-soft">{p.subtitle}</p>
       </div>
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
-        <div className="mb-1 text-sm font-black text-green-900">{p.selfServiceTitle}</div>
-        <p className="text-sm leading-relaxed text-green-800">{p.selfServiceBody}</p>
+      <div className="panel-animate-in rounded-[20px] border border-emerald-200 bg-emerald-50 p-4" style={{ animationDelay: "40ms" }}>
+        <div className="mb-1 text-sm font-black text-emerald-900">{p.selfServiceTitle}</div>
+        <p className="text-sm leading-relaxed text-emerald-800">{p.selfServiceBody}</p>
       </div>
       <StaffSection units={initial.units} assignableUnits={initial.assignableUnits} staff={initial.staff} removedStaff={initial.removedStaff} />
       <DeviceSection units={initial.units} assignableUnits={initial.assignableUnits} devices={initial.devices} revokedDevices={initial.revokedDevices} />
@@ -55,21 +57,21 @@ function StaffSection({
   const [showRemoved, setShowRemoved] = useState(false)
 
   return (
-    <section>
+    <section className="panel-animate-in" style={{ animationDelay: "80ms" }}>
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-lg font-bold">{p.staffTitle}</h2>
+        <h2 className="font-[family-name:var(--font-panel-display)] text-lg font-bold text-panel-ink">{p.staffTitle}</h2>
         <button
           data-tour="onboarding-add-person"
           onClick={() => setShowAdd(true)}
-          className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
+          className="rounded-xl bg-panel-brand px-3.5 py-2 text-xs font-bold text-white shadow-[0_1px_2px_rgba(226,67,31,0.25)] transition-all duration-150 hover:bg-panel-brand-deep active:scale-[0.98]"
         >
           {p.addPerson}
         </button>
       </div>
-      <p className="mb-3 text-sm text-neutral-500">{p.staffHint}</p>
+      <p className="mb-3 text-sm text-panel-ink-soft">{p.staffHint}</p>
 
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-        {staff.length === 0 && <p className="p-4 text-sm text-neutral-400">{p.noStaffYet}</p>}
+      <div className="overflow-hidden rounded-[20px] border border-panel-line bg-panel-surface shadow-[0_1px_2px_rgba(23,20,15,0.04)]">
+        {staff.length === 0 && <p className="p-4 text-sm text-panel-ink-soft">{p.noStaffYet}</p>}
         {staff.map((s) => (
           <StaffRow key={s.id} staff={s} unitLabel={unitName(units, s.unit_id, p.allTrucks, p.truckArchivedSuffix)} />
         ))}
@@ -79,14 +81,14 @@ function StaffSection({
         <div className="mt-3">
           <button
             onClick={() => setShowRemoved((v) => !v)}
-            className="text-xs font-bold text-neutral-500 underline"
+            className="text-xs font-bold text-panel-ink-soft underline decoration-panel-line hover:text-panel-ink"
           >
             {showRemoved ? p.hideRemoved(removedStaff.length) : p.showRemoved(removedStaff.length)}
           </button>
           {showRemoved && (
             <div className="mt-2 space-y-1">
               {removedStaff.map((s) => (
-                <div key={s.id} className="rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500">
+                <div key={s.id} className="rounded-lg bg-panel-bg px-3 py-2 text-xs text-panel-ink-soft">
                   {s.name}
                 </div>
               ))}
@@ -133,18 +135,18 @@ function StaffRow({
   const stale = !!staff.lastUsedAt && daysAgo(staff.lastUsedAt) >= 21
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 p-3 first:border-t-0">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-panel-line p-3 first:border-t-0">
       <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-bold">
+        <div className="flex items-center gap-2 text-sm font-bold text-panel-ink">
           {staff.name}
-          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-bold text-neutral-500">
+          <span className="rounded-full bg-panel-bg px-2 py-0.5 text-[11px] font-bold text-panel-ink-soft">
             {roleLabel(staff.role, p)}
           </span>
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
+        <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-panel-ink-soft">
           <span>{unitLabel}</span>
           <span>·</span>
-          <span className="text-neutral-400">{lastUsedText}</span>
+          <span className="text-panel-ink/40">{lastUsedText}</span>
           {stale && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">
               {p.stillHereBadge}
@@ -154,11 +156,11 @@ function StaffRow({
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="font-mono text-lg font-black tracking-[0.2em] text-neutral-300">{p.pinMaskedLabel}</span>
+        <span className="font-[family-name:var(--font-panel-display)] text-lg font-bold tracking-[0.2em] text-panel-ink/25">{p.pinMaskedLabel}</span>
 
         {confirming === "reset" ? (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-neutral-500">{p.confirmResetPin}</span>
+            <span className="text-panel-ink-soft">{p.confirmResetPin}</span>
             <button
               disabled={pending}
               onClick={() =>
@@ -174,17 +176,17 @@ function StaffRow({
                   setConfirming(null)
                 })
               }
-              className="font-bold text-neutral-900"
+              className="font-bold text-panel-brand"
             >
               {p.yesReset}
             </button>
-            <button onClick={() => setConfirming(null)} className="text-neutral-500">
+            <button onClick={() => setConfirming(null)} className="text-panel-ink-soft">
               {c.cancel}
             </button>
           </div>
         ) : confirming === "remove" ? (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-neutral-500">{p.confirmRemoveAccess}</span>
+            <span className="text-panel-ink-soft">{p.confirmRemoveAccess}</span>
             <button
               disabled={pending}
               onClick={() =>
@@ -193,46 +195,39 @@ function StaffRow({
                   if (result.ok) setGone(true)
                 })
               }
-              className="font-bold text-red-600"
+              className="font-bold text-rose-600"
             >
               {c.yesRemove}
             </button>
-            <button onClick={() => setConfirming(null)} className="text-neutral-500">
+            <button onClick={() => setConfirming(null)} className="text-panel-ink-soft">
               {c.cancel}
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-3 text-xs font-semibold">
-            <button onClick={() => setConfirming("reset")} className="text-neutral-500 hover:text-neutral-900">
+            <button onClick={() => setConfirming("reset")} className="text-panel-ink-soft hover:text-panel-brand">
               {p.resetPin}
             </button>
-            <button onClick={() => setConfirming("remove")} className="text-neutral-400 hover:text-red-600">
+            <button onClick={() => setConfirming("remove")} className="text-panel-ink/35 hover:text-rose-600">
               {c.remove}
             </button>
           </div>
         )}
       </div>
 
-      {error && <p className="w-full text-xs text-red-600">{error}</p>}
+      {error && <p className="w-full text-xs text-rose-600">{error}</p>}
 
       {reveal && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-            <h3 className="mb-1.5 text-xl font-black">{p.pinResetTitle}</h3>
-            <p className="mb-4 text-sm text-neutral-500">{p.pinResetHint(staff.name)}</p>
-            <div className="mb-4 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
-              <div className="select-all font-mono text-4xl font-black tracking-[0.3em] text-neutral-900">{reveal}</div>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setReveal(null)}
-                className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white"
-              >
-                {p.understood}
-              </button>
-            </div>
+        <Modal size="sm">
+          <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.pinResetTitle}</h3>
+          <p className="mb-4 text-sm text-panel-ink-soft">{p.pinResetHint(staff.name)}</p>
+          <div className="mb-4 rounded-xl border border-dashed border-panel-line bg-panel-bg p-6 text-center">
+            <div className="select-all font-[family-name:var(--font-panel-display)] text-4xl font-bold tracking-[0.3em] text-panel-ink">{reveal}</div>
           </div>
-        </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setReveal(null)}>{p.understood}</Button>
+          </div>
+        </Modal>
       )}
     </div>
   )
@@ -255,23 +250,23 @@ function DeviceSection({
   const [showRevoked, setShowRevoked] = useState(false)
 
   return (
-    <section>
+    <section className="panel-animate-in" style={{ animationDelay: "120ms" }}>
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-lg font-bold">{p.devicesTitle}</h2>
+        <h2 className="font-[family-name:var(--font-panel-display)] text-lg font-bold text-panel-ink">{p.devicesTitle}</h2>
         {assignableUnits.length > 0 && (
           <button
             data-tour="onboarding-add-device"
             onClick={() => setShowAdd(true)}
-            className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
+            className="rounded-xl bg-panel-brand px-3.5 py-2 text-xs font-bold text-white shadow-[0_1px_2px_rgba(226,67,31,0.25)] transition-all duration-150 hover:bg-panel-brand-deep active:scale-[0.98]"
           >
             {p.pairTablet}
           </button>
         )}
       </div>
-      <p className="mb-3 text-sm text-neutral-500">{p.devicesHint}</p>
+      <p className="mb-3 text-sm text-panel-ink-soft">{p.devicesHint}</p>
 
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-        {devices.length === 0 && <p className="p-4 text-sm text-neutral-400">{p.noDevicesYet}</p>}
+      <div className="overflow-hidden rounded-[20px] border border-panel-line bg-panel-surface shadow-[0_1px_2px_rgba(23,20,15,0.04)]">
+        {devices.length === 0 && <p className="p-4 text-sm text-panel-ink-soft">{p.noDevicesYet}</p>}
         {devices.map((d) => (
           <DeviceRow key={d.id} device={d} unitLabel={unitName(units, d.unit_id, p.allTrucks, p.truckArchivedSuffix)} />
         ))}
@@ -281,14 +276,14 @@ function DeviceSection({
         <div className="mt-3">
           <button
             onClick={() => setShowRevoked((v) => !v)}
-            className="text-xs font-bold text-neutral-500 underline"
+            className="text-xs font-bold text-panel-ink-soft underline decoration-panel-line hover:text-panel-ink"
           >
             {showRevoked ? p.hideRevoked(revokedDevices.length) : p.showRevoked(revokedDevices.length)}
           </button>
           {showRevoked && (
             <div className="mt-2 space-y-1">
               {revokedDevices.map((d) => (
-                <div key={d.id} className="rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500">
+                <div key={d.id} className="rounded-lg bg-panel-bg px-3 py-2 text-xs text-panel-ink-soft">
                   {d.label}
                 </div>
               ))}
@@ -332,28 +327,28 @@ function DeviceRow({
       })()
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 p-3 first:border-t-0">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-panel-line p-3 first:border-t-0">
       <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-bold">
+        <div className="flex items-center gap-2 text-sm font-bold text-panel-ink">
           {device.label}
-          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-bold text-neutral-500">
+          <span className="rounded-full bg-panel-bg px-2 py-0.5 text-[11px] font-bold text-panel-ink-soft">
             {unitLabel}
           </span>
           <span
             className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-              paired ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+              paired ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
             }`}
           >
             {paired ? p.pairedBadge : p.waitingCodeBadge}
           </span>
         </div>
-        <div className="mt-0.5 text-xs text-neutral-500">
-          {p.connectedSince(sinceLabel)} · <span className="text-neutral-400">{lastSeenText}</span>
+        <div className="mt-0.5 text-xs text-panel-ink-soft">
+          {p.connectedSince(sinceLabel)} · <span className="text-panel-ink/40">{lastSeenText}</span>
         </div>
       </div>
       {confirming ? (
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-500">{p.confirmRevoke}</span>
+          <span className="text-panel-ink-soft">{p.confirmRevoke}</span>
           <button
             disabled={pending}
             onClick={() =>
@@ -362,16 +357,16 @@ function DeviceRow({
                 if (result.ok) setGone(true)
               })
             }
-            className="font-bold text-red-600"
+            className="font-bold text-rose-600"
           >
             {p.yesRevoke}
           </button>
-          <button onClick={() => setConfirming(false)} className="text-neutral-500">
+          <button onClick={() => setConfirming(false)} className="text-panel-ink-soft">
             {t.panel.common.cancel}
           </button>
         </div>
       ) : (
-        <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-neutral-400 hover:text-red-600">
+        <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-panel-ink/35 hover:text-rose-600">
           {p.revoke}
         </button>
       )}

@@ -10,6 +10,9 @@ import { EditTruckModal } from "./trucks/EditTruckModal"
 import { HoursModal } from "./trucks/HoursModal"
 import { OwnAlertsModal } from "./trucks/OwnAlertsModal"
 import { ArchiveTruckModal } from "./trucks/ArchiveTruckModal"
+import { Modal } from "./ui/Modal"
+import { Button } from "./ui/Button"
+import { labelClass, cardSelectClass } from "./ui/tokens"
 
 export function TruckRow({
   unit,
@@ -88,27 +91,29 @@ export function TruckRow({
   }
 
   return (
-    <div className={`rounded-2xl border bg-white p-4 ${isPaused ? "border-amber-300 bg-amber-50/40" : "border-neutral-200"}`}>
+    <div
+      className={`rounded-[20px] border bg-panel-surface p-4 shadow-[0_1px_2px_rgba(23,20,15,0.04)] transition-shadow hover:shadow-[0_8px_24px_-8px_rgba(23,20,15,0.10)] ${isPaused ? "border-amber-300 bg-amber-50/40" : "border-panel-line"}`}
+    >
       <div className="flex items-start gap-3">
-        <div className="h-16 w-16 flex-none overflow-hidden rounded-xl bg-neutral-100">
+        <div className="h-16 w-16 flex-none overflow-hidden rounded-xl bg-panel-bg">
           {unit.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={unit.photo_url} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">{c.noPhoto}</div>
+            <div className="flex h-full w-full items-center justify-center text-[10px] text-panel-ink/35">{c.noPhoto}</div>
           )}
         </div>
 
         <div className="flex-1">
-          <div className="font-bold">
+          <div className="font-bold text-panel-ink">
             {unit.name}
             <span
               className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
                 isPaused
                   ? "bg-amber-100 text-amber-700"
                   : showingClosed
-                    ? "bg-neutral-100 text-neutral-500"
-                    : "bg-green-100 text-green-700"
+                    ? "bg-panel-bg text-panel-ink-soft"
+                    : "bg-emerald-100 text-emerald-700"
               }`}
             >
               {isPaused
@@ -120,7 +125,7 @@ export function TruckRow({
                   : p.openBadge}
             </span>
           </div>
-          {unit.location && <div className="text-xs text-neutral-500">{unit.location}</div>}
+          {unit.location && <div className="text-xs text-panel-ink-soft">{unit.location}</div>}
         </div>
       </div>
 
@@ -142,29 +147,29 @@ export function TruckRow({
         </div>
       )}
 
-      <div className="mt-3 border-t border-neutral-100 text-sm">
-        <div className="flex flex-col gap-0.5 border-b border-neutral-100 py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-          <span className="font-medium text-neutral-500">{p.horarioLabel}</span>
-          <span className="font-semibold sm:text-right">
+      <div className="mt-3 border-t border-panel-line text-sm">
+        <div className="flex flex-col gap-0.5 border-b border-panel-line py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+          <span className="font-medium text-panel-ink-soft">{p.horarioLabel}</span>
+          <span className="font-semibold text-panel-ink sm:text-right">
             {summary.hours ? summary.hours : (summary.days ?? p.closedAllWeek)}
-            {summary.hours && summary.days && <span className="ml-1 font-normal text-neutral-400">· {summary.days}</span>}
+            {summary.hours && summary.days && <span className="ml-1 font-normal text-panel-ink/40">· {summary.days}</span>}
           </span>
         </div>
         <div className="flex flex-col gap-0.5 py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-          <span className="font-medium text-neutral-500">{p.kitchenAlertsLabel}</span>
-          <span className="font-semibold sm:text-right">
+          <span className="font-medium text-panel-ink-soft">{p.kitchenAlertsLabel}</span>
+          <span className="font-semibold text-panel-ink sm:text-right">
             {amber} / {red} {p.minSuffix}{" "}
-            <span className="font-normal text-neutral-400">· {hasOwnAlerts ? p.ownAlertsTag : p.businessAlertsTag}</span>
+            <span className="font-normal text-panel-ink/40">· {hasOwnAlerts ? p.ownAlertsTag : p.businessAlertsTag}</span>
           </span>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-panel-line pt-3">
         {isPaused ? (
           <button
             onClick={doReopen}
             disabled={pending}
-            className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white"
+            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700"
           >
             {p.reopenNow}
           </button>
@@ -172,98 +177,112 @@ export function TruckRow({
           <button
             onClick={openPauseModal}
             disabled={pending}
-            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800"
+            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 transition-colors hover:bg-amber-100"
           >
             {p.pause}
           </button>
         )}
-        <button onClick={() => setShowEdit(true)} className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold">
+        <button
+          onClick={() => setShowEdit(true)}
+          className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
+        >
           {p.editNamePhoto}
         </button>
-        <button onClick={() => setShowHours(true)} className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold">
+        <button
+          onClick={() => setShowHours(true)}
+          className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
+        >
           {p.changeHours}
         </button>
         {hasOwnAlerts ? (
-          <button onClick={removeOwnAlerts} disabled={pending} className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold">
+          <button
+            onClick={removeOwnAlerts}
+            disabled={pending}
+            className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
+          >
             {p.removeOwnAlerts}
           </button>
         ) : (
-          <button onClick={() => setShowOwnAlerts(true)} className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold">
+          <button
+            onClick={() => setShowOwnAlerts(true)}
+            className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
+          >
             {p.setOwnAlerts}
           </button>
         )}
-        <Link href="/panel/qr" className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold underline-offset-2 hover:underline">
+        <Link
+          href="/panel/qr"
+          className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink underline-offset-2 transition-colors hover:border-panel-brand hover:text-panel-brand hover:underline"
+        >
           {p.viewQr}
         </Link>
         <button
           onClick={() => setShowArchive(true)}
-          className="ml-auto text-xs font-semibold text-neutral-400 hover:text-red-600"
+          className="ml-auto text-xs font-semibold text-panel-ink/35 hover:text-rose-600"
         >
           {p.archiveTruck}
         </button>
       </div>
 
       {showPause && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-            <h3 className="mb-1.5 text-xl font-black">{p.pauseModalTitle(unit.name)}</h3>
-            <p className="mb-4 text-sm text-neutral-500">{p.pauseModalExplain}</p>
+        <Modal size="md">
+          <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.pauseModalTitle(unit.name)}</h3>
+          <p className="mb-4 text-sm text-panel-ink-soft">{p.pauseModalExplain}</p>
 
-            <div className="mb-4 rounded-xl bg-neutral-900 p-4 text-white">
-              <div className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-400">{p.pausePreviewLabel}</div>
-              <div className="text-lg font-bold">
-                {pauseDuration.minutes === null
-                  ? p.pausePreviewClosedToday
-                  : p.pausePreviewReturnsAt(
-                      (pausedUntilTime() as Date).toLocaleTimeString(locale, { timeZone: timezone, hour: "numeric", minute: "2-digit" }),
-                    )}
-              </div>
-            </div>
-
-            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.pauseWhyLabel}</label>
-            <div className="mb-4 grid grid-cols-2 gap-2">
-              {PAUSE_REASONS.map((reason) => (
-                <button
-                  key={reason}
-                  type="button"
-                  aria-pressed={pauseReason === reason}
-                  onClick={() => setPauseReason(reason)}
-                  className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${pauseReason === reason ? "border-neutral-900" : "border-neutral-200"}`}
-                >
-                  {reason}
-                </button>
-              ))}
-            </div>
-
-            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.pauseUntilLabel}</label>
-            <div className="mb-5 grid grid-cols-2 gap-2">
-              {PAUSE_DURATIONS.map((dur) => (
-                <button
-                  key={dur.label}
-                  type="button"
-                  aria-pressed={pauseDuration.label === dur.label}
-                  onClick={() => setPauseDuration(dur)}
-                  className={`rounded-lg border-2 p-2.5 text-left text-xs font-bold ${pauseDuration.label === dur.label ? "border-neutral-900" : "border-neutral-200"}`}
-                >
-                  {dur.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowPause(false)} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-                {c.cancel}
-              </button>
-              <button
-                onClick={doPause}
-                disabled={pending}
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-              >
-                {p.pauseConfirm}
-              </button>
+          <div className="mb-4 rounded-xl bg-panel-dark p-4 text-white">
+            <div className="mb-2 text-[11px] font-black uppercase tracking-wide text-white/45">{p.pausePreviewLabel}</div>
+            <div className="text-lg font-bold">
+              {pauseDuration.minutes === null
+                ? p.pausePreviewClosedToday
+                : p.pausePreviewReturnsAt(
+                    (pausedUntilTime() as Date).toLocaleTimeString(locale, { timeZone: timezone, hour: "numeric", minute: "2-digit" }),
+                  )}
             </div>
           </div>
-        </div>
+
+          <label className={labelClass}>{p.pauseWhyLabel}</label>
+          <div className="mb-4 grid grid-cols-2 gap-2">
+            {PAUSE_REASONS.map((reason) => (
+              <button
+                key={reason}
+                type="button"
+                aria-pressed={pauseReason === reason}
+                onClick={() => setPauseReason(reason)}
+                className={`${cardSelectClass(pauseReason === reason)} text-xs font-bold text-panel-ink`}
+              >
+                {reason}
+              </button>
+            ))}
+          </div>
+
+          <label className={labelClass}>{p.pauseUntilLabel}</label>
+          <div className="mb-5 grid grid-cols-2 gap-2">
+            {PAUSE_DURATIONS.map((dur) => (
+              <button
+                key={dur.label}
+                type="button"
+                aria-pressed={pauseDuration.label === dur.label}
+                onClick={() => setPauseDuration(dur)}
+                className={`${cardSelectClass(pauseDuration.label === dur.label)} text-xs font-bold text-panel-ink`}
+              >
+                {dur.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setShowPause(false)} className="px-3 py-2">
+              {c.cancel}
+            </Button>
+            <Button
+              onClick={doPause}
+              disabled={pending}
+              className="bg-amber-600 shadow-[0_1px_2px_rgba(217,119,6,0.25)] hover:bg-amber-700"
+            >
+              {p.pauseConfirm}
+            </Button>
+          </div>
+        </Modal>
       )}
 
       {showEdit && <EditTruckModal unit={unit} onClose={() => setShowEdit(false)} />}
@@ -293,10 +312,10 @@ export function ArchivedTruckRow({ unit }: { unit: OwnerUnitsData["archived"][nu
   if (gone) return null
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+    <div className="flex items-center justify-between rounded-xl border border-panel-line bg-panel-bg p-3">
       <div>
-        <div className="text-sm font-semibold text-neutral-600">{unit.name}</div>
-        <div className="text-xs text-neutral-400">
+        <div className="text-sm font-semibold text-panel-ink-soft">{unit.name}</div>
+        <div className="text-xs text-panel-ink/40">
           {p.archivedOn(unit.archived_at ? new Date(unit.archived_at).toLocaleDateString(locale) : "")}
         </div>
       </div>
@@ -308,7 +327,7 @@ export function ArchivedTruckRow({ unit }: { unit: OwnerUnitsData["archived"][nu
             if (result.ok) setGone(true)
           })
         }
-        className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
+        className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
       >
         {p.reactivate}
       </button>

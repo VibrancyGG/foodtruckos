@@ -15,6 +15,8 @@ import {
 } from "@/lib/units/hours"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { OwnerUnitsData } from "@/lib/units/getOwnerUnits"
+import { Modal } from "../ui/Modal"
+import { Button } from "../ui/Button"
 
 function TimeInput12h({ value, onChange }: { value: string; onChange: (next: string) => void }) {
   const { hour12, minute, period } = to12h(value)
@@ -102,12 +104,11 @@ export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][n
   const summary = summarizeHours(hours, lang)
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-        <h3 className="mb-1.5 text-xl font-black">{p.hoursModalTitle(unit.name)}</h3>
-        <p className="mb-4 text-sm text-neutral-500">{p.hoursModalHint}</p>
+    <Modal size="md" scroll>
+      <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.hoursModalTitle(unit.name)}</h3>
+      <p className="mb-4 text-sm text-panel-ink-soft">{p.hoursModalHint}</p>
 
-        <div className="mb-3 overflow-hidden rounded-xl border border-neutral-200">
+      <div className="mb-3 overflow-hidden rounded-xl border border-panel-line">
           {DAYS.map((d) => {
             const dh = hours[d.key] ?? null
             const closed = dh === null
@@ -142,32 +143,27 @@ export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][n
           })}
         </div>
 
-        <button onClick={applyToAll} className="mb-3 text-xs font-bold text-neutral-600 underline">
-          {p.applyToAllDays}
-        </button>
+      <button onClick={applyToAll} className="mb-3 text-xs font-bold text-panel-brand underline">
+        {p.applyToAllDays}
+      </button>
 
-        <div className="mb-4 rounded-lg bg-neutral-50 p-2.5 text-xs text-neutral-600">
-          {p.wouldBeLabel}{" "}
-          <b className="text-neutral-900">
-            {summary.hours ? `${summary.hours}${summary.days ? ` · ${summary.days}` : ""}` : summary.days ?? p.closedAllWeek}
-          </b>
-        </div>
-
-        {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-            {c.cancel}
-          </button>
-          <button
-            onClick={submit}
-            disabled={pending}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-          >
-            {pending ? c.saving : p.saveSchedule}
-          </button>
-        </div>
+      <div className="mb-4 rounded-lg bg-panel-bg p-2.5 text-xs text-panel-ink-soft">
+        {p.wouldBeLabel}{" "}
+        <b className="text-panel-ink">
+          {summary.hours ? `${summary.hours}${summary.days ? ` · ${summary.days}` : ""}` : summary.days ?? p.closedAllWeek}
+        </b>
       </div>
-    </div>
+
+      {error && <p className="mb-3 text-xs text-rose-600">{error}</p>}
+
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" onClick={onClose} className="px-3 py-2">
+          {c.cancel}
+        </Button>
+        <Button onClick={submit} disabled={pending}>
+          {pending ? c.saving : p.saveSchedule}
+        </Button>
+      </div>
+    </Modal>
   )
 }

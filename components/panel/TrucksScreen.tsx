@@ -7,6 +7,9 @@ import { requestNewTruck } from "@/lib/trucks/requests"
 import { pricePerTruck, monthlyTotal } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { TruckRow, ArchivedTruckRow } from "./TruckRow"
+import { Modal } from "./ui/Modal"
+import { Button } from "./ui/Button"
+import { labelClass } from "./ui/tokens"
 
 export function TrucksScreen({
   initial,
@@ -64,18 +67,22 @@ export function TrucksScreen({
 
   return (
     <div className="space-y-3">
-      <div data-tour="onboarding-trucks-title">
-        <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
-        <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
+      <div data-tour="onboarding-trucks-title" className="panel-animate-in">
+        <h1 className="mb-1 font-[family-name:var(--font-panel-display)] text-2xl font-bold text-panel-ink">{p.title}</h1>
+        <p className="mb-2 text-sm text-panel-ink-soft">{p.subtitle}</p>
       </div>
 
-      <div data-tour="onboarding-trucks-settings" className="rounded-2xl border border-neutral-200 bg-white p-4">
-        <h2 className="text-sm font-bold">{p.sharedSettingsTitle(initial.active.length)}</h2>
-        <p className="mb-3 text-xs text-neutral-500">{p.sharedSettingsHint}</p>
+      <div
+        data-tour="onboarding-trucks-settings"
+        className="panel-animate-in rounded-[20px] border border-panel-line bg-panel-surface p-4 shadow-[0_1px_2px_rgba(23,20,15,0.04)]"
+        style={{ animationDelay: "40ms" }}
+      >
+        <h2 className="text-sm font-bold text-panel-ink">{p.sharedSettingsTitle(initial.active.length)}</h2>
+        <p className="mb-3 text-xs text-panel-ink-soft">{p.sharedSettingsHint}</p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <div className="mb-1.5 text-xs font-bold text-neutral-600">{p.alertThresholdsLabel}</div>
+            <div className="mb-1.5 text-xs font-bold text-panel-ink-soft">{p.alertThresholdsLabel}</div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-black text-amber-700">{p.amberLabel}</span>
               <input
@@ -88,9 +95,9 @@ export function TrucksScreen({
                   saveThresholds(v, Math.max(red, v + 1))
                 }}
                 disabled={pending}
-                className="w-16 rounded-lg border border-neutral-300 px-2 py-1.5 text-center text-sm font-bold"
+                className="w-16 rounded-lg border border-panel-line px-2 py-1.5 text-center text-sm font-bold outline-none focus:border-panel-brand focus:ring-4 focus:ring-panel-brand/10"
               />
-              <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-700">{p.redLabel}</span>
+              <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-black text-rose-700">{p.redLabel}</span>
               <input
                 type="number"
                 min={2}
@@ -101,11 +108,11 @@ export function TrucksScreen({
                   saveThresholds(amber, v)
                 }}
                 disabled={pending}
-                className="w-16 rounded-lg border border-neutral-300 px-2 py-1.5 text-center text-sm font-bold"
+                className="w-16 rounded-lg border border-panel-line px-2 py-1.5 text-center text-sm font-bold outline-none focus:border-panel-brand focus:ring-4 focus:ring-panel-brand/10"
               />
-              <span className="text-xs text-neutral-500">{p.minSuffix}</span>
+              <span className="text-xs text-panel-ink-soft">{p.minSuffix}</span>
             </div>
-            <div className="mt-2.5 rounded-lg bg-neutral-50 p-2.5 text-xs leading-relaxed text-neutral-600">
+            <div className="mt-2.5 rounded-lg bg-panel-bg p-2.5 text-xs leading-relaxed text-panel-ink-soft">
               {initial.avgPrepMinutes !== null
                 ? p.alertTipWithData(initial.avgPrepMinutes, amber, red)
                 : p.alertTipNoData(amber, red)}
@@ -113,98 +120,91 @@ export function TrucksScreen({
           </div>
 
           <div>
-            <div className="text-xs font-bold text-neutral-600">{p.taxTitle}</div>
-            <p className="mb-2 text-xs text-neutral-400">{p.taxHint}</p>
+            <div className="text-xs font-bold text-panel-ink-soft">{p.taxTitle}</div>
+            <p className="mb-2 text-xs text-panel-ink/40">{p.taxHint}</p>
             <div className="grid gap-2">
               <button
                 onClick={() => setTaxIncluded(false)}
                 disabled={pending}
-                className={`rounded-xl border-2 p-3 text-left ${!tax ? "border-neutral-900" : "border-neutral-200"}`}
+                className={`rounded-xl border-2 p-3 text-left transition-colors ${!tax ? "border-panel-brand bg-panel-brand-soft/50" : "border-panel-line hover:border-panel-ink/15"}`}
               >
-                <div className="text-sm font-bold">{p.taxAdd}</div>
-                <div className="text-xs text-neutral-500">{p.taxAddHint}</div>
+                <div className="text-sm font-bold text-panel-ink">{p.taxAdd}</div>
+                <div className="text-xs text-panel-ink-soft">{p.taxAddHint}</div>
               </button>
               <button
                 onClick={() => setTaxIncluded(true)}
                 disabled={pending}
-                className={`rounded-xl border-2 p-3 text-left ${tax ? "border-neutral-900" : "border-neutral-200"}`}
+                className={`rounded-xl border-2 p-3 text-left transition-colors ${tax ? "border-panel-brand bg-panel-brand-soft/50" : "border-panel-line hover:border-panel-ink/15"}`}
               >
-                <div className="text-sm font-bold">{p.taxIncluded}</div>
-                <div className="text-xs text-neutral-500">{p.taxIncludedHint}</div>
+                <div className="text-sm font-bold text-panel-ink">{p.taxIncluded}</div>
+                <div className="text-xs text-panel-ink-soft">{p.taxIncludedHint}</div>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {initial.active.map((u) => (
-        <TruckRow key={u.id} unit={u} businessAmber={amber} businessRed={red} timezone={initial.timezone} />
+      {initial.active.map((u, i) => (
+        <div key={u.id} className="panel-animate-in" style={{ animationDelay: `${80 + i * 30}ms` }}>
+          <TruckRow unit={u} businessAmber={amber} businessRed={red} timezone={initial.timezone} />
+        </div>
       ))}
 
-      <div className="rounded-2xl border border-dashed border-neutral-300 p-4">
+      <div className="panel-animate-in rounded-[20px] border border-dashed border-panel-line p-4">
         {requestedAt ? (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-panel-ink-soft">
             {p.requestPending(new Date(requestedAt).toLocaleDateString(locale))}
           </p>
         ) : (
           <>
-            <p className="mb-2 text-sm text-neutral-500">{p.newTruckNote}</p>
-            <button
-              onClick={() => setShowRequest(true)}
-              className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
-            >
+            <p className="mb-2 text-sm text-panel-ink-soft">{p.newTruckNote}</p>
+            <Button onClick={() => setShowRequest(true)} className="px-3 py-1.5 text-xs">
               {p.requestTruckButton}
-            </button>
+            </Button>
           </>
         )}
       </div>
 
       {showRequest && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-            <h3 className="mb-1.5 text-xl font-black">{p.requestTruckTitle}</h3>
-            <p className="mb-4 text-sm text-neutral-500">{p.requestTruckBody}</p>
+        <Modal size="md">
+          <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{p.requestTruckTitle}</h3>
+          <p className="mb-4 text-sm text-panel-ink-soft">{p.requestTruckBody}</p>
 
-            <div className="mb-4 rounded-xl bg-neutral-900 p-4 text-white">
-              <div className="mb-1 text-[11px] font-black uppercase tracking-wide text-neutral-400">
-                {p.requestTruckPriceLabel}
-              </div>
-              <div className="text-lg font-bold">{p.requestTruckPricePreview(nextTruckCount, nextPrice)}</div>
-              <div className="text-sm text-neutral-300">{p.requestTruckTotalPreview(nextTotal)}</div>
-              <div className="mt-2 border-t border-neutral-700 pt-2 text-xs text-neutral-400">{p.requestTruckBillingNote}</div>
+          <div className="mb-4 rounded-xl bg-panel-dark p-4 text-white">
+            <div className="mb-1 text-[11px] font-black uppercase tracking-wide text-white/45">
+              {p.requestTruckPriceLabel}
             </div>
-
-            <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.requestTruckNoteLabel}</label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={p.requestTruckNotePlaceholder}
-              className="mb-4 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-              rows={2}
-            />
-            {requestError && <p className="mb-3 text-xs text-red-600">{requestError}</p>}
-
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setShowRequest(false)} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-                {p.requestTruckCancel}
-              </button>
-              <button
-                onClick={submitRequest}
-                disabled={requesting}
-                className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-              >
-                {requesting ? t.panel.common.saving : p.requestTruckSubmit}
-              </button>
-            </div>
+            <div className="text-lg font-bold">{p.requestTruckPricePreview(nextTruckCount, nextPrice)}</div>
+            <div className="text-sm text-white/70">{p.requestTruckTotalPreview(nextTotal)}</div>
+            <div className="mt-2 border-t border-white/15 pt-2 text-xs text-white/45">{p.requestTruckBillingNote}</div>
           </div>
-        </div>
+
+          <label className={labelClass}>{p.requestTruckNoteLabel}</label>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={p.requestTruckNotePlaceholder}
+            className="mb-4 w-full rounded-xl border border-panel-line bg-panel-bg/60 px-3.5 py-2.5 text-sm text-panel-ink outline-none transition-colors focus:border-panel-brand focus:bg-panel-surface focus:ring-4 focus:ring-panel-brand/10"
+            rows={2}
+          />
+          {requestError && <p className="mb-3 text-xs text-rose-600">{requestError}</p>}
+
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setShowRequest(false)} className="px-3 py-2">
+              {p.requestTruckCancel}
+            </Button>
+            <Button onClick={submitRequest} disabled={requesting}>
+              {requesting ? t.panel.common.saving : p.requestTruckSubmit}
+            </Button>
+          </div>
+        </Modal>
       )}
 
       {initial.archived.length > 0 && (
         <div>
           <button
             onClick={() => setShowArchived((s) => !s)}
-            className="text-xs font-bold text-neutral-500 underline"
+            className="text-xs font-bold text-panel-ink-soft underline decoration-panel-line hover:text-panel-ink"
           >
             {showArchived ? p.hideArchived : p.showArchived} ({initial.archived.length})
           </button>

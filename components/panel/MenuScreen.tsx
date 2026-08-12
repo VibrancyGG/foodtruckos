@@ -49,18 +49,18 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
 
   return (
     <div className="space-y-6">
-      <div data-tour="onboarding-menu-title">
-        <h1 className="mb-1 text-2xl font-black">{m.title}</h1>
-        <p className="mb-2 text-sm text-neutral-500">{m.subtitle}</p>
+      <div data-tour="onboarding-menu-title" className="panel-animate-in">
+        <h1 className="mb-1 font-[family-name:var(--font-panel-display)] text-2xl font-bold text-panel-ink">{m.title}</h1>
+        <p className="mb-2 text-sm text-panel-ink-soft">{m.subtitle}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5">
+      <div className="panel-animate-in flex flex-wrap items-center gap-2.5" style={{ animationDelay: "40ms" }}>
         {initial.units.length > 1 && (
           <>
-            <div className="flex overflow-hidden rounded-lg border border-neutral-200 bg-white">
+            <div className="flex overflow-hidden rounded-xl border border-panel-line bg-panel-surface">
               <button
                 onClick={() => setFilter("todos")}
-                className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === "todos" ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+                className={`border-r border-panel-line px-3 py-2 text-xs font-bold transition-colors last:border-r-0 ${filter === "todos" ? "bg-panel-brand text-white" : "text-panel-ink-soft hover:bg-panel-bg"}`}
               >
                 {m.allTrucksFilter}
               </button>
@@ -68,26 +68,26 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
                 <button
                   key={u.id}
                   onClick={() => setFilter(u.id)}
-                  className={`border-r border-neutral-200 px-3 py-2 text-xs font-bold last:border-r-0 ${filter === u.id ? "bg-neutral-900 text-white" : "text-neutral-500"}`}
+                  className={`border-r border-panel-line px-3 py-2 text-xs font-bold transition-colors last:border-r-0 ${filter === u.id ? "bg-panel-brand text-white" : "text-panel-ink-soft hover:bg-panel-bg"}`}
                 >
                   {u.name}
                 </button>
               ))}
             </div>
-            <span className="text-xs text-neutral-500">{m.statsLine(visibleProducts.length, outCount, noPhotoCount, scopeName)}</span>
+            <span className="text-xs text-panel-ink-soft">{m.statsLine(visibleProducts.length, outCount, noPhotoCount, scopeName)}</span>
           </>
         )}
         <button
           data-tour="onboarding-add-product"
           onClick={() => setShowAddProduct(true)}
           disabled={initial.categories.length === 0}
-          className="ml-auto rounded-lg bg-neutral-900 px-3 py-2 text-xs font-bold text-white disabled:opacity-40"
+          className="ml-auto rounded-xl bg-panel-brand px-3.5 py-2.5 text-xs font-bold text-white shadow-[0_1px_2px_rgba(226,67,31,0.25)] transition-all duration-150 hover:bg-panel-brand-deep active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
         >
           {m.addProduct}
         </button>
       </div>
 
-      {initial.categories.map((cat) => (
+      {initial.categories.map((cat, i) => (
         <CategorySection
           key={cat.id}
           category={cat}
@@ -99,6 +99,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           options={initial.options}
           filter={filter}
           onEditCategory={() => setEditingCategory(cat)}
+          delay={80 + i * 40}
         />
       ))}
 
@@ -112,16 +113,21 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           optionGroups={initial.optionGroups}
           options={initial.options}
           filter={filter}
+          delay={80 + initial.categories.length * 40}
         />
       )}
 
       {filter !== "todos" && visibleProducts.length === 0 && (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-7 text-center text-sm font-semibold text-neutral-400">
+        <div className="panel-animate-in rounded-[20px] border border-panel-line bg-panel-surface p-7 text-center text-sm font-semibold text-panel-ink-soft">
           {m.noTrucksExclusiveYet}
         </div>
       )}
 
-      <button data-tour="onboarding-add-category" onClick={() => setShowAddCategory(true)} className="text-sm font-bold text-neutral-600">
+      <button
+        data-tour="onboarding-add-category"
+        onClick={() => setShowAddCategory(true)}
+        className="text-sm font-bold text-panel-brand transition-colors hover:text-panel-brand-deep"
+      >
         {m.addCategory}
       </button>
 
@@ -153,6 +159,7 @@ function CategorySection({
   options,
   filter,
   onEditCategory,
+  delay = 0,
 }: {
   category: { id: string; name_es: string; name_en: string }
   products: OwnerMenuData["products"]
@@ -163,6 +170,7 @@ function CategorySection({
   options: OwnerMenuData["options"]
   filter: string
   onEditCategory?: () => void
+  delay?: number
 }) {
   const { lang, t } = useLang()
   const m = t.panel.menuPage
@@ -170,18 +178,21 @@ function CategorySection({
   if (products.length === 0 && filter !== "todos") return null
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-      <div className="flex items-center gap-2.5 border-b border-neutral-100 px-4 py-3">
-        <h2 className="text-sm font-black">{lang === "es" ? category.name_es : category.name_en}</h2>
-        <span className="text-xs font-bold text-neutral-400">{products.length}</span>
+    <section
+      className="panel-animate-in overflow-hidden rounded-[20px] border border-panel-line bg-panel-surface shadow-[0_1px_2px_rgba(23,20,15,0.04)]"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="flex items-center gap-2.5 border-b border-panel-line px-4 py-3">
+        <h2 className="text-sm font-bold text-panel-ink">{lang === "es" ? category.name_es : category.name_en}</h2>
+        <span className="text-xs font-bold text-panel-ink/35">{products.length}</span>
         {onEditCategory && (
-          <button onClick={onEditCategory} className="ml-auto text-xs font-bold text-neutral-400 hover:text-neutral-700">
+          <button onClick={onEditCategory} className="ml-auto text-xs font-bold text-panel-ink-soft hover:text-panel-brand">
             {m.editCategory}
           </button>
         )}
       </div>
       {products.length === 0 ? (
-        <p className="px-4 py-4 text-xs text-neutral-400">{m.noProductsInCategory}</p>
+        <p className="px-4 py-4 text-xs text-panel-ink-soft">{m.noProductsInCategory}</p>
       ) : (
         <div>
           {products.map((p) => (

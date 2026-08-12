@@ -4,6 +4,9 @@ import { useState, useTransition } from "react"
 import { updateUnit, uploadUnitPhoto, removeUnitPhoto } from "@/lib/units/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { OwnerUnitsData } from "@/lib/units/getOwnerUnits"
+import { Modal } from "../ui/Modal"
+import { Button } from "../ui/Button"
+import { inputClass, labelClass } from "../ui/tokens"
 
 export function EditTruckModal({ unit, onClose }: { unit: OwnerUnitsData["active"][number]; onClose: () => void }) {
   const { t } = useLang()
@@ -53,70 +56,64 @@ export function EditTruckModal({ unit, onClose }: { unit: OwnerUnitsData["active
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-        <h3 className="mb-1.5 text-xl font-black">{unit.name}</h3>
-        <p className="mb-4 text-sm text-neutral-500">{p.editTruckHint}</p>
+    <Modal size="md">
+      <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">{unit.name}</h3>
+      <p className="mb-4 text-sm text-panel-ink-soft">{p.editTruckHint}</p>
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.photoLabelTruck}</label>
-        <div className="mb-4 flex items-center gap-3">
-          <div className="h-20 w-20 flex-none overflow-hidden rounded-xl border border-dashed border-neutral-300 bg-neutral-50">
-            {photoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photoUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-center text-[10px] text-neutral-400">{c.noPhoto}</div>
-            )}
-          </div>
-          <div>
-            <label className="mr-2 inline-block cursor-pointer rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold">
-              {photoUrl ? p.changePhoto : p.choosePhoto}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) onPhotoPick(file)
-                }}
-              />
-            </label>
-            {photoUrl && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPhotoFile(null)
-                  setPhotoUrl(null)
-                }}
-                className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-bold"
-              >
-                {p.removePhoto}
-              </button>
-            )}
-            <p className="mt-1.5 text-[11px] leading-snug text-neutral-400">{p.photoHintTruck}</p>
-          </div>
+      <label className={labelClass}>{p.photoLabelTruck}</label>
+      <div className="mb-4 flex items-center gap-3">
+        <div className="h-20 w-20 flex-none overflow-hidden rounded-xl border border-dashed border-panel-line bg-panel-bg">
+          {photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-center text-[10px] text-panel-ink/35">{c.noPhoto}</div>
+          )}
         </div>
-
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.nameQuestion}</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{p.locationQuestion}</label>
-        <input value={location} onChange={(e) => setLocation(e.target.value)} className="mb-4 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
-
-        {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-            {c.cancel}
-          </button>
-          <button
-            onClick={submit}
-            disabled={pending}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-          >
-            {pending ? c.saving : c.save}
-          </button>
+        <div>
+          <label className="mr-2 inline-block cursor-pointer rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold transition-colors hover:border-panel-brand hover:text-panel-brand">
+            {photoUrl ? p.changePhoto : p.choosePhoto}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) onPhotoPick(file)
+              }}
+            />
+          </label>
+          {photoUrl && (
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoFile(null)
+                setPhotoUrl(null)
+              }}
+              className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold transition-colors hover:border-rose-300 hover:text-rose-600"
+            >
+              {p.removePhoto}
+            </button>
+          )}
+          <p className="mt-1.5 text-[11px] leading-snug text-panel-ink/40">{p.photoHintTruck}</p>
         </div>
       </div>
-    </div>
+
+      <label className={labelClass}>{p.nameQuestion}</label>
+      <input value={name} onChange={(e) => setName(e.target.value)} className={`${inputClass} mb-3`} />
+      <label className={labelClass}>{p.locationQuestion}</label>
+      <input value={location} onChange={(e) => setLocation(e.target.value)} className={`${inputClass} mb-4`} />
+
+      {error && <p className="mb-3 text-xs text-rose-600">{error}</p>}
+
+      <div className="flex justify-end gap-2">
+        <Button variant="ghost" onClick={onClose} className="px-3 py-2">
+          {c.cancel}
+        </Button>
+        <Button onClick={submit} disabled={pending}>
+          {pending ? c.saving : c.save}
+        </Button>
+      </div>
+    </Modal>
   )
 }

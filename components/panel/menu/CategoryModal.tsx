@@ -4,6 +4,9 @@ import { useState, useTransition } from "react"
 import { createCategory, updateCategory, deleteCategory } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { TranslateFieldActions } from "../TranslateFieldActions"
+import { Modal } from "../ui/Modal"
+import { Button } from "../ui/Button"
+import { inputClass, labelClass } from "../ui/tokens"
 
 type Props =
   | { mode: "add"; onClose: () => void }
@@ -54,57 +57,53 @@ export function CategoryModal(props: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
-        <h3 className="mb-1.5 text-xl font-black">{props.mode === "edit" ? m.editCategory : m.addCategory}</h3>
-        <p className="mb-4 text-sm text-neutral-500">{m.addCategoryHint}</p>
+    <Modal size="sm">
+      <h3 className="mb-1.5 font-[family-name:var(--font-panel-display)] text-xl font-bold">
+        {props.mode === "edit" ? m.editCategory : m.addCategory}
+      </h3>
+      <p className="mb-4 text-sm text-panel-ink-soft">{m.addCategoryHint}</p>
 
-        <div className="mb-1.5 flex items-center justify-between">
-          <label className="block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
-          <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
-        </div>
-        <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
-        <div className="mb-1.5 flex items-center justify-between">
-          <label className="block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
-          <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
-        </div>
-        <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-4 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
+      <div className="mb-1.5 flex items-center justify-between">
+        <label className={labelClass}>{c.nameEsPlaceholder}</label>
+        <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
+      </div>
+      <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className={`${inputClass} mb-3`} />
+      <div className="mb-1.5 flex items-center justify-between">
+        <label className={labelClass}>{c.nameEnPlaceholder}</label>
+        <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
+      </div>
+      <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className={`${inputClass} mb-4`} />
 
-        {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
+      {error && <p className="mb-3 text-xs text-rose-600">{error}</p>}
 
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            {props.mode === "edit" &&
-              (confirmDelete ? (
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-neutral-500">{m.confirmRemoveCategory}</span>
-                  <button onClick={remove} disabled={pending} className="font-bold text-red-600">
-                    {c.yesRemove}
-                  </button>
-                  <button onClick={() => setConfirmDelete(false)} className="text-neutral-500">
-                    {c.cancel}
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => setConfirmDelete(true)} className="text-xs font-bold text-red-600">
-                  {m.deleteCategory}
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          {props.mode === "edit" &&
+            (confirmDelete ? (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-panel-ink-soft">{m.confirmRemoveCategory}</span>
+                <button onClick={remove} disabled={pending} className="font-bold text-rose-600">
+                  {c.yesRemove}
                 </button>
-              ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={onClose} className="rounded-lg px-3 py-2 text-sm font-bold text-neutral-500">
-              {c.cancel}
-            </button>
-            <button
-              onClick={submit}
-              disabled={pending}
-              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-            >
-              {pending ? c.saving : props.mode === "edit" ? c.save : m.createCategory}
-            </button>
-          </div>
+                <button onClick={() => setConfirmDelete(false)} className="text-panel-ink-soft">
+                  {c.cancel}
+                </button>
+              </div>
+            ) : (
+              <Button variant="danger" onClick={() => setConfirmDelete(true)} className="text-xs">
+                {m.deleteCategory}
+              </Button>
+            ))}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={onClose} className="px-3 py-2">
+            {c.cancel}
+          </Button>
+          <Button onClick={submit} disabled={pending}>
+            {pending ? c.saving : props.mode === "edit" ? c.save : m.createCategory}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

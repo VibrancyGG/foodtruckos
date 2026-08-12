@@ -4,6 +4,20 @@
   --background: #ffffff;
   --foreground: #171717;
   color-scheme: light;
+
+  /* Identidad del panel del dueño — el naranja ya es la marca de FoodTruckOS
+     (login/registro lo usan como #FF5A36); aquí es donde "aparece con
+     fuerza" (foodtruckos-diseno). Nunca se usa en pantallas del comensal. */
+  --panel-bg: #faf9f6;
+  --panel-surface: #ffffff;
+  --panel-ink: #17140f;
+  --panel-ink-soft: #6b645c;
+  --panel-line: #eae6de;
+  --panel-brand: #ff5a36;
+  --panel-brand-deep: #e2431f;
+  --panel-brand-soft: #fff1ec;
+  --panel-dark: #17140f;
+  --panel-dark-soft: #2a251d;
 }
 
 @theme inline {
@@ -11,6 +25,72 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-panel-bg: var(--panel-bg);
+  --color-panel-surface: var(--panel-surface);
+  --color-panel-ink: var(--panel-ink);
+  --color-panel-ink-soft: var(--panel-ink-soft);
+  --color-panel-line: var(--panel-line);
+  --color-panel-brand: var(--panel-brand);
+  --color-panel-brand-deep: var(--panel-brand-deep);
+  --color-panel-brand-soft: var(--panel-brand-soft);
+  --color-panel-dark: var(--panel-dark);
+  --color-panel-dark-soft: var(--panel-dark-soft);
+  --font-panel-display: var(--font-panel-display);
+  --font-panel-body: var(--font-panel-body);
+}
+
+/* ---- Panel del dueño: movimiento con propósito, nunca decorativo ---- */
+
+@keyframes panelFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panelScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes panelBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.panel-animate-in {
+  animation: panelFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.panel-modal-in {
+  animation: panelScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.panel-backdrop-in {
+  animation: panelBackdropIn 0.18s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-animate-in,
+  .panel-modal-in,
+  .panel-backdrop-in {
+    animation: none !important;
+  }
 }
 
 /* Cada pantalla (menú del comensal, panel, cocina) define su propio color

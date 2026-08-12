@@ -60,28 +60,28 @@ export function ProductRow({
   const exclusiveUnitName = exclusiveUnitId ? units.find((u) => u.id === exclusiveUnitId)?.name : null
 
   return (
-    <div className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 border-t border-neutral-100 px-4 py-3 first:border-t-0 ${soldOut ? "opacity-60" : ""}`}>
-      <div className="h-11 w-11 flex-none overflow-hidden rounded-lg bg-neutral-100">
+    <div className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 border-t border-panel-line px-4 py-3 transition-opacity first:border-t-0 ${soldOut ? "opacity-55" : ""}`}>
+      <div className="h-11 w-11 flex-none overflow-hidden rounded-lg bg-panel-bg">
         {product.photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.photo_url} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-center text-[9px] leading-tight text-neutral-400">{m.noPhotoShort}</div>
+          <div className="flex h-full w-full items-center justify-center text-center text-[9px] leading-tight text-panel-ink/35">{m.noPhotoShort}</div>
         )}
       </div>
 
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="truncate font-semibold">{lang === "es" ? product.name_es : product.name_en}</span>
+          <span className="truncate font-semibold text-panel-ink">{lang === "es" ? product.name_es : product.name_en}</span>
           {exclusiveUnitName && (
             <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">{m.exclusivityOnly(exclusiveUnitName)}</span>
           )}
-          {soldOut && <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">{m.soldOut}</span>}
+          {soldOut && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700">{m.soldOut}</span>}
         </div>
-        <div className="truncate text-xs text-neutral-500">{lang === "es" ? product.description_es : product.description_en}</div>
+        <div className="truncate text-xs text-panel-ink-soft">{lang === "es" ? product.description_es : product.description_en}</div>
       </div>
 
-      <div className="text-sm font-bold tabular-nums">${product.price.toFixed(2)}</div>
+      <div className="font-[family-name:var(--font-panel-display)] text-sm font-bold tabular-nums text-panel-ink">${product.price.toFixed(2)}</div>
 
       <div className="flex items-center gap-2">
         <button
@@ -90,11 +90,14 @@ export function ProductRow({
           aria-label={m.soldOut}
           disabled={pending}
           onClick={onToggleSoldOut}
-          className={`inline-flex h-[26px] w-[44px] flex-none shrink-0 items-center rounded-full p-0.5 transition-colors ${soldOut ? "justify-start bg-neutral-300" : "justify-end bg-green-600"}`}
+          className={`inline-flex h-[26px] w-[44px] flex-none shrink-0 items-center rounded-full p-0.5 transition-colors ${soldOut ? "justify-start bg-panel-line" : "justify-end bg-emerald-600"}`}
         >
           <span className="h-5 w-5 flex-none rounded-full bg-white shadow" />
         </button>
-        <button onClick={openEdit} className="rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-bold text-neutral-700">
+        <button
+          onClick={openEdit}
+          className="rounded-lg border border-panel-line px-2.5 py-1 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
+        >
           {t.panel.common.edit}
         </button>
       </div>
