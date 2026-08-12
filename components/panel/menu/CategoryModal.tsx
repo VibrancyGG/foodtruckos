@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { createCategory, updateCategory, deleteCategory } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { TranslateFieldActions } from "../TranslateFieldActions"
 
 type Props =
   | { mode: "add"; onClose: () => void }
@@ -58,15 +59,14 @@ export function CategoryModal(props: Props) {
         <h3 className="mb-1.5 text-xl font-black">{props.mode === "edit" ? m.editCategory : m.addCategory}</h3>
         <p className="mb-4 text-sm text-neutral-500">{m.addCategoryHint}</p>
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
+          <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
+        </div>
         <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
         <div className="mb-1.5 flex items-center justify-between">
           <label className="block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
-          {nameEs.trim() && (
-            <button type="button" onClick={() => setNameEn(nameEs)} className="text-[11px] font-bold text-neutral-400 underline">
-              {c.copyFromSpanish}
-            </button>
-          )}
+          <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
         </div>
         <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-4 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
 

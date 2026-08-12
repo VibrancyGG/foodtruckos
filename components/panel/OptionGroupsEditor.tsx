@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { createOptionGroup, deleteOptionGroup, createOption, updateOption, deleteOption } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { TranslateFieldActions } from "./TranslateFieldActions"
 
 export function OptionGroupsEditor({
   productId,
@@ -60,20 +61,22 @@ export function OptionGroupsEditor({
       ))}
 
       {showAddGroup ? (
-        <div className="space-y-2 rounded-lg border border-neutral-200 bg-white p-2.5">
+        <div className="space-y-1.5 rounded-lg border border-neutral-200 bg-white p-2.5">
           <input
             value={nameEs}
             onChange={(e) => setNameEs(e.target.value)}
             placeholder={c.nameEsPlaceholder}
             className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
           />
+          <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
           <input
             value={nameEn}
             onChange={(e) => setNameEn(e.target.value)}
             placeholder={c.nameEnPlaceholder}
             className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
           />
-          <div className="flex flex-wrap items-center gap-2.5 text-xs text-neutral-600">
+          <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
+          <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs text-neutral-600">
             <label className="flex items-center gap-1">
               <input type="checkbox" checked={required} onChange={(e) => setRequired(e.target.checked)} />
               {m.requiredLabel}
@@ -202,12 +205,14 @@ function OptionGroupRow({
             placeholder={c.nameEsPlaceholder}
             className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
           />
+          <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
           <input
             value={nameEn}
             onChange={(e) => setNameEn(e.target.value)}
             placeholder={c.nameEnPlaceholder}
             className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
           />
+          <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
           <div className="flex items-center gap-2 text-xs">
             <select
               value={kind}
@@ -311,12 +316,14 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
           placeholder={c.nameEsPlaceholder}
           className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
         />
+        <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
         <input
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
           placeholder={c.nameEnPlaceholder}
           className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
         />
+        <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
         <div className="flex items-center gap-2 text-xs">
           <select
             value={kind}

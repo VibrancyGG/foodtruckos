@@ -231,6 +231,8 @@ export type Dictionary = {
       nameEsPlaceholder: string
       nameEnPlaceholder: string
       copyFromSpanish: string
+      suggestTranslation: string
+      translating: string
     }
     menuPage: {
       title: string
@@ -1000,6 +1002,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         nameEsPlaceholder: "Nombre en español",
         nameEnPlaceholder: "Name in English",
         copyFromSpanish: "Usar el mismo texto",
+        suggestTranslation: "Traducir con IA",
+        translating: "Traduciendo…",
       },
       menuPage: {
         title: "Menú",
@@ -1772,6 +1776,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         nameEsPlaceholder: "Nombre en español",
         nameEnPlaceholder: "Name in English",
         copyFromSpanish: "Use the same text",
+        suggestTranslation: "Translate with AI",
+        translating: "Translating…",
       },
       menuPage: {
         title: "Menu",

@@ -11,6 +11,7 @@ import {
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
 import { OptionGroupsEditor } from "../OptionGroupsEditor"
+import { TranslateFieldActions } from "../TranslateFieldActions"
 
 type Unit = { id: string; name: string }
 type Category = { id: string; name_es: string; name_en: string }
@@ -183,19 +184,21 @@ export function ProductModal(props: EditProps | AddProps) {
           </div>
         </div>
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
+          <TranslateFieldActions sourceValue={nameEn} setTarget={setNameEs} direction="en-es" />
+        </div>
         <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
         <div className="mb-1.5 flex items-center justify-between">
           <label className="block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
-          {nameEs.trim() && (
-            <button type="button" onClick={() => setNameEn(nameEs)} className="text-[11px] font-bold text-neutral-400 underline">
-              {c.copyFromSpanish}
-            </button>
-          )}
+          <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
         </div>
         <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
 
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.descriptionEsPlaceholder}</label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-xs font-bold text-neutral-500">{m.descriptionEsPlaceholder}</label>
+          <TranslateFieldActions sourceValue={descEn} setTarget={setDescEs} direction="en-es" />
+        </div>
         <textarea
           ref={descEsRef}
           value={descEs}
@@ -209,11 +212,7 @@ export function ProductModal(props: EditProps | AddProps) {
         />
         <div className="mb-1.5 flex items-center justify-between">
           <label className="block text-xs font-bold text-neutral-500">{m.descriptionEnPlaceholder}</label>
-          {descEs.trim() && (
-            <button type="button" onClick={() => setDescEn(descEs)} className="text-[11px] font-bold text-neutral-400 underline">
-              {c.copyFromSpanish}
-            </button>
-          )}
+          <TranslateFieldActions sourceValue={descEs} setTarget={setDescEn} direction="es-en" allowCopy />
         </div>
         <textarea
           ref={descEnRef}
