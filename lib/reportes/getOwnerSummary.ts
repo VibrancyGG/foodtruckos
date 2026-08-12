@@ -87,6 +87,15 @@ export async function getOwnerSummary(businessId: string) {
     ? await supabase.from("order_items").select("order_id, product_name_snapshot, quantity").in("order_id", orderIds)
     : { data: [] }
 
+  const last30Start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const { data: prepEvents } = await supabase
+    .from("order_status_events")
+    .select("created_at, orders!inner(created_at, business_id)")
+    .eq("to_status", "listo")
+    .eq("orders.business_id", businessId)
+    .gte("created_at", last30Start.toISOString())
+    .limit(500)
+
   // ---- ventas por mes (para hero, año acumulado y la línea 12 meses) ----
   const byMonth = new Map<string, { total: number; count: number }>()
   for (const o of orderList) {
@@ -255,6 +264,69 @@ export async function getOwnerSummary(businessId: string) {
     }
   }
 
+  // ---- insight: hora pico, últimos 30 días, todo el negocio ----
+  // Igual disciplina que arriba: nada se muestra si no hay suficientes
+  // pedidos reales para que un "pico" signifique algo (mínimo 5).
+  let peakHourInsight: { hour: number; count: number } | null = null
+  {
+    const recentOrders = orderList.filter((o) => o.created_at >= last30Start)
+    if (recentOrders.length >= 5) {
+      const byHour = new Map<number, number>()
+      for (const o of recentOrders) {
+        const { minutes } = dateInTimezone(timezone, o.created_at)
+        const hour = Math.floor(minutes / 60)
+        byHour.set(hour, (byHour.get(hour) ?? 0) + 1)
+      }
+      const [hour, count] = [...byHour.entries()].sort((a, b) => b[1] - a[1])[0]
+      peakHourInsight = { hour, count }
+    }
+  }
+
+  // ---- insight: día de la semana más fuerte, últimos 30 días ----
+  let bestDayInsight: { weekday: number; avgTotal: number } | null = null
+  {
+    const recentOrders = orderList.filter((o) => o.created_at >= last30Start)
+    if (recentOrders.length >= 5) {
+      const byWeekday = new Map<number, { total: number; days: Set<string> }>()
+      for (const o of recentOrders) {
+        const parts = new Intl.DateTimeFormat("en-US", { timeZone: timezone, weekday: "short" }).formatToParts(o.created_at)
+        const weekdayName = parts.find((p) => p.type === "weekday")?.value ?? "Sun"
+        const weekdayIndex = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(weekdayName)
+        const calendarKey = new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(o.created_at)
+        const bucket = byWeekday.get(weekdayIndex) ?? { total: 0, days: new Set<string>() }
+        bucket.total += o.total
+        bucket.days.add(calendarKey)
+        byWeekday.set(weekdayIndex, bucket)
+      }
+      const averaged = [...byWeekday.entries()].map(([weekday, b]) => ({ weekday, avgTotal: b.total / b.days.size }))
+      if (averaged.length > 1) {
+        averaged.sort((a, b) => b.avgTotal - a.avgTotal)
+        bestDayInsight = { weekday: averaged[0].weekday, avgTotal: Math.round(averaged[0].avgTotal) }
+      }
+    }
+  }
+
+  // ---- insight: tiempo promedio de preparación, últimos 30 días ----
+  // Mismo criterio que lib/units/getOwnerUnits.ts: descarta atípicos (>60
+  // min, casi siempre un pedido de prueba olvidado) y no muestra nada con
+  // menos de 3 muestras reales.
+  const MAX_REASONABLE_PREP_MINUTES = 60
+  const prepMinutesList = (prepEvents ?? [])
+    .map((e) => {
+      const order = Array.isArray(e.orders) ? e.orders[0] : e.orders
+      if (!order) return null
+      const mins = (new Date(e.created_at).getTime() - new Date(order.created_at).getTime()) / 60000
+      return mins > 0 && mins <= MAX_REASONABLE_PREP_MINUTES ? mins : null
+    })
+    .filter((m): m is number => m !== null)
+  const avgPrepInsight =
+    prepMinutesList.length >= 3
+      ? { avgMinutes: Math.round(prepMinutesList.reduce((s, m) => s + m, 0) / prepMinutesList.length), sampleSize: prepMinutesList.length }
+      : null
+
+  // ---- insight: platillo estrella del mes ----
+  const topProductInsight = topProducts.length > 0 ? topProducts[0] : null
+
   return {
     currentMonth,
     currentYear,
@@ -271,6 +343,10 @@ export async function getOwnerSummary(businessId: string) {
     topProducts,
     activity,
     lateOpenInsight,
+    peakHourInsight,
+    bestDayInsight,
+    avgPrepInsight,
+    topProductInsight,
     pendingInProgress,
     pendingDelivered,
     noShow,

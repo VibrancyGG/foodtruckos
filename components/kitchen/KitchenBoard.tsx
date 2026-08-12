@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
@@ -87,6 +87,18 @@ export function KitchenBoard({
   useWakeLock()
   const [todayCount, setTodayCount] = useState(0)
   const knownOrderIds = useRef<Set<string>>(new Set(initial.orders.map((o) => o.id)))
+
+  // Consecutivo propio del truck, no el folio global del negocio (que puede
+  // saltar de orden en orden si otro truck vende al mismo tiempo). Se arma
+  // con lo que ya se pedía para el badge "N pedidos hoy" (entregados) más el
+  // lugar de cada pedido activo en la fila de este truck — sin consulta
+  // nueva, y siempre en vivo porque se recalcula con cada cambio de estado.
+  const queuePosition = useMemo(() => {
+    const activeSorted = [...orders].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    const map = new Map<string, number>()
+    activeSorted.forEach((o, i) => map.set(o.id, todayCount + i + 1))
+    return map
+  }, [orders, todayCount])
 
   const fetchTodayCount = useCallback(async () => {
     const supabase = createClient()
@@ -349,10 +361,15 @@ export function KitchenBoard({
                       className="rounded-[10px] border p-3.5 pb-4"
                       style={{ background: "#1B1917", borderColor: "#332F29", borderLeftWidth: 6, borderLeftColor: LEVEL_COLOR[lv] }}
                     >
-                      <div className="mb-2.5 flex items-center gap-2.5">
+                      <div className="mb-1 flex items-baseline gap-2.5">
                         <span className="text-[31px] font-black leading-none tracking-tight tabular-nums">#{o.folio}</span>
                         <span className="text-[19px] font-extrabold leading-none tabular-nums" style={{ color: AGE_TEXT_COLOR[lv] }}>
                           {ageLabel(o)}
+                        </span>
+                      </div>
+                      <div className="mb-2.5 flex items-center gap-2.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "#9C948A" }}>
+                          {t.kitchen.queuePosition(queuePosition.get(o.id) ?? 0)}
                         </span>
                         {!readOnly && HAS_BACK[col] && (
                           <button

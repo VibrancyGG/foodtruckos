@@ -55,6 +55,7 @@ export type Dictionary = {
     bellDenied: string
   }
   kitchen: {
+    queuePosition: (n: number) => string
     newColumn: string
     prepColumn: string
     readyColumn: string
@@ -602,6 +603,13 @@ export type Dictionary = {
       salesActivityDisclaimer: string
       lateOpenInsightTitle: (unitName: string, minutes: number) => string
       lateOpenInsightBody: (amount: string) => string
+      highlightsTitle: string
+      highlightsHint: string
+      noHighlightsYet: string
+      peakHourHighlight: (range: string, count: number) => string
+      bestDayHighlight: (dayName: string, amount: string) => string
+      avgPrepHighlight: (minutes: number) => string
+      topProductHighlight: (name: string, qty: number) => string
       noSalesToGraph: string
       noActiveTrucks: string
       noSalesThisMonth: string
@@ -831,6 +839,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       bellDenied: "No diste permiso de notificación — igual te avisamos con este sonido si dejas la pantalla abierta.",
     },
     kitchen: {
+      queuePosition: (n) => `#${n} en la fila de este truck`,
       newColumn: "Nuevas",
       prepColumn: "Preparando",
       readyColumn: "Listas",
@@ -1386,6 +1395,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         salesActivityDisclaimer: "Esto mide a qué hora entran los pedidos, comparado con tu horario publicado en Trucks. No registra entradas ni salidas de personal, y no sirve para calcular pagos.",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} empieza a vender ${minutes} minutos tarde`,
         lateOpenInsightBody: (amount) => `Al ritmo de venta de esa unidad, esa franja ronda los ${amount} al mes — es una estimación a partir de su venta por hora, no un dato exacto.`,
+        highlightsTitle: "Puntos clave",
+        highlightsHint: "De los últimos 30 días, para ayudarte a decidir.",
+        noHighlightsYet: "Todavía no hay suficientes pedidos para mostrar puntos clave.",
+        peakHourHighlight: (range, count) => `Tu hora con más ventas es de ${range}, con ${count} pedido${count === 1 ? "" : "s"} en los últimos 30 días.`,
+        bestDayHighlight: (dayName, amount) => `${dayName} es tu día más fuerte: ${amount} en venta promedio.`,
+        avgPrepHighlight: (minutes) => `En promedio, un pedido tarda ${minutes} min en estar listo desde que se recibe.`,
+        topProductHighlight: (name, qty) => `Tu platillo más vendido este mes es ${name}, con ${qty} vendidos.`,
         noSalesToGraph: "Todavía no hay ventas registradas para graficar.",
         noActiveTrucks: "Todavía no hay trucks activos.",
         noSalesThisMonth: "Todavía no hay ventas este mes.",
@@ -1613,6 +1629,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       bellDenied: "You didn't allow notifications — we'll still play this sound if you leave the screen open.",
     },
     kitchen: {
+      queuePosition: (n) => `#${n} in this truck's line`,
       newColumn: "New",
       prepColumn: "Cooking",
       readyColumn: "Ready",
@@ -2167,6 +2184,13 @@ export const dictionary: Record<Lang, Dictionary> = {
         salesActivityDisclaimer: "This measures what time orders come in, compared to the hours you published in Trucks. It doesn't log staff clock-ins or clock-outs, and it's not used to calculate pay.",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} starts selling ${minutes} minutes late`,
         lateOpenInsightBody: (amount) => `At that unit's sales pace, that gap runs about ${amount} a month — an estimate from its hourly sales rate, not an exact figure.`,
+        highlightsTitle: "Key highlights",
+        highlightsHint: "From the last 30 days, to help you decide.",
+        noHighlightsYet: "Not enough orders yet to show highlights.",
+        peakHourHighlight: (range, count) => `Your busiest hour is ${range}, with ${count} order${count === 1 ? "" : "s"} in the last 30 days.`,
+        bestDayHighlight: (dayName, amount) => `${dayName} is your strongest day: ${amount} in average sales.`,
+        avgPrepHighlight: (minutes) => `On average, an order is ready ${minutes} min after it's received.`,
+        topProductHighlight: (name, qty) => `Your best-selling item this month is ${name}, with ${qty} sold.`,
         noSalesToGraph: "No sales recorded yet to graph.",
         noActiveTrucks: "No active trucks yet.",
         noSalesThisMonth: "No sales yet this month.",

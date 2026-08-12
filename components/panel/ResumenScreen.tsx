@@ -3,11 +3,26 @@
 import type { OwnerSummary } from "@/lib/reportes/getOwnerSummary"
 import { money, pctDelta, fmtDelta, monthName } from "@/lib/reportes/format"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { formatClock } from "@/lib/units/hours"
 import { MonthlyLineChart } from "./reportes/MonthlyLineChart"
 import { TruckBarChart } from "./reportes/TruckBarChart"
 import { ChannelDonut } from "./reportes/ChannelDonut"
 import { TopProductsChart } from "./reportes/TopProductsChart"
 import { ActivityRow } from "./reportes/ActivityRow"
+
+const WEEKDAY_LABEL: Record<"es" | "en", string[]> = {
+  es: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+}
+
+function Highlight({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2 text-xs leading-relaxed text-neutral-700">
+      <span className="mt-1 h-1.5 w-1.5 flex-none rounded-full bg-blue-500" />
+      <span>{children}</span>
+    </li>
+  )
+}
 
 function Delta({ current, previous, label, noDataLabel }: { current: number; previous: number | null; label: string; noDataLabel: string }) {
   const delta = previous !== null ? pctDelta(current, previous) : null
@@ -111,6 +126,34 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
           <p className="mt-1 text-xs leading-relaxed text-neutral-500">{p.noShowHint}</p>
         </div>
       </div>
+
+      {(() => {
+        const highlights: React.ReactNode[] = []
+        if (data.topProductInsight) {
+          highlights.push(
+            <Highlight key="top">{p.topProductHighlight(data.topProductInsight.name, data.topProductInsight.quantity)}</Highlight>,
+          )
+        }
+        if (data.peakHourInsight) {
+          const h = data.peakHourInsight.hour
+          const range = `${formatClock(`${String(h).padStart(2, "0")}:00`)} – ${formatClock(`${String((h + 1) % 24).padStart(2, "0")}:00`)}`
+          highlights.push(<Highlight key="peak">{p.peakHourHighlight(range, data.peakHourInsight.count)}</Highlight>)
+        }
+        if (data.bestDayInsight) {
+          const dayName = WEEKDAY_LABEL[lang][data.bestDayInsight.weekday]
+          highlights.push(<Highlight key="day">{p.bestDayHighlight(dayName, money(data.bestDayInsight.avgTotal))}</Highlight>)
+        }
+        if (data.avgPrepInsight) {
+          highlights.push(<Highlight key="prep">{p.avgPrepHighlight(data.avgPrepInsight.avgMinutes)}</Highlight>)
+        }
+        return (
+          <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-5">
+            <div className="mb-1 text-xs font-bold uppercase tracking-wide text-blue-900">{p.highlightsTitle}</div>
+            <p className="mb-3 text-xs text-neutral-500">{p.highlightsHint}</p>
+            {highlights.length > 0 ? <ul className="space-y-2">{highlights}</ul> : <p className="text-xs text-neutral-400">{p.noHighlightsYet}</p>}
+          </div>
+        )
+      })()}
 
       <div className="rounded-2xl border border-neutral-200 bg-white p-5">
         <div className="mb-1 text-xs font-bold uppercase tracking-wide text-neutral-500">{p.monthlySales}</div>
