@@ -190,6 +190,40 @@ export type Dictionary = {
       impersonatingBanner: (businessName: string) => string
       exitImpersonation: string
     }
+    onboarding: {
+      next: string
+      back: string
+      skip: string
+      finish: string
+      stepOf: (current: number, total: number) => string
+      restartButton: string
+      welcomeTitle: string
+      welcomeBody: string
+      resumenTitle: string
+      resumenBody: string
+      menuTitle: string
+      menuBody: string
+      menuCategoryTitle: string
+      menuCategoryBody: string
+      menuProductTitle: string
+      menuProductBody: string
+      trucksTitle: string
+      trucksBody: string
+      trucksCreateTitle: string
+      trucksCreateBody: string
+      marcaTitle: string
+      marcaBody: string
+      personalTitle: string
+      personalBody: string
+      personalDeviceTitle: string
+      personalDeviceBody: string
+      qrTitle: string
+      qrBody: string
+      cuentaTitle: string
+      cuentaBody: string
+      doneTitle: string
+      doneBody: string
+    }
     truckApprovalBanner: {
       title: string
       body: (unitName: string) => string
@@ -975,6 +1009,40 @@ export const dictionary: Record<Lang, Dictionary> = {
         logout: "Cerrar sesión",
         impersonatingBanner: (businessName) => `Estás viendo el panel de ${businessName} como administrador`,
         exitImpersonation: "Salir",
+      },
+      onboarding: {
+        next: "Siguiente",
+        back: "Atrás",
+        skip: "Saltar el tour",
+        finish: "Terminar",
+        stepOf: (current, total) => `Paso ${current} de ${total}`,
+        restartButton: "Ver el tutorial de nuevo",
+        welcomeTitle: "¡Bienvenido a FoodTruckOS!",
+        welcomeBody: "Te mostramos rápido qué puedes hacer en cada pantalla. Toma menos de dos minutos, y puedes saltarlo cuando quieras.",
+        resumenTitle: "Resumen",
+        resumenBody: "Aquí ves cómo va tu negocio: cuánto vendiste este mes, qué se vende más, y cómo se comparan tus trucks entre sí.",
+        menuTitle: "Menú",
+        menuBody: "Aquí armas lo que vendes: primero creas categorías (como \"Bebidas\" o \"Postres\"), y dentro de cada una agregas tus platillos.",
+        menuCategoryTitle: "Crea tu primera categoría",
+        menuCategoryBody: "Usa este botón para crear una categoría. Puedes editarla o eliminarla después, si no tiene platillos dentro.",
+        menuProductTitle: "Agrega un platillo",
+        menuProductBody: "Con este botón agregas un platillo: nombre, precio y foto. Si quieres que el cliente pueda pedirlo \"sin cebolla\" o \"con extra queso\", eso se configura después, al editar el platillo, en la sección de Personalización.",
+        trucksTitle: "Trucks",
+        trucksBody: "Aquí configuras cada camión: su nombre, foto y horario. El horario es lo que decide si tu menú aparece abierto o cerrado para el cliente.",
+        trucksCreateTitle: "Configura tu primer truck",
+        trucksCreateBody: "Nombre, foto y horario son lo único obligatorio. Los tiempos de aviso en cocina puedes dejarlos como están — son solo para avisarte si un pedido se está tardando. Cuando quieras, puedes agregar más trucks desde aquí abajo.",
+        marcaTitle: "Marca",
+        marcaBody: "Aquí le das la imagen a tu menú: sube tu logo, elige tu color, y el resto del estilo — así es como tus clientes te van a reconocer.",
+        personalTitle: "Personal",
+        personalBody: "Aquí das de alta a cada persona de tu equipo. Le pones su nombre y su rol, y el sistema le genera un PIN de 4 dígitos para entrar a cocina.",
+        personalDeviceTitle: "Conecta el aparato de cada persona",
+        personalDeviceBody: "Después de crear a la persona, usa este botón para asociar el celular o tablet donde va a trabajar — así cada aparato entra solo con su PIN correspondiente.",
+        qrTitle: "Códigos QR",
+        qrBody: "Aquí descargas o imprimes el código QR de cada truck. Tus clientes lo escanean para ver el menú y ordenar desde su celular, sin necesitar ninguna cuenta.",
+        cuentaTitle: "Cuenta",
+        cuentaBody: "Aquí ves tu plan, cuántos trucks tienes activos, y cómo entraste a tu cuenta. Si quieres volver a ver este tutorial, el botón está aquí abajo.",
+        doneTitle: "¡Listo!",
+        doneBody: "Ya conoces todo el panel. Puedes empezar por Menú creando tu primera categoría, o ir directo a Trucks a configurar tu horario.",
       },
       truckApprovalBanner: {
         title: "¡Tu truck nuevo ya está aprobado!",
@@ -1764,6 +1832,40 @@ export const dictionary: Record<Lang, Dictionary> = {
         logout: "Log out",
         impersonatingBanner: (businessName) => `You're viewing ${businessName}'s panel as an admin`,
         exitImpersonation: "Exit",
+      },
+      onboarding: {
+        next: "Next",
+        back: "Back",
+        skip: "Skip tour",
+        finish: "Finish",
+        stepOf: (current, total) => `Step ${current} of ${total}`,
+        restartButton: "Watch the tutorial again",
+        welcomeTitle: "Welcome to FoodTruckOS!",
+        welcomeBody: "We'll show you quickly what you can do on each screen. It takes less than two minutes, and you can skip it anytime.",
+        resumenTitle: "Summary",
+        resumenBody: "This is where you see how your business is doing: how much you sold this month, what's selling best, and how your trucks compare.",
+        menuTitle: "Menu",
+        menuBody: "This is where you build what you sell: first you create categories (like \"Drinks\" or \"Desserts\"), then add your items inside each one.",
+        menuCategoryTitle: "Create your first category",
+        menuCategoryBody: "Use this button to create a category. You can edit or delete it later, as long as it has no items in it.",
+        menuProductTitle: "Add an item",
+        menuProductBody: "This button adds an item: name, price, and photo. If you want customers to order it \"no onion\" or \"extra cheese,\" that's set up afterward, when editing the item, in the Customization section.",
+        trucksTitle: "Trucks",
+        trucksBody: "This is where you configure each truck: its name, photo, and hours. The hours decide whether your menu shows as open or closed to customers.",
+        trucksCreateTitle: "Set up your first truck",
+        trucksCreateBody: "Name, photo, and hours are the only required fields. You can leave the kitchen alert timers as they are — they just warn you if an order is taking too long. You can add more trucks anytime from down here.",
+        marcaTitle: "Brand",
+        marcaBody: "This is where you give your menu its look: upload your logo, pick your color, and the rest of the style — this is how customers will recognize you.",
+        personalTitle: "Staff",
+        personalBody: "This is where you add each person on your team. Enter their name and role, and the system generates a 4-digit PIN for them to get into the kitchen screen.",
+        personalDeviceTitle: "Connect each person's device",
+        personalDeviceBody: "After creating a person, use this button to link the phone or tablet they'll work from — that way each device only unlocks with its matching PIN.",
+        qrTitle: "QR codes",
+        qrBody: "This is where you download or print each truck's QR code. Customers scan it to see the menu and order from their phone, no account needed.",
+        cuentaTitle: "Account",
+        cuentaBody: "This is where you see your plan, how many trucks you have active, and how you signed in. If you want to watch this tutorial again, the button is right here.",
+        doneTitle: "All set!",
+        doneBody: "You now know your way around the panel. You can start in Menu by creating your first category, or head straight to Trucks to set your hours.",
       },
       truckApprovalBanner: {
         title: "Your new truck is approved!",

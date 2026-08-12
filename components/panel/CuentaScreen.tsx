@@ -6,6 +6,7 @@ import { requestCancellation } from "@/lib/billing/actions"
 import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
 import { pricePerTruck } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { useOnboarding } from "./onboarding/OnboardingProvider"
 
 export function CuentaScreen({
   billing,
@@ -18,6 +19,7 @@ export function CuentaScreen({
 }) {
   const { t } = useLang()
   const p = t.panel.cuentaPage
+  const { restart: restartOnboarding } = useOnboarding()
   const STATUS_LABEL: Record<string, string> = {
     trial: p.statusTrial,
     active: p.statusActive,
@@ -135,6 +137,13 @@ export function CuentaScreen({
             <span className="font-semibold">{signInMethod === "google" ? p.signInGoogle : p.signInPassword}</span>
           </div>
         </div>
+        <button
+          data-tour="onboarding-restart"
+          onClick={restartOnboarding}
+          className="mt-4 text-xs font-bold text-neutral-500 underline"
+        >
+          {t.panel.onboarding.restartButton}
+        </button>
       </div>
 
       <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-5">

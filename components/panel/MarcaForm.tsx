@@ -75,7 +75,7 @@ export function MarcaForm({
           <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
         </div>
 
-        <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <section data-tour="onboarding-marca-logo" className="rounded-2xl border border-neutral-200 bg-white p-5">
           <span className="text-[11px] font-black tracking-wide text-neutral-400">{p.step1}</span>
           <h2 className="mb-1 font-bold">{p.uploadLogoTitle}</h2>
           <p className="mb-4 text-sm text-neutral-500">{p.uploadLogoHint}</p>

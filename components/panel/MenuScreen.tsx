@@ -49,7 +49,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div data-tour="onboarding-menu-title">
         <h1 className="mb-1 text-2xl font-black">{m.title}</h1>
         <p className="mb-2 text-sm text-neutral-500">{m.subtitle}</p>
       </div>
@@ -78,6 +78,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           </>
         )}
         <button
+          data-tour="onboarding-add-product"
           onClick={() => setShowAddProduct(true)}
           disabled={initial.categories.length === 0}
           className="ml-auto rounded-lg bg-neutral-900 px-3 py-2 text-xs font-bold text-white disabled:opacity-40"
@@ -120,7 +121,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
         </div>
       )}
 
-      <button onClick={() => setShowAddCategory(true)} className="text-sm font-bold text-neutral-600">
+      <button data-tour="onboarding-add-category" onClick={() => setShowAddCategory(true)} className="text-sm font-bold text-neutral-600">
         {m.addCategory}
       </button>
 

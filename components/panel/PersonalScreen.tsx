@@ -59,6 +59,7 @@ function StaffSection({
       <div className="mb-1 flex items-center justify-between">
         <h2 className="text-lg font-bold">{p.staffTitle}</h2>
         <button
+          data-tour="onboarding-add-person"
           onClick={() => setShowAdd(true)}
           className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
         >
@@ -259,6 +260,7 @@ function DeviceSection({
         <h2 className="text-lg font-bold">{p.devicesTitle}</h2>
         {assignableUnits.length > 0 && (
           <button
+            data-tour="onboarding-add-device"
             onClick={() => setShowAdd(true)}
             className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-bold text-white"
           >

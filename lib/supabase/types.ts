@@ -235,6 +235,7 @@ export type Database = {
           logo_url: string | null
           menu_style: string
           name: string
+          onboarding_completed_at: string | null
           slug: string
           subscription_status: string
           tax_included: boolean
@@ -253,6 +254,7 @@ export type Database = {
           logo_url?: string | null
           menu_style?: string
           name: string
+          onboarding_completed_at?: string | null
           slug: string
           subscription_status?: string
           tax_included?: boolean
@@ -271,6 +273,7 @@ export type Database = {
           logo_url?: string | null
           menu_style?: string
           name?: string
+          onboarding_completed_at?: string | null
           slug?: string
           subscription_status?: string
           tax_included?: boolean

@@ -44,7 +44,7 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
 
   return (
     <div className="space-y-4">
-      <div>
+      <div data-tour="onboarding-resumen-title">
         <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
         <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
       </div>

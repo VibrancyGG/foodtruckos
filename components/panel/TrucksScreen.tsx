@@ -64,12 +64,12 @@ export function TrucksScreen({
 
   return (
     <div className="space-y-3">
-      <div>
+      <div data-tour="onboarding-trucks-title">
         <h1 className="mb-1 text-2xl font-black">{p.title}</h1>
         <p className="mb-2 text-sm text-neutral-500">{p.subtitle}</p>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-4">
+      <div data-tour="onboarding-trucks-settings" className="rounded-2xl border border-neutral-200 bg-white p-4">
         <h2 className="text-sm font-bold">{p.sharedSettingsTitle(initial.active.length)}</h2>
         <p className="mb-3 text-xs text-neutral-500">{p.sharedSettingsHint}</p>
 
