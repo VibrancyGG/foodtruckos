@@ -9,6 +9,7 @@ import { ProductModal } from "./menu/ProductModal"
 export function ProductRow({
   product,
   units,
+  categories,
   unitProducts,
   optionGroups,
   options,
@@ -16,6 +17,7 @@ export function ProductRow({
 }: {
   product: OwnerMenuData["products"][number]
   units: OwnerMenuData["units"]
+  categories: OwnerMenuData["categories"]
   unitProducts: OwnerMenuData["unitProducts"]
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
@@ -102,6 +104,7 @@ export function ProductRow({
           mode="edit"
           product={product}
           units={units}
+          categories={categories}
           currentExclusiveUnitId={exclusiveUnitId}
           optionGroups={optionGroups.filter((g) => g.product_id === product.id)}
           options={options}

@@ -92,6 +92,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           category={cat}
           products={(productsByCategory.get(cat.id) ?? []).filter((p) => visible(p.id))}
           units={initial.units}
+          categories={initial.categories}
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
           options={initial.options}
@@ -105,6 +106,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           category={{ id: "sin-categoria", name_es: m.noCategory, name_en: m.noCategory }}
           products={(productsByCategory.get("sin-categoria") ?? []).filter((p) => visible(p.id))}
           units={initial.units}
+          categories={initial.categories}
           unitProducts={initial.unitProducts}
           optionGroups={initial.optionGroups}
           options={initial.options}
@@ -144,6 +146,7 @@ function CategorySection({
   category,
   products,
   units,
+  categories,
   unitProducts,
   optionGroups,
   options,
@@ -153,6 +156,7 @@ function CategorySection({
   category: { id: string; name_es: string; name_en: string }
   products: OwnerMenuData["products"]
   units: OwnerMenuData["units"]
+  categories: OwnerMenuData["categories"]
   unitProducts: OwnerMenuData["unitProducts"]
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
@@ -184,6 +188,7 @@ function CategorySection({
               key={p.id}
               product={p}
               units={units}
+              categories={categories}
               unitProducts={unitProducts}
               optionGroups={optionGroups}
               options={options}

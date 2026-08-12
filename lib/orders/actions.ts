@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 
 const TAX_RATE = 0.08625 // Norman, Oklahoma — mover a configuración por negocio cuando haya más de un estado.
 
@@ -26,6 +27,31 @@ export async function createOrder(input: {
   }
 
   const supabase = await createClient()
+
+  // Nunca se confía en que la pantalla del comensal esté al día — pudo cargar
+  // el menú minutos antes de que el truck cerrara o se pausara. El servidor
+  // vuelve a comprobar horario/pausa/suspensión justo antes de insertar,
+  // igual que ya recalcula el precio en vez de confiar en lo que mandó el
+  // navegador.
+  const [{ data: unit }, { data: business }] = await Promise.all([
+    supabase.from("units").select("status, hours, paused_until").eq("id", input.unitId).single(),
+    supabase.from("businesses").select("timezone, subscription_status").eq("id", input.businessId).single(),
+  ])
+
+  if (!unit || !business) {
+    return { error: "No pudimos verificar el estado del truck. Intenta de nuevo." }
+  }
+  if (business.subscription_status === "suspended" || unit.status === "archived") {
+    return { error: "Este truck no está disponible en este momento" }
+  }
+  if (unit.status === "paused") {
+    const stillPaused = !unit.paused_until || new Date(unit.paused_until) > new Date()
+    if (stillPaused) return { error: "Este truck está en pausa ahora mismo" }
+  }
+  const openStatus = isOpenNow(parseWeeklyHours(unit.hours), business.timezone)
+  if (!openStatus.open) {
+    return { error: "Este truck está cerrado ahora mismo — vuelve dentro de su horario" }
+  }
 
   // El precio de línea se recalcula aquí, del lado del servidor, a partir de lo
   // que el cliente mandó como personalización — nunca se confía en un total

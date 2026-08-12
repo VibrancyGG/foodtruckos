@@ -91,14 +91,19 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     return map
   }, [data.unitProducts])
 
+  // Un grupo sin ninguna opción todavía (el dueño lo creó pero no le ha
+  // agregado nada) no cuenta como personalización real — mostrarlo confunde
+  // al comensal con un encabezado vacío y nada que elegir debajo.
   const groupsByProduct = useMemo(() => {
+    const groupsWithOptions = new Set(data.options.map((o) => o.group_id))
     const map = new Map<string, typeof data.optionGroups>()
     for (const g of data.optionGroups) {
+      if (!groupsWithOptions.has(g.id)) continue
       if (!map.has(g.product_id)) map.set(g.product_id, [])
       map.get(g.product_id)!.push(g)
     }
     return map
-  }, [data.optionGroups])
+  }, [data.optionGroups, data.options])
 
   const productsByCategory = useMemo(() => {
     const groups = new Map<string | null, typeof data.products>()

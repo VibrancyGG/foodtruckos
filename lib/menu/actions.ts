@@ -13,11 +13,13 @@ export async function updateProduct(input: {
   descriptionEs: string
   descriptionEn: string
   price: number
+  categoryId: string
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
   if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
   if (!(input.price > 0)) return { ok: false, error: "El precio debe ser mayor a cero" }
+  if (!input.categoryId) return { ok: false, error: "Elige una categoría" }
 
   const supabase = await createClient()
 
@@ -39,6 +41,7 @@ export async function updateProduct(input: {
       description_es: input.descriptionEs.trim() || null,
       description_en: input.descriptionEn.trim() || null,
       price: input.price,
+      category_id: input.categoryId,
     })
     .eq("id", input.productId)
     .eq("business_id", businessId)
@@ -242,11 +245,15 @@ export async function deleteCategory(categoryId: string): Promise<Result> {
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
 
   const supabase = await createClient()
+  // Solo cuenta platillos activos — uno retirado ya no aparece en el Menú del
+  // dueño (getOwnerMenu.ts filtra por status="active"), así que contarlo aquí
+  // bloqueaba borrar una categoría que en pantalla se ve vacía.
   const { count } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })
     .eq("category_id", categoryId)
     .eq("business_id", businessId)
+    .eq("status", "active")
 
   if (count && count > 0) return { ok: false, error: "Esta categoría tiene platillos — muévelos antes de eliminarla" }
 
@@ -363,6 +370,7 @@ export async function createOptionGroup(input: {
   productId: string
   nameEs: string
   nameEn: string
+  kind: "add" | "remove"
   required: boolean
   minSelect: number
   maxSelect: number
@@ -382,6 +390,7 @@ export async function createOptionGroup(input: {
     product_id: input.productId,
     group_name_es: input.nameEs,
     group_name_en: input.nameEn,
+    kind: input.kind,
     required: input.required,
     min_select: input.minSelect,
     max_select: input.maxSelect,
@@ -409,18 +418,28 @@ export async function deleteOptionGroup(groupId: string): Promise<Result> {
   return { ok: true }
 }
 
+// El kind de la opción siempre lo hereda del grupo — nunca lo decide el
+// cliente — así un grupo de "quitar" no puede terminar con una opción que
+// cobra, ni uno de "agregar" con una que aparece como "quitar".
 export async function createOption(input: {
   groupId: string
   nameEs: string
   nameEn: string
   priceDelta: number
-  kind: "add" | "remove"
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
   if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
 
   const supabase = await createClient()
+  const { data: group } = await supabase
+    .from("product_option_groups")
+    .select("kind")
+    .eq("id", input.groupId)
+    .eq("business_id", businessId)
+    .maybeSingle()
+  if (!group) return { ok: false, error: "No se encontró el grupo" }
+
   const { count } = await supabase
     .from("product_options")
     .select("id", { count: "exact", head: true })
@@ -431,8 +450,8 @@ export async function createOption(input: {
     group_id: input.groupId,
     option_name_es: input.nameEs,
     option_name_en: input.nameEn,
-    price_delta: input.kind === "remove" ? 0 : input.priceDelta,
-    kind: input.kind,
+    price_delta: group.kind === "remove" ? 0 : input.priceDelta,
+    kind: group.kind,
     sort_order: count ?? 0,
   })
 
@@ -446,20 +465,28 @@ export async function updateOption(input: {
   nameEs: string
   nameEn: string
   priceDelta: number
-  kind: "add" | "remove"
 }): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
   if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
 
   const supabase = await createClient()
+  const { data: existing } = await supabase
+    .from("product_options")
+    .select("group_id, product_option_groups!inner(kind)")
+    .eq("id", input.optionId)
+    .eq("business_id", businessId)
+    .maybeSingle()
+  if (!existing) return { ok: false, error: "No se encontró la opción" }
+  const groupKind = (existing.product_option_groups as unknown as { kind: "add" | "remove" }).kind
+
   const { error } = await supabase
     .from("product_options")
     .update({
       option_name_es: input.nameEs,
       option_name_en: input.nameEn,
-      price_delta: input.kind === "remove" ? 0 : input.priceDelta,
-      kind: input.kind,
+      price_delta: groupKind === "remove" ? 0 : input.priceDelta,
+      kind: groupKind,
     })
     .eq("id", input.optionId)
     .eq("business_id", businessId)

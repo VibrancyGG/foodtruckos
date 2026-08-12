@@ -252,6 +252,8 @@ export type Dictionary = {
       confirmRemove: string
       removeFromMenu: string
       noOptionGroups: string
+      personalizationHint: string
+      nameAndDescriptionTitle: string
       required: string
       optionalLabel: string
       selectRange: (min: number, max: number) => string
@@ -259,7 +261,12 @@ export type Dictionary = {
       addOptionGroup: string
       addOption: string
       addWithCost: string
-      removeNoCost: string
+      addNoCost: string
+      groupKindQuestion: string
+      groupKindAdd: string
+      groupKindAddHint: string
+      groupKindRemove: string
+      groupKindRemoveHint: string
       priceDeltaPlaceholder: string
       priceDeltaHint: string
       minLabel: string
@@ -1023,14 +1030,21 @@ export const dictionary: Record<Lang, Dictionary> = {
         confirmRemove: "¿Seguro? Si solo se acabó hoy, usa el interruptor.",
         removeFromMenu: "Quitar del menú",
         noOptionGroups: "Sin grupos de personalización todavía.",
+        personalizationHint: "¿Quieres que el cliente pueda personalizar este platillo? Ej. \"¿le agregamos algo?\" o \"¿le quitamos algo?\". Opcional.",
+        nameAndDescriptionTitle: "Nombre y descripción",
         required: "obligatorio",
         optionalLabel: "opcional",
         selectRange: (min, max) => `elige ${min}–${max}`,
         deleteGroup: "Eliminar grupo",
         addOptionGroup: "+ Agregar grupo de opciones",
         addOption: "+ Agregar opción",
-        addWithCost: "Agregar ingrediente",
-        removeNoCost: "Quitar ingrediente",
+        addWithCost: "Agregar con costo",
+        addNoCost: "Agregar sin costo",
+        groupKindQuestion: "¿Este grupo es para agregar o para quitar ingredientes?",
+        groupKindAdd: "Se agrega",
+        groupKindAddHint: "Ej. extra queso, tocino",
+        groupKindRemove: "Se quita",
+        groupKindRemoveHint: "Ej. sin cebolla, sin picante",
         priceDeltaPlaceholder: "+$",
         priceDeltaHint: "Déjalo en 0 si no tiene costo extra",
         optionNameMissingError: "Escribe el nombre del ingrediente en español y en inglés",
@@ -1381,12 +1395,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         qrChannel: "Código QR",
         ventanillaChannel: "Ventanilla",
         daysWithSales: (n) => `${n} día${n === 1 ? "" : "s"} con ventas, últimos 30 días`,
-        opensLate: (dur) => `abre ${dur} después de lo publicado`,
-        opensOnTime: "abre según lo publicado",
+        opensLate: (dur) => `primera venta ${dur} después de la apertura`,
+        opensOnTime: "primera venta a tiempo",
         noPublishedHours: "sin horario publicado",
         firstOrder: "primer pedido:",
-        lastOrder: "último:",
-        closesEarly: (dur) => `cierra ${dur} antes de lo publicado`,
+        lastOrder: "último pedido:",
+        closesEarly: (dur) => `última venta ${dur} antes del cierre`,
         noOrdersLast30: (name) => `${name} — sin órdenes en los últimos 30 días.`,
         pendingCollectionTitle: "Pendiente de cobro",
         pendingInProgressLabel: "En curso, sin cobrar",
@@ -1797,14 +1811,21 @@ export const dictionary: Record<Lang, Dictionary> = {
         confirmRemove: "Sure? If it just ran out today, use the switch instead.",
         removeFromMenu: "Remove from menu",
         noOptionGroups: "No customization groups yet.",
+        personalizationHint: "Want customers to be able to customize this item? E.g. \"add something?\" or \"remove something?\". Optional.",
+        nameAndDescriptionTitle: "Name and description",
         required: "required",
         optionalLabel: "optional",
         selectRange: (min, max) => `choose ${min}–${max}`,
         deleteGroup: "Delete group",
         addOptionGroup: "+ Add option group",
         addOption: "+ Add option",
-        addWithCost: "Add ingredient",
-        removeNoCost: "Remove ingredient",
+        addWithCost: "Add with a cost",
+        addNoCost: "Add with no cost",
+        groupKindQuestion: "Is this group for adding or removing ingredients?",
+        groupKindAdd: "Added",
+        groupKindAddHint: "E.g. extra cheese, bacon",
+        groupKindRemove: "Removed",
+        groupKindRemoveHint: "E.g. no onion, not spicy",
         priceDeltaPlaceholder: "+$",
         priceDeltaHint: "Leave it at 0 if there's no extra cost",
         optionNameMissingError: "Enter the ingredient's name in Spanish and English",
@@ -2155,12 +2176,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         qrChannel: "QR code",
         ventanillaChannel: "Counter",
         daysWithSales: (n) => `${n} day${n === 1 ? "" : "s"} with sales, last 30 days`,
-        opensLate: (dur) => `opens ${dur} after published`,
-        opensOnTime: "opens on published time",
+        opensLate: (dur) => `first sale ${dur} after opening`,
+        opensOnTime: "first sale on time",
         noPublishedHours: "no published hours",
         firstOrder: "first order:",
-        lastOrder: "last:",
-        closesEarly: (dur) => `closes ${dur} before published`,
+        lastOrder: "last order:",
+        closesEarly: (dur) => `last sale ${dur} before closing`,
         noOrdersLast30: (name) => `${name} — no orders in the last 30 days.`,
         pendingCollectionTitle: "Pending collection",
         pendingInProgressLabel: "In progress, unpaid",

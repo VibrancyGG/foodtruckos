@@ -64,14 +64,18 @@ export function VentanillaForm({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
 
+  // Un grupo sin opciones todavía no cuenta como personalización real — ver
+  // el mismo criterio en components/menu/MenuClient.tsx.
   const groupsByProduct = useMemo(() => {
+    const groupsWithOptions = new Set(options.map((o) => o.group_id))
     const map = new Map<string, typeof optionGroups>()
     for (const g of optionGroups) {
+      if (!groupsWithOptions.has(g.id)) continue
       if (!map.has(g.product_id)) map.set(g.product_id, [])
       map.get(g.product_id)!.push(g)
     }
     return map
-  }, [optionGroups])
+  }, [optionGroups, options])
 
   const catProducts = products.filter((p) => p.category_id === cat)
 
@@ -445,7 +449,13 @@ function LineCustomizeDialog({
                     onClick={() => !disabled && toggle(g, o.id)}
                     disabled={disabled}
                     className="rounded-lg border-2 px-3.5 py-2.5 text-left text-sm font-bold disabled:opacity-40"
-                    style={isSel ? { borderColor: "#5B8DEF", background: "#16253F", color: "#BBD4FF" } : { borderColor: EDGE, background: SURFACE2, color: TEXT }}
+                    style={
+                      isSel
+                        ? o.kind === "remove"
+                          ? { borderColor: "#E5484D", background: "#3A1E1F", color: "#FF9EA1" }
+                          : { borderColor: "#5B8DEF", background: "#16253F", color: "#BBD4FF" }
+                        : { borderColor: EDGE, background: SURFACE2, color: TEXT }
+                    }
                   >
                     {lang === "es" ? o.option_name_es : o.option_name_en}
                     {o.sold_out ? ` · ${t.soldOutShort}` : o.kind === "add" && o.price_delta > 0 ? ` +$${o.price_delta.toFixed(2)}` : ""}

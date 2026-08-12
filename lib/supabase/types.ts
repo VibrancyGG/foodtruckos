@@ -745,6 +745,7 @@ export type Database = {
           group_name_en: string
           group_name_es: string
           id: string
+          kind: string
           max_select: number
           min_select: number
           product_id: string
@@ -756,6 +757,7 @@ export type Database = {
           group_name_en: string
           group_name_es: string
           id?: string
+          kind?: string
           max_select?: number
           min_select?: number
           product_id: string
@@ -767,6 +769,7 @@ export type Database = {
           group_name_en?: string
           group_name_es?: string
           id?: string
+          kind?: string
           max_select?: number
           min_select?: number
           product_id?: string

@@ -21,6 +21,7 @@ export function OptionGroupsEditor({
   const [showAddGroup, setShowAddGroup] = useState(false)
   const [nameEs, setNameEs] = useState("")
   const [nameEn, setNameEn] = useState("")
+  const [kind, setKind] = useState<"add" | "remove">("add")
   const [required, setRequired] = useState(false)
   const [minSelect, setMinSelect] = useState("0")
   const [maxSelect, setMaxSelect] = useState("1")
@@ -38,12 +39,14 @@ export function OptionGroupsEditor({
         productId,
         nameEs,
         nameEn,
+        kind,
         required,
         minSelect: parseInt(minSelect, 10) || 0,
         maxSelect: parseInt(maxSelect, 10) || 1,
       })
       setNameEs("")
       setNameEn("")
+      setKind("add")
       setRequired(false)
       setMinSelect("0")
       setMaxSelect("1")
@@ -61,7 +64,32 @@ export function OptionGroupsEditor({
       ))}
 
       {showAddGroup ? (
-        <div className="space-y-1.5 rounded-lg border border-neutral-200 bg-white p-2.5">
+        <div className="space-y-2 rounded-lg border border-neutral-200 bg-white p-2.5">
+          <div>
+            <p className="mb-1.5 text-[11px] font-bold text-neutral-500">{m.groupKindQuestion}</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setKind("add")}
+                className={`rounded-lg border-2 p-2 text-left ${kind === "add" ? "border-green-600 bg-green-50" : "border-neutral-200"}`}
+              >
+                <div className="text-xs font-bold" style={kind === "add" ? { color: "#15803D" } : undefined}>
+                  + {m.groupKindAdd}
+                </div>
+                <div className="text-[10px] text-neutral-400">{m.groupKindAddHint}</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setKind("remove")}
+                className={`rounded-lg border-2 p-2 text-left ${kind === "remove" ? "border-red-600 bg-red-50" : "border-neutral-200"}`}
+              >
+                <div className="text-xs font-bold" style={kind === "remove" ? { color: "#B91C1C" } : undefined}>
+                  − {m.groupKindRemove}
+                </div>
+                <div className="text-[10px] text-neutral-400">{m.groupKindRemoveHint}</div>
+              </button>
+            </div>
+          </div>
           <input
             value={nameEs}
             onChange={(e) => setNameEs(e.target.value)}
@@ -139,11 +167,12 @@ function OptionGroupRow({
   const { lang, t } = useLang()
   const m = t.panel.menuPage
   const c = t.panel.common
+  const groupKind = group.kind as "add" | "remove"
   const [showAddOption, setShowAddOption] = useState(false)
   const [nameEs, setNameEs] = useState("")
   const [nameEn, setNameEn] = useState("")
+  const [hasCost, setHasCost] = useState(false)
   const [priceDelta, setPriceDelta] = useState("0")
-  const [kind, setKind] = useState<"add" | "remove">("add")
   const [error, setError] = useState<string | null>(null)
   const [gone, setGone] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -157,11 +186,16 @@ function OptionGroupRow({
       return
     }
     startTransition(async () => {
-      await createOption({ groupId: group.id, nameEs, nameEn, priceDelta: parseFloat(priceDelta) || 0, kind })
+      await createOption({
+        groupId: group.id,
+        nameEs,
+        nameEn,
+        priceDelta: hasCost ? parseFloat(priceDelta) || 0 : 0,
+      })
       setNameEs("")
       setNameEn("")
+      setHasCost(false)
       setPriceDelta("0")
-      setKind("add")
       setShowAddOption(false)
     })
   }
@@ -177,8 +211,16 @@ function OptionGroupRow({
     <div className="rounded-lg border border-neutral-200 bg-white p-2.5">
       <div className="mb-1.5 flex items-center justify-between">
         <div>
-          <div className="text-xs font-bold">{lang === "es" ? group.group_name_es : group.group_name_en}</div>
-          <div className="text-[11px] text-neutral-400">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="rounded px-1.5 py-0.5 text-[10px] font-black"
+              style={groupKind === "remove" ? { background: "#FDE8E8", color: "#B91C1C" } : { background: "#E7F6EC", color: "#15803D" }}
+            >
+              {groupKind === "remove" ? `− ${m.groupKindRemove}` : `+ ${m.groupKindAdd}`}
+            </span>
+            <div className="text-xs font-bold">{lang === "es" ? group.group_name_es : group.group_name_en}</div>
+          </div>
+          <div className="mt-0.5 text-[11px] text-neutral-400">
             {group.required ? m.required : m.optionalLabel} · {m.selectRange(group.min_select, group.max_select)}
           </div>
         </div>
@@ -193,7 +235,7 @@ function OptionGroupRow({
 
       <div className="space-y-1">
         {options.map((o) => (
-          <OptionRow key={o.id} option={o} />
+          <OptionRow key={o.id} option={o} groupKind={groupKind} />
         ))}
       </div>
 
@@ -213,26 +255,27 @@ function OptionGroupRow({
             className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
           />
           <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
-          <div className="flex items-center gap-2 text-xs">
-            <select
-              value={kind}
-              onChange={(e) => setKind(e.target.value as "add" | "remove")}
-              className="rounded border border-neutral-300 px-1.5 py-1"
-            >
-              <option value="add">{m.addWithCost}</option>
-              <option value="remove">{m.removeNoCost}</option>
-            </select>
-            {kind === "add" && (
-              <input
-                value={priceDelta}
-                onChange={(e) => setPriceDelta(e.target.value)}
-                inputMode="decimal"
-                placeholder={m.priceDeltaPlaceholder}
-                className="w-16 rounded border border-neutral-300 px-1.5 py-1"
-              />
-            )}
-          </div>
-          {kind === "add" && <p className="text-[11px] text-neutral-400">{m.priceDeltaHint}</p>}
+          {groupKind === "add" && (
+            <div className="flex items-center gap-2 text-xs">
+              <select
+                value={hasCost ? "cost" : "free"}
+                onChange={(e) => setHasCost(e.target.value === "cost")}
+                className="rounded border border-neutral-300 px-1.5 py-1"
+              >
+                <option value="free">{m.addNoCost}</option>
+                <option value="cost">{m.addWithCost}</option>
+              </select>
+              {hasCost && (
+                <input
+                  value={priceDelta}
+                  onChange={(e) => setPriceDelta(e.target.value)}
+                  inputMode="decimal"
+                  placeholder={m.priceDeltaPlaceholder}
+                  className="w-16 rounded border border-neutral-300 px-1.5 py-1"
+                />
+              )}
+            </div>
+          )}
           {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button
@@ -262,7 +305,7 @@ function OptionGroupRow({
   )
 }
 
-function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
+function OptionRow({ option, groupKind }: { option: OwnerMenuData["options"][number]; groupKind: "add" | "remove" }) {
   const { lang, t } = useLang()
   const m = t.panel.menuPage
   const c = t.panel.common
@@ -270,8 +313,8 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
   const [editing, setEditing] = useState(false)
   const [nameEs, setNameEs] = useState(option.option_name_es)
   const [nameEn, setNameEn] = useState(option.option_name_en)
+  const [hasCost, setHasCost] = useState(option.price_delta > 0)
   const [priceDelta, setPriceDelta] = useState(String(option.price_delta))
-  const [kind, setKind] = useState<"add" | "remove">(option.kind as "add" | "remove")
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   if (gone) return null
@@ -287,8 +330,7 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
         optionId: option.id,
         nameEs,
         nameEn,
-        priceDelta: parseFloat(priceDelta) || 0,
-        kind,
+        priceDelta: hasCost ? parseFloat(priceDelta) || 0 : 0,
       })
       if (!r.ok) {
         setError(r.error)
@@ -302,8 +344,8 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
     setError(null)
     setNameEs(option.option_name_es)
     setNameEn(option.option_name_en)
+    setHasCost(option.price_delta > 0)
     setPriceDelta(String(option.price_delta))
-    setKind(option.kind as "add" | "remove")
     setEditing(false)
   }
 
@@ -324,25 +366,27 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
           className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
         />
         <TranslateFieldActions sourceValue={nameEs} setTarget={setNameEn} direction="es-en" allowCopy />
-        <div className="flex items-center gap-2 text-xs">
-          <select
-            value={kind}
-            onChange={(e) => setKind(e.target.value as "add" | "remove")}
-            className="rounded border border-neutral-300 px-1.5 py-1"
-          >
-            <option value="add">{m.addWithCost}</option>
-            <option value="remove">{m.removeNoCost}</option>
-          </select>
-          {kind === "add" && (
-            <input
-              value={priceDelta}
-              onChange={(e) => setPriceDelta(e.target.value)}
-              inputMode="decimal"
-              placeholder={m.priceDeltaPlaceholder}
-              className="w-16 rounded border border-neutral-300 px-1.5 py-1"
-            />
-          )}
-        </div>
+        {groupKind === "add" && (
+          <div className="flex items-center gap-2 text-xs">
+            <select
+              value={hasCost ? "cost" : "free"}
+              onChange={(e) => setHasCost(e.target.value === "cost")}
+              className="rounded border border-neutral-300 px-1.5 py-1"
+            >
+              <option value="free">{m.addNoCost}</option>
+              <option value="cost">{m.addWithCost}</option>
+            </select>
+            {hasCost && (
+              <input
+                value={priceDelta}
+                onChange={(e) => setPriceDelta(e.target.value)}
+                inputMode="decimal"
+                placeholder={m.priceDeltaPlaceholder}
+                className="w-16 rounded border border-neutral-300 px-1.5 py-1"
+              />
+            )}
+          </div>
+        )}
         {error && <p className="text-xs text-red-600">{error}</p>}
         <div className="flex gap-2">
           <button
