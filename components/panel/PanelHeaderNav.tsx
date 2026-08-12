@@ -54,16 +54,19 @@ export function PanelHeaderNav({
       )}
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
         <span className="flex min-w-0 items-center gap-2.5 text-sm font-bold">
-          <span className="relative flex h-8 w-8 flex-none items-center justify-center overflow-hidden rounded-xl bg-panel-brand shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
+          {logoUrl ? (
+            // Montado directo sobre el header, sin placa — igual que en cocina
+            // y el menú del comensal, para que el logo del cliente se vea tal
+            // cual lo subió, sin recorte ni fondo que lo distorsione.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="h-8 w-8 flex-none object-contain" />
+          ) : (
+            <span className="flex h-8 w-8 flex-none items-center justify-center rounded-xl bg-panel-brand">
               <span className="font-[family-name:var(--font-panel-display)] text-sm font-bold text-white">
                 {businessName.charAt(0).toUpperCase()}
               </span>
-            )}
-          </span>
+            </span>
+          )}
           <span className="truncate font-[family-name:var(--font-panel-display)] text-[15px] tracking-tight">{businessName}</span>
         </span>
         <div className="flex flex-none items-center gap-2">
