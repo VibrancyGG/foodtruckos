@@ -9,10 +9,7 @@ import { getOwnerContext } from "@/lib/auth/dal"
 // confiar en un id que viene del cliente cuando ya sabemos quién es.
 type UploadResult = { ok: false; error: string } | { ok: true; publicUrl: string }
 
-async function uploadBusinessImage(
-  formData: FormData,
-  kind: "logo" | "cover",
-): Promise<UploadResult> {
+export async function uploadLogo(formData: FormData): Promise<UploadResult> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
 
@@ -21,7 +18,7 @@ async function uploadBusinessImage(
 
   const supabase = await createClient()
   const ext = file.name.split(".").pop() || "webp"
-  const path = `${businessId}/branding/${kind}-${Date.now()}.${ext}`
+  const path = `${businessId}/branding/logo-${Date.now()}.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from("business-media")
@@ -35,21 +32,13 @@ async function uploadBusinessImage(
 
   const { error: updateError } = await supabase
     .from("businesses")
-    .update(kind === "logo" ? { logo_url: publicUrl } : { cover_photo_url: publicUrl })
+    .update({ logo_url: publicUrl })
     .eq("id", businessId)
 
   if (updateError) return { ok: false, error: "La imagen se subió pero no se pudo guardar" }
 
   revalidatePath("/panel")
   return { ok: true, publicUrl }
-}
-
-export async function uploadLogo(formData: FormData) {
-  return uploadBusinessImage(formData, "logo")
-}
-
-export async function uploadCoverPhoto(formData: FormData) {
-  return uploadBusinessImage(formData, "cover")
 }
 
 export async function saveBrandSettings(input: {

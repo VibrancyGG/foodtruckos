@@ -215,6 +215,53 @@ export async function createCategory(input: {
   return { ok: true }
 }
 
+export async function updateCategory(input: {
+  categoryId: string
+  nameEs: string
+  nameEn: string
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("menu_categories")
+    .update({ name_es: input.nameEs, name_en: input.nameEn })
+    .eq("id", input.categoryId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
+  revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  return { ok: true }
+}
+
+export async function deleteCategory(categoryId: string): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", categoryId)
+    .eq("business_id", businessId)
+
+  if (count && count > 0) return { ok: false, error: "Esta categoría tiene platillos — muévelos antes de eliminarla" }
+
+  const { error } = await supabase
+    .from("menu_categories")
+    .delete()
+    .eq("id", categoryId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo eliminar" }
+  revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  return { ok: true }
+}
+
 // Un platillo nuevo se ofrece en todos los trucks del negocio por default —
 // "menú base compartido, con posibilidad de exclusivo por truck" (brief) —
 // salvo que el dueño ya elija "Solo Truck X" al crearlo, en cuyo caso queda
@@ -390,6 +437,34 @@ export async function createOption(input: {
   })
 
   if (error) return { ok: false, error: "No se pudo crear la opción" }
+  revalidatePath("/panel/menu")
+  return { ok: true }
+}
+
+export async function updateOption(input: {
+  optionId: string
+  nameEs: string
+  nameEn: string
+  priceDelta: number
+  kind: "add" | "remove"
+}): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (!input.nameEs.trim() || !input.nameEn.trim()) return { ok: false, error: "Falta el nombre" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("product_options")
+    .update({
+      option_name_es: input.nameEs,
+      option_name_en: input.nameEn,
+      price_delta: input.kind === "remove" ? 0 : input.priceDelta,
+      kind: input.kind,
+    })
+    .eq("id", input.optionId)
+    .eq("business_id", businessId)
+
+  if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/menu")
   return { ok: true }
 }

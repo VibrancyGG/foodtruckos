@@ -230,6 +230,7 @@ export type Dictionary = {
       chooseImage: string
       nameEsPlaceholder: string
       nameEnPlaceholder: string
+      copyFromSpanish: string
     }
     menuPage: {
       title: string
@@ -237,6 +238,10 @@ export type Dictionary = {
       noCategory: string
       addCategory: string
       createCategory: string
+      editCategory: string
+      deleteCategory: string
+      confirmRemoveCategory: string
+      noProductsInCategory: string
       pricePlaceholder: string
       addProduct: string
       hideOptions: string
@@ -254,14 +259,20 @@ export type Dictionary = {
       addWithCost: string
       removeNoCost: string
       priceDeltaPlaceholder: string
+      priceDeltaHint: string
       minLabel: string
       maxLabel: string
       requiredLabel: string
+      optionNameMissingError: string
+      editOption: string
       allTrucksFilter: string
       statsLine: (total: number, out: number, noPhoto: number, scopeName: string | null) => string
       whoSellsIt: string
       noPhotoShort: string
       formError: string
+      categoryFormError: string
+      productFormError: string
+      categoryRequiredError: string
       editModalHint: string
       addModalHint: string
       photoLabel: string
@@ -388,9 +399,6 @@ export type Dictionary = {
       chooseColorHint: string
       contrastConfirm: (colorName: string, ratio: string) => string
       step3: string
-      coverTitle: string
-      coverHint: string
-      step4: string
       styleTitle: string
       styleHint: string
       vibrante: string
@@ -402,7 +410,6 @@ export type Dictionary = {
       saveChanges: string
       previewLabel: string
       liveLabel: string
-      coverPlaceholder: string
       addPreviewLabel: string
       previewNoProducts: string
       motifStep: string
@@ -432,6 +439,7 @@ export type Dictionary = {
       whoLabel: string
       namePlaceholder: string
       nameMissingError: string
+      deviceNameMissingError: string
       addStaffHint: string
       whatWillDoLabel: string
       roleCocina: string
@@ -991,6 +999,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         chooseImage: "Elegir imagen",
         nameEsPlaceholder: "Nombre en español",
         nameEnPlaceholder: "Name in English",
+        copyFromSpanish: "Usar el mismo texto",
       },
       menuPage: {
         title: "Menú",
@@ -998,6 +1007,10 @@ export const dictionary: Record<Lang, Dictionary> = {
         noCategory: "Sin categoría",
         addCategory: "+ Agregar categoría",
         createCategory: "Crear categoría",
+        editCategory: "Editar categoría",
+        deleteCategory: "Eliminar categoría",
+        confirmRemoveCategory: "¿Eliminar esta categoría? Solo se puede si no tiene platillos.",
+        noProductsInCategory: "Todavía no tiene platillos.",
         pricePlaceholder: "Precio",
         addProduct: "+ Agregar platillo",
         hideOptions: "Ocultar",
@@ -1012,9 +1025,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         deleteGroup: "Eliminar grupo",
         addOptionGroup: "+ Agregar grupo de opciones",
         addOption: "+ Agregar opción",
-        addWithCost: "Agregar (con costo)",
-        removeNoCost: "Quitar (sin costo)",
+        addWithCost: "Agregar ingrediente",
+        removeNoCost: "Quitar ingrediente",
         priceDeltaPlaceholder: "+$",
+        priceDeltaHint: "Déjalo en 0 si no tiene costo extra",
+        optionNameMissingError: "Escribe el nombre del ingrediente en español y en inglés",
+        editOption: "Editar",
         minLabel: "mínimo",
         maxLabel: "máximo",
         requiredLabel: "obligatorio",
@@ -1026,6 +1042,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         whoSellsIt: "¿Quién lo vende?",
         noPhotoShort: "Falta\nfoto",
         formError: "Revisa el nombre y el precio",
+        categoryFormError: "Escribe el nombre en español y en inglés",
+        productFormError: "Escribe el nombre en español e inglés, y un precio mayor a 0",
+        categoryRequiredError: "Elige una categoría",
         editModalHint: "Los cambios se ven en el menú de tus clientes de inmediato.",
         addModalHint: "Aparece en el menú de tus clientes en cuanto lo guardes.",
         photoLabel: "Foto del platillo",
@@ -1094,7 +1113,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         removePhoto: "Quitar",
         photoHintTruck: "Una foto del truck como se ve por fuera. Sirve para que el cliente confirme que está en el correcto.",
         nameQuestion: "¿Cómo le dices a este truck?",
-        locationQuestion: "¿Dónde se para normalmente?",
+        locationQuestion: "Ubicación",
         nameRequired: "El truck necesita un nombre",
         hoursModalTitle: (name) => `Horario de ${name}`,
         hoursModalHint: "Fuera de este horario tu menú avisa que están cerrados. Si un día no abres, apágalo.",
@@ -1154,10 +1173,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         chooseColorTitle: "Elige tu color",
         chooseColorHint: "Diez colores probados bajo el sol. Cualquiera funciona — no hay forma de elegir mal.",
         contrastConfirm: (colorName, ratio) => `${colorName} · el texto se ajusta solo y queda en ${ratio}:1 de contraste. Se lee bajo el sol.`,
-        step3: "3 · TU PORTADA",
-        coverTitle: "Foto de portada",
-        coverHint: "La foto de tu truck o de tu comida, arriba del menú. Es opcional.",
-        step4: "4 · TU ESTILO",
+        step3: "3 · TU ESTILO",
         styleTitle: "Cómo se ve tu menú",
         styleHint: "Si todavía no tienes fotos de tus platillos, Tradicional se ve mejor.",
         vibrante: "Vibrante",
@@ -1169,7 +1185,6 @@ export const dictionary: Record<Lang, Dictionary> = {
         saveChanges: "Guardar cambios",
         previewLabel: "Así lo verá tu cliente",
         liveLabel: "En vivo",
-        coverPlaceholder: "Tu foto de portada aquí",
         addPreviewLabel: "Agregar",
         previewNoProducts: "Tus platillos aparecerán aquí en cuanto los agregues en Menú.",
         motifStep: "DETALLE",
@@ -1199,6 +1214,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         whoLabel: "¿Cómo se llama?",
         namePlaceholder: "Nombre y apellido",
         nameMissingError: "Falta el nombre",
+        deviceNameMissingError: "Ponle un nombre al dispositivo y elige un truck",
         addStaffHint: "Le vamos a crear un PIN de cuatro dígitos. Solo eso necesita para entrar.",
         whatWillDoLabel: "¿Qué va a hacer?",
         roleCocina: "Cocina",
@@ -1348,8 +1364,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         topSelling: "Lo que más se vende",
         piecesThisMonth: "piezas este mes",
         salesActivity: "Actividad de venta",
-        salesActivityHint: "Cuándo entra la primera y la última orden de cada truck",
-        salesActivityDisclaimer: "Esto mide cuándo empieza y termina la venta de cada truck. No registra entradas ni salidas de personal, y no sirve para calcular pagos.",
+        salesActivityHint: "A qué hora entra el primer y el último pedido de cada truck, en promedio, y cómo se compara con el horario que publicaste — últimos 30 días.",
+        salesActivityDisclaimer: "Esto mide a qué hora entran los pedidos, comparado con tu horario publicado en Trucks. No registra entradas ni salidas de personal, y no sirve para calcular pagos.",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} empieza a vender ${minutes} minutos tarde`,
         lateOpenInsightBody: (amount) => `Al ritmo de venta de esa unidad, esa franja ronda los ${amount} al mes — es una estimación a partir de su venta por hora, no un dato exacto.`,
         noSalesToGraph: "Todavía no hay ventas registradas para graficar.",
@@ -1361,11 +1377,11 @@ export const dictionary: Record<Lang, Dictionary> = {
         qrChannel: "Código QR",
         ventanillaChannel: "Ventanilla",
         daysWithSales: (n) => `${n} día${n === 1 ? "" : "s"} con ventas, últimos 30 días`,
-        opensLate: (dur) => `abre ${dur} tarde`,
-        opensOnTime: "abre a tiempo",
+        opensLate: (dur) => `abre ${dur} después de lo publicado`,
+        opensOnTime: "abre según lo publicado",
         noPublishedHours: "sin horario publicado",
-        firstOrder: "primera orden",
-        lastOrder: "última",
+        firstOrder: "primer pedido:",
+        lastOrder: "último:",
         closesEarly: (dur) => `cierra ${dur} antes de lo publicado`,
         noOrdersLast30: (name) => `${name} — sin órdenes en los últimos 30 días.`,
         pendingCollectionTitle: "Pendiente de cobro",
@@ -1755,6 +1771,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         chooseImage: "Choose image",
         nameEsPlaceholder: "Nombre en español",
         nameEnPlaceholder: "Name in English",
+        copyFromSpanish: "Use the same text",
       },
       menuPage: {
         title: "Menu",
@@ -1762,6 +1779,10 @@ export const dictionary: Record<Lang, Dictionary> = {
         noCategory: "No category",
         addCategory: "+ Add category",
         createCategory: "Create category",
+        editCategory: "Edit category",
+        deleteCategory: "Delete category",
+        confirmRemoveCategory: "Delete this category? Only possible if it has no items.",
+        noProductsInCategory: "No items yet.",
         pricePlaceholder: "Price",
         addProduct: "+ Add item",
         hideOptions: "Hide",
@@ -1776,9 +1797,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         deleteGroup: "Delete group",
         addOptionGroup: "+ Add option group",
         addOption: "+ Add option",
-        addWithCost: "Add (with cost)",
-        removeNoCost: "Remove (no cost)",
+        addWithCost: "Add ingredient",
+        removeNoCost: "Remove ingredient",
         priceDeltaPlaceholder: "+$",
+        priceDeltaHint: "Leave it at 0 if there's no extra cost",
+        optionNameMissingError: "Enter the ingredient's name in Spanish and English",
+        editOption: "Edit",
         minLabel: "minimum",
         maxLabel: "maximum",
         requiredLabel: "required",
@@ -1790,6 +1814,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         whoSellsIt: "Who sells it?",
         noPhotoShort: "No\nphoto",
         formError: "Check the name and the price",
+        categoryFormError: "Enter the name in Spanish and English",
+        productFormError: "Enter the name in Spanish and English, and a price greater than 0",
+        categoryRequiredError: "Choose a category",
         editModalHint: "Changes show up in your customers' menu right away.",
         addModalHint: "It shows up in your customers' menu as soon as you save it.",
         photoLabel: "Photo of the dish",
@@ -1858,7 +1885,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         removePhoto: "Remove",
         photoHintTruck: "A photo of the truck as it looks from outside. Helps the customer confirm they're at the right one.",
         nameQuestion: "What do you call this truck?",
-        locationQuestion: "Where does it usually park?",
+        locationQuestion: "Location",
         nameRequired: "The truck needs a name",
         hoursModalTitle: (name) => `Hours for ${name}`,
         hoursModalHint: "Outside these hours your menu shows as closed. If you don't open some day, turn it off.",
@@ -1918,10 +1945,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         chooseColorTitle: "Choose your color",
         chooseColorHint: "Ten colors tested in direct sunlight. Any of them works — there's no wrong choice.",
         contrastConfirm: (colorName, ratio) => `${colorName} · the text adjusts itself and stays at a ${ratio}:1 contrast ratio. Readable in direct sun.`,
-        step3: "3 · YOUR COVER PHOTO",
-        coverTitle: "Cover photo",
-        coverHint: "A photo of your truck or your food, above the menu. Optional.",
-        step4: "4 · YOUR STYLE",
+        step3: "3 · YOUR STYLE",
         styleTitle: "How your menu looks",
         styleHint: "If you don't have photos of your dishes yet, Traditional looks better.",
         vibrante: "Vibrant",
@@ -1933,7 +1957,6 @@ export const dictionary: Record<Lang, Dictionary> = {
         saveChanges: "Save changes",
         previewLabel: "What your customer will see",
         liveLabel: "Live",
-        coverPlaceholder: "Your cover photo here",
         addPreviewLabel: "Add",
         previewNoProducts: "Your dishes will show up here once you add them in Menu.",
         motifStep: "DETAIL",
@@ -1963,6 +1986,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         whoLabel: "What's their name?",
         namePlaceholder: "First and last name",
         nameMissingError: "Name is required",
+        deviceNameMissingError: "Give the device a name and pick a truck",
         addStaffHint: "We'll create a four-digit PIN for them. That's all they need to enter.",
         whatWillDoLabel: "What will they do?",
         roleCocina: "Kitchen",
@@ -2112,8 +2136,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         topSelling: "Best sellers",
         piecesThisMonth: "units this month",
         salesActivity: "Sales activity",
-        salesActivityHint: "When the first and last order of each truck come in",
-        salesActivityDisclaimer: "This measures when each truck's selling starts and ends. It doesn't log staff clock-ins or clock-outs, and it's not used to calculate pay.",
+        salesActivityHint: "What time the first and last order of each truck come in, on average, and how that compares to the hours you published — last 30 days.",
+        salesActivityDisclaimer: "This measures what time orders come in, compared to the hours you published in Trucks. It doesn't log staff clock-ins or clock-outs, and it's not used to calculate pay.",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} starts selling ${minutes} minutes late`,
         lateOpenInsightBody: (amount) => `At that unit's sales pace, that gap runs about ${amount} a month — an estimate from its hourly sales rate, not an exact figure.`,
         noSalesToGraph: "No sales recorded yet to graph.",
@@ -2125,11 +2149,11 @@ export const dictionary: Record<Lang, Dictionary> = {
         qrChannel: "QR code",
         ventanillaChannel: "Counter",
         daysWithSales: (n) => `${n} day${n === 1 ? "" : "s"} with sales, last 30 days`,
-        opensLate: (dur) => `opens ${dur} late`,
-        opensOnTime: "opens on time",
+        opensLate: (dur) => `opens ${dur} after published`,
+        opensOnTime: "opens on published time",
         noPublishedHours: "no published hours",
-        firstOrder: "first order",
-        lastOrder: "last",
+        firstOrder: "first order:",
+        lastOrder: "last:",
         closesEarly: (dur) => `closes ${dur} before published`,
         noOrdersLast30: (name) => `${name} — no orders in the last 30 days.`,
         pendingCollectionTitle: "Pending collection",

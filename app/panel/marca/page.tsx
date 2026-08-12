@@ -12,7 +12,7 @@ export default async function PanelPage() {
   const [{ data: business }, { data: units }, { data: products }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("name, slug, logo_url, cover_photo_url, brand_color, menu_style, brand_motif, header_style")
+      .select("name, slug, logo_url, brand_color, menu_style, brand_motif, header_style")
       .eq("id", businessId)
       .single(),
     supabase
@@ -37,7 +37,6 @@ export default async function PanelPage() {
       <MarcaForm
         businessName={business.name}
         initialLogoUrl={business.logo_url}
-        initialCoverUrl={business.cover_photo_url}
         initialColor={business.brand_color || "#D62828"}
         initialStyle={business.menu_style}
         initialMotif={business.brand_motif}

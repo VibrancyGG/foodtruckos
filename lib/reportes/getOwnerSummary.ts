@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { toNumber } from "@/lib/supabase/numeric"
-import { dayKeyFor, parseWeeklyHours } from "@/lib/units/hours"
+import { parseWeeklyHours, dateInTimezone } from "@/lib/units/hours"
 
 // Los nombres de mes se calculan del lado del cliente con Intl según el
 // idioma del dueño (useLang) — aquí solo viajan el año y el índice de mes
@@ -9,9 +9,6 @@ function monthKey(d: Date) {
   return `${d.getUTCFullYear()}-${d.getUTCMonth()}`
 }
 
-function minutesOfDay(d: Date) {
-  return d.getUTCHours() * 60 + d.getUTCMinutes()
-}
 
 function fmtMinutes(m: number) {
   const h = Math.floor(m / 60) % 24
@@ -30,7 +27,8 @@ export async function getOwnerSummary(businessId: string) {
 
   const windowStart = new Date(Date.UTC(currentYear - 1, 0, 1))
 
-  const [{ data: units }, { data: allOrders }] = await Promise.all([
+  const [{ data: business }, { data: units }, { data: allOrders }] = await Promise.all([
+    supabase.from("businesses").select("timezone").eq("id", businessId).single(),
     // Sin filtro de status: un truck archivado se sigue facturando/mostrando
     // en Trucks/Cuenta que no, pero su venta pasada es historia real (Regla
     // 2, nunca se destruye) — si aquí se excluyera, la suma de perTruck ya
@@ -45,6 +43,7 @@ export async function getOwnerSummary(businessId: string) {
       .order("created_at"),
   ])
 
+  const timezone = business?.timezone ?? "America/Chicago"
   const unitList = units ?? []
   const allOrderList = (allOrders ?? []).map((o) => ({ ...o, total: toNumber(o.total), created_at: new Date(o.created_at) }))
 
@@ -170,13 +169,19 @@ export async function getOwnerSummary(businessId: string) {
   const activityWindowStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   const activity = unitList.map((u) => {
     const weeklyHours = parseWeeklyHours(u.hours)
-    const byDay = new Map<string, Date[]>()
+    // Cada orden se agrupa por el día calendario y los minutos del día en la
+    // zona horaria REAL del negocio, no en UTC — sin esto, una orden tomada
+    // a las 11pm hora local (madrugada en UTC) cae en el día calendario
+    // equivocado y compara contra el horario publicado equivocado, lo que
+    // puede inflar el "cierra X antes de lo publicado" a un número absurdo.
+    const byDay = new Map<string, { dayKey: ReturnType<typeof dateInTimezone>["dayKey"]; minutes: number }[]>()
     for (const o of orderList) {
       if (o.unit_id !== u.id || o.created_at < activityWindowStart) continue
-      const dayKey = o.created_at.toISOString().slice(0, 10)
-      const arr = byDay.get(dayKey) ?? []
-      arr.push(o.created_at)
-      byDay.set(dayKey, arr)
+      const local = dateInTimezone(timezone, o.created_at)
+      const calendarKey = new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(o.created_at)
+      const arr = byDay.get(calendarKey) ?? []
+      arr.push(local)
+      byDay.set(calendarKey, arr)
     }
 
     const firstMinutes: number[] = []
@@ -184,19 +189,19 @@ export async function getOwnerSummary(businessId: string) {
     const lateDeltas: number[] = []
     const earlyCloseDeltas: number[] = []
 
-    for (const [dayKey, times] of byDay) {
-      times.sort((a, b) => a.getTime() - b.getTime())
+    for (const times of byDay.values()) {
+      times.sort((a, b) => a.minutes - b.minutes)
       const first = times[0]
       const last = times[times.length - 1]
-      firstMinutes.push(minutesOfDay(first))
-      lastMinutes.push(minutesOfDay(last))
+      firstMinutes.push(first.minutes)
+      lastMinutes.push(last.minutes)
 
-      const published = weeklyHours[dayKeyFor(new Date(dayKey + "T00:00:00Z"))]
+      const published = weeklyHours[first.dayKey]
       if (published) {
         const [oh, om] = published.open.split(":").map(Number)
         const [ch, cm] = published.close.split(":").map(Number)
-        lateDeltas.push(minutesOfDay(first) - (oh * 60 + om))
-        earlyCloseDeltas.push(ch * 60 + cm - minutesOfDay(last))
+        lateDeltas.push(first.minutes - (oh * 60 + om))
+        earlyCloseDeltas.push(ch * 60 + cm - last.minutes)
       }
     }
 

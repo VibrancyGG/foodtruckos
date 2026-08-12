@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { PALETTE } from "@/lib/branding/palette"
 import { onColorFor, contrastRatio } from "@/lib/branding/color"
 import { MOTIFS, isBrandMotif, type BrandMotif } from "@/lib/branding/motifs"
-import { uploadLogo, uploadCoverPhoto, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
+import { uploadLogo, saveBrandSettings, updateUnitBrandColor } from "@/lib/media/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { toNumber } from "@/lib/supabase/numeric"
 import { displayFont } from "@/lib/fonts"
@@ -24,7 +24,6 @@ type PreviewProduct = {
 export function MarcaForm({
   businessName,
   initialLogoUrl,
-  initialCoverUrl,
   initialColor,
   initialStyle,
   initialMotif,
@@ -34,7 +33,6 @@ export function MarcaForm({
 }: {
   businessName: string
   initialLogoUrl: string | null
-  initialCoverUrl: string | null
   initialColor: string
   initialStyle: string
   initialMotif: string
@@ -46,7 +44,6 @@ export function MarcaForm({
   const p = t.panel.marcaPage
   const c = t.panel.common
   const [logoUrl, setLogoUrl] = useState(initialLogoUrl)
-  const [coverUrl, setCoverUrl] = useState(initialCoverUrl)
   const [color, setColor] = useState(initialColor)
   const [style, setStyle] = useState<MenuStyle>(
     initialStyle === "tradicional" ? "tradicional" : "vibrante",
@@ -134,18 +131,6 @@ export function MarcaForm({
 
         <section className="rounded-2xl border border-neutral-200 bg-white p-5">
           <span className="text-[11px] font-black tracking-wide text-neutral-400">{p.step3}</span>
-          <h2 className="mb-1 font-bold">{p.coverTitle}</h2>
-          <p className="mb-4 text-sm text-neutral-500">{p.coverHint}</p>
-          <ImageUploaderInline
-            currentUrl={coverUrl}
-            wide
-            action={uploadCoverPhoto}
-            onUploaded={(url) => setCoverUrl(url)}
-          />
-        </section>
-
-        <section className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <span className="text-[11px] font-black tracking-wide text-neutral-400">{p.step4}</span>
           <h2 className="mb-1 font-bold">{p.styleTitle}</h2>
           <p className="mb-4 text-sm text-neutral-500">{p.styleHint}</p>
           <div className="grid grid-cols-2 gap-3">
@@ -312,14 +297,6 @@ export function MarcaForm({
               {businessName}
             </div>
           </div>
-          {coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={coverUrl} alt="" className="h-28 w-full object-cover" />
-          ) : (
-            <div className="flex h-16 items-center justify-center bg-neutral-100 text-xs text-neutral-400">
-              {p.coverPlaceholder}
-            </div>
-          )}
           {previewProducts.length === 0 ? (
             <p className="p-4 text-center text-xs text-neutral-400">{p.previewNoProducts}</p>
           ) : style === "vibrante" ? (

@@ -319,27 +319,35 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                         key={p.id}
                         onClick={() => !soldOut && handleTap(p)}
                         disabled={soldOut}
-                        className="block w-full rounded-xl border-2 border-dashed p-3.5 text-left disabled:opacity-60"
+                        className="flex w-full items-start gap-3 rounded-xl border-2 border-dashed p-3.5 text-left disabled:opacity-60"
                         style={{ borderColor: "var(--brand-primary)" }}
                       >
-                        <div className="uppercase leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--brand-primary)" }}>
-                          {name}
-                        </div>
-                        {desc && (
-                          <div className="mt-1 text-[12.5px] leading-snug" style={{ color: INK_SOFT }}>
-                            {desc}
+                        {p.photo_url && (
+                          <div className="grid h-[68px] w-[68px] flex-none place-items-center overflow-hidden rounded-md">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
                           </div>
                         )}
-                        {soldOut ? (
-                          <SoldOutTag label={t.menu.soldOut} />
-                        ) : (
-                          <span
-                            className="mt-2.5 inline-block rounded-full px-3.5 py-1.5 text-xs font-bold"
-                            style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
-                          >
-                            {p.price > 0 ? `${t.menu.buildFrom} $${p.price.toFixed(2)}` : t.menu.buildCta}
-                          </span>
-                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="uppercase leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--brand-primary)" }}>
+                            {name}
+                          </div>
+                          {desc && (
+                            <div className="mt-1 text-[12.5px] leading-snug" style={{ color: INK_SOFT }}>
+                              {desc}
+                            </div>
+                          )}
+                          {soldOut ? (
+                            <SoldOutTag label={t.menu.soldOut} />
+                          ) : (
+                            <span
+                              className="mt-2.5 inline-block rounded-full px-3.5 py-1.5 text-xs font-bold"
+                              style={{ background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
+                            >
+                              {p.price > 0 ? `${t.menu.buildFrom} $${p.price.toFixed(2)}` : t.menu.buildCta}
+                            </span>
+                          )}
+                        </div>
                       </button>
                     )
                   }

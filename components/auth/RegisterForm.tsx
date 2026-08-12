@@ -98,8 +98,9 @@ export function RegisterForm() {
           <label className="mb-1 block text-xs font-bold text-neutral-500">{p.phoneLabel}</label>
           <input
             type="tel"
+            inputMode="numeric"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(e.target.value.replace(/[^\d\s\-()+]/g, ""))}
             placeholder={p.phonePlaceholder}
             className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#FF5A36]"
           />

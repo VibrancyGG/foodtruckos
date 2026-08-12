@@ -41,7 +41,7 @@ const EN_TO_KEY: Record<string, DayKey> = {
 // servidor (UTC en Vercel) ni la del navegador de quien mira la pantalla.
 // Sin esto, un comensal en otra zona horaria (o el render en el servidor)
 // ve un horario de apertura que no corresponde al truck real.
-function nowInTimezone(timezone: string, now: Date): { dayKey: DayKey; minutes: number } {
+export function dateInTimezone(timezone: string, now: Date): { dayKey: DayKey; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     weekday: "short",
@@ -69,7 +69,7 @@ export type OpenStatus = { open: boolean; opensAt: string | null; closesAt: stri
 // manual del dueño, que sigue siendo la señal más fuerte (foodtruckos-diseno:
 // avanzar/pausar toma un solo toque y siempre gana sobre cualquier cálculo).
 export function isOpenNow(hours: WeeklyHours, timezone: string, now: Date = new Date()): OpenStatus {
-  const { dayKey, minutes } = nowInTimezone(timezone, now)
+  const { dayKey, minutes } = dateInTimezone(timezone, now)
   const today = hours[dayKey]
   if (today) {
     const open = toMinutes(today.open)
@@ -79,6 +79,28 @@ export function isOpenNow(hours: WeeklyHours, timezone: string, now: Date = new 
   }
   return { open: false, opensAt: today ? today.open : null, closesAt: null }
 }
+
+const MINUTE_STEPS = ["00", "15", "30", "45"] as const
+
+// UI de horarios: siempre 12h AM/PM, nunca el <input type="time"> nativo del
+// navegador (su formato depende del idioma/región del sistema operativo, así
+// que en algunos equipos aparece en 24h aunque el dueño nunca lo pidió).
+export function to12h(hhmm: string): { hour12: number; minute: string; period: "am" | "pm" } {
+  const [hStr, mStr] = hhmm.split(":")
+  const h = Number(hStr)
+  const minute = MINUTE_STEPS.includes(mStr as (typeof MINUTE_STEPS)[number]) ? mStr : "00"
+  const period: "am" | "pm" = h >= 12 ? "pm" : "am"
+  const hour12 = h % 12 || 12
+  return { hour12, minute, period }
+}
+
+export function from12h(hour12: number, minute: string, period: "am" | "pm"): string {
+  const h24 = period === "am" ? (hour12 % 12) : (hour12 % 12) + 12
+  return `${String(h24).padStart(2, "0")}:${minute}`
+}
+
+export const HOUR_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1)
+export const MINUTE_OPTIONS = [...MINUTE_STEPS]
 
 export function formatClock(t: string): string {
   const [hStr, mStr] = t.split(":")

@@ -37,7 +37,7 @@ export function OwnAlertsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
         <h3 className="mb-1.5 text-xl font-black">{p.ownAlertsModalTitle(unit.name)}</h3>
         <p className="mb-4 text-sm text-neutral-500">{p.ownAlertsModalHint(businessAmber, businessRed)}</p>

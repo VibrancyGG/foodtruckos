@@ -67,7 +67,7 @@ export function ProductModal(props: EditProps | AddProps) {
       el.style.height = "auto"
       el.style.height = `${el.scrollHeight}px`
     }
-  }, [])
+  }, [descEs, descEn])
 
   function onPhotoPick(file: File) {
     setPhotoFile(file)
@@ -78,7 +78,7 @@ export function ProductModal(props: EditProps | AddProps) {
     setError(null)
     const priceNum = parseFloat(price)
     if (!nameEs.trim() || !nameEn.trim() || !(priceNum > 0)) {
-      setError(m.formError)
+      setError(m.productFormError)
       return
     }
 
@@ -111,7 +111,7 @@ export function ProductModal(props: EditProps | AddProps) {
         onClose()
       } else {
         if (!categoryId) {
-          setError(m.formError)
+          setError(m.categoryRequiredError)
           return
         }
         const result = await createProduct({
@@ -151,7 +151,7 @@ export function ProductModal(props: EditProps | AddProps) {
   ]
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
         <h3 className="mb-1.5 text-xl font-black">{props.mode === "edit" ? (lang === "es" ? props.product.name_es : props.product.name_en) : m.addProduct}</h3>
         <p className="mb-4 text-sm text-neutral-500">{props.mode === "edit" ? m.editModalHint : m.addModalHint}</p>
@@ -185,7 +185,14 @@ export function ProductModal(props: EditProps | AddProps) {
 
         <label className="mb-1.5 block text-xs font-bold text-neutral-500">{c.nameEsPlaceholder}</label>
         <input value={nameEs} onChange={(e) => setNameEs(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-xs font-bold text-neutral-500">{c.nameEnPlaceholder}</label>
+          {nameEs.trim() && (
+            <button type="button" onClick={() => setNameEn(nameEs)} className="text-[11px] font-bold text-neutral-400 underline">
+              {c.copyFromSpanish}
+            </button>
+          )}
+        </div>
         <input value={nameEn} onChange={(e) => setNameEn(e.target.value)} className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" />
 
         <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.descriptionEsPlaceholder}</label>
@@ -200,7 +207,14 @@ export function ProductModal(props: EditProps | AddProps) {
           rows={2}
           className="mb-3 w-full resize-none overflow-hidden rounded-lg border border-neutral-300 px-3 py-2 text-sm"
         />
-        <label className="mb-1.5 block text-xs font-bold text-neutral-500">{m.descriptionEnPlaceholder}</label>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-xs font-bold text-neutral-500">{m.descriptionEnPlaceholder}</label>
+          {descEs.trim() && (
+            <button type="button" onClick={() => setDescEn(descEs)} className="text-[11px] font-bold text-neutral-400 underline">
+              {c.copyFromSpanish}
+            </button>
+          )}
+        </div>
         <textarea
           ref={descEnRef}
           value={descEn}

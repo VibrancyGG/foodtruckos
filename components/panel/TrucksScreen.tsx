@@ -160,12 +160,7 @@ export function TrucksScreen({
       </div>
 
       {showRequest && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowRequest(false)
-          }}
-        >
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
           <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
             <h3 className="mb-1.5 text-xl font-black">{p.requestTruckTitle}</h3>
             <p className="mb-4 text-sm text-neutral-500">{p.requestTruckBody}</p>

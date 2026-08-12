@@ -13,6 +13,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
   const [filter, setFilter] = useState<string>("todos")
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [showAddCategory, setShowAddCategory] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<{ id: string; name_es: string; name_en: string } | null>(null)
 
   // "Solo Truck X" en el prototipo === is_offered:false en los demás trucks.
   // Sin fila en unit_products para esa unidad se trata como ofrecido — así
@@ -95,6 +96,7 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           optionGroups={initial.optionGroups}
           options={initial.options}
           filter={filter}
+          onEditCategory={() => setEditingCategory(cat)}
         />
       ))}
 
@@ -130,7 +132,10 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
           onClose={() => setShowAddProduct(false)}
         />
       )}
-      {showAddCategory && <CategoryModal onClose={() => setShowAddCategory(false)} />}
+      {showAddCategory && <CategoryModal mode="add" onClose={() => setShowAddCategory(false)} />}
+      {editingCategory && (
+        <CategoryModal mode="edit" category={editingCategory} onClose={() => setEditingCategory(null)} />
+      )}
     </div>
   )
 }
@@ -143,6 +148,7 @@ function CategorySection({
   optionGroups,
   options,
   filter,
+  onEditCategory,
 }: {
   category: { id: string; name_es: string; name_en: string }
   products: OwnerMenuData["products"]
@@ -151,30 +157,41 @@ function CategorySection({
   optionGroups: OwnerMenuData["optionGroups"]
   options: OwnerMenuData["options"]
   filter: string
+  onEditCategory?: () => void
 }) {
-  const { lang } = useLang()
+  const { lang, t } = useLang()
+  const m = t.panel.menuPage
 
-  if (products.length === 0) return null
+  if (products.length === 0 && filter !== "todos") return null
 
   return (
     <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
       <div className="flex items-center gap-2.5 border-b border-neutral-100 px-4 py-3">
         <h2 className="text-sm font-black">{lang === "es" ? category.name_es : category.name_en}</h2>
         <span className="text-xs font-bold text-neutral-400">{products.length}</span>
+        {onEditCategory && (
+          <button onClick={onEditCategory} className="ml-auto text-xs font-bold text-neutral-400 hover:text-neutral-700">
+            {m.editCategory}
+          </button>
+        )}
       </div>
-      <div>
-        {products.map((p) => (
-          <ProductRow
-            key={p.id}
-            product={p}
-            units={units}
-            unitProducts={unitProducts}
-            optionGroups={optionGroups}
-            options={options}
-            filter={filter}
-          />
-        ))}
-      </div>
+      {products.length === 0 ? (
+        <p className="px-4 py-4 text-xs text-neutral-400">{m.noProductsInCategory}</p>
+      ) : (
+        <div>
+          {products.map((p) => (
+            <ProductRow
+              key={p.id}
+              product={p}
+              units={units}
+              unitProducts={unitProducts}
+              optionGroups={optionGroups}
+              options={options}
+              filter={filter}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

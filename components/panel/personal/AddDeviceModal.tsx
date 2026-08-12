@@ -27,7 +27,7 @@ export function AddDeviceModal({ units, onClose }: { units: Unit[]; onClose: () 
   function submit() {
     setError(null)
     if (!label.trim() || !unitId) {
-      setError(t.panel.menuPage.formError)
+      setError(p.deviceNameMissingError)
       return
     }
     startTransition(async () => {
@@ -75,7 +75,7 @@ export function AddDeviceModal({ units, onClose }: { units: Unit[]; onClose: () 
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
         <h3 className="mb-1.5 text-xl font-black">{p.connectDeviceTitle}</h3>
         <p className="mb-4 text-sm text-neutral-500">{p.devicesHint}</p>

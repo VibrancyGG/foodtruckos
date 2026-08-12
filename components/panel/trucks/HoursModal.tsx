@@ -2,9 +2,58 @@
 
 import { useState, useTransition } from "react"
 import { updateUnitHours } from "@/lib/units/actions"
-import { DAYS, parseWeeklyHours, summarizeHours, type WeeklyHours, type DayHours } from "@/lib/units/hours"
+import {
+  DAYS,
+  parseWeeklyHours,
+  summarizeHours,
+  to12h,
+  from12h,
+  HOUR_OPTIONS,
+  MINUTE_OPTIONS,
+  type WeeklyHours,
+  type DayHours,
+} from "@/lib/units/hours"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { OwnerUnitsData } from "@/lib/units/getOwnerUnits"
+
+function TimeInput12h({ value, onChange }: { value: string; onChange: (next: string) => void }) {
+  const { hour12, minute, period } = to12h(value)
+  return (
+    <span className="flex items-center gap-1">
+      <select
+        value={hour12}
+        onChange={(e) => onChange(from12h(Number(e.target.value), minute, period))}
+        className="rounded-lg border border-neutral-300 px-1 py-1 text-xs font-bold"
+      >
+        {HOUR_OPTIONS.map((h) => (
+          <option key={h} value={h}>
+            {h}
+          </option>
+        ))}
+      </select>
+      <span className="text-neutral-400">:</span>
+      <select
+        value={minute}
+        onChange={(e) => onChange(from12h(hour12, e.target.value, period))}
+        className="rounded-lg border border-neutral-300 px-1 py-1 text-xs font-bold"
+      >
+        {MINUTE_OPTIONS.map((m) => (
+          <option key={m} value={m}>
+            {m}
+          </option>
+        ))}
+      </select>
+      <select
+        value={period}
+        onChange={(e) => onChange(from12h(hour12, minute, e.target.value as "am" | "pm"))}
+        className="rounded-lg border border-neutral-300 px-1 py-1 text-xs font-bold uppercase"
+      >
+        <option value="am">AM</option>
+        <option value="pm">PM</option>
+      </select>
+    </span>
+  )
+}
 
 export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][number]; onClose: () => void }) {
   const { lang, t } = useLang()
@@ -53,7 +102,7 @@ export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][n
   const summary = summarizeHours(hours, lang)
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
         <h3 className="mb-1.5 text-xl font-black">{p.hoursModalTitle(unit.name)}</h3>
         <p className="mb-4 text-sm text-neutral-500">{p.hoursModalHint}</p>
@@ -82,20 +131,10 @@ export function HoursModal({ unit, onClose }: { unit: OwnerUnitsData["active"][n
                 {closed ? (
                   <span className="text-xs font-semibold text-neutral-400">{p.closedDay}</span>
                 ) : (
-                  <span className="flex items-center gap-1.5 text-xs">
-                    <input
-                      type="time"
-                      value={dh.open}
-                      onChange={(e) => setDay(d.key, { ...dh, open: e.target.value })}
-                      className="rounded-lg border border-neutral-300 px-1.5 py-1 text-xs font-bold"
-                    />
+                  <span className="flex flex-wrap items-center gap-1.5 text-xs">
+                    <TimeInput12h value={dh.open} onChange={(v) => setDay(d.key, { ...dh, open: v })} />
                     <span className="text-neutral-400">–</span>
-                    <input
-                      type="time"
-                      value={dh.close}
-                      onChange={(e) => setDay(d.key, { ...dh, close: e.target.value })}
-                      className="rounded-lg border border-neutral-300 px-1.5 py-1 text-xs font-bold"
-                    />
+                    <TimeInput12h value={dh.close} onChange={(v) => setDay(d.key, { ...dh, close: v })} />
                   </span>
                 )}
               </div>

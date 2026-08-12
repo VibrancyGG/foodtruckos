@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import type { OwnerMenuData } from "@/lib/menu/getOwnerMenu"
-import { createOptionGroup, deleteOptionGroup, createOption, deleteOption } from "@/lib/menu/actions"
+import { createOptionGroup, deleteOptionGroup, createOption, updateOption, deleteOption } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 
 export function OptionGroupsEditor({
@@ -23,10 +23,15 @@ export function OptionGroupsEditor({
   const [required, setRequired] = useState(false)
   const [minSelect, setMinSelect] = useState("0")
   const [maxSelect, setMaxSelect] = useState("1")
+  const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
   function addGroup() {
-    if (!nameEs.trim() || !nameEn.trim()) return
+    setError(null)
+    if (!nameEs.trim() || !nameEn.trim()) {
+      setError(m.categoryFormError)
+      return
+    }
     startTransition(async () => {
       await createOptionGroup({
         productId,
@@ -92,6 +97,7 @@ export function OptionGroupsEditor({
               />
             </label>
           </div>
+          {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button
               onClick={addGroup}
@@ -100,7 +106,13 @@ export function OptionGroupsEditor({
             >
               {c.create}
             </button>
-            <button onClick={() => setShowAddGroup(false)} className="text-xs text-neutral-500">
+            <button
+              onClick={() => {
+                setError(null)
+                setShowAddGroup(false)
+              }}
+              className="text-xs text-neutral-500"
+            >
               {c.cancel}
             </button>
           </div>
@@ -129,13 +141,18 @@ function OptionGroupRow({
   const [nameEn, setNameEn] = useState("")
   const [priceDelta, setPriceDelta] = useState("0")
   const [kind, setKind] = useState<"add" | "remove">("add")
+  const [error, setError] = useState<string | null>(null)
   const [gone, setGone] = useState(false)
   const [pending, startTransition] = useTransition()
 
   if (gone) return null
 
   function addOption() {
-    if (!nameEs.trim() || !nameEn.trim()) return
+    setError(null)
+    if (!nameEs.trim() || !nameEn.trim()) {
+      setError(m.optionNameMissingError)
+      return
+    }
     startTransition(async () => {
       await createOption({ groupId: group.id, nameEs, nameEn, priceDelta: parseFloat(priceDelta) || 0, kind })
       setNameEs("")
@@ -210,6 +227,8 @@ function OptionGroupRow({
               />
             )}
           </div>
+          {kind === "add" && <p className="text-[11px] text-neutral-400">{m.priceDeltaHint}</p>}
+          {error && <p className="text-xs text-red-600">{error}</p>}
           <div className="flex gap-2">
             <button
               onClick={addOption}
@@ -218,7 +237,13 @@ function OptionGroupRow({
             >
               {m.addOption}
             </button>
-            <button onClick={() => setShowAddOption(false)} className="text-xs text-neutral-500">
+            <button
+              onClick={() => {
+                setError(null)
+                setShowAddOption(false)
+              }}
+              className="text-xs text-neutral-500"
+            >
               {c.cancel}
             </button>
           </div>
@@ -233,10 +258,100 @@ function OptionGroupRow({
 }
 
 function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
-  const { lang } = useLang()
+  const { lang, t } = useLang()
+  const m = t.panel.menuPage
+  const c = t.panel.common
   const [gone, setGone] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [nameEs, setNameEs] = useState(option.option_name_es)
+  const [nameEn, setNameEn] = useState(option.option_name_en)
+  const [priceDelta, setPriceDelta] = useState(String(option.price_delta))
+  const [kind, setKind] = useState<"add" | "remove">(option.kind as "add" | "remove")
+  const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   if (gone) return null
+
+  function save() {
+    setError(null)
+    if (!nameEs.trim() || !nameEn.trim()) {
+      setError(m.optionNameMissingError)
+      return
+    }
+    startTransition(async () => {
+      const r = await updateOption({
+        optionId: option.id,
+        nameEs,
+        nameEn,
+        priceDelta: parseFloat(priceDelta) || 0,
+        kind,
+      })
+      if (!r.ok) {
+        setError(r.error)
+        return
+      }
+      setEditing(false)
+    })
+  }
+
+  function cancelEdit() {
+    setError(null)
+    setNameEs(option.option_name_es)
+    setNameEn(option.option_name_en)
+    setPriceDelta(String(option.price_delta))
+    setKind(option.kind as "add" | "remove")
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <div className="space-y-1.5 rounded border border-neutral-200 bg-neutral-50 p-1.5">
+        <input
+          value={nameEs}
+          onChange={(e) => setNameEs(e.target.value)}
+          placeholder={c.nameEsPlaceholder}
+          className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
+        />
+        <input
+          value={nameEn}
+          onChange={(e) => setNameEn(e.target.value)}
+          placeholder={c.nameEnPlaceholder}
+          className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
+        />
+        <div className="flex items-center gap-2 text-xs">
+          <select
+            value={kind}
+            onChange={(e) => setKind(e.target.value as "add" | "remove")}
+            className="rounded border border-neutral-300 px-1.5 py-1"
+          >
+            <option value="add">{m.addWithCost}</option>
+            <option value="remove">{m.removeNoCost}</option>
+          </select>
+          {kind === "add" && (
+            <input
+              value={priceDelta}
+              onChange={(e) => setPriceDelta(e.target.value)}
+              inputMode="decimal"
+              placeholder={m.priceDeltaPlaceholder}
+              className="w-16 rounded border border-neutral-300 px-1.5 py-1"
+            />
+          )}
+        </div>
+        {error && <p className="text-xs text-red-600">{error}</p>}
+        <div className="flex gap-2">
+          <button
+            onClick={save}
+            disabled={pending}
+            className="rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-bold text-white disabled:opacity-60"
+          >
+            {pending ? c.saving : c.save}
+          </button>
+          <button onClick={cancelEdit} className="text-xs text-neutral-500">
+            {c.cancel}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center justify-between text-xs">
@@ -248,18 +363,23 @@ function OptionRow({ option }: { option: OwnerMenuData["options"][number] }) {
             ? "(−)"
             : ""}
       </span>
-      <button
-        disabled={pending}
-        onClick={() =>
-          startTransition(async () => {
-            const r = await deleteOption(option.id)
-            if (r.ok) setGone(true)
-          })
-        }
-        className="text-neutral-400 hover:text-red-600"
-      >
-        ✕
-      </button>
+      <span className="flex items-center gap-2.5">
+        <button onClick={() => setEditing(true)} className="text-neutral-400 hover:text-neutral-700">
+          {m.editOption}
+        </button>
+        <button
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const r = await deleteOption(option.id)
+              if (r.ok) setGone(true)
+            })
+          }
+          className="text-neutral-400 hover:text-red-600"
+        >
+          ✕
+        </button>
+      </span>
     </div>
   )
 }

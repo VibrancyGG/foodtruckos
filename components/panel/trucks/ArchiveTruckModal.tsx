@@ -27,7 +27,7 @@ export function ArchiveTruckModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-5">
       <div className="w-full max-w-md rounded-2xl bg-white p-6" role="dialog" aria-modal="true">
         <h3 className="mb-1.5 text-xl font-black">{p.archiveModalTitle(unit.name)}</h3>
         <p className="mb-3 text-sm leading-relaxed text-neutral-600">{p.archiveModalBody}</p>
