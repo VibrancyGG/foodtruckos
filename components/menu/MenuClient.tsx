@@ -53,6 +53,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [customerName, setCustomerName] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
+  const [staleReload, setStaleReload] = useState(false)
   const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
   const [hydrated, setHydrated] = useState(false)
 
@@ -169,14 +170,29 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   async function handleCheckout() {
     setSending(true)
     setSendError(false)
-    const result = await createOrder({
-      businessId: data.business.id,
-      unitId: data.unit.id,
-      orderPointId: data.orderPoint.id,
-      taxIncluded: data.business.tax_included,
-      customerName: customerName || undefined,
-      items: cart,
-    })
+    let result: Awaited<ReturnType<typeof createOrder>>
+    try {
+      result = await createOrder({
+        businessId: data.business.id,
+        unitId: data.unit.id,
+        orderPointId: data.orderPoint.id,
+        taxIncluded: data.business.tax_included,
+        customerName: customerName || undefined,
+        items: cart,
+      })
+    } catch {
+      // La llamada en sí truena (no una respuesta con { error }) casi
+      // siempre porque el navegador sigue con el código de antes del último
+      // despliegue y el servidor ya no reconoce esa versión de la acción.
+      // Reintentar con el mismo código roto vuelve a fallar igual — hay que
+      // recargar para traer el código nuevo. El carrito ya vive en
+      // localStorage (regla de oro), así que la recarga no pierde el pedido:
+      // vuelve a aparecer solo y el comensal nada más toca "enviar" otra vez.
+      setSending(false)
+      setStaleReload(true)
+      window.setTimeout(() => window.location.reload(), 1500)
+      return
+    }
     setSending(false)
     if ("error" in result) {
       setSendError(true)
@@ -495,12 +511,16 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
               className="w-full rounded-lg border-2 px-3 py-2 text-sm"
               style={{ background: "#fff", color: INK, borderColor: "#3A332C" }}
             />
-            {sendError && (
-              <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{t.menu.sendError}</div>
+            {staleReload ? (
+              <div className="rounded-lg bg-amber-50 p-2 text-sm text-amber-800">{t.menu.updatedReloading}</div>
+            ) : (
+              sendError && (
+                <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{t.menu.sendError}</div>
+              )
             )}
             <button
               onClick={handleCheckout}
-              disabled={sending}
+              disabled={sending || staleReload}
               className="w-full rounded-lg py-3 uppercase tracking-wide disabled:opacity-60"
               style={{ fontFamily: "var(--font-display)", fontSize: 18, background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
             >

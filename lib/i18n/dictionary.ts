@@ -12,6 +12,7 @@ export type Dictionary = {
     soldOut: string
     sending: string
     sendError: string
+    updatedReloading: string
     retry: string
     cancel: string
     customerNameLabel: string
@@ -268,6 +269,7 @@ export type Dictionary = {
       copyFromSpanish: string
       suggestTranslation: string
       translating: string
+      staleReloadToast: string
     }
     menuPage: {
       title: string
@@ -815,6 +817,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       soldOut: "Se acabó",
       sending: "Enviando tu pedido…",
       sendError: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
+      updatedReloading: "Actualizamos el menú — recargando tu pantalla. Tu pedido sigue en el carrito, solo dale a enviar otra vez.",
       retry: "Reintentar",
       cancel: "Cancelar",
       customerNameLabel: "Tu nombre (opcional)",
@@ -1088,6 +1091,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         copyFromSpanish: "Usar el mismo texto",
         suggestTranslation: "Traducir con IA",
         translating: "Traduciendo…",
+        staleReloadToast: "Actualizamos el panel — recargando esta pantalla…",
       },
       menuPage: {
         title: "Menú",
@@ -1639,6 +1643,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       soldOut: "Sold out",
       sending: "Sending your order…",
       sendError: "We couldn't send your order. Check your connection and try again",
+      updatedReloading: "We just updated the menu — reloading your screen. Your order is still in your cart, just tap send again.",
       retry: "Retry",
       cancel: "Cancel",
       customerNameLabel: "Your name (optional)",
@@ -1911,6 +1916,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         copyFromSpanish: "Use the same text",
         suggestTranslation: "Translate with AI",
         translating: "Translating…",
+        staleReloadToast: "We just updated the panel — reloading this screen…",
       },
       menuPage: {
         title: "Menu",

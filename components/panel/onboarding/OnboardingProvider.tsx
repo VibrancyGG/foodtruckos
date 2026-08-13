@@ -64,8 +64,15 @@ export function OnboardingProvider({ children, shouldAutoStart }: { children: Re
   useEffect(() => {
     if (!active) return
     const step = ONBOARDING_STEPS[stepIndex]
-    if (step.route && step.route !== pathname) {
-      router.push(step.route)
+    const route = step.route
+    if (route && route !== pathname) {
+      // setTimeout, no startTransition: el aviso de React ("update a
+      // component while rendering a different component") viene de que
+      // router.push corre en el mismo flush síncrono que el commit de otro
+      // componente del árbol — startTransition no lo saca de ese flush,
+      // pero diferirlo a una macrotarea sí.
+      const id = setTimeout(() => router.push(route), 0)
+      return () => clearTimeout(id)
     }
   }, [active, stepIndex, pathname, router])
 

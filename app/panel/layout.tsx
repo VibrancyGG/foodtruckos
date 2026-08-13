@@ -10,6 +10,7 @@ import { SuspendedNotice } from "@/components/panel/SuspendedNotice"
 import { TruckApprovalBanner } from "@/components/panel/TruckApprovalBanner"
 import { OnboardingProvider } from "@/components/panel/onboarding/OnboardingProvider"
 import { OnboardingTour } from "@/components/panel/onboarding/OnboardingTour"
+import { StaleDeployGuard } from "@/components/panel/StaleDeployGuard"
 import { panelDisplayFont, panelBodyFont } from "@/lib/fonts"
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
@@ -36,6 +37,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
 
   return (
     <LangProvider defaultLang="es">
+      <StaleDeployGuard />
       <OnboardingProvider shouldAutoStart={shouldAutoStart}>
         <div className={`${panelDisplayFont.variable} ${panelBodyFont.variable} min-h-screen bg-panel-bg font-[family-name:var(--font-panel-body)] text-panel-ink`}>
           <PanelHeaderNav
