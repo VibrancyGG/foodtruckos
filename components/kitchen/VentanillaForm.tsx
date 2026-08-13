@@ -59,6 +59,7 @@ export function VentanillaForm({
   const [editing, setEditing] = useState<KitchenData["products"][number] | null>(null)
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [paidNow, setPaidNow] = useState<boolean | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<"efectivo" | "tarjeta" | null>(null)
   const [orderChips, setOrderChips] = useState<Set<string>>(new Set())
   const [orderText, setOrderText] = useState("")
   const [sending, setSending] = useState(false)
@@ -131,6 +132,7 @@ export function VentanillaForm({
           unitId,
           taxIncluded,
           paidNow,
+          paymentMethod: paidNow ? (paymentMethod ?? undefined) : undefined,
           orderNotes: orderNotesText() || undefined,
           items: lines.map((l) => ({
             productId: l.productId,
@@ -311,7 +313,10 @@ export function VentanillaForm({
                 {t.alreadyPaid}
               </button>
               <button
-                onClick={() => setPaidNow(false)}
+                onClick={() => {
+                  setPaidNow(false)
+                  setPaymentMethod(null)
+                }}
                 aria-pressed={paidNow === false}
                 className="rounded-lg border-2 py-3 text-[13.5px] font-extrabold"
                 style={paidNow === false ? { borderColor: "#30A46C", background: "#16301F", color: "#8BE9B0" } : { borderColor: EDGE, background: SURFACE2, color: TEXT }}
@@ -319,10 +324,30 @@ export function VentanillaForm({
                 {t.payAtPickup}
               </button>
             </div>
+            {paidNow === true && (
+              <div className="mb-2.5 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setPaymentMethod("efectivo")}
+                  aria-pressed={paymentMethod === "efectivo"}
+                  className="rounded-lg border-2 py-2.5 text-[13px] font-extrabold"
+                  style={paymentMethod === "efectivo" ? { borderColor: "#5B8DEF", background: "#182338", color: "#8FB2FF" } : { borderColor: EDGE, background: SURFACE2, color: TEXT }}
+                >
+                  {t.paymentMethodCash}
+                </button>
+                <button
+                  onClick={() => setPaymentMethod("tarjeta")}
+                  aria-pressed={paymentMethod === "tarjeta"}
+                  className="rounded-lg border-2 py-2.5 text-[13px] font-extrabold"
+                  style={paymentMethod === "tarjeta" ? { borderColor: "#5B8DEF", background: "#182338", color: "#8FB2FF" } : { borderColor: EDGE, background: SURFACE2, color: TEXT }}
+                >
+                  {t.paymentMethodCard}
+                </button>
+              </div>
+            )}
             {error && <div className="mb-2 rounded bg-red-950 p-2 text-sm text-red-300">{dictionary[lang].menu.sendError}</div>}
             <button
               onClick={send}
-              disabled={sending || lines.length === 0 || paidNow === null}
+              disabled={sending || lines.length === 0 || paidNow === null || (paidNow === true && !paymentMethod)}
               className="w-full rounded-lg py-4 text-[17px] font-black disabled:opacity-50"
               style={{ background: "#5B8DEF", color: "#0A1020" }}
             >

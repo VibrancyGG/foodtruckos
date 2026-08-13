@@ -649,6 +649,7 @@ export type Database = {
           id: string
           notes: string | null
           order_point_id: string | null
+          payment_method: string | null
           payment_status: string
           status: string
           subtotal: number
@@ -668,6 +669,7 @@ export type Database = {
           id?: string
           notes?: string | null
           order_point_id?: string | null
+          payment_method?: string | null
           payment_status?: string
           status?: string
           subtotal?: number
@@ -687,6 +689,7 @@ export type Database = {
           id?: string
           notes?: string | null
           order_point_id?: string | null
+          payment_method?: string | null
           payment_status?: string
           status?: string
           subtotal?: number

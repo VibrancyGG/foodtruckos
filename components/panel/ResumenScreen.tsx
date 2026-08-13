@@ -11,6 +11,7 @@ import { TruckBarChart } from "./reportes/TruckBarChart"
 import { ChannelDonut } from "./reportes/ChannelDonut"
 import { TopProductsChart } from "./reportes/TopProductsChart"
 import { ActivityRow } from "./reportes/ActivityRow"
+import { OrdersLedger } from "./reportes/OrdersLedger"
 
 const WEEKDAY_LABEL: Record<"es" | "en", string[]> = {
   es: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
@@ -287,6 +288,15 @@ export function ResumenScreen({ data }: { data: OwnerSummary }) {
           <p className="mt-3 text-[11px] leading-relaxed text-panel-ink/40">{p.salesActivityDisclaimer}</p>
         </Card>
       </div>
+
+      <Card delay={380}>
+        <OrdersLedger
+          orders={data.ledger}
+          trucks={data.perTruck.map((u) => ({ unitId: u.unitId, name: u.name }))}
+          t={t}
+          lang={lang}
+        />
+      </Card>
     </div>
   )
 }

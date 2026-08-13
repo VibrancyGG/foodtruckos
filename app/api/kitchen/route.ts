@@ -15,7 +15,7 @@ const TAX_RATE = 0.08625
 type Body =
   | { action: "advance"; orderId: string; unitId?: string }
   | { action: "regress"; orderId: string; unitId?: string }
-  | { action: "deliver"; orderId: string; paid: boolean; unitId?: string }
+  | { action: "deliver"; orderId: string; paid: boolean; paymentMethod?: string; unitId?: string }
   | { action: "cancel"; orderId: string; unitId?: string }
   | { action: "soldOut"; unitProductId: string; soldOut: boolean; unitId?: string }
   | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
@@ -24,6 +24,7 @@ type Body =
       unitId?: string
       taxIncluded: boolean
       paidNow: boolean
+      paymentMethod?: string
       orderNotes?: string
       items: {
         productId: string
@@ -128,9 +129,17 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
     if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
 
+    // payment_method solo se toca cuando hay un cambio real: al cobrar aquí
+    // (paymentMethod viene en el body) o al marcar sin cobrar (se limpia).
+    // Una orden que YA venía pagada de ventanilla (paidNow) se entrega sin
+    // volver a preguntar el método — no debe perder el que ya se registró.
     await supabase
       .from("orders")
-      .update({ status: "entregado", payment_status: body.paid ? "pagada" : "pendiente" })
+      .update({
+        status: "entregado",
+        payment_status: body.paid ? "pagada" : "pendiente",
+        ...(body.paid ? (body.paymentMethod ? { payment_method: body.paymentMethod } : {}) : { payment_method: null }),
+      })
       .eq("id", order.id)
     await supabase.from("order_status_events").insert({
       business_id: unit.business_id,
@@ -210,6 +219,7 @@ export async function POST(req: NextRequest) {
         channel: "ventanilla",
         status: "recibido",
         payment_status: body.paidNow ? "pagada" : "pendiente",
+        payment_method: body.paidNow ? (body.paymentMethod ?? null) : null,
         subtotal,
         tax_amount: taxAmount,
         tax_included_snapshot: body.taxIncluded,

@@ -74,6 +74,9 @@ export type Dictionary = {
     askPaid: string
     yesCharged: string
     deliverUnpaid: string
+    paymentMethodCash: string
+    paymentMethodCard: string
+    paymentMethodPrompt: string
     ventanilla: string
     newVentanillaOrder: string
     soldOutToggle: string
@@ -147,6 +150,20 @@ export type Dictionary = {
     add: string
     counterFallbackName: string
     noCategoryLabel: string
+    lookupButton: string
+    lookupTitle: string
+    lookupSubtitle: string
+    lookupPlaceholder: string
+    lookupSearch: string
+    lookupSearching: string
+    lookupNotFound: string
+    lookupStatusRecibido: string
+    lookupStatusPreparando: string
+    lookupStatusListo: string
+    lookupStatusEntregado: string
+    lookupStatusCancelado: string
+    lookupPaidWith: (method: string) => string
+    lookupUnpaid: string
     pairTitle: string
     pairSubtitle: string
     pairPlaceholder: string
@@ -649,6 +666,33 @@ export type Dictionary = {
       salesActivity: string
       salesActivityHint: string
       salesActivityDisclaimer: string
+      ledgerTitle: string
+      ledgerSubtitle: string
+      ledgerFilterTruck: string
+      ledgerFilterAllTrucks: string
+      ledgerFilterFrom: string
+      ledgerFilterTo: string
+      ledgerFilterPaymentMethod: string
+      ledgerFilterAllMethods: string
+      ledgerFilterPaymentStatus: string
+      ledgerFilterAllStatuses: string
+      ledgerFilterChannel: string
+      ledgerFilterAllChannels: string
+      ledgerSearchPlaceholder: string
+      ledgerExport: string
+      ledgerEmpty: string
+      ledgerColFolio: string
+      ledgerColDate: string
+      ledgerColTruck: string
+      ledgerColChannel: string
+      ledgerColStatus: string
+      ledgerColPayment: string
+      ledgerColTotal: string
+      ledgerShowingCount: (n: number) => string
+      ledgerStatusPaid: string
+      ledgerStatusUnpaid: string
+      ledgerChannelQr: string
+      ledgerChannelVentanilla: string
       lateOpenInsightTitle: (unitName: string, minutes: number) => string
       lateOpenInsightBody: (amount: string) => string
       highlightsTitle: string
@@ -906,6 +950,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       askPaid: "¿Ya cobraste esta orden?",
       yesCharged: "Sí, cobré",
       deliverUnpaid: "Entregar sin cobrar",
+      paymentMethodCash: "Efectivo",
+      paymentMethodCard: "Tarjeta",
+      paymentMethodPrompt: "¿Cómo pagó?",
       ventanilla: "Ventanilla",
       newVentanillaOrder: "Nuevo pedido en ventanilla",
       soldOutToggle: "Se acabó",
@@ -980,6 +1027,20 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "¿Algún cambio?",
       add: "Agregar",
       counterFallbackName: "Mostrador",
+      lookupButton: "Buscar pedido",
+      lookupTitle: "Buscar pedido",
+      lookupSubtitle: "Por número de folio, últimos 7 días",
+      lookupPlaceholder: "Ej. 42",
+      lookupSearch: "Buscar",
+      lookupSearching: "Buscando…",
+      lookupNotFound: "No encontramos ese folio en los últimos 7 días",
+      lookupStatusRecibido: "Nueva",
+      lookupStatusPreparando: "Preparando",
+      lookupStatusListo: "Lista",
+      lookupStatusEntregado: "Entregada",
+      lookupStatusCancelado: "Cancelada",
+      lookupPaidWith: (method) => `Pagada · ${method}`,
+      lookupUnpaid: "Sin cobrar",
       noCategoryLabel: "Sin categoría",
       pairTitle: "Emparejar esta pantalla",
       pairSubtitle: "Pide el código al dueño del negocio.",
@@ -1489,6 +1550,33 @@ export const dictionary: Record<Lang, Dictionary> = {
         salesActivity: "Actividad de venta",
         salesActivityHint: "A qué hora entra el primer y el último pedido de cada truck, en promedio, y cómo se compara con el horario que publicaste — últimos 30 días.",
         salesActivityDisclaimer: "Esto mide a qué hora entran los pedidos, comparado con tu horario publicado en Trucks. No registra entradas ni salidas de personal, y no sirve para calcular pagos.",
+      ledgerTitle: "Tus pedidos",
+      ledgerSubtitle: "Últimos 30 días. Filtra y descarga para comparar contra tu caja o tu banco.",
+      ledgerFilterTruck: "Truck",
+      ledgerFilterAllTrucks: "Todos",
+      ledgerFilterFrom: "Desde",
+      ledgerFilterTo: "Hasta",
+      ledgerFilterPaymentMethod: "Medio de pago",
+      ledgerFilterAllMethods: "Todos",
+      ledgerFilterPaymentStatus: "Estado de pago",
+      ledgerFilterAllStatuses: "Todos",
+      ledgerFilterChannel: "Canal",
+      ledgerFilterAllChannels: "Todos",
+      ledgerSearchPlaceholder: "Folio o nombre del cliente",
+      ledgerExport: "Descargar CSV",
+      ledgerEmpty: "No hay pedidos con estos filtros.",
+      ledgerColFolio: "Folio",
+      ledgerColDate: "Fecha",
+      ledgerColTruck: "Truck",
+      ledgerColChannel: "Canal",
+      ledgerColStatus: "Estado",
+      ledgerColPayment: "Pago",
+      ledgerColTotal: "Total",
+      ledgerShowingCount: (n) => `${n} pedido${n === 1 ? "" : "s"}`,
+      ledgerStatusPaid: "Pagada",
+      ledgerStatusUnpaid: "Sin cobrar",
+      ledgerChannelQr: "QR",
+      ledgerChannelVentanilla: "Ventanilla",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} empieza a vender ${minutes} minutos tarde`,
         lateOpenInsightBody: (amount) => `Al ritmo de venta de esa unidad, esa franja ronda los ${amount} al mes — es una estimación a partir de su venta por hora, no un dato exacto.`,
         highlightsTitle: "Puntos clave",
@@ -1744,6 +1832,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       askPaid: "Did you already charge this order?",
       yesCharged: "Yes, charged",
       deliverUnpaid: "Deliver without charging",
+      paymentMethodCash: "Cash",
+      paymentMethodCard: "Card",
+      paymentMethodPrompt: "How did they pay?",
       ventanilla: "Counter",
       newVentanillaOrder: "New counter order",
       soldOutToggle: "Sold out",
@@ -1817,6 +1908,20 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "Any changes?",
       add: "Add",
       counterFallbackName: "Counter",
+      lookupButton: "Find order",
+      lookupTitle: "Find order",
+      lookupSubtitle: "By folio number, last 7 days",
+      lookupPlaceholder: "E.g. 42",
+      lookupSearch: "Search",
+      lookupSearching: "Searching…",
+      lookupNotFound: "We couldn't find that folio in the last 7 days",
+      lookupStatusRecibido: "New",
+      lookupStatusPreparando: "In progress",
+      lookupStatusListo: "Ready",
+      lookupStatusEntregado: "Picked up",
+      lookupStatusCancelado: "Cancelled",
+      lookupPaidWith: (method) => `Paid · ${method}`,
+      lookupUnpaid: "Not paid yet",
       noCategoryLabel: "No category",
       pairTitle: "Pair this screen",
       pairSubtitle: "Ask the business owner for the code.",
@@ -2326,6 +2431,33 @@ export const dictionary: Record<Lang, Dictionary> = {
         salesActivity: "Sales activity",
         salesActivityHint: "What time the first and last order of each truck come in, on average, and how that compares to the hours you published — last 30 days.",
         salesActivityDisclaimer: "This measures what time orders come in, compared to the hours you published in Trucks. It doesn't log staff clock-ins or clock-outs, and it's not used to calculate pay.",
+      ledgerTitle: "Your orders",
+      ledgerSubtitle: "Last 30 days. Filter and download to compare against your register or your bank.",
+      ledgerFilterTruck: "Truck",
+      ledgerFilterAllTrucks: "All",
+      ledgerFilterFrom: "From",
+      ledgerFilterTo: "To",
+      ledgerFilterPaymentMethod: "Payment method",
+      ledgerFilterAllMethods: "All",
+      ledgerFilterPaymentStatus: "Payment status",
+      ledgerFilterAllStatuses: "All",
+      ledgerFilterChannel: "Channel",
+      ledgerFilterAllChannels: "All",
+      ledgerSearchPlaceholder: "Folio or customer name",
+      ledgerExport: "Download CSV",
+      ledgerEmpty: "No orders match these filters.",
+      ledgerColFolio: "Folio",
+      ledgerColDate: "Date",
+      ledgerColTruck: "Truck",
+      ledgerColChannel: "Channel",
+      ledgerColStatus: "Status",
+      ledgerColPayment: "Payment",
+      ledgerColTotal: "Total",
+      ledgerShowingCount: (n) => `${n} order${n === 1 ? "" : "s"}`,
+      ledgerStatusPaid: "Paid",
+      ledgerStatusUnpaid: "Not paid",
+      ledgerChannelQr: "QR",
+      ledgerChannelVentanilla: "Counter",
         lateOpenInsightTitle: (unitName, minutes) => `${unitName} starts selling ${minutes} minutes late`,
         lateOpenInsightBody: (amount) => `At that unit's sales pace, that gap runs about ${amount} a month — an estimate from its hourly sales rate, not an exact figure.`,
         highlightsTitle: "Key highlights",

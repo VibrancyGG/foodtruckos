@@ -10,6 +10,7 @@ import { enqueueAction, drainQueue, pendingCount } from "@/lib/kitchen/offlineQu
 import { useWakeLock } from "@/lib/kitchen/useWakeLock"
 import { VentanillaForm } from "./VentanillaForm"
 import { DaySummaryModal } from "./DaySummaryModal"
+import { OrderLookupModal } from "./OrderLookupModal"
 import { SoldOutScreen } from "./SoldOutScreen"
 import type { KitchenData } from "@/lib/kitchen/getKitchenData"
 
@@ -79,6 +80,7 @@ export function KitchenBoard({
   const [showVentanilla, setShowVentanilla] = useState(false)
   const [showSoldOut, setShowSoldOut] = useState(false)
   const [showDaySummary, setShowDaySummary] = useState(false)
+  const [showLookup, setShowLookup] = useState(false)
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
   const [askCancelFor, setAskCancelFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
@@ -211,9 +213,9 @@ export function KitchenBoard({
     act({ action: "regress", orderId })
   }
 
-  function deliver(orderId: string, paid: boolean) {
+  function deliver(orderId: string, paid: boolean, paymentMethod?: "efectivo" | "tarjeta") {
     setOrders((os) => os.filter((o) => o.id !== orderId))
-    act({ action: "deliver", orderId, paid })
+    act({ action: "deliver", orderId, paid, paymentMethod })
     setAskPayFor(null)
     setTodayCount((n) => n + 1)
   }
@@ -342,6 +344,7 @@ export function KitchenBoard({
           ))}
         <div className="ml-auto flex w-full flex-wrap gap-2 md:w-auto">
           <ToolButton onClick={() => setShowDaySummary(true)} label={t.kitchen.salesButton} />
+          <ToolButton onClick={() => setShowLookup(true)} label={t.kitchen.lookupButton} />
           {!readOnly && (
             <>
               <ToolButton onClick={() => setSoundOn((s) => !s)} label={soundOn ? t.kitchen.soundOn : t.kitchen.soundOff} on={soundOn} />
@@ -491,9 +494,17 @@ export function KitchenBoard({
                       {!readOnly && (col === "listo" ? (
                         askPayFor === o.id ? (
                           <div className="mt-2.5 space-y-1.5">
-                            <button onClick={() => deliver(o.id, true)} className="w-full rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
-                              {t.kitchen.yesCharged} ${o.total.toFixed(2)}
-                            </button>
+                            <div className="mb-0.5 text-center text-[11px] font-bold uppercase tracking-wide text-neutral-400">
+                              {t.kitchen.paymentMethodPrompt} ${o.total.toFixed(2)}
+                            </div>
+                            <div className="grid grid-cols-2 gap-1.5">
+                              <button onClick={() => deliver(o.id, true, "efectivo")} className="rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
+                                {t.kitchen.paymentMethodCash}
+                              </button>
+                              <button onClick={() => deliver(o.id, true, "tarjeta")} className="rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
+                                {t.kitchen.paymentMethodCard}
+                              </button>
+                            </div>
                             <button onClick={() => deliver(o.id, false)} className="w-full rounded-lg py-2.5 text-sm font-bold" style={{ background: "#232019", color: "#FFCB6B", border: "1px solid #6B4A12" }}>
                               {t.kitchen.deliverUnpaid}
                             </button>
@@ -579,6 +590,8 @@ export function KitchenBoard({
           onClose={() => setShowDaySummary(false)}
         />
       )}
+
+      {showLookup && <OrderLookupModal unitId={unitId} lang={lang} onClose={() => setShowLookup(false)} />}
     </div>
   )
 }

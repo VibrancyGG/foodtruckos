@@ -37,7 +37,7 @@ export async function getOwnerSummary(businessId: string) {
     supabase.from("units").select("id, name, hours").eq("business_id", businessId),
     supabase
       .from("orders")
-      .select("id, unit_id, channel, status, payment_status, total, created_at")
+      .select("id, folio, unit_id, channel, status, payment_status, payment_method, customer_name, total, created_at")
       .eq("business_id", businessId)
       .gte("created_at", windowStart.toISOString())
       .order("created_at"),
@@ -327,6 +327,29 @@ export async function getOwnerSummary(businessId: string) {
   // ---- insight: platillo estrella del mes ----
   const topProductInsight = topProducts.length > 0 ? topProducts[0] : null
 
+  // ---- historial de órdenes, últimos 30 días — para que el dueño concilie
+  // caja/banco o consulte algo puntual, no para analítica (eso ya lo hace el
+  // resto de esta pantalla). Mismo dataset de allOrderList, sin consulta
+  // nueva — ya cubre un año completo.
+  const ledgerWindowStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const unitNameById = new Map(unitList.map((u) => [u.id, u.name]))
+  const ledger = allOrderList
+    .filter((o) => o.created_at >= ledgerWindowStart)
+    .map((o) => ({
+      id: o.id,
+      folio: o.folio,
+      unitId: o.unit_id,
+      unitName: unitNameById.get(o.unit_id) ?? "—",
+      channel: o.channel,
+      status: o.status,
+      paymentStatus: o.payment_status,
+      paymentMethod: o.payment_method,
+      customerName: o.customer_name,
+      total: o.total,
+      createdAt: o.created_at.toISOString(),
+    }))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
   return {
     currentMonth,
     currentYear,
@@ -350,6 +373,7 @@ export async function getOwnerSummary(businessId: string) {
     pendingInProgress,
     pendingDelivered,
     noShow,
+    ledger,
   }
 }
 
