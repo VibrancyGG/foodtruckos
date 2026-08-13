@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -68,6 +69,7 @@ export function KitchenBoard({
   logoUrl?: string | null
 }) {
   const { lang, setLang, t } = useLang()
+  const router = useRouter()
   const [orders, setOrders] = useState(initial.orders)
   const [items, setItems] = useState(initial.items)
   const [unitProducts, setUnitProducts] = useState(initial.unitProducts)
@@ -80,6 +82,7 @@ export function KitchenBoard({
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
   const [askCancelFor, setAskCancelFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
+  const [confirmingLogout, setConfirmingLogout] = useState(false)
   const [now, setNow] = useState(() => Date.now())
   const [soundOn, setSoundOn] = useState(true)
   const [activeTab, setActiveTab] = useState<Column>("recibido")
@@ -177,6 +180,14 @@ export function KitchenBoard({
       clearTimeout(countKick)
     }
   }, [unitId, businessId, refetch, fetchTodayCount])
+
+  // Cierra la sesión de la persona, no el emparejamiento del dispositivo —
+  // el siguiente en el turno solo teclea su PIN (lib/staff/session.ts:
+  // startStaffSession sigue viendo el mismo ft_device).
+  async function handleLogout() {
+    await fetch("/api/staff/logout", { method: "POST" })
+    router.push("/cocina")
+  }
 
   function act(body: Record<string, unknown>) {
     // El Encargado puede operar un truck que no es el de su dispositivo
@@ -305,6 +316,30 @@ export function KitchenBoard({
         >
           {lang === "es" ? "EN" : "ES"}
         </button>
+        {!readOnly &&
+          (confirmingLogout ? (
+            <div className="flex items-center gap-1.5 text-xs font-bold">
+              <span style={{ color: "#FFB3B5" }}>{t.kitchen.confirmLogout}</span>
+              <button onClick={handleLogout} className="rounded-full px-2.5 py-1.5" style={{ background: "#E5484D", color: "#fff" }}>
+                {t.kitchen.logout}
+              </button>
+              <button
+                onClick={() => setConfirmingLogout(false)}
+                className="rounded-full border px-2.5 py-1.5"
+                style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+              >
+                {t.kitchen.back}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmingLogout(true)}
+              className="rounded-full border px-2.5 py-1.5 text-xs font-bold"
+              style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+            >
+              {t.kitchen.logout}
+            </button>
+          ))}
         <div className="ml-auto flex w-full flex-wrap gap-2 md:w-auto">
           <ToolButton onClick={() => setShowDaySummary(true)} label={t.kitchen.salesButton} />
           {!readOnly && (

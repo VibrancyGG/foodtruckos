@@ -86,6 +86,22 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
               {lang === "es" ? "EN" : "ES"}
             </button>
           </div>
+
+          {/* Versión condensada del momento de marca del panel izquierdo —
+              en pantallas < 1024px ese panel se oculta por completo
+              (lg:flex), y la mayoría de dueños entra desde el celular, así
+              que sin esto el primer momento de la app era un formulario
+              genérico en vez del producto mismo. */}
+          <div className="mb-7 lg:hidden">
+            <div
+              className="mb-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
+              style={{ background: "rgba(255,90,54,.14)", color: "#FF8A5C" }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full motion-safe:animate-pulse" style={{ background: "#FF5A36" }} />
+              {p.signatureEyebrow}
+            </div>
+            <h1 className="text-[20px] font-black leading-[1.15] tracking-tight text-white">{p.signatureHeadline}</h1>
+          </div>
           <div className="mb-6 hidden justify-end lg:flex">
             <button
               onClick={() => setLang(lang === "es" ? "en" : "es")}

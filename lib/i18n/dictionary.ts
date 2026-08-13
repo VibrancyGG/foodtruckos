@@ -185,6 +185,10 @@ export type Dictionary = {
     attentionNeededTitle: string
     attentionNeededEmpty: string
     trucksOverviewDisclaimer: string
+    logout: string
+    confirmLogout: string
+    staffOnline: string
+    staffOffline: string
   }
   panel: {
     nav: {
@@ -1015,6 +1019,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       attentionNeededTitle: "Requieren atención",
       attentionNeededEmpty: "Nada pasado de tiempo. Todos los trucks van al día.",
       trucksOverviewDisclaimer: "Se actualiza cada vez que entras a esta pantalla.",
+      logout: "Cerrar sesión",
+      confirmLogout: "¿Cerrar tu sesión en este dispositivo?",
+      staffOnline: "En línea",
+      staffOffline: "Desconectado",
     },
     panel: {
       nav: {
@@ -1848,6 +1856,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       attentionNeededTitle: "Need attention",
       attentionNeededEmpty: "Nothing running late. All trucks are on track.",
       trucksOverviewDisclaimer: "Refreshes every time you open this screen.",
+      logout: "Log out",
+      confirmLogout: "Log out of this device?",
+      staffOnline: "Online",
+      staffOffline: "Offline",
     },
     panel: {
       nav: {

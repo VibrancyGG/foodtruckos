@@ -17,9 +17,9 @@ function calendarKey(date: string | Date, timezone: string) {
 // Vista exclusiva del Encargado (y del dueño en su panel): cómo van TODOS
 // los trucks del negocio ahora mismo, no solo el suyo. Nunca se le muestra
 // al personal de cocina/ventanilla — esos siguen viendo solo su tablero.
-// Todo sale de datos reales del momento; "en línea" no se calcula porque no
-// hay una señal confiable de conexión por truck todavía (foodtruckos-datos
-// Regla: nunca inventar un número).
+// Todo sale de datos reales del momento; "en línea" sale de device_sessions
+// (no expirada, no revocada) — nunca se inventa (foodtruckos-datos Regla:
+// nunca inventar un número).
 //
 // Llave de servicio, no el cliente público: la política pública de `units`
 // solo deja ver trucks con status='active' — un truck en pausa (el caso que
@@ -49,6 +49,28 @@ export async function getTrucksOverview(businessId: string) {
   // cerradas — la fecha exacta de "hoy" se decide después con calendarKey,
   // nunca con este límite.
   const salesWindowStart = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [{ data: staffRows }, { data: onlineSessionRows }] = await Promise.all([
+    supabase.from("staff").select("id, unit_id, name, role").eq("business_id", businessId).eq("active", true),
+    // Solo dice "en línea" a alguien con sesión vigente de verdad — no
+    // revocada y sin expirar todavía — nunca a partir de cuándo se emparejó
+    // el dispositivo, que puede ser meses atrás (lib/staff/session.ts).
+    supabase
+      .from("device_sessions")
+      .select("staff_id, devices!inner(unit_id, business_id)")
+      .is("revoked_at", null)
+      .gt("expires_at", new Date().toISOString())
+      .eq("devices.business_id", businessId),
+  ])
+
+  const onlineStaffIds = new Set((onlineSessionRows ?? []).map((r) => r.staff_id))
+  const staffByUnit = new Map<string, { id: string; name: string; role: string; online: boolean }[]>()
+  for (const s of staffRows ?? []) {
+    if (!s.unit_id) continue
+    const list = staffByUnit.get(s.unit_id) ?? []
+    list.push({ id: s.id, name: s.name, role: s.role, online: onlineStaffIds.has(s.id) })
+    staffByUnit.set(s.unit_id, list)
+  }
 
   const [{ data: openOrdersRaw }, { data: closedOrdersRaw }] = await Promise.all([
     // Sin filtro de fecha — exactamente lo mismo que ve cocina (getKitchenData:
@@ -128,6 +150,7 @@ export async function getTrucksOverview(businessId: string) {
       amberMinutes: amber,
       redMinutes: red,
       level: unitOpen.length === 0 ? null : oldestMinutes >= red ? "red" : oldestMinutes >= amber ? "amber" : null,
+      staff: staffByUnit.get(u.id) ?? [],
     }
   })
 

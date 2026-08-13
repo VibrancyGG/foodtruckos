@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { TrucksOverview } from "@/lib/kitchen/getTrucksOverview"
 import { formatClock } from "@/lib/units/hours"
@@ -22,6 +24,15 @@ export function TrucksOverviewBoard({
   logoUrl?: string | null
 }) {
   const { lang, setLang, t } = useLang()
+  const router = useRouter()
+  const [confirmingLogout, setConfirmingLogout] = useState(false)
+
+  // Cierra la sesión del Encargado, no el emparejamiento del dispositivo —
+  // igual que en KitchenBoard, el siguiente turno solo teclea su PIN.
+  async function handleLogout() {
+    await fetch("/api/staff/logout", { method: "POST" })
+    router.push("/cocina")
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-y-auto" style={{ background: "#100F0D", color: "#F6F3ED" }}>
@@ -40,6 +51,29 @@ export function TrucksOverviewBoard({
         >
           {lang === "es" ? "EN" : "ES"}
         </button>
+        {confirmingLogout ? (
+          <div className="flex items-center gap-1.5 text-xs font-bold">
+            <span style={{ color: "#FFB3B5" }}>{t.kitchen.confirmLogout}</span>
+            <button onClick={handleLogout} className="rounded-full px-2.5 py-1.5" style={{ background: "#E5484D", color: "#fff" }}>
+              {t.kitchen.logout}
+            </button>
+            <button
+              onClick={() => setConfirmingLogout(false)}
+              className="rounded-full border px-2.5 py-1.5"
+              style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+            >
+              {t.kitchen.back}
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmingLogout(true)}
+            className="rounded-full border px-2.5 py-1.5 text-xs font-bold"
+            style={{ borderColor: "#332F29", color: "#F6F3ED" }}
+          >
+            {t.kitchen.logout}
+          </button>
+        )}
       </header>
 
       <div className="mx-auto w-full max-w-5xl flex-1 px-4.5 py-5">
@@ -83,6 +117,30 @@ export function TrucksOverviewBoard({
                 </span>
               </div>
               {truck.location && <p className="mt-0.5 text-xs font-medium text-neutral-400">{truck.location}</p>}
+
+              {truck.staff.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {truck.staff.map((s) => {
+                    const roleLabel =
+                      s.role === "cocina" ? t.panel.personalPage.roleCocina
+                      : s.role === "cajero" ? t.panel.personalPage.roleCajero
+                      : t.panel.personalPage.roleEncargado
+                    return (
+                      <span
+                        key={s.id}
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
+                        style={{ background: "#232019", color: "#F6F3ED" }}
+                      >
+                        <span
+                          className="h-[7px] w-[7px] rounded-full"
+                          style={{ background: s.online ? "#30A46C" : "#5A5147" }}
+                        />
+                        {s.name} · {roleLabel} · {s.online ? t.kitchen.staffOnline : t.kitchen.staffOffline}
+                      </span>
+                    )
+                  })}
+                </div>
+              )}
 
               <div className="mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-lg border" style={{ borderColor: "#332F29", background: "#332F29" }}>
                 <div className="p-2.5 text-center" style={{ background: "#232019" }}>
