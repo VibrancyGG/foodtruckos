@@ -14,6 +14,12 @@ export type CartItemInput = {
   notes?: string
 }
 
+// Códigos, no texto: el mensaje real que ve el comensal se arma del lado del
+// cliente con el diccionario bilingüe (t.menu.orderError.*), según el idioma
+// que tenga activo en ese momento — el servidor no sabe en qué idioma está
+// viendo la pantalla quien pidió.
+export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed"
+
 export async function createOrder(input: {
   businessId: string
   unitId: string
@@ -21,9 +27,9 @@ export async function createOrder(input: {
   taxIncluded: boolean
   customerName?: string
   items: CartItemInput[]
-}): Promise<{ orderId: string; folio: number } | { error: string }> {
+}): Promise<{ orderId: string; folio: number } | { error: CreateOrderErrorCode }> {
   if (input.items.length === 0) {
-    return { error: "El carrito está vacío" }
+    return { error: "emptyCart" }
   }
 
   const supabase = await createClient()
@@ -39,18 +45,18 @@ export async function createOrder(input: {
   ])
 
   if (!unit || !business) {
-    return { error: "No pudimos verificar el estado del truck. Intenta de nuevo." }
+    return { error: "verifyFailed" }
   }
   if (business.subscription_status === "suspended" || unit.status === "archived") {
-    return { error: "Este truck no está disponible en este momento" }
+    return { error: "unavailable" }
   }
   if (unit.status === "paused") {
     const stillPaused = !unit.paused_until || new Date(unit.paused_until) > new Date()
-    if (stillPaused) return { error: "Este truck está en pausa ahora mismo" }
+    if (stillPaused) return { error: "paused" }
   }
   const openStatus = isOpenNow(parseWeeklyHours(unit.hours), business.timezone)
   if (!openStatus.open) {
-    return { error: "Este truck está cerrado ahora mismo — vuelve dentro de su horario" }
+    return { error: "closed" }
   }
 
   // El precio de línea se recalcula aquí, del lado del servidor, a partir de lo
@@ -86,7 +92,7 @@ export async function createOrder(input: {
     .single()
 
   if (orderError || !order) {
-    return { error: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez" }
+    return { error: "sendFailed" }
   }
 
   const { error: itemsError } = await supabase.from("order_items").insert(
@@ -107,11 +113,11 @@ export async function createOrder(input: {
     // El pedido ya existe sin líneas — no lo dejamos así de silencio; se marca
     // cancelado para que nadie en cocina lo prepare vacío por error.
     await supabase.from("orders").update({ status: "cancelado" }).eq("id", order.id)
-    return { error: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez" }
+    return { error: "sendFailed" }
   }
 
   if (!order.folio) {
-    return { error: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez" }
+    return { error: "sendFailed" }
   }
 
   return { orderId: order.id, folio: order.folio }

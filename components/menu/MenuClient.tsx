@@ -52,7 +52,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [cart, setCart] = useState<CartLine[]>([])
   const [customerName, setCustomerName] = useState("")
   const [sending, setSending] = useState(false)
-  const [sendError, setSendError] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
   const [staleReload, setStaleReload] = useState(false)
   const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
   const [hydrated, setHydrated] = useState(false)
@@ -169,7 +169,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
 
   async function handleCheckout() {
     setSending(true)
-    setSendError(false)
+    setSendError(null)
     let result: Awaited<ReturnType<typeof createOrder>>
     try {
       result = await createOrder({
@@ -195,7 +195,11 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     }
     setSending(false)
     if ("error" in result) {
-      setSendError(true)
+      // El servidor manda un código (truck cerrado, en pausa, suspendido,
+      // etc.), nunca el texto — mostrar siempre el mismo mensaje genérico
+      // aquí escondía el motivo real, y un texto fijo en español no habría
+      // respetado el idioma que el comensal tiene activo en la pantalla.
+      setSendError(t.menu.orderError[result.error])
       return
     }
     try {
@@ -515,7 +519,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
               <div className="rounded-lg bg-amber-50 p-2 text-sm text-amber-800">{t.menu.updatedReloading}</div>
             ) : (
               sendError && (
-                <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{t.menu.sendError}</div>
+                <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{sendError}</div>
               )
             )}
             <button

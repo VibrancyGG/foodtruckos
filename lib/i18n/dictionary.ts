@@ -12,6 +12,14 @@ export type Dictionary = {
     soldOut: string
     sending: string
     sendError: string
+    orderError: {
+      emptyCart: string
+      verifyFailed: string
+      unavailable: string
+      paused: string
+      closed: string
+      sendFailed: string
+    }
     updatedReloading: string
     retry: string
     cancel: string
@@ -817,6 +825,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       soldOut: "Se acabó",
       sending: "Enviando tu pedido…",
       sendError: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
+      orderError: {
+        emptyCart: "Tu carrito está vacío",
+        verifyFailed: "No pudimos verificar el estado del truck. Intenta de nuevo.",
+        unavailable: "Este truck no está disponible en este momento",
+        paused: "Este truck está en pausa ahora mismo",
+        closed: "Este truck está cerrado ahora mismo — vuelve dentro de su horario",
+        sendFailed: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
+      },
       updatedReloading: "Actualizamos el menú — recargando tu pantalla. Tu pedido sigue en el carrito, solo dale a enviar otra vez.",
       retry: "Reintentar",
       cancel: "Cancelar",
@@ -1643,6 +1659,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       soldOut: "Sold out",
       sending: "Sending your order…",
       sendError: "We couldn't send your order. Check your connection and try again",
+      orderError: {
+        emptyCart: "Your cart is empty",
+        verifyFailed: "We couldn't verify the truck's status. Try again.",
+        unavailable: "This truck isn't available right now",
+        paused: "This truck is paused right now",
+        closed: "This truck is closed right now — come back during its hours",
+        sendFailed: "We couldn't send your order. Check your connection and try again",
+      },
       updatedReloading: "We just updated the menu — reloading your screen. Your order is still in your cart, just tap send again.",
       retry: "Retry",
       cancel: "Cancel",
