@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { markOnboardingSeen } from "@/lib/onboarding/actions"
 import { ONBOARDING_STEPS } from "@/lib/onboarding/steps"
@@ -61,19 +61,38 @@ export function OnboardingProvider({ children, shouldAutoStart }: { children: Re
 
   // Si el paso actual vive en otra pantalla, navega — así "Siguiente" cruza
   // de Menú a Trucks a Marca sin que el dueño tenga que hacer clic en el nav.
+  //
+  // Solo se fuerza esa navegación UNA vez por paso (autoNavigatedStepRef).
+  // Antes este efecto dependía de `pathname` sin memoria: cualquier cambio
+  // de ruta —incluido que el dueño se saliera del tour por su cuenta
+  // tocando el nav— volvía a comparar contra la ruta del paso actual y lo
+  // regresaba ahí sin parar. Como "active" queda guardado en localStorage,
+  // ese loop sobrevivía a recargar la página y hasta a cerrar la pestaña —
+  // solo se notaba roto en incógnito porque ahí no hay localStorage previo.
+  // Si ya empujamos una vez para este paso y la ruta sigue sin coincidir,
+  // es porque el dueño se movió solo — se respeta eso y se cierra el tour
+  // en vez de perseguirlo.
+  const autoNavigatedStepRef = useRef<number | null>(null)
   useEffect(() => {
     if (!active) return
     const step = ONBOARDING_STEPS[stepIndex]
     const route = step.route
-    if (route && route !== pathname) {
-      // setTimeout, no startTransition: el aviso de React ("update a
-      // component while rendering a different component") viene de que
-      // router.push corre en el mismo flush síncrono que el commit de otro
-      // componente del árbol — startTransition no lo saca de ese flush,
-      // pero diferirlo a una macrotarea sí.
-      const id = setTimeout(() => router.push(route), 0)
-      return () => clearTimeout(id)
+    if (!route || route === pathname) return
+
+    if (autoNavigatedStepRef.current === stepIndex) {
+      setActive(false)
+      clearPersisted()
+      return
     }
+
+    autoNavigatedStepRef.current = stepIndex
+    // setTimeout, no startTransition: el aviso de React ("update a
+    // component while rendering a different component") viene de que
+    // router.push corre en el mismo flush síncrono que el commit de otro
+    // componente del árbol — startTransition no lo saca de ese flush,
+    // pero diferirlo a una macrotarea sí.
+    const id = setTimeout(() => router.push(route), 0)
+    return () => clearTimeout(id)
   }, [active, stepIndex, pathname, router])
 
   function persist(idx: number) {

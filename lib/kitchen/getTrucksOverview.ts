@@ -4,6 +4,16 @@ import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 
 const OPEN_STATUSES = ["recibido", "preparando", "listo"]
 
+// "Hoy" se decide con la fecha calendario en la zona horaria del negocio
+// (America/Chicago para Oklahoma), no con la medianoche del servidor —
+// Vercel corre en UTC, así que un `new Date().setHours(0,0,0,0)` recortaba
+// pedidos abiertos desde la tarde/noche anterior (hora local) que cocina sí
+// mostraba sin ningún filtro de fecha. Mismo patrón que ya usa
+// lib/reportes/getOwnerSummary.ts.
+function calendarKey(date: string | Date, timezone: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: timezone }).format(new Date(date))
+}
+
 // Vista exclusiva del Encargado (y del dueño en su panel): cómo van TODOS
 // los trucks del negocio ahora mismo, no solo el suyo. Nunca se le muestra
 // al personal de cocina/ventanilla — esos siguen viendo solo su tablero.
@@ -18,10 +28,8 @@ const OPEN_STATUSES = ["recibido", "preparando", "listo"]
 // todos modos (lib/staff/session.ts ya verificó la sesión a mano).
 export async function getTrucksOverview(businessId: string) {
   const supabase = createServiceClient()
-  const startOfDay = new Date()
-  startOfDay.setHours(0, 0, 0, 0)
 
-  const [{ data: units }, { data: business }, { data: orders }] = await Promise.all([
+  const [{ data: units }, { data: business }] = await Promise.all([
     supabase
       .from("units")
       .select("id, name, location, status, paused_until, hours, alert_amber_minutes, alert_red_minutes")
@@ -33,16 +41,39 @@ export async function getTrucksOverview(businessId: string) {
       .select("default_alert_amber_minutes, default_alert_red_minutes, timezone")
       .eq("id", businessId)
       .single(),
+  ])
+
+  const timezone = business?.timezone ?? "America/Chicago"
+  const todayKey = calendarKey(new Date(), timezone)
+  // Ventana amplia (3 días) solo para acotar la consulta de ventas ya
+  // cerradas — la fecha exacta de "hoy" se decide después con calendarKey,
+  // nunca con este límite.
+  const salesWindowStart = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+
+  const [{ data: openOrdersRaw }, { data: closedOrdersRaw }] = await Promise.all([
+    // Sin filtro de fecha — exactamente lo mismo que ve cocina (getKitchenData:
+    // "not entregado/cancelado" sin límite de creación). Un pedido abierto
+    // desde ayer en hora local no debe desaparecer de esta pantalla.
     supabase
       .from("orders")
       .select("id, unit_id, folio, status, payment_status, total, created_at, customer_name")
       .eq("business_id", businessId)
-      .gte("created_at", startOfDay.toISOString())
+      .in("status", OPEN_STATUSES)
       .order("created_at"),
+    supabase
+      .from("orders")
+      .select("id, unit_id, folio, status, payment_status, total, created_at, customer_name")
+      .eq("business_id", businessId)
+      .eq("status", "entregado")
+      .eq("payment_status", "pagada")
+      .gte("created_at", salesWindowStart),
   ])
 
-  const orderList = (orders ?? []).map((o) => ({ ...o, total: toNumber(o.total) }))
-  const openOrders = orderList.filter((o) => OPEN_STATUSES.includes(o.status))
+  const openOrders = (openOrdersRaw ?? []).map((o) => ({ ...o, total: toNumber(o.total) }))
+  const paidToday = (closedOrdersRaw ?? [])
+    .map((o) => ({ ...o, total: toNumber(o.total) }))
+    .filter((o) => calendarKey(o.created_at, timezone) === todayKey)
+  const orderList = [...openOrders, ...paidToday]
   const openOrderIds = openOrders.map((o) => o.id)
 
   const { data: items } = openOrderIds.length
