@@ -59,13 +59,13 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: "marca",
     route: "/panel/marca",
-    target: "onboarding-marca-logo",
+    target: "onboarding-marca-title",
     content: (t) => ({ title: t.panel.onboarding.marcaTitle, body: t.panel.onboarding.marcaBody }),
   },
   {
     id: "personal",
     route: "/panel/personal",
-    target: "onboarding-add-person",
+    target: "onboarding-personal-title",
     content: (t) => ({ title: t.panel.onboarding.personalTitle, body: t.panel.onboarding.personalBody }),
   },
   {
@@ -77,13 +77,13 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: "qr",
     route: "/panel/qr",
-    target: null,
+    target: "onboarding-qr-title",
     content: (t) => ({ title: t.panel.onboarding.qrTitle, body: t.panel.onboarding.qrBody }),
   },
   {
     id: "cuenta",
     route: "/panel/cuenta",
-    target: "onboarding-restart",
+    target: "onboarding-cuenta-title",
     content: (t) => ({ title: t.panel.onboarding.cuentaTitle, body: t.panel.onboarding.cuentaBody }),
   },
   {

@@ -50,7 +50,7 @@ export function CuentaScreen({
 
   return (
     <div className="max-w-xl space-y-4">
-      <div className="panel-animate-in">
+      <div data-tour="onboarding-cuenta-title" className="panel-animate-in">
         <h1 className="mb-1 font-[family-name:var(--font-panel-display)] text-2xl font-bold text-panel-ink">{p.title}</h1>
         <p className="mb-2 text-sm text-panel-ink-soft">{p.subtitle}</p>
       </div>

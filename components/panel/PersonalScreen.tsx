@@ -26,7 +26,7 @@ export function PersonalScreen({ initial }: { initial: OwnerStaffData }) {
   const p = t.panel.personalPage
   return (
     <div className="space-y-8">
-      <div className="panel-animate-in">
+      <div data-tour="onboarding-personal-title" className="panel-animate-in">
         <h1 className="mb-1 font-[family-name:var(--font-panel-display)] text-2xl font-bold text-panel-ink">{p.title}</h1>
         <p className="mb-2 text-sm text-panel-ink-soft">{p.subtitle}</p>
       </div>
