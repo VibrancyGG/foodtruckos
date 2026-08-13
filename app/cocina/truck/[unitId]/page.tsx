@@ -52,6 +52,7 @@ export default async function CocinaTruckPage({ params }: { params: Promise<{ un
         initial={initial}
         logoUrl={business?.logo_url}
         backHref="/cocina"
+        trialDaysLeft={session.trialWarning ? session.trialDaysLeft : null}
       />
     </LangProvider>
   )

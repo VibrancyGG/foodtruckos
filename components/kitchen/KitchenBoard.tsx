@@ -55,6 +55,7 @@ export function KitchenBoard({
   backHref,
   readOnly = false,
   logoUrl,
+  trialDaysLeft = null,
 }: {
   unitId: string
   businessId: string
@@ -68,6 +69,7 @@ export function KitchenBoard({
   backHref?: string
   readOnly?: boolean
   logoUrl?: string | null
+  trialDaysLeft?: number | null
 }) {
   const { lang, setLang, t } = useLang()
   const router = useRouter()
@@ -265,6 +267,11 @@ export function KitchenBoard({
 
   return (
     <div className="flex h-screen flex-col overflow-hidden" style={{ background: "#100F0D", color: "#F6F3ED" }}>
+      {trialDaysLeft !== null && (
+        <div className="flex-none px-4 py-2 text-center text-sm font-bold" style={{ background: "#F5A524", color: "#231602" }}>
+          {t.panel.trialBanner(trialDaysLeft)}
+        </div>
+      )}
       {sessionExpired && (
         <div className="flex flex-none items-center justify-between px-4 py-3 text-sm font-semibold" style={{ background: "#3A1E1F", color: "#FFB3B5" }}>
           <span>{t.kitchen.sessionExpired}</span>

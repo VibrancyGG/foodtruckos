@@ -11,10 +11,11 @@ import { TruckApprovalBanner } from "@/components/panel/TruckApprovalBanner"
 import { OnboardingProvider } from "@/components/panel/onboarding/OnboardingProvider"
 import { OnboardingTour } from "@/components/panel/onboarding/OnboardingTour"
 import { StaleDeployGuard } from "@/components/panel/StaleDeployGuard"
+import { TrialBanner } from "@/components/panel/TrialBanner"
 import { panelDisplayFont, panelBodyFont } from "@/lib/fonts"
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
-  const { user, businessId, business, impersonating, suspended } = await getOwnerContext()
+  const { user, businessId, business, impersonating, suspended, trialDaysLeft, trialWarning } = await getOwnerContext()
 
   if (!user) redirect("/login")
 
@@ -48,6 +49,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
             impersonating={impersonating}
             stopImpersonationAction={impersonating ? stopImpersonation : undefined}
           />
+          {!impersonating && trialWarning && trialDaysLeft !== null && <TrialBanner daysLeft={trialDaysLeft} />}
           {approvedRequest && approvedRequest.unitName && (
             <TruckApprovalBanner requestId={approvedRequest.id} unitName={approvedRequest.unitName} />
           )}

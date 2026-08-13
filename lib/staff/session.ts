@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import { createServiceClient } from "@/lib/supabase/service"
 import { generateOpaqueToken, parseOpaqueToken, secretMatches, pepperedPin, hashSecret } from "@/lib/staff/crypto"
+import { getTrialInfo } from "@/lib/billing/trial"
 
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000 // 12h — una tablet no debería tener que re-entrar a media jornada
 const LOCKOUT_STEPS_SECONDS = [30, 60, 120, 300, 900] // 30s, 1m, 2m, 5m, tope 15m
@@ -13,6 +14,8 @@ type Device = {
   revoked_at: string | null
   failed_pin_attempts: number
   pin_locked_until: string | null
+  trialDaysLeft: number | null
+  trialWarning: boolean
 }
 
 async function loadDevice(deviceId: string): Promise<Device | null> {
@@ -20,15 +23,18 @@ async function loadDevice(deviceId: string): Promise<Device | null> {
   const { data } = await supabase
     .from("devices")
     .select(
-      "id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until, businesses(subscription_status)",
+      "id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until, businesses(subscription_status, trial_ends_at)",
     )
     .eq("id", deviceId)
     .maybeSingle()
   if (!data) return null
-  // Negocio suspendido por falta de pago: corta el acceso a cocina igual que
+  const status = data.businesses?.subscription_status ?? "active"
+  const trial = getTrialInfo(status, data.businesses?.trial_ends_at ?? null)
+  // Negocio suspendido por falta de pago (o prueba gratis vencida sin pago —
+  // mismo criterio que getOwnerContext): corta el acceso a cocina igual que
   // un dispositivo revocado — se revisa en cada llamada, no solo al emparejar.
-  if (data.businesses?.subscription_status === "suspended") return null
-  return data
+  if (status === "suspended" || trial.expired) return null
+  return { ...data, trialDaysLeft: trial.daysLeft, trialWarning: trial.showWarning }
 }
 
 // Verifica solo la cookie de dispositivo — la usan las pantallas de "pedir
@@ -113,6 +119,8 @@ type VerifiedStaffSession = {
   deviceId: string
   sessionId: string
   role: string
+  trialDaysLeft: number | null
+  trialWarning: boolean
 }
 
 // Se llama en CADA acción de cocina, no solo al refrescar la cookie — es lo
@@ -156,6 +164,8 @@ export async function verifyStaffSession(
     deviceId: device.id,
     sessionId: session.id,
     role: staff.role,
+    trialDaysLeft: device.trialDaysLeft,
+    trialWarning: device.trialWarning,
   }
 }
 

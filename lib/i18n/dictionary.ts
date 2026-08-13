@@ -280,6 +280,7 @@ export type Dictionary = {
     }
     suspendedTitle: string
     suspendedBody: string
+    trialBanner: (daysLeft: number) => string
     common: {
       save: string
       saving: string
@@ -1158,6 +1159,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       suspendedTitle: "Cuenta suspendida",
       suspendedBody: "Tu suscripción no está vigente. El panel, la cocina y el menú de tus clientes están pausados hasta que se resuelva. Contáctanos para reactivarla.",
+      trialBanner: (daysLeft) =>
+        daysLeft <= 0
+          ? "Tu prueba gratis termina hoy — contáctanos para no perder acceso."
+          : daysLeft === 1
+            ? "Tu prueba gratis termina mañana — contáctanos para seguir usando FoodTruckOS."
+            : `Tu prueba gratis termina en ${daysLeft} días — contáctanos para seguir usando FoodTruckOS.`,
       common: {
         save: "Guardar",
         saving: "Guardando…",
@@ -2039,6 +2046,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       suspendedTitle: "Account suspended",
       suspendedBody: "Your subscription isn't active. Your panel, kitchen, and customer menu are paused until it's resolved. Contact us to reactivate it.",
+      trialBanner: (daysLeft) =>
+        daysLeft <= 0
+          ? "Your free trial ends today — contact us to keep your access."
+          : daysLeft === 1
+            ? "Your free trial ends tomorrow — contact us to keep using FoodTruckOS."
+            : `Your free trial ends in ${daysLeft} days — contact us to keep using FoodTruckOS.`,
       common: {
         save: "Save",
         saving: "Saving…",

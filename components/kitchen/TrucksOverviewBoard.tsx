@@ -15,6 +15,7 @@ export function TrucksOverviewBoard({
   onViewTruck,
   allowViewAll = false,
   logoUrl,
+  trialDaysLeft = null,
 }: {
   overview: TrucksOverview
   staffName: string
@@ -22,6 +23,7 @@ export function TrucksOverviewBoard({
   onViewTruck: (unitId: string) => void
   allowViewAll?: boolean
   logoUrl?: string | null
+  trialDaysLeft?: number | null
 }) {
   const { lang, setLang, t } = useLang()
   const router = useRouter()
@@ -36,6 +38,11 @@ export function TrucksOverviewBoard({
 
   return (
     <div className="flex h-screen flex-col overflow-y-auto" style={{ background: "#100F0D", color: "#F6F3ED" }}>
+      {trialDaysLeft !== null && (
+        <div className="flex-none px-4 py-2 text-center text-sm font-bold" style={{ background: "#F5A524", color: "#231602" }}>
+          {t.panel.trialBanner(trialDaysLeft)}
+        </div>
+      )}
       <header className="flex flex-none flex-wrap items-center gap-3.5 border-b px-4.5 py-3" style={{ background: "#1B1917", borderColor: "#332F29" }}>
         {logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element

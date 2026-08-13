@@ -56,6 +56,7 @@ export default async function CocinaPage() {
           taxIncluded={initial.taxIncluded}
           initial={initial}
           logoUrl={business?.logo_url}
+          trialDaysLeft={session.trialWarning ? session.trialDaysLeft : null}
         />
       </LangProvider>
     )
@@ -73,6 +74,7 @@ export default async function CocinaPage() {
         taxIncluded={initial.taxIncluded}
         initial={initial}
         logoUrl={business?.logo_url}
+        trialDaysLeft={session.trialWarning ? session.trialDaysLeft : null}
       />
     </LangProvider>
   )

@@ -21,6 +21,7 @@ export function EncargadoBoard({
   taxIncluded,
   initial,
   logoUrl,
+  trialDaysLeft = null,
 }: {
   overview: TrucksOverview
   ownUnitId: string
@@ -32,6 +33,7 @@ export function EncargadoBoard({
   taxIncluded: boolean
   initial: KitchenData
   logoUrl?: string | null
+  trialDaysLeft?: number | null
 }) {
   const router = useRouter()
   const [viewingUnitId, setViewingUnitId] = useState<string | null>(null)
@@ -49,6 +51,7 @@ export function EncargadoBoard({
         initial={initial}
         onBack={() => setViewingUnitId(null)}
         logoUrl={logoUrl}
+        trialDaysLeft={trialDaysLeft}
       />
     )
   }
@@ -61,6 +64,7 @@ export function EncargadoBoard({
       allowViewAll
       onViewTruck={(unitId) => (unitId === ownUnitId ? setViewingUnitId(unitId) : router.push(`/cocina/truck/${unitId}`))}
       logoUrl={logoUrl}
+      trialDaysLeft={trialDaysLeft}
     />
   )
 }

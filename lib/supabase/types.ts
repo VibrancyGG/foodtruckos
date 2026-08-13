@@ -240,6 +240,7 @@ export type Database = {
           subscription_status: string
           tax_included: boolean
           timezone: string
+          trial_ends_at: string | null
         }
         Insert: {
           billing_mode?: string
@@ -259,6 +260,7 @@ export type Database = {
           subscription_status?: string
           tax_included?: boolean
           timezone?: string
+          trial_ends_at?: string | null
         }
         Update: {
           billing_mode?: string
@@ -278,6 +280,7 @@ export type Database = {
           subscription_status?: string
           tax_included?: boolean
           timezone?: string
+          trial_ends_at?: string | null
         }
         Relationships: []
       }
