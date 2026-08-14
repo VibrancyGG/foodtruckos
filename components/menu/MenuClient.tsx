@@ -246,7 +246,12 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         className="relative overflow-hidden px-4 pb-5 pt-4"
         style={blackHeader ? { background: "#0A0A0A", color: "#fff" } : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }}
       >
-        <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
+        {/* width/height="100%" explícitos, no solo el posicionamiento por CSS
+            (inset-0) — sin esto, algunos navegadores (Safari en particular)
+            caen al tamaño por defecto de un SVG sin atributos (~300x150) en
+            vez de estirarlo, dejando sin patrón cualquier parte del header
+            más ancha que eso. */}
+        <svg width="100%" height="100%" className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
           <defs>
             <pattern id="menuHeaderMotif" width="112" height="112" patternUnits="userSpaceOnUse">
               <g

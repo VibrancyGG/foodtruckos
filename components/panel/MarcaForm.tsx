@@ -274,7 +274,7 @@ export function MarcaForm({
             className="relative flex items-center gap-2.5 overflow-hidden px-3 py-3.5"
             style={headerStyle === "black" ? { background: "#0A0A0A", color: "#fff" } : { background: color, color: onColor }}
           >
-            <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
+            <svg width="100%" height="100%" className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
               <defs>
                 <pattern id="marcaPreviewMotif" width="112" height="112" patternUnits="userSpaceOnUse">
                   <g

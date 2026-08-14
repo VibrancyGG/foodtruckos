@@ -193,7 +193,7 @@ function CategorySection({
 }) {
   const { lang, t } = useLang()
   const m = t.panel.menuPage
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   if (products.length === 0 && filter !== "todos") return null
 

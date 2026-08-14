@@ -28,6 +28,25 @@ export function OptionGroupsEditor({
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
+  // Casi siempre el grupo se llama exactamente "¿Le agregamos algo?" o "¿Le
+  // quitamos algo?" — obligar a teclearlo cada vez que ya se sabe por el
+  // botón que se tocó es justo el trabajo repetitivo que se quería evitar.
+  // Solo se autocompleta si el nombre sigue vacío o es el default del otro
+  // tipo (nunca pisa un nombre propio que el dueño ya haya escrito, como
+  // "Elige tu salsa").
+  function selectKind(k: "add" | "remove") {
+    const defaults = {
+      add: { es: "¿Le agregamos algo?", en: "Add anything?" },
+      remove: { es: "¿Le quitamos algo?", en: "Take anything off?" },
+    }
+    const untouched = !nameEs.trim() || nameEs === defaults.add.es || nameEs === defaults.remove.es
+    setKind(k)
+    if (untouched) {
+      setNameEs(defaults[k].es)
+      setNameEn(defaults[k].en)
+    }
+  }
+
   function addGroup() {
     setError(null)
     if (!nameEs.trim() || !nameEn.trim()) {
@@ -70,7 +89,7 @@ export function OptionGroupsEditor({
             <div className="grid grid-cols-2 gap-1.5">
               <button
                 type="button"
-                onClick={() => setKind("add")}
+                onClick={() => selectKind("add")}
                 className={`rounded-lg border-2 p-2 text-left ${kind === "add" ? "border-green-600 bg-green-50" : "border-neutral-200"}`}
               >
                 <div className="text-xs font-bold" style={kind === "add" ? { color: "#15803D" } : undefined}>
@@ -80,7 +99,7 @@ export function OptionGroupsEditor({
               </button>
               <button
                 type="button"
-                onClick={() => setKind("remove")}
+                onClick={() => selectKind("remove")}
                 className={`rounded-lg border-2 p-2 text-left ${kind === "remove" ? "border-red-600 bg-red-50" : "border-neutral-200"}`}
               >
                 <div className="text-xs font-bold" style={kind === "remove" ? { color: "#B91C1C" } : undefined}>
