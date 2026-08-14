@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
-import { enqueueAction, drainQueue, pendingCount } from "@/lib/kitchen/offlineQueue"
+import { enqueueAction, drainQueue, pendingCount, pendingOrderActions } from "@/lib/kitchen/offlineQueue"
 import { useWakeLock } from "@/lib/kitchen/useWakeLock"
 import { VentanillaForm } from "./VentanillaForm"
 import { DaySummaryModal } from "./DaySummaryModal"
@@ -140,14 +140,29 @@ export function KitchenBoard({
     knownOrderIds.current = new Set((freshOrders ?? []).map((o) => o.id))
     if (arrivedNew && soundOn) beep()
 
-    setOrders(
-      (freshOrders ?? []).map((o) => ({
-        ...o,
-        subtotal: toNumber(o.subtotal),
-        tax_amount: toNumber(o.tax_amount),
-        total: toNumber(o.total),
-      })),
-    )
+    // La cola de acciones pendientes manda sobre esta foto: si "avanzar" o
+    // "regresar" sigue sin confirmarse, se respeta el estado que ya se ve en
+    // pantalla en vez del de la base (que puede seguir sin el cambio por
+    // conexión lenta); si "entregar"/"cancelar" sigue sin confirmarse, la
+    // orden se mantiene fuera de la lista como ya la quitó la acción local.
+    const pendingActions = pendingOrderActions(unitId)
+    setOrders((prev) => {
+      const prevById = new Map(prev.map((o) => [o.id, o]))
+      return (freshOrders ?? [])
+        .filter((o) => {
+          const action = pendingActions.get(o.id)
+          return action !== "deliver" && action !== "cancel"
+        })
+        .map((o) => {
+          const mapped = { ...o, subtotal: toNumber(o.subtotal), tax_amount: toNumber(o.tax_amount), total: toNumber(o.total) }
+          const action = pendingActions.get(o.id)
+          if (action === "advance" || action === "regress") {
+            const local = prevById.get(o.id)
+            if (local) return { ...mapped, status: local.status }
+          }
+          return mapped
+        })
+    })
     setItems((freshItems ?? []).map((i) => ({ ...i, unit_price_snapshot: toNumber(i.unit_price_snapshot), line_total: toNumber(i.line_total) })))
     setUnitProducts(freshUnitProducts ?? [])
     setOptions((freshOptions ?? []).map((o) => ({ ...o, price_delta: toNumber(o.price_delta) })))

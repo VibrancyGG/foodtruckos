@@ -39,6 +39,24 @@ export function pendingCount(unitToken: string) {
   return readQueue(unitToken).length
 }
 
+// La pantalla se refresca sola (poll cada 10s, tiempo real, reconexión) y esa
+// foto de la base puede llegar mientras una acción todavía está en camino en
+// esta cola — sin esto, el refresco pisaba el avance optimista y lo regresaba
+// a su estado anterior, empujando al personal a tocar "Empezar" otra vez y
+// generando un segundo avance real (Nueva se veía regresar y de pronto
+// saltaba directo a Lista). Se usa para que el refresco respete lo que el
+// personal ya tocó hasta que el servidor lo confirme de verdad.
+export function pendingOrderActions(unitToken: string): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const item of readQueue(unitToken)) {
+    const body = item.body as { orderId?: string; action?: string }
+    if (typeof body?.orderId === "string" && typeof body?.action === "string") {
+      map.set(body.orderId, body.action)
+    }
+  }
+  return map
+}
+
 let draining = false
 
 export async function drainQueue(unitToken: string, onChange?: () => void, onAuthError?: () => void) {
