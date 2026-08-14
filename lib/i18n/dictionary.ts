@@ -38,6 +38,7 @@ export type Dictionary = {
     notAvailableBody: string
     openNowLabel: string
     closedNowLabel: string
+    todayHoursLabel: (day: string, range: string) => string
   }
   tracking: {
     title: string
@@ -343,6 +344,9 @@ export type Dictionary = {
       editOption: string
       allTrucksFilter: string
       statsLine: (total: number, out: number, noPhoto: number, scopeName: string | null) => string
+    categorySummaryLine: (count: number, noun: string, out: number, noPhoto: number) => string
+    collapseCategory: string
+    expandCategory: string
       whoSellsIt: string
       noPhotoShort: string
       formError: string
@@ -900,6 +904,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       notAvailableBody: "Este menú no está disponible por ahora.",
       openNowLabel: "Abierto",
       closedNowLabel: "Cerrado",
+      todayHoursLabel: (day, range) => `Hoy ${day.charAt(0).toUpperCase()}${day.slice(1)} ${range}`,
     },
     tracking: {
       title: "Tu pedido",
@@ -1230,6 +1235,12 @@ export const dictionary: Record<Lang, Dictionary> = {
           (scopeName ? `${total} platillo${total === 1 ? "" : "s"} se venden en ${scopeName}` : `${total} platillo${total === 1 ? "" : "s"} en total`) +
           (out ? ` · ${out} agotado${out === 1 ? "" : "s"}` : "") +
           (noPhoto ? ` · ${noPhoto} sin foto` : " · todos con foto"),
+        categorySummaryLine: (count, noun, out, noPhoto) =>
+          [`${count} ${noun}`, out ? `${out} agotado${out === 1 ? "" : "s"}` : null, noPhoto ? `${noPhoto} sin foto` : null]
+            .filter(Boolean)
+            .join(" · "),
+        collapseCategory: "Colapsar",
+        expandCategory: "Expandir",
         whoSellsIt: "¿Quién lo vende?",
         noPhotoShort: "Falta\nfoto",
         formError: "Revisa el nombre y el precio",
@@ -1569,10 +1580,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       ledgerFilterAllStatuses: "Todos",
       ledgerFilterChannel: "Canal",
       ledgerFilterAllChannels: "Todos",
-      ledgerSearchPlaceholder: "Folio o nombre del cliente",
+      ledgerSearchPlaceholder: "Orden o nombre del cliente",
       ledgerExport: "Descargar CSV",
       ledgerEmpty: "No hay pedidos con estos filtros.",
-      ledgerColFolio: "Folio",
+      ledgerColFolio: "Orden",
       ledgerColDate: "Fecha",
       ledgerColTruck: "Truck",
       ledgerColChannel: "Canal",
@@ -1788,6 +1799,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       notAvailableBody: "This menu isn't available right now.",
       openNowLabel: "Open",
       closedNowLabel: "Closed",
+      todayHoursLabel: (day, range) => `Today ${day} ${range}`,
     },
     tracking: {
       title: "Your order",
@@ -2117,6 +2129,12 @@ export const dictionary: Record<Lang, Dictionary> = {
           (scopeName ? `${total} item${total === 1 ? "" : "s"} sold at ${scopeName}` : `${total} item${total === 1 ? "" : "s"} total`) +
           (out ? ` · ${out} sold out` : "") +
           (noPhoto ? ` · ${noPhoto} without a photo` : " · all with photos"),
+        categorySummaryLine: (count, noun, out, noPhoto) =>
+          [`${count} ${noun}`, out ? `${out} sold out` : null, noPhoto ? `${noPhoto} without a photo` : null]
+            .filter(Boolean)
+            .join(" · "),
+        collapseCategory: "Collapse",
+        expandCategory: "Expand",
         whoSellsIt: "Who sells it?",
         noPhotoShort: "No\nphoto",
         formError: "Check the name and the price",
@@ -2456,10 +2474,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       ledgerFilterAllStatuses: "All",
       ledgerFilterChannel: "Channel",
       ledgerFilterAllChannels: "All",
-      ledgerSearchPlaceholder: "Folio or customer name",
+      ledgerSearchPlaceholder: "Order or customer name",
       ledgerExport: "Download CSV",
       ledgerEmpty: "No orders match these filters.",
-      ledgerColFolio: "Folio",
+      ledgerColFolio: "Order",
       ledgerColDate: "Date",
       ledgerColTruck: "Truck",
       ledgerColChannel: "Channel",

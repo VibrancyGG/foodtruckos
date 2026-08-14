@@ -42,6 +42,7 @@ export function OrdersLedger({
   const today = useMemo(() => new Date(), [])
   const defaultFrom = useMemo(() => toDateInputValue(new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)), [today])
 
+  const [open, setOpen] = useState(false)
   const [truckId, setTruckId] = useState("todos")
   const [from, setFrom] = useState(defaultFrom)
   const [to, setTo] = useState(toDateInputValue(today))
@@ -72,7 +73,7 @@ export function OrdersLedger({
   }, [orders, truckId, from, to, method, status, channel, search])
 
   function exportCsv() {
-    const header = ["Folio", "Fecha", "Truck", "Canal", "Estado", "Pago", "Medio", "Cliente", "Total"]
+    const header = ["Folio", "Fecha", "Truck", "Canal", "Estado", "Pago", "Medio", "Cliente", "Pedido", "Total"]
     const rows = filtered.map((o) => [
       String(o.folio ?? ""),
       new Date(o.createdAt).toLocaleString(lang === "es" ? "es-MX" : "en-US"),
@@ -82,6 +83,7 @@ export function OrdersLedger({
       o.paymentStatus === "pagada" ? p.ledgerStatusPaid : p.ledgerStatusUnpaid,
       o.paymentMethod ?? "",
       o.customerName ?? "",
+      o.itemsSummary,
       o.total.toFixed(2),
     ])
     const csv = [header, ...rows].map((r) => r.map((c) => csvEscape(String(c))).join(",")).join("\n")
@@ -99,8 +101,31 @@ export function OrdersLedger({
 
   return (
     <div>
-      <Eyebrow>{p.ledgerTitle}</Eyebrow>
-      <p className="mb-3 mt-0.5 text-xs text-panel-ink-soft">{p.ledgerSubtitle}</p>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center gap-2 text-left"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className={`h-3.5 w-3.5 flex-none text-panel-ink-soft transition-transform duration-150 ${open ? "" : "-rotate-90"}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+        <Eyebrow>{p.ledgerTitle}</Eyebrow>
+      </button>
+
+      {!open && <p className="mt-0.5 text-xs text-panel-ink-soft">{p.ledgerSubtitle}</p>}
+
+      {open && (
+        <>
+      <p className="mb-3 mt-1.5 text-xs text-panel-ink-soft">{p.ledgerSubtitle}</p>
 
       <div className="mb-3 flex flex-wrap items-end gap-2">
         {trucks.length > 1 && (
@@ -155,16 +180,18 @@ export function OrdersLedger({
           placeholder={p.ledgerSearchPlaceholder}
           className="min-w-[160px] flex-1 rounded-lg border border-panel-line bg-panel-bg px-2.5 py-1.5 text-xs font-semibold text-panel-ink"
         />
+      </div>
+
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-[11px] font-bold text-panel-ink-soft">{p.ledgerShowingCount(filtered.length)}</p>
         <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
-          className="rounded-lg bg-panel-brand px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40"
+          className="text-[11px] font-semibold text-panel-ink-soft underline decoration-panel-line underline-offset-2 hover:text-panel-brand disabled:opacity-40"
         >
           {p.ledgerExport}
         </button>
       </div>
-
-      <p className="mb-2 text-[11px] font-bold text-panel-ink-soft">{p.ledgerShowingCount(filtered.length)}</p>
 
       <div className="max-h-[420px] overflow-auto rounded-xl border border-panel-line">
         {filtered.length === 0 ? (
@@ -216,6 +243,8 @@ export function OrdersLedger({
           </table>
         )}
       </div>
+        </>
+      )}
     </div>
   )
 }

@@ -329,10 +329,21 @@ export async function getOwnerSummary(businessId: string) {
 
   // ---- historial de órdenes, últimos 30 días — para que el dueño concilie
   // caja/banco o consulte algo puntual, no para analítica (eso ya lo hace el
-  // resto de esta pantalla). Mismo dataset de allOrderList, sin consulta
-  // nueva — ya cubre un año completo.
+  // resto de esta pantalla). Reusa allOrderList (ya cubre un año), pero el
+  // detalle de platillos sí necesita su propia consulta — la de `items` de
+  // arriba está acotada al periodo actual, no a esta ventana de 30 días.
   const ledgerWindowStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
   const unitNameById = new Map(unitList.map((u) => [u.id, u.name]))
+  const ledgerOrderIds = allOrderList.filter((o) => o.created_at >= ledgerWindowStart).map((o) => o.id)
+  const { data: ledgerItems } = ledgerOrderIds.length
+    ? await supabase.from("order_items").select("order_id, product_name_snapshot, quantity").in("order_id", ledgerOrderIds)
+    : { data: [] }
+  const itemsSummaryByOrder = new Map<string, string>()
+  for (const it of ledgerItems ?? []) {
+    const prev = itemsSummaryByOrder.get(it.order_id)
+    const piece = `${it.quantity}x ${it.product_name_snapshot}`
+    itemsSummaryByOrder.set(it.order_id, prev ? `${prev}, ${piece}` : piece)
+  }
   const ledger = allOrderList
     .filter((o) => o.created_at >= ledgerWindowStart)
     .map((o) => ({
@@ -347,6 +358,7 @@ export async function getOwnerSummary(businessId: string) {
       customerName: o.customer_name,
       total: o.total,
       createdAt: o.created_at.toISOString(),
+      itemsSummary: itemsSummaryByOrder.get(o.id) ?? "",
     }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 

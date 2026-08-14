@@ -77,14 +77,23 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
             <span className="text-xs text-panel-ink-soft">{m.statsLine(visibleProducts.length, outCount, noPhotoCount, scopeName)}</span>
           </>
         )}
-        <button
-          data-tour="onboarding-add-product"
-          onClick={() => setShowAddProduct(true)}
-          disabled={initial.categories.length === 0}
-          className="ml-auto rounded-xl bg-panel-brand px-3.5 py-2.5 text-xs font-bold text-white shadow-[0_1px_2px_rgba(226,67,31,0.25)] transition-all duration-150 hover:bg-panel-brand-deep active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
-        >
-          {m.addProduct}
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            data-tour="onboarding-add-category"
+            onClick={() => setShowAddCategory(true)}
+            className="rounded-xl border border-panel-line bg-panel-surface px-3.5 py-2.5 text-xs font-bold text-panel-ink transition-colors duration-150 hover:bg-panel-bg"
+          >
+            {m.addCategory}
+          </button>
+          <button
+            data-tour="onboarding-add-product"
+            onClick={() => setShowAddProduct(true)}
+            disabled={initial.categories.length === 0}
+            className="rounded-xl bg-panel-brand px-3.5 py-2.5 text-xs font-bold text-white shadow-[0_1px_2px_rgba(226,67,31,0.25)] transition-all duration-150 hover:bg-panel-brand-deep active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
+          >
+            {m.addProduct}
+          </button>
+        </div>
       </div>
 
       {initial.categories.map((cat, i) => (
@@ -123,14 +132,6 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
         </div>
       )}
 
-      <button
-        data-tour="onboarding-add-category"
-        onClick={() => setShowAddCategory(true)}
-        className="text-sm font-bold text-panel-brand transition-colors hover:text-panel-brand-deep"
-      >
-        {m.addCategory}
-      </button>
-
       {showAddProduct && (
         <ProductModal
           mode="add"
@@ -147,6 +148,24 @@ export function MenuScreen({ initial }: { initial: OwnerMenuData }) {
       )}
     </div>
   )
+}
+
+// El nombre de la categoría lo escribe el dueño libremente — no hay un tipo
+// fijo en la base. Se adivina el sustantivo correcto por palabras clave para
+// que el resumen diga "5 bebidas" en vez de "5 platillos" en la categoría de
+// bebidas; sin coincidencia, "platillos" es el default razonable.
+function categoryNoun(name: string, count: number, lang: "es" | "en") {
+  const n = name.toLowerCase()
+  if (lang === "es") {
+    if (n.includes("bebida") || n.includes("drink")) return count === 1 ? "bebida" : "bebidas"
+    if (n.includes("postre") || n.includes("dessert")) return count === 1 ? "postre" : "postres"
+    if (n.includes("extra")) return count === 1 ? "extra" : "extras"
+    return count === 1 ? "platillo" : "platillos"
+  }
+  if (n.includes("bebida") || n.includes("drink")) return count === 1 ? "drink" : "drinks"
+  if (n.includes("postre") || n.includes("dessert")) return count === 1 ? "dessert" : "desserts"
+  if (n.includes("extra")) return count === 1 ? "extra" : "extras"
+  return count === 1 ? "dish" : "dishes"
 }
 
 function CategorySection({
@@ -174,41 +193,87 @@ function CategorySection({
 }) {
   const { lang, t } = useLang()
   const m = t.panel.menuPage
+  const [collapsed, setCollapsed] = useState(false)
 
   if (products.length === 0 && filter !== "todos") return null
+
+  const unitScope = filter === "todos" ? units.map((u) => u.id) : [filter]
+  const outCount = products.filter((p) =>
+    unitScope.some((uid) => unitProducts.find((up) => up.product_id === p.id && up.unit_id === uid)?.sold_out),
+  ).length
+  const noPhotoCount = products.filter((p) => !p.photo_url).length
+  const categoryName = lang === "es" ? category.name_es : category.name_en
+  const noun = categoryNoun(categoryName, products.length, lang)
 
   return (
     <section
       className="panel-animate-in overflow-hidden rounded-[20px] border border-panel-line bg-panel-surface shadow-[0_1px_2px_rgba(23,20,15,0.04)]"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-center gap-2.5 border-b border-panel-line px-4 py-3">
-        <h2 className="text-sm font-bold text-panel-ink">{lang === "es" ? category.name_es : category.name_en}</h2>
-        <span className="text-xs font-bold text-panel-ink/35">{products.length}</span>
-        {onEditCategory && (
-          <button onClick={onEditCategory} className="ml-auto text-xs font-bold text-panel-ink-soft hover:text-panel-brand">
-            {m.editCategory}
-          </button>
-        )}
-      </div>
-      {products.length === 0 ? (
-        <p className="px-4 py-4 text-xs text-panel-ink-soft">{m.noProductsInCategory}</p>
-      ) : (
-        <div>
-          {products.map((p) => (
-            <ProductRow
-              key={p.id}
-              product={p}
-              units={units}
-              categories={categories}
-              unitProducts={unitProducts}
-              optionGroups={optionGroups}
-              options={options}
-              filter={filter}
-            />
-          ))}
+      <button
+        type="button"
+        onClick={() => setCollapsed((c) => !c)}
+        aria-expanded={!collapsed}
+        aria-label={collapsed ? m.expandCategory : m.collapseCategory}
+        className="flex w-full items-center gap-2.5 border-b border-panel-line px-4 py-3 text-left"
+        style={{ borderBottomWidth: collapsed ? 0 : 1 }}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className={`h-4 w-4 flex-none text-panel-ink-soft transition-transform duration-150 ${collapsed ? "-rotate-90" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-panel-ink">{categoryName}</h2>
+          {products.length > 0 && (
+            <p className="mt-0.5 text-xs font-semibold text-panel-ink-soft">{m.categorySummaryLine(products.length, noun, outCount, noPhotoCount)}</p>
+          )}
         </div>
-      )}
+        {onEditCategory && (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation()
+              onEditCategory()
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.stopPropagation()
+                onEditCategory()
+              }
+            }}
+            className="ml-auto flex-none text-xs font-bold text-panel-ink-soft hover:text-panel-brand"
+          >
+            {m.editCategory}
+          </span>
+        )}
+      </button>
+      {!collapsed &&
+        (products.length === 0 ? (
+          <p className="px-4 py-4 text-xs text-panel-ink-soft">{m.noProductsInCategory}</p>
+        ) : (
+          <div>
+            {products.map((p) => (
+              <ProductRow
+                key={p.id}
+                product={p}
+                units={units}
+                categories={categories}
+                unitProducts={unitProducts}
+                optionGroups={optionGroups}
+                options={options}
+                filter={filter}
+              />
+            ))}
+          </div>
+        ))}
     </section>
   )
 }

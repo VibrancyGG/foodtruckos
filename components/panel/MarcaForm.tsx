@@ -276,7 +276,7 @@ export function MarcaForm({
           >
             <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
               <defs>
-                <pattern id="marcaPreviewMotif" width="90" height="90" patternUnits="userSpaceOnUse">
+                <pattern id="marcaPreviewMotif" width="112" height="112" patternUnits="userSpaceOnUse">
                   <g
                     fill="none"
                     stroke="currentColor"

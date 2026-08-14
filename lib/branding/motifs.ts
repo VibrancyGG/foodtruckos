@@ -1,3 +1,18 @@
+// Reparte 4 copias de un ícono de 24x24 dentro del mosaico de 112x112 que se
+// repite de fondo — mismo criterio que los 4 motivos originales (dibujados a
+// mano), pero generado para no repetir 4 veces las coordenadas de cada ícono
+// nuevo. Tamaños y posiciones ligeramente distintos entre copias para que no
+// se vea como una cuadrícula perfecta.
+function scatter(ic: string): string {
+  const placements: [number, number, number][] = [
+    [4, 2, 1.15],
+    [60, 8, 0.95],
+    [12, 62, 1.0],
+    [64, 64, 1.2],
+  ]
+  return placements.map(([x, y, s]) => `<g transform="translate(${x},${y}) scale(${s})">${ic}</g>`).join("")
+}
+
 // Juegos de trazo por tipo de negocio — dibujo de fondo discreto en el
 // encabezado del menú del comensal. "ic" es el ícono de 24x24 para el
 // selector, "pat" es la versión ampliada (viewBox 112x112) que se repite
@@ -38,6 +53,76 @@ export const MOTIFS = {
       '<path d="M66 12c6 0 10 5 10 12s-4 12-10 12-10-5-10-12 4-12 10-12z"/><path d="M66 12c-3 6-3 18 0 24"/>' +
       '<path d="M20 66h20l-4 26H24z"/><path d="M21 74h18"/><path d="M26 66V60h8v6"/>' +
       '<path d="M78 72c0-4 4-6 9-6s9 2 9 6-4 7-9 7-9-3-9-7z"/><path d="M78 78v8c0 3 4 5 9 5s9-2 9-5v-8"/>',
+  },
+  grill: {
+    name: "Parrilla",
+    ic:
+      '<circle cx="12" cy="14" r="7"/><path d="M6 12h12M6 15h12M6.5 18h11"/>' +
+      '<path d="M8 6c0-1.6 1.2-2 1.2-3.4M12 5c0-1.6 1.2-2 1.2-3.4M16 6c0-1.6 1.2-2 1.2-3.4"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  flame: {
+    name: "Llama",
+    ic: '<path d="M12 2c1 3-3 4-3 8a3 3 0 0 0 6 0c0-1.5-1-2-1-3.5 1.5 1 2.5 3 2.5 5.5a5 5 0 0 1-10 0C6.5 8 9 6 12 2z"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  forkSpatula: {
+    name: "Tenedor y espátula",
+    ic:
+      '<path d="M5 2v5a1 1 0 0 0 2 0V2M7 2v5M9 2v7M7 9v13" transform="rotate(-20 7 12)"/>' +
+      '<path d="M17 2h-3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h3z" transform="rotate(20 17 12)"/>' +
+      '<path d="M17 8v14" transform="rotate(20 17 12)"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  foodtruck: {
+    name: "Food truck",
+    ic:
+      '<path d="M2 17V9h11v8M13 11h5l4 4v2h-2M2 17h1a2 2 0 0 0 4 0h8a2 2 0 0 0 4 0h2"/>' +
+      '<circle cx="6" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  forkRoad: {
+    name: "Tenedor y carretera",
+    ic: '<path d="M7 2v6M10 2v6M13 2v6M10 8v2"/><path d="M10 10L3 22M10 10l7 12"/><path d="M10 14v1M10 17v1M10 20v1"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  tacoPin: {
+    name: "Taco y ubicación",
+    ic:
+      '<path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13z"/><path d="M7.5 8.5a4.5 4.5 0 0 1 9 0"/>' +
+      '<path d="M7.5 8.5h9"/><path d="M10 6.5c.8.6 1.6.6 2.4 0s1.6-.6 2.4 0"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  burgerWheels: {
+    name: "Hamburguesa sobre ruedas",
+    ic:
+      '<path d="M4 10a8 3 0 0 1 16 0"/><path d="M4 12h16"/><path d="M5 14h14a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/>' +
+      '<circle cx="7" cy="19.5" r="1.6"/><circle cx="17" cy="19.5" r="1.6"/><path d="M7 17.5v.4M17 17.5v.4"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
+  },
+  truckSteam: {
+    name: "Camión con humo",
+    ic:
+      '<path d="M1 16V10h9v6M10 11h5l3.5 3.5V16H17M1 16h1a1.8 1.8 0 0 0 3.6 0h6.8a1.8 1.8 0 0 0 3.6 0h2.5"/>' +
+      '<circle cx="4.5" cy="16" r="1.4"/><circle cx="15.5" cy="16" r="1.4"/>' +
+      '<path d="M13 8c1-1 1-2 0-3M15 6.5c1-1 1-2 0-3" stroke-width="1.4"/>',
+    get pat() {
+      return scatter(this.ic)
+    },
   },
 } as const
 

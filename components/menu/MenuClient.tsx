@@ -7,7 +7,25 @@ import { createOrder, type CartItemInput } from "@/lib/orders/actions"
 import type { ActiveMenuData } from "@/lib/menu/getMenuData"
 import { displayFont } from "@/lib/fonts"
 import { MOTIFS, isBrandMotif } from "@/lib/branding/motifs"
+import { dateInTimezone, parseWeeklyHours } from "@/lib/units/hours"
 import { CustomizeSheet } from "./CustomizeSheet"
+
+const WEEKDAY_FULL: Record<"es" | "en", string[]> = {
+  es: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+}
+const WEEKDAY_INDEX: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 }
+
+// Formato pedido para este badge específicamente: siempre con minutos y
+// AM/PM en mayúsculas ("9:00 AM"), a diferencia de formatClock (que usa
+// minúsculas y omite ":00") que ya se usa en Trucks y en otras pantallas.
+function formatHourFull(hhmm: string) {
+  const [hStr, mStr] = hhmm.split(":")
+  const h = Number(hStr)
+  const period = h >= 12 ? "PM" : "AM"
+  const h12 = h % 12 || 12
+  return `${h12}:${mStr.padStart(2, "0")} ${period}`
+}
 
 type CartLine = CartItemInput & { key: string }
 
@@ -212,6 +230,9 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
 
   const blackHeader = data.business.header_style === "black"
   const motif = isBrandMotif(data.business.brand_motif) ? data.business.brand_motif : "tacos"
+  const today = dateInTimezone(data.business.timezone, new Date())
+  const todayHours = parseWeeklyHours(data.unit.hours)[today.dayKey]
+  const todayLabel = WEEKDAY_FULL[lang][WEEKDAY_INDEX[today.dayKey]]
 
   return (
     <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
@@ -227,7 +248,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
       >
         <svg className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
           <defs>
-            <pattern id="menuHeaderMotif" width="90" height="90" patternUnits="userSpaceOnUse">
+            <pattern id="menuHeaderMotif" width="112" height="112" patternUnits="userSpaceOnUse">
               <g
                 fill="none"
                 stroke="currentColor"
@@ -247,13 +268,13 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
             // transparente se funde; si trae su propio lienzo, ese lienzo se
             // ve, y es justo lo que se espera al subir un logo así.
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={data.business.logo_url} alt="" className="h-16 w-16 flex-none object-contain" />
+            <img src={data.business.logo_url} alt="" className="h-20 w-20 flex-none object-contain" />
           ) : (
             <div
-              className="grid h-14 w-14 flex-none place-items-center rounded-full"
+              className="grid h-20 w-20 flex-none place-items-center rounded-full"
               style={blackHeader ? { background: "rgba(255,255,255,0.1)" } : { background: "var(--brand-on-primary)", color: "var(--brand-primary)" }}
             >
-              <span style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>{monogram(data.business.name)}</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 24 }}>{monogram(data.business.name)}</span>
             </div>
           )}
           <div className="min-w-0 flex-1">
@@ -272,18 +293,25 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
             {lang === "es" ? "EN" : "ES"}
           </button>
         </div>
-        <div
-          className={`relative mt-3.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${blackHeader ? "bg-white/15" : "bg-black/20"}`}
-        >
-          <span
-            className="h-1.5 w-1.5 rounded-full"
-            style={
-              data.openStatus.open
-                ? { background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }
-                : { background: "#9CA3AF", boxShadow: "0 0 0 3px rgba(156,163,175,.28)" }
-            }
-          />
-          {data.openStatus.open ? t.menu.openNowLabel : t.menu.closedNowLabel}
+        <div className="relative mt-3.5 flex flex-wrap items-center gap-1.5">
+          <div
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${blackHeader ? "bg-white/15" : "bg-black/20"}`}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={
+                data.openStatus.open
+                  ? { background: "#4ADE80", boxShadow: "0 0 0 3px rgba(74,222,128,.28)" }
+                  : { background: "#9CA3AF", boxShadow: "0 0 0 3px rgba(156,163,175,.28)" }
+              }
+            />
+            {data.openStatus.open ? t.menu.openNowLabel : t.menu.closedNowLabel}
+          </div>
+          {todayHours && (
+            <div className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${blackHeader ? "bg-white/15" : "bg-black/20"}`}>
+              {t.menu.todayHoursLabel(todayLabel, `${formatHourFull(todayHours.open)} – ${formatHourFull(todayHours.close)}`)}
+            </div>
+          )}
         </div>
         <div
           className="absolute inset-x-0 bottom-0 h-1.5"
