@@ -106,6 +106,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* space-between only distributes leftover space — with no gap floor,
+     three items that exactly sum to the available width end up flush
+     against each other (brand touching nav, nav touching the CTA). This
+     guarantees breathing room at every size, not just below the
+     .nav-hidden breakpoint. */
+  gap: 16px;
   padding: 18px clamp(20px, 5vw, 64px);
   background: rgba(13, 9, 6, 0.78);
   backdrop-filter: blur(10px);
@@ -635,10 +641,18 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 720px) {
+/* Full nav's min-content (4 links, one of them un-wrappable single words)
+   plus the brand wordmark and header actions no longer fit comfortably
+   once tablets enter play — rather than let the browser overflow items
+   into each other, the nav collapses at the same point real content
+   layout stops needing it as a full row. No hamburger yet; revisit if a
+   tablet-specific nav becomes worth building. */
+@media (max-width: 900px) {
   .nav {
     display: none;
   }
+}
+@media (max-width: 720px) {
   .header {
     padding: 14px 16px;
     gap: 10px;
