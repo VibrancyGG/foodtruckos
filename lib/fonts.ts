@@ -1,4 +1,4 @@
-import { Anton, Space_Grotesk, Inter } from "next/font/google"
+import { Anton, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google"
 
 // Solo para las pantallas del comensal (menú, seguimiento) — la tipografía
 // condensada de carácter es parte de "la marca es del cliente"; el panel del
@@ -23,4 +23,13 @@ export const panelDisplayFont = Space_Grotesk({
 export const panelBodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-panel-body",
+})
+
+// Solo para acentos "de datos" del landing público (etiquetas de sección,
+// el tablero de cocina en vivo) — evoca el centro de operaciones sin
+// tomar prestada ninguna de las otras dos identidades tipográficas.
+export const landingMonoFont = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-landing-mono",
 })

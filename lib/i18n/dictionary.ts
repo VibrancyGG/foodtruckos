@@ -860,6 +860,68 @@ export type Dictionary = {
     alreadyHaveAccount: string
     backToLogin: string
   }
+  landing: {
+    navProduct: string
+    navBenefits: string
+    navPricing: string
+    navLogin: string
+    ctaTrial: string
+    heroEyebrow: string
+    heroTitleLine1: string
+    heroTitleAccent: string
+    heroSub: string
+    heroCtaPrimary: string
+    heroCtaSecondary: string
+    heroMeta: string
+    showcaseEyebrow: string
+    showcaseTitle: string
+    showcaseSub: string
+    boardTitle: string
+    boardLive: string
+    order1Name: string
+    order1Items: string
+    order1Badge: string
+    order2Name: string
+    order2Items: string
+    order2Badge: string
+    order3Name: string
+    order3Items: string
+    order3Badge: string
+    stat1Label: string
+    stat2Label: string
+    stat3Label: string
+    showcaseHint: string
+    benefitsEyebrow: string
+    benefitsTitle: string
+    benefitsSub: string
+    benefit1Title: string
+    benefit1Body: string
+    benefit2Title: string
+    benefit2Body: string
+    benefit3Title: string
+    benefit3Body: string
+    benefit4Title: string
+    benefit4Body: string
+    benefit5Title: string
+    benefit5Body: string
+    benefit6Title: string
+    benefit6Body: string
+    benefit7Title: string
+    benefit7Body: string
+    benefit8Title: string
+    benefit8Body: string
+    pricingEyebrow: string
+    pricingTitle: string
+    pricingSub: string
+    price1Tag: string
+    price2Tag: string
+    price3Tag: string
+    priceNote: string
+    pricePer: string
+    ctaTitle: string
+    ctaSub: string
+    footerCredit: string
+  }
 }
 
 // Solo texto de interfaz (botones, estados, mensajes). Los nombres y
@@ -1759,6 +1821,68 @@ export const dictionary: Record<Lang, Dictionary> = {
       alreadyHaveAccount: "¿Ya tienes cuenta?",
       backToLogin: "Entrar",
     },
+    landing: {
+      navProduct: "Producto",
+      navBenefits: "Beneficios",
+      navPricing: "Precios",
+      navLogin: "Iniciar sesión",
+      ctaTrial: "Prueba gratis",
+      heroEyebrow: "Cocina en vivo, pedido por QR, cero comisión",
+      heroTitleLine1: "Tu food truck,",
+      heroTitleAccent: "iluminado de verdad",
+      heroSub: "El comensal escanea, ordena desde su celular con tu marca — no la nuestra — y el pedido aparece al instante en tu cocina. Sin apps, sin comisión por pedido, sin curva de aprendizaje.",
+      heroCtaPrimary: "Empieza tu prueba gratis",
+      heroCtaSecondary: "Ver cómo funciona",
+      heroMeta: "Sin tarjeta para empezar · Cancela cuando quieras",
+      showcaseEyebrow: "Así se ve tu cocina",
+      showcaseTitle: "Cada orden, en tiempo real",
+      showcaseSub: "Mueve el mouse sobre el panel — así reacciona tu pantalla de cocina en cada turno.",
+      boardTitle: "Cocina — en vivo",
+      boardLive: "EN VIVO",
+      order1Name: "2× Torta de asada",
+      order1Items: "sin cebolla · extra queso",
+      order1Badge: "NUEVO",
+      order2Name: "Orden de tacos (4)",
+      order2Items: "para llevar",
+      order2Badge: "4 MIN",
+      order3Name: "Quesabirria + agua",
+      order3Items: "consomé extra",
+      order3Badge: "LISTA",
+      stat1Label: "Pedidos hoy",
+      stat2Label: "Prom. entrega",
+      stat3Label: "Venta hoy",
+      showcaseHint: "Avanzar una orden toma un solo toque — hecho para manos ocupadas en hora pico.",
+      benefitsEyebrow: "Por qué FoodTruckOS",
+      benefitsTitle: "Todo lo que tu negocio necesita, en un solo lugar",
+      benefitsSub: "Cada función existe porque un dueño de food truck la necesitó primero.",
+      benefit1Title: "Tu negocio, en vivo",
+      benefit1Body: "Abre el panel y mira, al instante, cuánto vendes, qué se agota y cómo va cada truck — sin esperar al cierre del día.",
+      benefit2Title: "Tus clientes ordenan en segundos",
+      benefit2Body: "Escanean un código y piden desde su propio celular. Sin apps que instalar, sin filas, sin clientes que se cansan de esperar.",
+      benefit3Title: "Cero comisión, cero letra chica",
+      benefit3Body: "Nunca cobramos por pedido ni te atamos a un contrato. Pagas tu mensualidad y el 100% de cada venta es tuyo.",
+      benefit4Title: "Tu negocio en la palma de tu mano",
+      benefit4Body: "Precios, pausas, personal y reportes — todo desde el celular, estés en el truck, en casa o en la fila del súper.",
+      benefit5Title: "Tu menú, siempre al día",
+      benefit5Body: "Cambia un precio o marca un platillo agotado en segundos, y se refleja al instante en el celular de tus clientes.",
+      benefit6Title: "Imprime tus QR las veces que quieras",
+      benefit6Body: "Descarga el código de cada truck y ponlo en tu ventanilla, tu mesa o tu volante — sin límite y sin costo extra.",
+      benefit7Title: "Tu marca, no la nuestra",
+      benefit7Body: "Logo, color y estilo del negocio en cada pantalla que ve tu cliente. FoodTruckOS trabaja detrás, invisible.",
+      benefit8Title: "Insights que trabajan por ti",
+      benefit8Body: "El panel te avisa solo qué platillo se vende más, cuándo tienes más movimiento y qué truck va mejor — sin armar una sola gráfica.",
+      pricingEyebrow: "Precio simple",
+      pricingTitle: "Mientras más trucks, más barato por unidad",
+      pricingSub: "Sin comisión por pedido. Sin permanencia mínima. Cancela cuando quieras.",
+      price1Tag: "1 truck",
+      price2Tag: "2 trucks",
+      price3Tag: "3 o más",
+      priceNote: "por truck",
+      pricePer: "/mes",
+      ctaTitle: "Tu food truck, en línea en minutos",
+      ctaSub: "Crea tu cuenta gratis y tu truck queda listo para recibir pedidos hoy mismo. Sin tarjeta, sin instalación, sin compromiso.",
+      footerCredit: "Desarrollado por Vibrancy GG. Todos los derechos reservados.",
+    },
   },
   en: {
     menu: {
@@ -2652,6 +2776,68 @@ export const dictionary: Record<Lang, Dictionary> = {
       requestSentBody: (email) => `We sent a confirmation link to ${email}. Open it to log your request, and our team will reach out soon to set up your panel.`,
       alreadyHaveAccount: "Already have an account?",
       backToLogin: "Sign in",
+    },
+    landing: {
+      navProduct: "Product",
+      navBenefits: "Benefits",
+      navPricing: "Pricing",
+      navLogin: "Log in",
+      ctaTrial: "Free trial",
+      heroEyebrow: "Live kitchen screen, QR ordering, zero commission",
+      heroTitleLine1: "Your food truck,",
+      heroTitleAccent: "truly lit up",
+      heroSub: "Diners scan a code and order from their own phone — under your brand, not ours — and the order shows up instantly on your kitchen screen. No apps, no commission, no learning curve.",
+      heroCtaPrimary: "Start your free trial",
+      heroCtaSecondary: "See how it works",
+      heroMeta: "No card to start · Cancel anytime",
+      showcaseEyebrow: "This is your kitchen",
+      showcaseTitle: "Every order, in real time",
+      showcaseSub: "Move your mouse over the panel — this is how your kitchen screen reacts on every shift.",
+      boardTitle: "Kitchen — live",
+      boardLive: "LIVE",
+      order1Name: "2× Carne asada torta",
+      order1Items: "no onion · extra cheese",
+      order1Badge: "NEW",
+      order2Name: "Taco order (4)",
+      order2Items: "to go",
+      order2Badge: "4 MIN",
+      order3Name: "Quesabirria + water",
+      order3Items: "extra consommé",
+      order3Badge: "READY",
+      stat1Label: "Orders today",
+      stat2Label: "Avg. delivery",
+      stat3Label: "Sales today",
+      showcaseHint: "Moving an order forward takes one tap — built for busy hands at rush hour.",
+      benefitsEyebrow: "Why FoodTruckOS",
+      benefitsTitle: "Everything your business needs, in one place",
+      benefitsSub: "Every feature exists because a food truck owner needed it first.",
+      benefit1Title: "Your business, live",
+      benefit1Body: "Open the panel and see, instantly, how much you're selling, what's running out, and how each truck is doing — no waiting for closing time.",
+      benefit2Title: "Your customers order in seconds",
+      benefit2Body: "They scan a code and order from their own phone. No apps to install, no lines, no customers who give up waiting.",
+      benefit3Title: "Zero commission, zero fine print",
+      benefit3Body: "We never charge per order, and there's no contract locking you in. You pay a flat monthly fee and keep 100% of every sale.",
+      benefit4Title: "Your business in the palm of your hand",
+      benefit4Body: "Prices, pauses, staff and reports — all from your phone, whether you're at the truck, at home, or in the checkout line.",
+      benefit5Title: "Your menu, always up to date",
+      benefit5Body: "Change a price or mark a dish sold out in seconds, and it shows instantly on your customers' phones.",
+      benefit6Title: "Print your QR codes as many times as you want",
+      benefit6Body: "Download each truck's code and put it on your window, your table or your flyer — no limit, no extra cost.",
+      benefit7Title: "Your brand, not ours",
+      benefit7Body: "Your logo, color and style on every screen your customer sees. FoodTruckOS works behind the scenes, invisible.",
+      benefit8Title: "Insights that work for you",
+      benefit8Body: "The panel tells you on its own what's selling best, when you're busiest, and which truck is doing better — no charts to build.",
+      pricingEyebrow: "Simple pricing",
+      pricingTitle: "The more trucks, the cheaper each one gets",
+      pricingSub: "No commission per order. No minimum commitment. Cancel anytime.",
+      price1Tag: "1 truck",
+      price2Tag: "2 trucks",
+      price3Tag: "3 or more",
+      priceNote: "per truck",
+      pricePer: "/mo",
+      ctaTitle: "Your food truck, online in minutes",
+      ctaSub: "Create your free account and your truck is ready to take orders today. No card, no install, no commitment.",
+      footerCredit: "Built by Vibrancy GG. All rights reserved.",
     },
   },
 }
