@@ -639,6 +639,10 @@
   .nav {
     display: none;
   }
+  .header {
+    padding: 14px 16px;
+    gap: 10px;
+  }
   .section {
     padding: 72px 20px;
   }
@@ -651,6 +655,30 @@
   }
   .ctaBand {
     padding: 80px 20px;
+  }
+}
+/* Header: por debajo de ~400px el logo + el toggle de idioma + el botón de
+   prueba gratis suman más ancho del que cabe en una fila sin encimarse —
+   se achican en vez de dejar que se toquen. */
+@media (max-width: 420px) {
+  .brand {
+    font-size: 0.92rem;
+    gap: 7px;
+  }
+  .brand img {
+    width: 22px;
+    height: 22px;
+  }
+  .headerActions {
+    gap: 8px;
+  }
+  .headerActions .btn {
+    padding: 9px 14px;
+    font-size: 0.8rem;
+  }
+  .langToggle {
+    padding: 5px 9px;
+    font-size: 0.68rem;
   }
 }
 @media (max-width: 520px) {
