@@ -315,12 +315,38 @@ export async function createProduct(input: {
     p_after: { name: input.nameEs, price: input.price },
   })
 
-  // Antes se creaban aquí, vacíos, los dos grupos de personalización que
-  // casi siempre se usan — pero eso duplicaba (y sin el "kind" correcto:
-  // los dos nacían como "agregar") lo que ya resuelve el formulario manual
-  // de OptionGroupsEditor, que ahora autocompleta el nombre al elegir
-  // +Se agrega/-Se quita. Un solo camino para crear grupos, no dos que
-  // podían desincronizarse.
+  // Todo platillo nuevo ya trae listos los dos grupos que casi siempre se
+  // usan — "le agregamos algo" / "le quitamos algo" — vacíos de opciones,
+  // para que el dueño solo tenga que agregar las opciones, nunca crear los
+  // grupos ni escribir su nombre (evitar carga manual repetitiva cuando el
+  // patrón es el mismo en todos los productos). El "kind" va explícito en
+  // cada uno — antes se omitía y los dos nacían como "agregar" por el
+  // default de la columna, así que "le quitamos algo?" se veía mal
+  // etiquetado en verde en vez de rojo.
+  await supabase.from("product_option_groups").insert([
+    {
+      business_id: businessId,
+      product_id: product.id,
+      group_name_es: "¿Le agregamos algo?",
+      group_name_en: "Add anything?",
+      kind: "add",
+      required: false,
+      min_select: 0,
+      max_select: 1,
+      sort_order: 0,
+    },
+    {
+      business_id: businessId,
+      product_id: product.id,
+      group_name_es: "¿Le quitamos algo?",
+      group_name_en: "Take anything off?",
+      kind: "remove",
+      required: false,
+      min_select: 0,
+      max_select: 1,
+      sort_order: 1,
+    },
+  ])
 
   const { data: units } = await supabase.from("units").select("id").eq("business_id", businessId).neq("status", "archived")
   if (units && units.length > 0) {
