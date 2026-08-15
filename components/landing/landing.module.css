@@ -20,6 +20,11 @@
   background: var(--bg);
   color: var(--ink);
   overflow-x: hidden;
+  /* Safari has a known bug where mix-blend-mode on a position:fixed
+     element (the cursor glow below) fails to blend at all unless its
+     stacking context is pinned down explicitly — isolate this subtree so
+     the blend always has a well-defined backdrop to composite against. */
+  isolation: isolate;
 }
 
 .pageGlow {
@@ -114,6 +119,7 @@
   gap: 16px;
   padding: 18px clamp(20px, 5vw, 64px);
   background: rgba(13, 9, 6, 0.78);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
