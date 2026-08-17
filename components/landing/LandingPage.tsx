@@ -144,9 +144,9 @@ export function LandingPage() {
     { icon: ICON_PATHS.sparkles, title: l.benefit8Title, body: l.benefit8Body },
   ]
   const prices = [
-    { tag: l.price1Tag, amount: "$69", mid: false },
-    { tag: l.price2Tag, amount: "$59", mid: true },
-    { tag: l.price3Tag, amount: "$49", mid: false },
+    { tag: l.price1Tag, amount: "$49", mid: false },
+    { tag: l.price2Tag, amount: "$39", mid: true },
+    { tag: l.price3Tag, amount: "$29", mid: false },
   ]
 
   return (
