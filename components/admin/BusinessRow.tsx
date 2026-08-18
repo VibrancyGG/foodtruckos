@@ -1,6 +1,6 @@
 "use client"
 
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 import { suspendBusiness, reactivateBusiness, setTrialEnd } from "@/lib/admin/actions"
 import { getTrialInfo } from "@/lib/billing/trial"
 import { startImpersonation } from "@/lib/admin/impersonate"
@@ -24,6 +24,7 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
     cancelled: a.statusCancelled,
   }
   const [pending, startTransition] = useTransition()
+  const [eligiendoVuelta, setEligiendoVuelta] = useState(false)
 
   // Sin fecha no hay vencimiento: es un estado válido, no un dato faltante.
   const trial = getTrialInfo(business.subscription_status, business.trial_ends_at)
@@ -88,17 +89,49 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
             </form>
           )}
           {business.subscription_status === "suspended" ? (
-            <button
-              disabled={pending}
-              onClick={() =>
-                startTransition(async () => {
-                  await reactivateBusiness(business.id)
-                })
-              }
-              className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
-            >
-              {a.reactivate}
-            </button>
+            eligiendoVuelta ? (
+              // Se pregunta siempre: volver como prueba o de pago no es lo
+              // mismo, y asumirlo en silencio ya nos costó una cuenta mal
+              // convertida.
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-neutral-500">{a.reactivateAsk}</span>
+                <button
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      await reactivateBusiness(business.id, "trial")
+                      setEligiendoVuelta(false)
+                    })
+                  }
+                  className="rounded-lg border border-blue-800 px-2.5 py-1 text-xs font-bold text-blue-300"
+                >
+                  {a.reactivateAsTrial}
+                </button>
+                <button
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      await reactivateBusiness(business.id, "active")
+                      setEligiendoVuelta(false)
+                    })
+                  }
+                  className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
+                >
+                  {a.reactivateAsPaid}
+                </button>
+                <button onClick={() => setEligiendoVuelta(false)} className="text-xs text-neutral-500">
+                  {a.cancel}
+                </button>
+              </div>
+            ) : (
+              <button
+                disabled={pending}
+                onClick={() => setEligiendoVuelta(true)}
+                className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
+              >
+                {a.reactivate}
+              </button>
+            )
           ) : (
             <button
               disabled={pending}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getAdminContext } from "@/lib/auth/getAdminContext"
+import { trialEndsFromNow } from "@/lib/billing/trial"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -54,20 +55,38 @@ export async function markArchiveWarned(unitId: string): Promise<Result> {
   return { ok: true }
 }
 
-export async function reactivateBusiness(businessId: string): Promise<Result> {
+// Reactivar SIEMPRE pregunta cómo vuelve, porque las dos respuestas cuestan
+// dinero en direcciones opuestas: devolver como "de pago" a quien seguía en
+// prueba se salta la conversación de cobro, y devolver como "prueba" a quien
+// ya pagaba le regala días.
+//
+// Antes esto asumía "de pago" en silencio. Un negocio con la prueba vencida
+// que se suspendía y reactivaba quedaba convertido en cuenta de pago sin que
+// nadie lo decidiera.
+export async function reactivateBusiness(
+  businessId: string,
+  como: "trial" | "active",
+): Promise<Result> {
   const { isAdmin } = await getAdminContext()
   if (!isAdmin) return { ok: false, error: "No autorizado" }
 
   const supabase = await createClient()
   const { error } = await supabase
     .from("businesses")
-    .update({ subscription_status: "active" })
+    .update(
+      como === "trial"
+        ? { subscription_status: "trial", trial_ends_at: trialEndsFromNow() }
+        : // Se limpia la fecha vieja a propósito: dejarla puesta es una mina —
+          // si alguien regresara la cuenta a "prueba" más adelante, nacería
+          // vencida en ese mismo instante.
+          { subscription_status: "active", trial_ends_at: null },
+    )
     .eq("id", businessId)
   if (error) return { ok: false, error: "No se pudo reactivar" }
 
   await supabase.rpc("log_admin_action", {
     p_business_id: businessId,
-    p_action: "business_reactivated",
+    p_action: como === "trial" ? "business_reactivated_as_trial" : "business_reactivated_as_paid",
     p_entity_type: "business",
     p_entity_id: businessId,
   })

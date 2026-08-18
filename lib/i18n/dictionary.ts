@@ -762,6 +762,10 @@ export type Dictionary = {
     recentActivity: string
     noActivity: string
     reactivate: string
+    reactivateAsk: string
+    reactivateAsTrial: string
+    reactivateAsPaid: string
+    cancel: string
     suspend: string
     statusTrial: string
     statusActive: string
@@ -1739,6 +1743,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       recentActivity: "Actividad reciente",
       noActivity: "Sin actividad todavía.",
       reactivate: "Reactivar",
+      reactivateAsk: "¿Cómo vuelve?",
+      reactivateAsTrial: "Prueba (14 días)",
+      reactivateAsPaid: "De pago",
+      cancel: "Cancelar",
       suspend: "Suspender",
       statusTrial: "Periodo de prueba",
       statusActive: "Activa",
@@ -2713,6 +2721,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       recentActivity: "Recent activity",
       noActivity: "No activity yet.",
       reactivate: "Reactivate",
+      reactivateAsk: "Comes back as:",
+      reactivateAsTrial: "Trial (14 days)",
+      reactivateAsPaid: "Paid",
+      cancel: "Cancel",
       suspend: "Suspend",
       statusTrial: "Trial",
       statusActive: "Active",
