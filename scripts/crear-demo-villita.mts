@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync } from "node:fs"
 import { createHmac, randomBytes, randomUUID } from "node:crypto"
 import { createClient } from "@supabase/supabase-js"
+import bcrypt from "bcrypt"
 
 const ORIGINAL = "98a50f5b-84ad-460c-aeea-fabcc0eaeb76"
 const SALIDA = "scripts/demo-villita.sql"
@@ -28,7 +29,11 @@ const PEPPER = env.STAFF_PIN_PEPPER
 if (!URL || !SERVICE || !PEPPER) throw new Error("Faltan variables en .env.local")
 
 const db = createClient(URL, SERVICE, { auth: { persistSession: false } })
+// El codigo de emparejamiento se guarda como HMAC pelado...
 const hash = (s: string) => createHmac("sha256", PEPPER).update(s).digest("hex")
+// ...pero el PIN va con bcrypt POR ENCIMA del HMAC. Guardar solo el HMAC
+// deja un PIN que nunca valida (lib/staff/session.ts usa bcrypt.compare).
+const hashPin = (pin: string) => bcrypt.hash(hash(pin), 10)
 
 const CORREO = "demo.villita@vibrancygg.com"
 const CLAVE = "DemoVillita2026!"
@@ -263,6 +268,7 @@ async function main() {
     { nombre: "Laura Jiménez", rol: "encargado", pin: "3456", unidad: null },
   ]
   for (const p of PERSONAL) {
+    const pinHash = await hashPin(p.pin)
     sql.push(
       `insert into staff (id, business_id, unit_id, name, role, pin_hash, active) values (${[
         q(randomUUID()),
@@ -270,7 +276,7 @@ async function main() {
         q(p.unidad),
         q(p.nombre),
         q(p.rol),
-        q(hash(p.pin)),
+        q(pinHash),
         "true",
       ].join(", ")});`,
     )
