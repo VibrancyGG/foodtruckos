@@ -78,7 +78,36 @@ export function VentanillaForm({
     return map
   }, [optionGroups, options])
 
-  const catProducts = products.filter((p) => p.category_id === cat)
+  // Un platillo exclusivo de otro truck no se vende aquí. Es la misma regla
+  // que aplica el menú del comensal (MenuClient): sin fila en unit_products se
+  // ofrece; con fila e is_offered=false, no.
+  //
+  // Faltaba justo aquí, y el efecto era que la ventanilla ofrecía cosas que
+  // ese truck no tiene y que por QR nadie podía pedir — las dos puertas de
+  // venta mostrando menús distintos.
+  const productosDelTruck = useMemo(
+    () =>
+      products.filter((p) => {
+        const up = unitProducts.find((u) => u.product_id === p.id)
+        return !(up && up.is_offered === false)
+      }),
+    [products, unitProducts],
+  )
+
+  // Una categoría sin platillos en este truck deja de tener pestaña: abrirla
+  // solo para encontrarla vacía no le sirve a nadie con prisa.
+  const categoriasConProductos = useMemo(
+    () => categories.filter((c) => productosDelTruck.some((p) => p.category_id === c.id)),
+    [categories, productosDelTruck],
+  )
+
+  // Si la categoría elegida se quedó sin platillos, se cae a la primera que sí
+  // tenga — derivado, no en estado, para no repintar de más.
+  const catActiva = categoriasConProductos.some((c) => c.id === cat)
+    ? cat
+    : (categoriasConProductos[0]?.id ?? null)
+
+  const catProducts = productosDelTruck.filter((p) => p.category_id === catActiva)
 
   function qtyInCart(productId: string) {
     return lines.filter((l) => l.productId === productId).reduce((s, l) => s + l.quantity, 0)
@@ -164,12 +193,12 @@ export function VentanillaForm({
       </div>
 
       <div className="flex flex-none gap-2 overflow-x-auto border-b px-4.5 py-2.5" style={{ background: SURFACE, borderColor: EDGE, scrollbarWidth: "none" }}>
-        {categories.map((c) => (
+        {categoriasConProductos.map((c) => (
           <button
             key={c.id}
             onClick={() => setCat(c.id)}
             className="flex-none whitespace-nowrap rounded-full border px-4 py-2.5 text-[13.5px] font-extrabold"
-            style={cat === c.id ? { background: TEXT, color: "#100F0D", borderColor: TEXT } : { background: SURFACE2, color: DIM, borderColor: EDGE }}
+            style={catActiva === c.id ? { background: TEXT, color: "#100F0D", borderColor: TEXT } : { background: SURFACE2, color: DIM, borderColor: EDGE }}
           >
             {lang === "es" ? c.name_es : c.name_en}
           </button>
