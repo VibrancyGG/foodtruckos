@@ -772,6 +772,8 @@ export type Dictionary = {
     statusSuspended: string
     statusCancelled: string
     trialNoLimit: string
+    trialSave: string
+    trialSetDays: (n: number) => string
     trialExpired: string
     trialDaysLeft: (n: number) => string
     perMonth: string
@@ -1753,6 +1755,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       statusSuspended: "Suspendida",
       statusCancelled: "Cancelada",
       trialNoLimit: "Sin vencimiento",
+      trialSave: "Guardar",
+      trialSetDays: (n) => `${n} días`,
       trialExpired: "Prueba vencida",
       trialDaysLeft: (n) => (n === 1 ? "Queda 1 día" : `Quedan ${n} días`),
       perMonth: "/mes",
@@ -2731,6 +2735,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       statusSuspended: "Suspended",
       statusCancelled: "Cancelled",
       trialNoLimit: "No expiry",
+      trialSave: "Save",
+      trialSetDays: (n) => `${n} days`,
       trialExpired: "Trial expired",
       trialDaysLeft: (n) => (n === 1 ? "1 day left" : `${n} days left`),
       perMonth: "/mo",

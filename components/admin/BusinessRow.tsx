@@ -25,6 +25,7 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
   }
   const [pending, startTransition] = useTransition()
   const [eligiendoVuelta, setEligiendoVuelta] = useState(false)
+  const [editandoFecha, setEditandoFecha] = useState(false)
 
   // Sin fecha no hay vencimiento: es un estado válido, no un dato faltante.
   const trial = getTrialInfo(business.subscription_status, business.trial_ends_at)
@@ -45,25 +46,21 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
           {STATUS_LABEL[business.subscription_status] ?? business.subscription_status}
         </span>
         {business.subscription_status === "trial" && (
-          <div className="mt-1.5 flex items-center gap-1.5">
-            {/* El calendario solo aparece en prueba: fuera de ese estado la
-                fecha no la lee nadie, y mostrarla confundiría. */}
-            <input
-              type="date"
-              disabled={pending}
-              defaultValue={business.trial_ends_at ? business.trial_ends_at.slice(0, 10) : ""}
-              onChange={(e) =>
-                startTransition(async () => {
-                  const v = e.target.value
-                  // Fin del día elegido: la prueba dura ese día completo.
-                  await setTrialEnd(business.id, v ? new Date(`${v}T23:59:59`).toISOString() : null)
-                })
-              }
-              className="rounded border border-neutral-700 bg-neutral-900 px-1.5 py-0.5 text-[11px] text-neutral-300"
-            />
-            <span className={`text-[11px] ${trialLabel.urgente ? "text-amber-400" : "text-neutral-500"}`}>
-              {trialLabel.texto}
-            </span>
+          <div className="mt-1.5">
+            {editandoFecha ? (
+              <TrialEditor
+                business={business}
+                onDone={() => setEditandoFecha(false)}
+                labels={a}
+              />
+            ) : (
+              <button
+                onClick={() => setEditandoFecha(true)}
+                className={`text-[11px] underline decoration-dotted underline-offset-2 ${trialLabel.urgente ? "text-amber-400" : "text-neutral-500"} hover:text-neutral-200`}
+              >
+                {trialLabel.texto}
+              </button>
+            )}
           </div>
         )}
       </td>
@@ -148,5 +145,81 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
         </div>
       </td>
     </tr>
+  )
+}
+
+// Editor de la fecha de prueba.
+//
+// La versión anterior guardaba en cada tecla del calendario: al escribir la
+// fecha, el primer dígito ya disparaba un guardado con valor incompleto y
+// borraba lo que se estaba escribiendo. Por eso no se dejaba cambiar.
+//
+// Ahora nada se guarda hasta que se pide. Y arriba están los atajos, porque
+// lo que de verdad se hace el 90% de las veces es "dale una semana más", no
+// elegir un martes concreto.
+function TrialEditor({
+  business,
+  onDone,
+  labels,
+}: {
+  business: AdminOverview["businesses"][number]
+  onDone: () => void
+  labels: { trialSave: string; trialNoLimit: string; trialSetDays: (n: number) => string; cancel: string }
+}) {
+  const [pending, startTransition] = useTransition()
+  const [valor, setValor] = useState(business.trial_ends_at ? business.trial_ends_at.slice(0, 10) : "")
+
+  // Fin del día elegido: la prueba dura ese día completo, no hasta la
+  // medianoche anterior.
+  const guardar = (iso: string | null) =>
+    startTransition(async () => {
+      await setTrialEnd(business.id, iso)
+      onDone()
+    })
+
+  const enDias = (n: number) => {
+    const d = new Date()
+    d.setDate(d.getDate() + n)
+    d.setHours(23, 59, 59, 0)
+    return d.toISOString()
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <input
+        type="date"
+        value={valor}
+        disabled={pending}
+        onChange={(e) => setValor(e.target.value)}
+        className="rounded border border-neutral-600 bg-neutral-900 px-2 py-1 text-xs text-neutral-100"
+      />
+      <button
+        disabled={pending}
+        onClick={() => guardar(valor ? new Date(`${valor}T23:59:59`).toISOString() : null)}
+        className="rounded-lg border border-green-800 px-2.5 py-1 text-xs font-bold text-green-300"
+      >
+        {labels.trialSave}
+      </button>
+      {[7, 14, 30].map((n) => (
+        <button
+          key={n}
+          disabled={pending}
+          onClick={() => guardar(enDias(n))}
+          className="rounded-lg border border-neutral-700 px-2 py-1 text-xs font-bold text-neutral-300 hover:border-neutral-500"
+        >
+          {labels.trialSetDays(n)}
+        </button>
+      ))}
+      <button
+        disabled={pending}
+        onClick={() => guardar(null)}
+        className="rounded-lg border border-neutral-700 px-2 py-1 text-xs font-bold text-neutral-400 hover:border-neutral-500"
+      >
+        {labels.trialNoLimit}
+      </button>
+      <button onClick={onDone} className="px-1 text-xs text-neutral-500">
+        {labels.cancel}
+      </button>
+    </div>
   )
 }
