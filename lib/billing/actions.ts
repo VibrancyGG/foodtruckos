@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
+import { avisarAdmin } from "@/lib/notificaciones/avisoAdmin"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -21,5 +22,25 @@ export async function requestCancellation(note: string): Promise<Result> {
   })
 
   if (error) return { ok: false, error: "No se pudo enviar la solicitud" }
+
+  // El más urgente de los tres: un cliente que se quiere ir todavía se puede
+  // retener, pero solo si alguien se entera el mismo día.
+  const { data: negocio } = await supabase
+    .from("businesses")
+    .select("name")
+    .eq("id", businessId)
+    .maybeSingle()
+
+  avisarAdmin({
+    asunto: `Quiere cancelar: ${negocio?.name ?? "negocio sin nombre"}`,
+    titulo: "Un cliente pidió cancelar",
+    datos: [
+      ["Negocio", negocio?.name ?? ""],
+      ["Estado", "Nada se canceló todavía"],
+    ],
+    nota: note,
+    destino: "/admin",
+  })
+
   return { ok: true }
 }

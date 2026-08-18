@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
 import { slugify } from "@/lib/utils/slugify"
+import { avisarAdmin } from "@/lib/notificaciones/avisoAdmin"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -31,6 +32,33 @@ export async function requestNewTruck(note: string): Promise<Result> {
   })
 
   if (error) return { ok: false, error: "No se pudo enviar la solicitud" }
+
+  // Un truck más es más cobro al mes, y el dueño se queda esperando hasta que
+  // alguien lo apruebe. El nombre se consulta aparte porque un correo que diga
+  // el identificador del negocio no le sirve a nadie.
+  const { data: negocio } = await supabase
+    .from("businesses")
+    .select("name")
+    .eq("id", businessId)
+    .maybeSingle()
+  const { count: trucksActuales } = await supabase
+    .from("units")
+    .select("id", { count: "exact", head: true })
+    .eq("business_id", businessId)
+    .eq("status", "active")
+
+  avisarAdmin({
+    asunto: `Truck nuevo: ${negocio?.name ?? "negocio sin nombre"}`,
+    titulo: "Un cliente quiere agregar un truck",
+    datos: [
+      ["Negocio", negocio?.name ?? ""],
+      ["Trucks activos hoy", String(trucksActuales ?? 0)],
+      ["Quedaría en", String((trucksActuales ?? 0) + 1)],
+    ],
+    nota: note,
+    destino: "/admin",
+  })
+
   revalidatePath("/panel/trucks")
   return { ok: true }
 }

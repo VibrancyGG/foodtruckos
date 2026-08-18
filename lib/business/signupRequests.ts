@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { avisarAdmin } from "@/lib/notificaciones/avisoAdmin"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -41,6 +42,21 @@ export async function submitBusinessSignupRequest(input: {
     note: input.note.trim() || null,
   })
   if (error) return { ok: false, error: "No se pudo enviar la solicitud" }
+
+  // Un prospecto esperando es lo más caro que hay: si nadie lo ve, se va con
+  // otro. El aviso no puede tumbar la solicitud, así que nunca relanza.
+  avisarAdmin({
+    asunto: `Negocio nuevo: ${input.businessName.trim()}`,
+    titulo: "Alguien quiere abrir su panel",
+    datos: [
+      ["Negocio", input.businessName.trim()],
+      ["Ciudad", input.city.trim()],
+      ["Correo", user.email ?? ""],
+      ["Teléfono", input.phone.trim()],
+    ],
+    nota: input.note,
+    destino: "/admin",
+  })
 
   revalidatePath("/panel/sin-acceso")
   return { ok: true }
