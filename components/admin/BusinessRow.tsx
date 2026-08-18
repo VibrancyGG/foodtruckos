@@ -1,7 +1,8 @@
 "use client"
 
 import { useTransition } from "react"
-import { suspendBusiness, reactivateBusiness } from "@/lib/admin/actions"
+import { suspendBusiness, reactivateBusiness, setTrialEnd } from "@/lib/admin/actions"
+import { getTrialInfo } from "@/lib/billing/trial"
 import { startImpersonation } from "@/lib/admin/impersonate"
 import { useLang } from "@/lib/i18n/LangProvider"
 import type { AdminOverview } from "@/lib/admin/getAdminOverview"
@@ -24,6 +25,14 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
   }
   const [pending, startTransition] = useTransition()
 
+  // Sin fecha no hay vencimiento: es un estado válido, no un dato faltante.
+  const trial = getTrialInfo(business.subscription_status, business.trial_ends_at)
+  const trialLabel = !business.trial_ends_at
+    ? { texto: a.trialNoLimit, urgente: false }
+    : trial.expired
+      ? { texto: a.trialExpired, urgente: true }
+      : { texto: a.trialDaysLeft(trial.daysLeft ?? 0), urgente: trial.showWarning }
+
   return (
     <tr className="border-b border-neutral-800">
       <td className="py-2.5 pr-3">
@@ -34,6 +43,28 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[business.subscription_status] ?? "bg-neutral-800 text-neutral-400"}`}>
           {STATUS_LABEL[business.subscription_status] ?? business.subscription_status}
         </span>
+        {business.subscription_status === "trial" && (
+          <div className="mt-1.5 flex items-center gap-1.5">
+            {/* El calendario solo aparece en prueba: fuera de ese estado la
+                fecha no la lee nadie, y mostrarla confundiría. */}
+            <input
+              type="date"
+              disabled={pending}
+              defaultValue={business.trial_ends_at ? business.trial_ends_at.slice(0, 10) : ""}
+              onChange={(e) =>
+                startTransition(async () => {
+                  const v = e.target.value
+                  // Fin del día elegido: la prueba dura ese día completo.
+                  await setTrialEnd(business.id, v ? new Date(`${v}T23:59:59`).toISOString() : null)
+                })
+              }
+              className="rounded border border-neutral-700 bg-neutral-900 px-1.5 py-0.5 text-[11px] text-neutral-300"
+            />
+            <span className={`text-[11px] ${trialLabel.urgente ? "text-amber-400" : "text-neutral-500"}`}>
+              {trialLabel.texto}
+            </span>
+          </div>
+        )}
       </td>
       <td className="py-2.5 pr-3 text-sm">{business.activeTrucks}</td>
       <td className="py-2.5 pr-3 text-sm font-semibold">

@@ -767,6 +767,9 @@ export type Dictionary = {
     statusActive: string
     statusSuspended: string
     statusCancelled: string
+    trialNoLimit: string
+    trialExpired: string
+    trialDaysLeft: (n: number) => string
     perMonth: string
     actionPriceChange: string
     actionCancelRequested: string
@@ -1741,6 +1744,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       statusActive: "Activa",
       statusSuspended: "Suspendida",
       statusCancelled: "Cancelada",
+      trialNoLimit: "Sin vencimiento",
+      trialExpired: "Prueba vencida",
+      trialDaysLeft: (n) => (n === 1 ? "Queda 1 día" : `Quedan ${n} días`),
       perMonth: "/mes",
       actionPriceChange: "Cambio de precio",
       actionCancelRequested: "Pidió cancelar",
@@ -2712,6 +2718,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       statusActive: "Active",
       statusSuspended: "Suspended",
       statusCancelled: "Cancelled",
+      trialNoLimit: "No expiry",
+      trialExpired: "Trial expired",
+      trialDaysLeft: (n) => (n === 1 ? "1 day left" : `${n} days left`),
       perMonth: "/mo",
       actionPriceChange: "Price change",
       actionCancelRequested: "Requested cancellation",

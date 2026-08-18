@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
+import { accessBlocked } from "@/lib/billing/trial"
 
 const TAX_RATE = 0.08625 // Norman, Oklahoma — mover a configuración por negocio cuando haya más de un estado.
 
@@ -41,13 +42,20 @@ export async function createOrder(input: {
   // navegador.
   const [{ data: unit }, { data: business }] = await Promise.all([
     supabase.from("units").select("status, hours, paused_until").eq("id", input.unitId).single(),
-    supabase.from("businesses").select("timezone, subscription_status").eq("id", input.businessId).single(),
+    supabase
+      .from("businesses")
+      .select("timezone, subscription_status, trial_ends_at")
+      .eq("id", input.businessId)
+      .single(),
   ])
 
   if (!unit || !business) {
     return { error: "verifyFailed" }
   }
-  if (business.subscription_status === "suspended" || unit.status === "archived") {
+  // Mismo criterio que el menú: prueba vencida bloquea igual que suspensión.
+  // Esta es la última puerta antes de insertar, así que aunque alguien tuviera
+  // el menú abierto de antes, el pedido no entra.
+  if (accessBlocked(business.subscription_status, business.trial_ends_at) || unit.status === "archived") {
     return { error: "unavailable" }
   }
   if (unit.status === "paused") {

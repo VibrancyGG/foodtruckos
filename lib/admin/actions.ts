@@ -74,3 +74,31 @@ export async function reactivateBusiness(businessId: string): Promise<Result> {
   revalidatePath("/admin")
   return { ok: true }
 }
+
+// Mover (o quitar) la fecha en que termina la prueba gratis. Siempre se va a
+// querer extenderle a alguien, y sin esto la única salida sería tocar la base
+// a mano.
+//
+// `null` = sin vencimiento. Es deliberado que exista: es como quedan los
+// negocios internos y los pilotos, y es lo que evita bloquear a alguien por
+// descuido (foodtruckos-negocio Regla 5).
+export async function setTrialEnd(businessId: string, endsAt: string | null): Promise<Result> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("businesses")
+    .update({ trial_ends_at: endsAt })
+    .eq("id", businessId)
+  if (error) return { ok: false, error: "No se pudo guardar la fecha" }
+
+  await supabase.rpc("log_admin_action", {
+    p_business_id: businessId,
+    p_action: endsAt ? "trial_end_set" : "trial_end_cleared",
+    p_entity_type: "business",
+    p_entity_id: businessId,
+  })
+  revalidatePath("/admin")
+  return { ok: true }
+}

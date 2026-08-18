@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { toNumber } from "@/lib/supabase/numeric"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
+import { accessBlocked } from "@/lib/billing/trial"
 
 // Resuelve SIEMPRE por qr_slug (la clave real y única del punto de pedido).
 // businessSlug/unitSlug en la URL son cosméticos, no autoritativos — si no
@@ -31,10 +32,14 @@ export async function getMenuData(qrSlug: string) {
   // Archivado: el QR deja de funcionar de verdad (foodtruckos-datos Regla 3).
   if (unit.status === "archived") return null
 
-  // Negocio suspendido por falta de pago: el QR deja de servir el menú por
-  // completo, igual que un truck archivado — no es un mensaje de "pausado",
-  // es que la suscripción no está vigente.
-  if (business.subscription_status === "suspended") {
+  // Suscripción no vigente — suspendida por falta de pago, o prueba gratis
+  // vencida: el QR deja de servir el menú por completo, igual que un truck
+  // archivado. No es un mensaje de "pausado".
+  //
+  // La prueba vencida cuenta aquí igual que la suspensión. Si no, el dueño y
+  // la cocina quedarían bloqueados mientras el QR sigue tomando pedidos que
+  // nadie puede ver ni preparar.
+  if (accessBlocked(business.subscription_status, business.trial_ends_at)) {
     return { suspended: true as const, paused: false as const, business, unit: { name: unit.name } }
   }
 

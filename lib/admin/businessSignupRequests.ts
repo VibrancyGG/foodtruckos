@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { trialEndsFromNow } from "@/lib/billing/trial"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -47,7 +48,9 @@ export async function approveBusinessSignup(
 
   const { data: business, error: businessError } = await supabase
     .from("businesses")
-    .insert({ name: request.business_name, slug })
+    // Prueba gratis de 14 días desde la aprobación. Sin esto el negocio nace
+    // sin fecha de vencimiento y nunca se le avisa ni se le bloquea nada.
+    .insert({ name: request.business_name, slug, trial_ends_at: trialEndsFromNow() })
     .select("id")
     .single()
   if (businessError || !business) return { ok: false, error: "No se pudo crear el negocio" }

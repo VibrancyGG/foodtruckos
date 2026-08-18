@@ -11,7 +11,7 @@ export async function getAdminOverview() {
   const [{ data: businesses }, { data: units }, { data: requests }, { data: businessSignups }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, name, slug, subscription_status, billing_mode, created_at")
+      .select("id, name, slug, subscription_status, billing_mode, created_at, trial_ends_at")
       .order("created_at", { ascending: false }),
     supabase.from("units").select("id, business_id, name, status, created_at, archived_at, archive_warned_at"),
     supabase
