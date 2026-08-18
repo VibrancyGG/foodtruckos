@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
+import { mejorarFoto } from "@/lib/media/mejorarFoto"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -530,12 +531,43 @@ export async function uploadProductPhoto(
   if (!file || file.size === 0) return { ok: false, error: "Elige una imagen" }
 
   const supabase = await createClient()
-  const ext = file.name.split(".").pop() || "webp"
-  const path = `${businessId}/products/${productId}-${Date.now()}.${ext}`
+  const sello = Date.now()
+  const extOriginal = file.name.split(".").pop() || "webp"
+
+  // Único punto donde entra la foto de un platillo, así que es donde se
+  // mejora. Hoy devuelve null siempre (el enganche está apagado a propósito,
+  // ver lib/media/mejorarFoto.ts) y esto se comporta igual que antes.
+  const mejorada = await mejorarFoto(file)
+  const aPublicar = mejorada ?? file
+
+  // La extensión sale del archivo que de verdad se publica, no del nombre que
+  // traía el original: si el proveedor devuelve webp y el dueño subió un .jpg,
+  // guardarlo como .jpg dejaría la URL mintiendo sobre su contenido.
+  const extPublicada = mejorada
+    ? aPublicar.type.split("/")[1]?.replace(/[^a-z0-9]/gi, "") || extOriginal
+    : extOriginal
+  const path = `${businessId}/products/${productId}-${sello}.${extPublicada}`
+
+  if (mejorada) {
+    // Se guarda la original aparte: si la mejora sale mal, o si algún día se
+    // cambia de proveedor y hay que reprocesar, hace falta partir de la foto
+    // como salió del celular — no de una ya tratada, que se degradaría.
+    const { error: errorOriginal } = await supabase.storage
+      .from("business-media")
+      .upload(`${businessId}/products/${productId}-${sello}-original.${extOriginal}`, file, {
+        contentType: file.type,
+      })
+    // No detiene la publicación —el dueño quiere ver su platillo, no nuestro
+    // respaldo— pero sí se anota: creer que tenemos las originales y no
+    // tenerlas es peor que no tenerlas.
+    if (errorOriginal) {
+      console.error("[uploadProductPhoto] no se pudo guardar la foto original:", errorOriginal)
+    }
+  }
 
   const { error: uploadError } = await supabase.storage
     .from("business-media")
-    .upload(path, file, { contentType: file.type })
+    .upload(path, aPublicar, { contentType: aPublicar.type })
   if (uploadError) return { ok: false, error: "No se pudo subir la imagen" }
 
   const {
