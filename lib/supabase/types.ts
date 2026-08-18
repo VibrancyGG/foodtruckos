@@ -405,7 +405,11 @@ export type Database = {
           pairing_code_expires_at: string | null
           pairing_code_hash: string | null
           pin_locked_until: string | null
+          printer_label: string | null
+          printer_last_ok_at: string | null
+          prints_tickets: boolean
           revoked_at: string | null
+          ticket_copies: number
           unit_id: string
         }
         Insert: {
@@ -420,7 +424,11 @@ export type Database = {
           pairing_code_expires_at?: string | null
           pairing_code_hash?: string | null
           pin_locked_until?: string | null
+          printer_label?: string | null
+          printer_last_ok_at?: string | null
+          prints_tickets?: boolean
           revoked_at?: string | null
+          ticket_copies?: number
           unit_id: string
         }
         Update: {
@@ -435,7 +443,11 @@ export type Database = {
           pairing_code_expires_at?: string | null
           pairing_code_hash?: string | null
           pin_locked_until?: string | null
+          printer_label?: string | null
+          printer_last_ok_at?: string | null
+          prints_tickets?: boolean
           revoked_at?: string | null
+          ticket_copies?: number
           unit_id?: string
         }
         Relationships: [

@@ -19,6 +19,8 @@ type Body =
   | { action: "cancel"; orderId: string; unitId?: string }
   | { action: "soldOut"; unitProductId: string; soldOut: boolean; unitId?: string }
   | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
+  | { action: "printerAlive" }
+  | { action: "settings" }
   | {
       action: "ventanilla"
       unitId?: string
@@ -183,6 +185,30 @@ export async function POST(req: NextRequest) {
       .eq("id", body.unitProductId)
       .eq("unit_id", unit.id)
     if (error) return NextResponse.json({ error: "No se pudo actualizar" }, { status: 400 })
+    return NextResponse.json({ ok: true })
+  }
+
+  // El dueño puede prender o apagar la impresión desde el panel mientras la
+  // tablet ya está abierta. La pantalla de cocina no se recarga en todo el
+  // día, así que sin esto el cambio no se notaría hasta el día siguiente.
+  // Se responde con lo de la sesión verificada, nunca con lo que venga en el
+  // body.
+  if (body.action === "settings") {
+    return NextResponse.json({
+      printsTickets: session.printsTickets,
+      ticketCopies: session.ticketCopies,
+    })
+  }
+
+  // Telemetría de la impresora: deja constancia de que sí imprimió, para poder
+  // decirle al dueño "tu impresora no responde desde las 3pm" sin ir al truck.
+  // Se escribe contra el dispositivo de la sesión, nunca contra uno que venga
+  // en el body.
+  if (body.action === "printerAlive") {
+    await supabase
+      .from("devices")
+      .update({ printer_last_ok_at: new Date().toISOString() })
+      .eq("id", session.deviceId)
     return NextResponse.json({ ok: true })
   }
 

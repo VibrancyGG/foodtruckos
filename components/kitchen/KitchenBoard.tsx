@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react"
+import { useEffect, useState, useCallback, useMemo, useRef, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -8,11 +8,15 @@ import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { enqueueAction, drainQueue, pendingCount, pendingOrderActions } from "@/lib/kitchen/offlineQueue"
 import { useWakeLock } from "@/lib/kitchen/useWakeLock"
+import { buildTicket } from "@/lib/kitchen/escpos"
+import { enqueueTicket, drainTickets, isPrintingAvailable } from "@/lib/kitchen/printBridge"
 import { VentanillaForm } from "./VentanillaForm"
 import { DaySummaryModal } from "./DaySummaryModal"
 import { OrderLookupModal } from "./OrderLookupModal"
 import { SoldOutScreen } from "./SoldOutScreen"
 import type { KitchenData } from "@/lib/kitchen/getKitchenData"
+
+const sinSuscripcion = () => () => {}
 
 const COLUMNS = ["recibido", "preparando", "listo"] as const
 type Column = (typeof COLUMNS)[number]
@@ -50,6 +54,9 @@ export function KitchenBoard({
   amberMinutes,
   redMinutes,
   taxIncluded,
+  printsTickets = false,
+  ticketCopies = 1,
+  syncPrinting = false,
   initial,
   onBack,
   backHref,
@@ -64,6 +71,9 @@ export function KitchenBoard({
   amberMinutes: number
   redMinutes: number
   taxIncluded: boolean
+  printsTickets?: boolean
+  ticketCopies?: number
+  syncPrinting?: boolean
   initial: KitchenData
   onBack?: () => void
   backHref?: string
@@ -95,6 +105,25 @@ export function KitchenBoard({
   const [todayCount, setTodayCount] = useState(0)
   const knownOrderIds = useRef<Set<string>>(new Set(initial.orders.map((o) => o.id)))
 
+  // El sonido y la impresión se leen por ref, no por dependencia: si entraran
+  // en las deps de refetch, tocar el botón de sonido destruiría y recrearía el
+  // canal de tiempo real y los cinco intervalos de abajo.
+  const soundOnRef = useRef(true)
+  const [printing, setPrinting] = useState({ enabled: printsTickets, copies: ticketCopies })
+  const printRef = useRef(printing)
+
+  // El diccionario también por ref, y por el mismo motivo: LangProvider
+  // resuelve el idioma guardado DESPUÉS de montar, así que `t` cambia de
+  // identidad una vez al arranque. Si eso llegara a las deps de refetch, el
+  // canal se destruiría y recrearía en cada carga de la pantalla.
+  const tRef = useRef(t)
+
+  // El caso de soporte más probable: compraron la impresora, abrieron Chrome
+  // en vez de la app, y llaman porque "no imprime". Mejor decírselo en
+  // pantalla que descubrirlo por teléfono.
+  const puedeImprimir = useSyncExternalStore(sinSuscripcion, isPrintingAvailable, () => false)
+  const printerMissing = printing.enabled && !puedeImprimir
+
   // Consecutivo propio del truck, no el folio global del negocio (que puede
   // saltar de orden en orden si otro truck vende al mismo tiempo). Se arma
   // con lo que ya se pedía para el badge "N pedidos hoy" (entregados) más el
@@ -106,6 +135,39 @@ export function KitchenBoard({
     activeSorted.forEach((o, i) => map.set(o.id, todayCount + i + 1))
     return map
   }, [orders, todayCount])
+
+  // Un solo camino para imprimir: lo usan tanto la orden que acaba de entrar
+  // como el botón de reimprimir, para que la copia salga idéntica al original.
+  const printOrder = useCallback(
+    (
+      order: { id: string; folio: number | null; channel: string; customer_name: string | null; payment_status: string; total: number; notes: string | null; created_at: string },
+      lines: { id: string; quantity: number; product_name_snapshot: string; customizations_snapshot: unknown; notes: string | null }[],
+      isReprint = false,
+    ) => {
+      if (!printRef.current.enabled) return
+      const bytes = buildTicket({
+        unitName,
+        order,
+        // order_items no tiene columna de orden, así que se ordena por id para
+        // que la reimpresión salga igual que la primera vez.
+        items: [...lines].sort((a, b) => a.id.localeCompare(b.id)),
+        labels: {
+          order: tRef.current.kitchen.ticket.order,
+          note: tRef.current.kitchen.ticket.note,
+          toCollect: tRef.current.kitchen.ticket.toCollect,
+          paid: tRef.current.kitchen.ticket.paid,
+          counter: tRef.current.kitchen.ventanilla,
+          qr: "QR",
+          reprint: tRef.current.kitchen.ticket.reprint,
+        },
+        isReprint,
+      })
+      // Solo se encola: quien avisa que la impresora respondió es el puente,
+      // cuando el papel salió de verdad.
+      enqueueTicket(unitId, bytes, printRef.current.copies)
+    },
+    [unitId, unitName],
+  )
 
   const fetchTodayCount = useCallback(async () => {
     const supabase = createClient()
@@ -119,6 +181,40 @@ export function KitchenBoard({
       .gte("created_at", startOfDay.toISOString())
     setTodayCount(count ?? 0)
   }, [unitId])
+
+  useEffect(() => {
+    soundOnRef.current = soundOn
+  }, [soundOn])
+
+  useEffect(() => {
+    printRef.current = printing
+  }, [printing])
+
+  useEffect(() => {
+    tRef.current = t
+  }, [t])
+
+  // Relee las preferencias de impresión de la sesión. Sin esto, prender la
+  // impresión en el panel no se notaría hasta recargar la tablet — y nadie
+  // recarga la pantalla de cocina.
+  const syncPrintingPrefs = useCallback(async () => {
+    if (!syncPrinting) return
+    try {
+      const res = await fetch("/api/kitchen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "settings" }),
+      })
+      if (!res.ok) return
+      const data = (await res.json()) as { printsTickets?: boolean; ticketCopies?: number }
+      if (typeof data.printsTickets !== "boolean") return
+      const next = { enabled: data.printsTickets, copies: data.ticketCopies ?? 1 }
+      // Solo si cambió: si no, esto repintaría el tablero cada minuto.
+      setPrinting((prev) => (prev.enabled === next.enabled && prev.copies === next.copies ? prev : next))
+    } catch {
+      // sin red no pasa nada: se reintenta al siguiente ciclo
+    }
+  }, [syncPrinting])
 
   const refetch = useCallback(async () => {
     const supabase = createClient()
@@ -135,10 +231,18 @@ export function KitchenBoard({
     const { data: freshUnitProducts } = await supabase.from("unit_products").select("*").eq("unit_id", unitId)
     const { data: freshOptions } = await supabase.from("product_options").select("*").eq("business_id", businessId).order("sort_order")
 
+    // Lista, no booleano: si entran dos órdenes en el mismo ciclo hay que
+    // imprimir dos comandas, no una. Se captura antes de pisar el set de ids.
     const isNew = (id: string) => !knownOrderIds.current.has(id)
-    const arrivedNew = (freshOrders ?? []).some((o) => o.status === "recibido" && isNew(o.id))
+    const nuevas = (freshOrders ?? []).filter((o) => o.status === "recibido" && isNew(o.id))
     knownOrderIds.current = new Set((freshOrders ?? []).map((o) => o.id))
-    if (arrivedNew && soundOn) beep()
+    if (nuevas.length && soundOnRef.current) beep()
+    for (const o of nuevas) {
+      printOrder(
+        { ...o, total: toNumber(o.total) },
+        (freshItems ?? []).filter((i) => i.order_id === o.id),
+      )
+    }
 
     // La cola de acciones pendientes manda sobre esta foto: si "avanzar" o
     // "regresar" sigue sin confirmarse, se respeta el estado que ya se ve en
@@ -166,7 +270,7 @@ export function KitchenBoard({
     setItems((freshItems ?? []).map((i) => ({ ...i, unit_price_snapshot: toNumber(i.unit_price_snapshot), line_total: toNumber(i.line_total) })))
     setUnitProducts(freshUnitProducts ?? [])
     setOptions((freshOptions ?? []).map((o) => ({ ...o, price_delta: toNumber(o.price_delta) })))
-  }, [unitId, businessId, soundOn])
+  }, [unitId, businessId, printOrder])
 
   useEffect(() => {
     const supabase = createClient()
@@ -185,9 +289,13 @@ export function KitchenBoard({
     const drain = setInterval(() => {
       drainQueue(unitId, () => setPending(pendingCount(unitId)), () => setSessionExpired(true))
       setPending(pendingCount(unitId))
+      drainTickets(unitId)
     }, 4000)
     const clock = setInterval(() => setNow(Date.now()), 15000)
-    const countPoll = setInterval(fetchTodayCount, 60000)
+    const countPoll = setInterval(() => {
+      fetchTodayCount()
+      syncPrintingPrefs()
+    }, 60000)
     const countKick = setTimeout(fetchTodayCount, 0)
 
     return () => {
@@ -198,7 +306,7 @@ export function KitchenBoard({
       clearInterval(countPoll)
       clearTimeout(countKick)
     }
-  }, [unitId, businessId, refetch, fetchTodayCount])
+  }, [unitId, businessId, refetch, fetchTodayCount, syncPrintingPrefs])
 
   // Cierra la sesión de la persona, no el emparejamiento del dispositivo —
   // el siguiente en el turno solo teclea su PIN (lib/staff/session.ts:
@@ -285,6 +393,11 @@ export function KitchenBoard({
       {trialDaysLeft !== null && (
         <div className="flex-none px-4 py-2 text-center text-sm font-bold" style={{ background: "#F5A524", color: "#231602" }}>
           {t.panel.trialBanner(trialDaysLeft)}
+        </div>
+      )}
+      {printerMissing && (
+        <div className="flex-none px-4 py-2.5 text-center text-sm font-semibold" style={{ background: "#3A2A12", color: "#FFCB6B" }}>
+          {t.kitchen.printerMissingApp}
         </div>
       )}
       {sessionExpired && (
@@ -431,15 +544,29 @@ export function KitchenBoard({
                         <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "#9C948A" }}>
                           {t.kitchen.queuePosition(queuePosition.get(o.id) ?? 0)}
                         </span>
-                        {!readOnly && HAS_BACK[col] && (
-                          <button
-                            onClick={() => regress(o.id)}
-                            aria-label={t.kitchen.back}
-                            className="ml-auto grid h-10 w-10 flex-none place-items-center rounded-lg border text-lg"
-                            style={{ borderColor: "#332F29", color: "#9C948A" }}
-                          >
-                            ←
-                          </button>
+                        {!readOnly && (printing.enabled || HAS_BACK[col]) && (
+                          <span className="ml-auto flex flex-none items-center gap-2">
+                            {printing.enabled && (
+                              <button
+                                onClick={() => printOrder({ ...o, total: toNumber(o.total) }, items.filter((i) => i.order_id === o.id), true)}
+                                aria-label={t.kitchen.reprintButton}
+                                className="grid h-10 w-10 place-items-center rounded-lg border text-base"
+                                style={{ borderColor: "#332F29", color: "#9C948A" }}
+                              >
+                                ⎙
+                              </button>
+                            )}
+                            {HAS_BACK[col] && (
+                              <button
+                                onClick={() => regress(o.id)}
+                                aria-label={t.kitchen.back}
+                                className="grid h-10 w-10 place-items-center rounded-lg border text-lg"
+                                style={{ borderColor: "#332F29", color: "#9C948A" }}
+                              >
+                                ←
+                              </button>
+                            )}
+                          </span>
                         )}
                       </div>
                       <div className="mb-2.5 text-[13.5px] font-semibold text-neutral-400">

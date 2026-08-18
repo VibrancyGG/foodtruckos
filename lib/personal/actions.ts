@@ -175,6 +175,49 @@ export async function createDevice(input: { label: string; unitId: string }): Pr
   return { ok: true, pairingCode, expiresAt }
 }
 
+// El dueño decide qué tablet manda las comandas al papel. Apagarlo no rompe
+// nada: la cocina simplemente vuelve a trabajar en pantalla.
+export async function setDevicePrinting(deviceId: string, printsTickets: boolean): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("devices")
+    .update({ prints_tickets: printsTickets })
+    .eq("id", deviceId)
+    .eq("business_id", businessId)
+  if (error) return { ok: false, error: "No se pudo guardar" }
+
+  await supabase.rpc("log_owner_action", {
+    p_business_id: businessId,
+    p_action: printsTickets ? "device_printing_on" : "device_printing_off",
+    p_entity_type: "device",
+    p_entity_id: deviceId,
+  })
+  revalidatePath("/panel/personal")
+  return { ok: true }
+}
+
+// Dos copias sirven cuando el mismo ticket tiene que ir al riel de cocina y
+// a la ventanilla. Más de dos no le hemos visto uso, y cada copia es papel.
+export async function setDeviceTicketCopies(deviceId: string, copies: number): Promise<Result> {
+  const { businessId } = await getOwnerContext()
+  if (!businessId) return { ok: false, error: "Sin negocio vinculado" }
+  if (copies !== 1 && copies !== 2) return { ok: false, error: "Número de copias no válido" }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("devices")
+    .update({ ticket_copies: copies })
+    .eq("id", deviceId)
+    .eq("business_id", businessId)
+  if (error) return { ok: false, error: "No se pudo guardar" }
+
+  revalidatePath("/panel/personal")
+  return { ok: true }
+}
+
 export async function revokeDevice(deviceId: string): Promise<Result> {
   const { businessId } = await getOwnerContext()
   if (!businessId) return { ok: false, error: "Sin negocio vinculado" }

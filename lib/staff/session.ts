@@ -14,6 +14,8 @@ type Device = {
   revoked_at: string | null
   failed_pin_attempts: number
   pin_locked_until: string | null
+  prints_tickets: boolean
+  ticket_copies: number
   trialDaysLeft: number | null
   trialWarning: boolean
 }
@@ -23,7 +25,7 @@ async function loadDevice(deviceId: string): Promise<Device | null> {
   const { data } = await supabase
     .from("devices")
     .select(
-      "id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until, businesses(subscription_status, trial_ends_at)",
+      "id, business_id, unit_id, device_secret_hash, revoked_at, failed_pin_attempts, pin_locked_until, prints_tickets, ticket_copies, businesses(subscription_status, trial_ends_at)",
     )
     .eq("id", deviceId)
     .maybeSingle()
@@ -119,6 +121,8 @@ type VerifiedStaffSession = {
   deviceId: string
   sessionId: string
   role: string
+  printsTickets: boolean
+  ticketCopies: number
   trialDaysLeft: number | null
   trialWarning: boolean
 }
@@ -164,6 +168,8 @@ export async function verifyStaffSession(
     deviceId: device.id,
     sessionId: session.id,
     role: staff.role,
+    printsTickets: device.prints_tickets,
+    ticketCopies: device.ticket_copies,
     trialDaysLeft: device.trialDaysLeft,
     trialWarning: device.trialWarning,
   }

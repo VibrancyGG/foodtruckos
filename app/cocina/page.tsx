@@ -72,6 +72,9 @@ export default async function CocinaPage() {
         amberMinutes={amberMinutes}
         redMinutes={redMinutes}
         taxIncluded={initial.taxIncluded}
+        printsTickets={session.printsTickets}
+        ticketCopies={session.ticketCopies}
+        syncPrinting
         initial={initial}
         logoUrl={business?.logo_url}
         trialDaysLeft={session.trialWarning ? session.trialDaysLeft : null}

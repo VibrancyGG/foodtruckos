@@ -150,6 +150,15 @@ export type Dictionary = {
     anyChange: string
     add: string
     counterFallbackName: string
+    reprintButton: string
+    printerMissingApp: string
+    ticket: {
+      order: string
+      note: string
+      toCollect: string
+      paid: string
+      reprint: string
+    }
     noCategoryLabel: string
     lookupButton: string
     lookupTitle: string
@@ -571,6 +580,12 @@ export type Dictionary = {
       lastSeenYesterday: string
       lastSeenDaysAgo: (n: number) => string
       neverConnected: string
+      printingOn: string
+      printingOff: string
+      printerUnnamed: string
+      printerNeverPrinted: string
+      printerLastOk: (fecha: string) => string
+      ticketCopies: (n: number) => string
       noDevicesYet: string
       showRevoked: (n: number) => string
       hideRevoked: (n: number) => string
@@ -1095,6 +1110,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "¿Algún cambio?",
       add: "Agregar",
       counterFallbackName: "Mostrador",
+      reprintButton: "Reimprimir",
+      printerMissingApp: "Esta tablet tiene la impresión activada, pero no está usando la app de FoodTruckOS — por eso no salen las comandas.",
+      ticket: {
+        order: "ORDEN",
+        note: "Nota",
+        toCollect: "POR COBRAR",
+        paid: "PAGADA",
+        reprint: "COPIA",
+      },
       lookupButton: "Buscar pedido",
       lookupTitle: "Buscar pedido",
       lookupSubtitle: "Por número de folio, últimos 7 días",
@@ -1530,6 +1554,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         lastSeenYesterday: "última vez ayer",
         lastSeenDaysAgo: (n) => `última vez hace ${n} días`,
         neverConnected: "Nunca se ha conectado",
+        printingOn: "Imprime comandas",
+        printingOff: "Sin impresión",
+        printerUnnamed: "Impresora sin nombre",
+        printerNeverPrinted: "todavía no imprime",
+        printerLastOk: (fecha: string) => `última impresión el ${fecha}`,
+        ticketCopies: (n) => (n === 1 ? "1 copia" : `${n} copias`),
         noDevicesYet: "Todavía no hay dispositivos.",
         showRevoked: (n) => `Ver desconectados (${n})`,
         hideRevoked: (n) => `Ocultar desconectados (${n})`,
@@ -2051,6 +2081,15 @@ export const dictionary: Record<Lang, Dictionary> = {
       anyChange: "Any changes?",
       add: "Add",
       counterFallbackName: "Counter",
+      reprintButton: "Print again",
+      printerMissingApp: "This tablet has printing turned on, but it is not running the FoodTruckOS app — that is why no tickets come out.",
+      ticket: {
+        order: "ORDER",
+        note: "Note",
+        toCollect: "TO COLLECT",
+        paid: "PAID",
+        reprint: "COPY",
+      },
       lookupButton: "Find order",
       lookupTitle: "Find order",
       lookupSubtitle: "By folio number, last 7 days",
@@ -2486,6 +2525,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         lastSeenYesterday: "last seen yesterday",
         lastSeenDaysAgo: (n) => `last seen ${n} days ago`,
         neverConnected: "Never connected",
+        printingOn: "Prints tickets",
+        printingOff: "No printing",
+        printerUnnamed: "Unnamed printer",
+        printerNeverPrinted: "has not printed yet",
+        printerLastOk: (fecha: string) => `last printed on ${fecha}`,
+        ticketCopies: (n) => (n === 1 ? "1 copy" : `${n} copies`),
         noDevicesYet: "No devices yet.",
         showRevoked: (n) => `Show disconnected (${n})`,
         hideRevoked: (n) => `Hide disconnected (${n})`,

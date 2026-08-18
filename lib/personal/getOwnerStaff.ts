@@ -11,7 +11,7 @@ export async function getOwnerStaff(businessId: string) {
       .order("created_at"),
     supabase
       .from("devices")
-      .select("id, unit_id, label, paired_at, revoked_at, last_seen_at, created_at")
+      .select("id, unit_id, label, paired_at, revoked_at, last_seen_at, created_at, prints_tickets, ticket_copies, printer_label, printer_last_ok_at")
       .eq("business_id", businessId)
       .order("created_at"),
     // Todos los trucks, incluidos los dados de baja: el personal/dispositivo

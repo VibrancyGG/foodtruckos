@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import type { OwnerStaffData } from "@/lib/personal/getOwnerStaff"
-import { removeStaff, revokeDevice, resetStaffPin } from "@/lib/personal/actions"
+import { removeStaff, revokeDevice, resetStaffPin, setDevicePrinting, setDeviceTicketCopies } from "@/lib/personal/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { AddStaffModal } from "./personal/AddStaffModal"
 import { AddDeviceModal } from "./personal/AddDeviceModal"
@@ -319,6 +319,12 @@ function DeviceRow({
     month: "short",
     year: "numeric",
   })
+  const printerOkLabel = device.printer_last_ok_at
+    ? new Date(device.printer_last_ok_at).toLocaleDateString(lang === "es" ? "es-MX" : "en-US", {
+        day: "numeric",
+        month: "short",
+      })
+    : ""
   const lastSeenText = !device.last_seen_at
     ? p.neverConnected
     : (() => {
@@ -345,6 +351,14 @@ function DeviceRow({
         <div className="mt-0.5 text-xs text-panel-ink-soft">
           {p.connectedSince(sinceLabel)} · <span className="text-panel-ink/40">{lastSeenText}</span>
         </div>
+        {device.prints_tickets && (
+          <div className="mt-1 text-xs font-semibold text-panel-ink-soft">
+            {device.printer_label || p.printerUnnamed} ·{" "}
+            <span className="text-panel-ink/40">
+              {device.printer_last_ok_at ? p.printerLastOk(printerOkLabel) : p.printerNeverPrinted}
+            </span>
+          </div>
+        )}
       </div>
       {confirming ? (
         <div className="flex items-center gap-2 text-xs">
@@ -366,9 +380,39 @@ function DeviceRow({
           </button>
         </div>
       ) : (
-        <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-panel-ink/35 hover:text-rose-600">
-          {p.revoke}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                await setDevicePrinting(device.id, !device.prints_tickets)
+              })
+            }
+            className={
+              device.prints_tickets
+                ? "rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700"
+                : "rounded-full bg-panel-bg px-2.5 py-1 text-xs font-semibold text-panel-ink-soft"
+            }
+          >
+            {device.prints_tickets ? p.printingOn : p.printingOff}
+          </button>
+          {device.prints_tickets && (
+            <button
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  await setDeviceTicketCopies(device.id, device.ticket_copies === 1 ? 2 : 1)
+                })
+              }
+              className="rounded-full bg-panel-bg px-2.5 py-1 text-xs font-semibold text-panel-ink-soft"
+            >
+              {p.ticketCopies(device.ticket_copies)}
+            </button>
+          )}
+          <button onClick={() => setConfirming(true)} className="text-xs font-semibold text-panel-ink/35 hover:text-rose-600">
+            {p.revoke}
+          </button>
+        </div>
       )}
     </div>
   )
