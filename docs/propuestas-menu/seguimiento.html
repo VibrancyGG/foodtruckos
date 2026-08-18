@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tu pedido — Taquería El Farol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#D62828;--on-primary:#fff;
+  --ink:#1A1512;--ink-soft:#6B615A;--panel:#FFFDF9;--line:#E4DCD0;
+  --ok:#1B7F4F;--okBg:#E8F5EE;
+  --display:'Anton','Haettenschweiler','Arial Narrow',sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#DDD6CC;font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* barra de prueba (no es parte del producto) */
+.lab{position:sticky;top:0;z-index:60;background:#1D1D1F;color:#EDEDEF;font:500 12px/1.4 var(--body);padding:8px 12px}
+.lab-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;max-width:920px;margin:0 auto}
+.lab b{font-weight:600}
+.sw{display:flex;gap:5px}
+.sw button{width:21px;height:21px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff}
+.lab .ghost{background:#3A3A3E;color:#EDEDEF;border:0;border-radius:4px;padding:4px 9px;font:600 12px var(--body);cursor:pointer}
+.lab a{background:#3A3A3E;color:#EDEDEF;border-radius:4px;padding:4px 9px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+body.clean .lab{display:none}
+
+.phone{max-width:430px;margin:0 auto;background:var(--panel);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.14);
+  display:flex;flex-direction:column}
+
+/* encabezado del negocio */
+.top{background:var(--primary);color:var(--on-primary);padding:14px 18px;display:flex;align-items:center;gap:11px;flex:none}
+.mark{width:38px;height:38px;border-radius:50%;background:var(--on-primary);color:var(--primary);
+  font-family:var(--display);font-size:19px;display:grid;place-items:center;flex:none}
+.bn{font-family:var(--display);font-size:19px;text-transform:uppercase;line-height:1;margin:0}
+.bs{font-size:11.5px;opacity:.9;margin:2px 0 0;font-weight:500}
+.conn{margin-left:auto;font-size:11px;font-weight:700;background:rgba(0,0,0,.22);border-radius:100px;padding:4px 10px;display:flex;align-items:center;gap:5px}
+.conn i{width:6px;height:6px;border-radius:50%;background:#4ADE80;display:block}
+.conn.off{background:#5A1B1E}
+.conn.off i{background:#FF8A80}
+
+.body{flex:1;padding:22px 18px 30px}
+
+/* número de orden */
+.num{text-align:center;padding:6px 0 18px}
+.num .k{font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
+.num .v{font-family:var(--display);font-size:76px;line-height:.92;margin-top:4px;letter-spacing:.01em}
+.num .w{font-size:13.5px;color:var(--ink-soft);margin-top:6px;font-weight:500}
+
+/* estado grande */
+.state{border-radius:16px;padding:22px 20px;text-align:center;margin-bottom:20px;
+  background:var(--panel);border:2px solid var(--line)}
+.state .t{font-family:var(--display);font-size:30px;text-transform:uppercase;line-height:1.04;margin:0}
+.state .s{font-size:14.5px;color:var(--ink-soft);margin:8px 0 0;line-height:1.45}
+.state.go{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.state.go .s{color:var(--on-primary);opacity:.94}
+.state.done{background:var(--okBg);border-color:#BFE3CE}
+.state.done .t,.state.done .s{color:#14603C}
+.pulse{animation:p 1.6s ease-in-out infinite}
+@keyframes p{50%{transform:scale(1.03)}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+
+/* pasos */
+.steps{display:flex;gap:0;margin-bottom:22px}
+.st{flex:1;text-align:center;position:relative}
+.st .d{width:26px;height:26px;border-radius:50%;background:var(--line);color:var(--ink-soft);
+  display:grid;place-items:center;margin:0 auto 6px;font-size:13px;font-weight:800;position:relative;z-index:2}
+.st .l{font-size:11px;font-weight:700;color:var(--ink-soft);line-height:1.25}
+.st::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:3px;background:var(--line);z-index:1}
+.st:first-child::before{display:none}
+.st.on .d{background:var(--primary);color:var(--on-primary)}
+.st.on .l{color:var(--ink);font-weight:800}
+.st.pass .d{background:var(--primary);color:var(--on-primary)}
+.st.pass::before,.st.on::before{background:var(--primary)}
+
+/* bloques */
+.box{border:1px solid var(--line);border-radius:13px;padding:15px 16px;margin-bottom:13px;background:var(--panel)}
+.box h3{font-family:var(--display);font-size:15px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 11px}
+.li{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li .q{background:#F1EBE1;border-radius:5px;min-width:26px;height:26px;display:grid;place-items:center;font-size:14px;font-weight:800}
+.li .n{font-size:14.5px;font-weight:700;line-height:1.2}
+.li .m{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.li .m span{font-size:11.5px;font-weight:700;border-radius:4px;padding:2px 7px}
+.li .m .a{background:#E4F3EA;color:#14603C}
+.li .m .r{background:#FBE7E7;color:#8A1F23}
+.li .p{font-size:14.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.tot{display:flex;justify-content:space-between;align-items:baseline;padding-top:11px;margin-top:4px;border-top:2px solid var(--line);
+  font-size:19px;font-weight:800}
+.tot small{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft)}
+.pay{border-radius:11px;padding:13px 15px;margin-bottom:13px;font-size:14.5px;font-weight:700}
+.pay.due{background:#FDF3E0;color:#6B4A12;border:1px solid #F0D9A8}
+.pay.paid{background:var(--okBg);color:#14603C;border:1px solid #BFE3CE}
+
+.bell{width:100%;border:2px solid var(--ink);background:var(--panel);border-radius:11px;padding:15px;
+  font:800 15px var(--body);color:var(--ink);cursor:pointer;min-height:54px;margin-bottom:13px}
+.bell:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.bell.on{background:var(--okBg);border-color:#BFE3CE;color:#14603C}
+.hint{font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.5;margin:0 0 6px}
+.foot{padding:18px;text-align:center;color:var(--ink-soft);font-size:11.5px;opacity:.75}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <div class="lab-row">
+    <b>Seguimiento del pedido</b>
+    <button class="ghost" id="next">Avanzar estado</button>
+    <button class="ghost" id="red">Cortar conexión</button>
+    <div class="sw" id="sw" role="group" aria-label="Color"></div>
+    <button class="ghost" id="lang">EN</button>
+    <a href="menu-comensal.html">Menú</a>
+    <button class="ghost" id="hide">Ocultar</button>
+    <span class="sep" id="labState"></span>
+  </div>
+</div>
+
+<div class="phone">
+  <div class="top">
+    <div class="mark">EF</div>
+    <div><h1 class="bn">Taquería El Farol</h1><p class="bs" id="truck">Truck 1 · Main &amp; Porter</p></div>
+    <div class="conn" id="conn"><i></i><span id="connT">En vivo</span></div>
+  </div>
+  <div class="body" id="body"></div>
+  <div class="foot">FoodTruckOS</div>
+</div>
+
+<script>
+const PALETTE=[
+ {es:'Rojo chile',hex:'#D62828'},{es:'Naranja trompo',hex:'#F4661B'},{es:'Amarillo maíz',hex:'#F2A413'},
+ {es:'Verde nopal',hex:'#257B4B'},{es:'Verde limón',hex:'#7CB518'},{es:'Turquesa',hex:'#0C7979'},
+ {es:'Azul talavera',hex:'#1F5FBF'},{es:'Morado jamaica',hex:'#7B2D8E'},{es:'Rosa mexicano',hex:'#D11072'},
+ {es:'Café mole',hex:'#8A3B12'}];
+const INK='#1A1512';
+const lum=h=>{const c=h.slice(1).match(/../g).map(x=>{const v=parseInt(x,16)/255;
+  return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const ratio=(a,b)=>{const A=lum(a),B=lum(b);return (Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
+const onColor=h=>ratio(h,'#FFFFFF')>=ratio(h,INK)?'#FFFFFF':INK;
+
+/* El pedido llega por la dirección del QR más el número de orden — sin cuenta,
+   sin contraseña. Si venimos del menú (?orden=48), leemos ESE pedido real de
+   localStorage: mismos productos, total y nombre que se acaban de mandar.
+   Sin el parámetro (alguien abrió este archivo directo), se usa un pedido de
+   muestra para que la pantalla siga sirviendo como referencia de diseño. */
+function leerParam(nom){
+  const m=location.search.match(new RegExp('[?&]'+nom+'=([^&]+)'));
+  return m?decodeURIComponent(m[1]):null;
+}
+const ordenParam=leerParam('orden'), dParam=leerParam('d');
+const PASOS=['recibido','preparando','listo','entregado'];
+let ORD=null, noEncontrado=false, truckNom=null, paso=0;
+function cargarSnap(d){
+  ORD={n:d.n,pagado:!!d.pagado,sub:d.sub,tax:d.tax,cliente:d.cliente||null,
+    items:(d.items||[]).map(i=>({q:i.q,n:i.n,add:i.add||[],rm:i.rm||[],nota:i.nota||''}))};
+  truckNom=d.truck||null;
+  const i=PASOS.indexOf(d.s);
+  if(i>-1)paso=i;
+}
+if(dParam){
+  /* Camino principal: el pedido completo viaja en la URL, así que da igual si
+     este archivo comparte o no almacenamiento con el que lo mandó aquí. */
+  try{cargarSnap(JSON.parse(dParam))}catch(e){noEncontrado=true}
+}else if(ordenParam){
+  /* Alguien abrió el enlace corto (solo ?orden=) o el navegador si comparte
+     almacenamiento con el mismo origen: se intenta el respaldo. */
+  try{
+    const raw=localStorage.getItem('ftPedido_'+ordenParam);
+    if(raw)cargarSnap(JSON.parse(raw));else noEncontrado=true;
+  }catch(e){noEncontrado=true}
+}
+if(!ORD&&!noEncontrado)ORD={n:47,pagado:false,sub:12.75,tax:.08625,cliente:null,
+  items:[{q:2,n:'Taco al pastor',add:['Queso'],rm:['Cebolla'],nota:''},
+         {q:1,n:'Quesabirria (3 pzas)',add:[],rm:[],nota:''},
+         {q:1,n:'Agua de horchata',add:[],rm:[],nota:''}]};
+let lang='es', online=true, aviso=false, t0=Date.now();
+
+const T={
+ es:{truck:'Truck 1 · Main & Porter',live:'En vivo',off:'Sin conexión',
+  k:'Tu número',steps:['Recibido','Preparando','Listo','Entregado'],
+  titles:['Ya llegó a la cocina','Lo están preparando','¡Listo! Pasa por él','¡Gracias!'],
+  subs:['En un momento empiezan con él.','Te avisamos aquí en cuanto esté.',
+        'Ve a la ventanilla y di tu número.','Que lo disfrutes. Aquí estaremos.'],
+  wait:m=>'Va '+m+' min · normalmente tardan unos 12',
+  what:'Lo que pediste',total:'Total',taxes:'Impuesto incluido',
+  due:n=>'Paga en la ventanilla: '+n,paid:'Ya está pagado',
+  bell:'Avísame cuando esté listo',bellOn:'Te avisamos ✓',
+  hint:'Deja esta pantalla abierta y te avisamos con un sonido. También te llega la notificación si la aceptaste.',
+  hintOff:'Sin internet no se actualiza solo. Vuelve a cargar cuando tengas señal.',
+  bellNote:'Esto es una demostración: en la app real aquí se pediría permiso para mandarte una notificación.',
+  bellDenied:'No diste permiso de notificación — igual te avisamos con este sonido si dejas la pantalla abierta.',
+  para:'A nombre de',notFoundT:'No encontramos ese pedido',
+  notFoundS:'El enlace puede estar viejo o el pedido ya se entregó hace rato. Si acabas de ordenar, regresa al menú y vuelve a intentar.',
+  backMenu:'Volver al menú'},
+ en:{truck:'Truck 1 · Main & Porter',live:'Live',off:'Offline',
+  k:'Your number',steps:['Received','Cooking','Ready','Picked up'],
+  titles:['It reached the kitchen','They are cooking it','Ready! Come get it','Thank you!'],
+  subs:['They will start on it in a moment.','We will tell you here as soon as it is done.',
+        'Head to the window and say your number.','Enjoy it. See you next time.'],
+  wait:m=>m+' min so far · usually about 12',
+  what:'What you ordered',total:'Total',taxes:'Tax included',
+  due:n=>'Pay at the window: '+n,paid:'Already paid',
+  bell:'Tell me when it is ready',bellOn:'We will tell you ✓',
+  hint:'Keep this screen open and we will play a sound. You also get the notification if you allowed it.',
+  hintOff:'Without internet this will not update on its own. Reload when you have signal.',
+  bellNote:'This is a demo: the real app would ask permission here to send you a notification.',
+  bellDenied:'You did not allow notifications — we still play this sound if you leave the screen open.',
+  para:'Under the name',notFoundT:'We could not find that order',
+  notFoundS:'The link may be old, or the order was already picked up a while ago. If you just ordered, go back to the menu and try again.',
+  backMenu:'Back to the menu'}
+};
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toFixed(2);
+const total=()=>ORD?ORD.sub*(1+ORD.tax):0;
+
+function paint(i){
+  const p=PALETTE[i],on=onColor(p.hex);
+  document.documentElement.style.setProperty('--primary',p.hex);
+  document.documentElement.style.setProperty('--on-primary',on);
+  [...$('#sw').children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+}
+PALETTE.forEach((p,i)=>{const b=document.createElement('button');
+  b.style.background=p.hex;b.title=p.es;b.setAttribute('aria-label',p.es);
+  b.onclick=()=>paint(i);$('#sw').appendChild(b)});
+
+/* sonido cuando pasa a listo — el comensal no está mirando la pantalla */
+let ac;
+function ding(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  [0,.2].forEach((d,i)=>{const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);o.type='sine';o.frequency.value=i?1175:880;
+    const t=ac.currentTime+d;g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(.3,t+.012);
+    g.gain.exponentialRampToValueAtTime(.0001,t+.34);o.start(t);o.stop(t+.36)})}catch(e){}
+  if(navigator.vibrate)navigator.vibrate([120,70,120]);}
+
+function draw(){
+  const t=T[lang];
+  $('#truck').textContent=truckNom||t.truck;
+  $('#connT').textContent=online?t.live:t.off;
+  $('#conn').classList.toggle('off',!online);
+
+  if(noEncontrado){
+    $('#labState').textContent='no encontrado';
+    $('#body').innerHTML=
+      '<div class="state" style="margin-top:26px"><p class="t">'+t.notFoundT+'</p>'+
+        '<p class="s">'+t.notFoundS+'</p></div>'+
+      '<a class="bell" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box" href="menu-comensal.html">'+t.backMenu+'</a>';
+    return;
+  }
+
+  const mins=Math.max(1,Math.round((Date.now()-t0)/60000));
+  $('#labState').textContent=PASOS[paso];
+
+  const listo=paso===2, fin=paso===3;
+  $('#body').innerHTML=
+    '<div class="num"><div class="k">'+t.k+'</div><div class="v">'+ORD.n+'</div>'+
+      (ORD.cliente?'<div class="w">'+t.para+' '+ORD.cliente+'</div>':'')+
+      (fin?'':'<div class="w">'+t.wait(mins)+'</div>')+'</div>'+
+    '<div class="state'+(listo?' go pulse':'')+(fin?' done':'')+'">'+
+      '<p class="t">'+t.titles[paso]+'</p><p class="s">'+t.subs[paso]+'</p></div>'+
+    '<div class="steps">'+PASOS.map((p,i)=>
+      '<div class="st'+(i<paso?' pass':'')+(i===paso?' on':'')+'">'+
+      '<div class="d">'+(i<paso?'✓':i+1)+'</div><div class="l">'+t.steps[i]+'</div></div>').join('')+'</div>'+
+    (fin?'':(ORD.pagado
+      ? '<div class="pay paid">'+t.paid+'</div>'
+      : '<div class="pay due">'+t.due(money(total()))+'</div>'))+
+    (paso<2?'<button class="bell'+(aviso?' on':'')+'" id="bell">'+(aviso?t.bellOn:t.bell)+'</button>'+
+      '<p class="hint">'+(aviso
+        ?(('Notification' in window&&Notification.permission==='denied')?t.bellDenied:t.bellNote)
+        :(online?t.hint:t.hintOff))+'</p>':'')+
+    '<div class="box"><h3>'+t.what+'</h3>'+
+      ORD.items.map(i=>'<div class="li"><div class="q">'+i.q+'</div><div>'+
+        '<div class="n">'+i.n+'</div>'+
+        ((i.add.length||i.rm.length)?'<div class="m">'+
+          i.add.map(a=>'<span class="a">+ '+a+'</span>').join('')+
+          i.rm.map(r=>'<span class="r">'+(lang==='es'?'Sin ':'No ')+r.toLowerCase()+'</span>').join('')+
+        '</div>':'')+
+        (i.nota?'<div class="m"><span class="a" style="background:#F1EBE1;color:#6B615A">“'+i.nota+'”</span></div>':'')+
+      '</div></div>').join('')+
+      '<div class="tot"><span>'+t.total+'<small>'+t.taxes+'</small></span><span>'+money(total())+'</span></div>'+
+    '</div>';
+  const b=$('#bell');
+  if(b)b.onclick=()=>{aviso=!aviso;draw();
+    if(aviso&&'Notification' in window&&Notification.permission==='default')Notification.requestPermission()};
+}
+
+$('#next').onclick=()=>{
+  if(paso>=3){paso=0;t0=Date.now();draw();return}
+  paso++;
+  if(paso===2&&aviso)ding();
+  draw();
+};
+$('#red').onclick=()=>{online=!online;
+  $('#red').textContent=online?'Cortar conexión':'Reconectar';
+  draw();
+  /* al reconectar se vuelve a pedir el estado completo, no se confía en lo que llegó suelto */
+  if(online)draw();
+};
+$('#lang').onclick=()=>{lang=lang==='es'?'en':'es';$('#lang').textContent=lang==='es'?'EN':'ES';
+  document.documentElement.lang=lang;draw()};
+$('#hide').onclick=()=>document.body.classList.add('clean');
+
+/* Estado real: cocina escribe el paso en el mismo localStorage['ftPedido_'+n]
+   cuando toca "Empezar", "Lista" o "Entregada". Mismo puente que menú→cocina,
+   ahora cocina→comensal: evento 'storage' si están en pestañas del mismo
+   navegador, más un sondeo de respaldo por si el evento no llega. */
+function revisarEstado(){
+  if(!ORD||noEncontrado)return;
+  try{
+    const raw=localStorage.getItem('ftPedido_'+ORD.n);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    const i=PASOS.indexOf(d.s);
+    if(i>-1&&i!==paso){
+      const pasaAListo=i===2&&paso<2;
+      paso=i;ORD.pagado=!!d.pagado;
+      if(pasaAListo&&aviso)ding();
+      draw();
+    }else if(d.pagado!==ORD.pagado){
+      ORD.pagado=!!d.pagado;draw();
+    }
+  }catch(e){}
+}
+window.addEventListener('storage',e=>{if(e.key==='ftPedido_'+(ORD&&ORD.n))revisarEstado()});
+setInterval(revisarEstado,4000);
+
+draw();paint(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Los tres trucks — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#17171A;--soft:#6C6C72;--line:#E6E4DF;--bg:#FAFAF8;--card:#FFF;
+  --amber:#B0700A;--red:#C4292E;--green:#1B7F4F;--amberBg:#FDF3E0;--redBg:#FDECEC;--greenBg:#E9F6EF;
+  --f:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab button,.lab a{background:#2F2C29;color:#D8D5D0;border:0;border-radius:4px;padding:5px 10px;font:600 12px var(--f);cursor:pointer;text-decoration:none}
+.lab .sep{margin-left:auto;color:#6F675E}
+
+.wrap{max-width:1080px;margin:0 auto;padding:30px 22px 70px}
+.head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:0}
+h1{font-size:32px;font-weight:800;letter-spacing:-.03em;margin:6px 0 0;line-height:1}
+.clock{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(292px,1fr))}
+.truck{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column}
+.truck.alert{border-color:#F0BFC0;box-shadow:0 0 0 3px #FDECEC}
+.tname{display:flex;align-items:center;gap:9px}
+.tname h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0}
+.pill{font-size:11.5px;font-weight:800;border-radius:100px;padding:3px 10px;letter-spacing:.03em}
+.pill.open{background:var(--greenBg);color:var(--green)}
+.pill.paused{background:var(--amberBg);color:var(--amber)}
+.pill.off{background:var(--redBg);color:var(--red)}
+.tloc{font-size:13px;color:var(--soft);margin:5px 0 0;font-weight:500}
+.counts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:16px}
+.cell{background:var(--card);padding:11px 8px;text-align:center}
+.cell b{display:block;font-size:27px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.cell span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--soft);margin-top:5px}
+.cell.hot b{color:var(--red)}
+.rows{margin-top:15px;display:flex;flex-direction:column;gap:9px;flex:1}
+.r{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:13.5px}
+.r .k{color:var(--soft);font-weight:600}
+.r .v{font-weight:800;font-variant-numeric:tabular-nums}
+.r .v.amber{color:var(--amber)}.r .v.red{color:var(--red)}.r .v.green{color:var(--green)}
+.go{margin-top:16px;display:block;text-align:center;background:var(--ink);color:#fff;border:0;border-radius:9px;padding:13px;font:800 14px var(--f);cursor:pointer;text-decoration:none}
+.go:hover{background:#000}
+
+h3{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:38px 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.att{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.att .row{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line)}
+.att .row:last-child{border-bottom:0}
+.att .num{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.att .what{font-size:14px;font-weight:600}
+.att .what em{font-style:normal;color:var(--soft);font-weight:500}
+.att .t{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+.att .t.red{color:var(--red)}.att .t.amber{color:var(--amber)}
+.att .tag{font-size:11px;font-weight:800;background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:3px 10px;white-space:nowrap}
+.none{padding:26px;text-align:center;color:var(--soft);font-size:14px;font-weight:600}
+.foot{margin-top:34px;font-size:12.5px;color:var(--soft);border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:560px){.att .row{grid-template-columns:auto 1fr auto;gap:9px}.att .tag{display:none}}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Vista de los tres trucks</b>
+  <button id="pausar">Pausar Truck 2</button>
+  <button id="caer">Tirar conexión de Truck 3</button>
+  <button id="prisa">Adelantar 8 min</button>
+  <a href="pantalla-cocina.html">Ir a la pantalla de cocina →</a>
+  <span class="sep">Para el dueño y el encargado · nunca en la pantalla del cocinero</span>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <p class="eyebrow">Taquería El Farol</p>
+      <h1>Los tres trucks, ahora</h1>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <h3>Requieren atención</h3>
+  <div class="att" id="att"></div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+const M=60000,now=()=>Date.now();
+let offset=0;
+const CONFIG={amber:8,red:15};   // los mismos umbrales que define el dueño
+
+const TRUCKS=[
+ {id:1,nombre:'Truck 1',lugar:'Main & Porter',estado:'abierto',online:true,ventas:412.75,
+  ordenes:[{n:47,t:14,s:'prep',pagado:true,q:'Jennifer',res:'3 tacos al pastor + agua'},
+           {n:48,t:9,s:'prep',pagado:true,q:'Mostrador',res:'2 quesabirrias + consomé'},
+           {n:50,t:2,s:'nueva',pagado:false,q:'Marisol',res:'Torta ahogada + jarritos'},
+           {n:46,t:19,s:'lista',pagado:false,q:'Luis',res:'Mulita + elote'}]},
+ {id:2,nombre:'Truck 2',lugar:'Campus Corner',estado:'abierto',online:true,ventas:268.50,
+  ordenes:[{n:31,t:23,s:'prep',pagado:false,q:'Ana',res:'2 burritos de asada'},
+           {n:32,t:6,s:'prep',pagado:true,q:'Mostrador',res:'4 tacos de tripa'},
+           {n:33,t:1,s:'nueva',pagado:false,q:'Pedro',res:'Papas con queso'}]},
+ {id:3,nombre:'Truck 3',lugar:'Lindsey & 24th',estado:'abierto',online:true,ventas:97.25,
+  ordenes:[{n:12,t:4,s:'lista',pagado:true,q:'Sofía',res:'Esquites + horchata'}]}
+];
+
+const lvl=m=>m>=CONFIG.red?'red':(m>=CONFIG.amber?'amber':'');
+const age=o=>o.t+Math.floor(offset/M);
+const money=n=>'$'+n.toFixed(2);
+
+function draw(){
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+' · actualiza solo';
+
+  document.getElementById('grid').innerHTML=TRUCKS.map(t=>{
+    const ab=t.ordenes.filter(o=>o.s!=='entregada');
+    const nue=ab.filter(o=>o.s==='nueva').length,
+          pre=ab.filter(o=>o.s==='prep').length,
+          lis=ab.filter(o=>o.s==='lista').length;
+    const vieja=ab.length?Math.max(...ab.map(age)):0;
+    const porCobrar=ab.filter(o=>!o.pagado).length;
+    const l=t.online?lvl(vieja):'red';
+    const alerta=!t.online||l==='red'||t.estado==='pausado';
+    const pill=!t.online?'<span class="pill off">Sin conexión</span>'
+      :t.estado==='pausado'?'<span class="pill paused">En pausa</span>'
+      :'<span class="pill open">Abierto</span>';
+    return '<div class="truck'+(alerta?' alert':'')+'">'+
+      '<div class="tname"><h2>'+t.nombre+'</h2>'+pill+'</div>'+
+      '<p class="tloc">'+t.lugar+'</p>'+
+      '<div class="counts">'+
+        '<div class="cell"><b>'+nue+'</b><span>Nuevas</span></div>'+
+        '<div class="cell'+(l==='red'?' hot':'')+'"><b>'+pre+'</b><span>Preparando</span></div>'+
+        '<div class="cell"><b>'+lis+'</b><span>Listas</span></div>'+
+      '</div>'+
+      '<div class="rows">'+
+        '<div class="r"><span class="k">La más antigua</span><span class="v '+l+'">'+
+          (ab.length?vieja+' min':'—')+'</span></div>'+
+        '<div class="r"><span class="k">Por cobrar</span><span class="v'+(porCobrar?' amber':'')+'">'+
+          (porCobrar?porCobrar+' orden'+(porCobrar>1?'es':''):'ninguna')+'</span></div>'+
+        '<div class="r"><span class="k">Venta de hoy</span><span class="v">'+money(t.ventas)+'</span></div>'+
+      '</div>'+
+      '<a class="go" href="pantalla-cocina.html">Ver su tablero</a>'+
+    '</div>';
+  }).join('');
+
+  const att=[];
+  TRUCKS.forEach(t=>t.ordenes.filter(o=>o.s!=='lista'&&lvl(age(o))).forEach(o=>att.push({t,o})));
+  att.sort((a,b)=>age(b.o)-age(a.o));
+  document.getElementById('att').innerHTML=att.length?att.map(({t,o})=>
+    '<div class="row"><span class="num">#'+o.n+'</span>'+
+    '<span class="what">'+o.res+' <em>· '+o.q+'</em></span>'+
+    '<span class="tag">'+t.nombre+'</span>'+
+    '<span class="t '+lvl(age(o))+'">'+age(o)+' min</span></div>').join('')
+    : '<div class="none">Nada pasado de tiempo. Los tres trucks van al día.</div>';
+
+  const sinCon=TRUCKS.filter(t=>!t.online).map(t=>t.nombre);
+  document.getElementById('foot').textContent=
+    'Venta del día, los tres trucks: '+money(TRUCKS.reduce((s,t)=>s+t.ventas,0))+
+    (sinCon.length?' · Sin conexión: '+sinCon.join(', ')+'. Sus órdenes se guardan en el truck y se sincronizan al volver.':'');
+}
+
+document.getElementById('pausar').onclick=()=>{
+  const t=TRUCKS[1];t.estado=t.estado==='pausado'?'abierto':'pausado';
+  document.getElementById('pausar').textContent=(t.estado==='pausado'?'Reabrir':'Pausar')+' Truck 2';draw()};
+document.getElementById('caer').onclick=()=>{
+  const t=TRUCKS[2];t.online=!t.online;
+  document.getElementById('caer').textContent=(t.online?'Tirar':'Restablecer')+' conexión de Truck 3';draw()};
+document.getElementById('prisa').onclick=()=>{offset+=8*M;draw()};
+
+draw();setInterval(draw,1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>C · Pizarrón — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#D62828;
+  --on-primary:#fff;
+  --ink:#16130F;
+  --ink-soft:#6E655C;
+  --panel:#FFFEFB;
+  --line:#E0D9CE;
+  --sold:#A69C92;
+  --display:'Bebas Neue','Arial Narrow',sans-serif;
+  --body:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#DED7CB;font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* ---------- barra de prueba (no es parte del producto) ---------- */
+.lab{position:sticky;top:0;z-index:60;background:#1D1D1F;color:#EDEDEF;font:500 12px/1.4 var(--body);padding:8px 12px}
+.lab-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.lab b{font-weight:600;letter-spacing:.02em}
+.lab-tag{background:#3A3A3E;padding:2px 7px;border-radius:3px;font-size:11px}
+.sw{display:flex;gap:5px}
+.sw button{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff}
+.lab a,.lab .ghost{background:#3A3A3E;color:#EDEDEF;border:0;border-radius:4px;padding:4px 8px;font:500 12px var(--body);cursor:pointer;text-decoration:none}
+.lab .ratio{margin-left:auto;font-variant-numeric:tabular-nums}
+.lab .ok{color:#7CE38B}.lab .bad{color:#FF8A80}
+body.clean .lab{display:none}
+
+.phone{max-width:430px;margin:0 auto;background:var(--panel);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.14)}
+
+/* ---------- encabezado compacto ---------- */
+.top{display:flex;align-items:center;gap:13px;padding:15px 18px 13px;border-bottom:2px solid var(--ink)}
+.mark{width:42px;height:42px;border-radius:50%;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:20px;display:grid;place-items:center;flex:none;letter-spacing:.04em}
+.bname{font-family:var(--display);font-size:27px;line-height:.94;letter-spacing:.02em;margin:0}
+.bsub{font-size:12px;color:var(--ink-soft);margin:2px 0 0;font-weight:500}
+.state{margin-left:auto;text-align:right;font-size:11.5px;font-weight:600;line-height:1.3;flex:none}
+.state .on{color:#1B8A42}
+
+/* ---------- navegación por categoría ---------- */
+.nav{position:sticky;z-index:30;top:0;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:7px;overflow-x:auto;padding:10px 18px;scrollbar-width:none}
+body:not(.clean) .nav{top:38px}
+.nav::-webkit-scrollbar{display:none}
+.nav button{flex:none;border:1.5px solid var(--line);background:var(--panel);border-radius:100px;padding:7px 14px;font:600 13px var(--body);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.nav button[aria-current=true]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.nav button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* ---------- categoría ---------- */
+.cat{border-top:4px solid var(--primary);margin-top:22px;padding:9px 18px 2px;display:flex;align-items:baseline;gap:9px}
+.cat:first-of-type{margin-top:0}
+.cat h2{font-family:var(--display);font-size:26px;letter-spacing:.04em;margin:0;line-height:1}
+.cat span{font-size:11.5px;color:var(--ink-soft);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- renglón de platillo ---------- */
+.row{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 18px 12px;font:inherit;color:inherit;cursor:pointer}
+.row:focus-visible{outline:3px solid var(--primary);outline-offset:-3px}
+.line{display:flex;align-items:baseline;gap:7px}
+.rname{font-family:var(--display);font-size:22px;letter-spacing:.02em;line-height:1.05;flex:none;max-width:66%}
+.lead{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-5px);min-width:14px}
+.rprice{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.rdesc{display:block;font-size:12.5px;line-height:1.35;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.out .rname,.row.out .rprice{color:var(--sold);text-decoration:line-through;text-decoration-thickness:1.5px}
+.row.out .rdesc{color:var(--sold)}
+.tag{display:inline-block;background:var(--ink);color:#fff;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:2px;margin-left:8px;vertical-align:2px}
+
+.foot{padding:24px 18px 120px;text-align:center;color:var(--ink-soft);font-size:12px}
+.foot .made{opacity:.55;margin-top:6px;font-size:11px}
+
+/* ---------- barra de pedido ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:430px;margin:0 auto;padding:11px 16px calc(11px + env(safe-area-inset-bottom));background:var(--panel);border-top:2px solid var(--ink)}
+.bar button{width:100%;border:0;border-radius:6px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:21px;letter-spacing:.05em;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.bar button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.bar .n{background:rgba(0,0,0,.24);border-radius:100px;padding:1px 11px;font-size:16px}
+.bar[hidden]{display:none}
+
+/* ---------- hoja ---------- */
+.veil{position:fixed;inset:0;background:rgba(22,19,15,.5);z-index:70;opacity:0;pointer-events:none;transition:opacity .18s}
+.veil.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:80;max-width:430px;margin:0 auto;background:var(--panel);border-radius:10px 10px 0 0;max-height:92vh;overflow:auto;transform:translateY(100%);transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.sheet-hd{padding:20px 18px 14px;border-bottom:4px solid var(--primary)}
+.sheet-hd h2{font-family:var(--display);font-size:31px;letter-spacing:.02em;margin:0;line-height:1}
+.sheet-hd p{margin:8px 0 0;font-size:13.5px;line-height:1.45;color:var(--ink-soft)}
+.step{padding:17px 18px;border-bottom:1px solid var(--line)}
+.step h3{font-family:var(--display);font-size:17px;letter-spacing:.05em;margin:0 0 11px;color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--panel);border-radius:6px;padding:11px 15px;font:500 14.5px var(--body);color:var(--ink);cursor:pointer;min-height:47px}
+.opt[aria-pressed=true]{border-color:var(--primary);background:var(--primary);color:var(--on-primary)}
+.opt:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.opt small{display:block;font-weight:400;opacity:.8;font-size:12px;font-variant-numeric:tabular-nums}
+.qty{display:flex;align-items:center;gap:15px}
+.qty button{width:52px;height:52px;border-radius:6px;border:1.5px solid var(--ink);background:var(--panel);font-family:var(--display);font-size:25px;line-height:1;cursor:pointer;color:var(--ink)}
+.qty output{font-family:var(--display);font-size:30px;min-width:38px;text-align:center}
+.note{width:100%;border:1.5px solid var(--line);border-radius:6px;padding:11px;font:400 14.5px var(--body);min-height:60px;resize:vertical;color:var(--ink)}
+.note:focus-visible{outline:3px solid var(--primary);outline-offset:1px}
+.sheet-ft{position:sticky;bottom:0;background:var(--panel);border-top:2px solid var(--ink);padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px}
+.sheet-ft .cancel{flex:none;border:1.5px solid var(--line);background:var(--panel);border-radius:6px;padding:0 17px;font:600 14px var(--body);cursor:pointer;color:var(--ink-soft)}
+.sheet-ft .add{flex:1;border:0;border-radius:6px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:20px;letter-spacing:.05em;padding:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.sheet-ft .add span:last-child{font-family:var(--body);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <div class="lab-row">
+    <b>C · Pizarrón</b><span class="lab-tag" id="tagName">Rojo chile</span>
+    <div class="sw" id="sw" role="group" aria-label="Paleta"></div>
+    <button class="ghost" id="lang">EN</button>
+    <a href="index.html">← Todas</a>
+    <button class="ghost" id="hide">Ocultar</button>
+    <span class="ratio" id="ratio"></span>
+  </div>
+</div>
+
+<div class="phone">
+  <header class="top">
+    <div class="mark">EF</div>
+    <div>
+      <h1 class="bname">Taquería El Farol</h1>
+      <p class="bsub" id="truck">Truck 1 · Main &amp; Porter</p>
+    </div>
+    <div class="state"><span class="on" id="hours">Abierto</span><br><span id="closes">cierra 9:00 pm</span></div>
+  </header>
+  <nav class="nav" id="nav" aria-label="Categorías"></nav>
+  <main id="menu"></main>
+  <footer class="foot">
+    <div id="taxline">Los precios no incluyen impuesto (8.625%)</div>
+    <div class="made">FoodTruckOS</div>
+  </footer>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <button id="barBtn"><span id="barTxt">Ver pedido</span><span class="n" id="barN">0</span></button>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shName"></div>
+
+<script>
+const PALETTE=[
+ {es:'Rojo chile',en:'Chile red',hex:'#D62828'},
+ {es:'Naranja trompo',en:'Trompo orange',hex:'#F4661B'},
+ {es:'Amarillo maíz',en:'Corn yellow',hex:'#F2A413'},
+ {es:'Verde nopal',en:'Nopal green',hex:'#257B4B'},
+ {es:'Verde limón',en:'Lime green',hex:'#7CB518'},
+ {es:'Turquesa',en:'Turquoise',hex:'#0C7979'},
+ {es:'Azul talavera',en:'Talavera blue',hex:'#1F5FBF'},
+ {es:'Morado jamaica',en:'Jamaica purple',hex:'#7B2D8E'},
+ {es:'Rosa mexicano',en:'Mexican pink',hex:'#D11072'},
+ {es:'Café mole',en:'Mole brown',hex:'#8A3B12'}
+];
+const INK='#16130F';
+const lum=h=>{const c=h.slice(1).match(/../g).map(x=>{const v=parseInt(x,16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const ratio=(a,b)=>{const A=lum(a),B=lum(b);return (Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
+const onColor=h=>ratio(h,'#FFFFFF')>=ratio(h,INK)?'#FFFFFF':INK;
+
+const EXTRAS=[['Queso','Cheese',1],['Aguacate','Avocado',1.5],['Doble carne','Double meat',2.5],['Salsa de la casa','House salsa',0]];
+const QT=[['Cebolla','Onion'],['Cilantro','Cilantro'],['Limón','Lime']];
+const QB=[['Jalapeño','Jalapeño'],['Aguacate','Avocado'],['Frijoles','Beans'],['Crema','Crema']];
+const MENU=[
+{es:'Tacos',en:'Tacos',ex:EXTRAS,q:QT,items:[
+ ['Al pastor','Al pastor',3.25,'Del trompo, marinado 24 horas en guajillo y achiote. Con piña asada.','Off the spit, 24-hour guajillo and achiote marinade. Grilled pineapple.'],
+ ['Asada','Asada',3.50,'Res al carbón, picada gruesa para que se sienta.','Charcoal beef, chopped coarse so you can feel it.'],
+ ['Chorizo','Chorizo',3.00,'Hecho en casa, con papa cuando la hay.','House-made, with potato when we have it.'],
+ ['Lengua','Lengua',3.75,'Cocida seis horas hasta que se deshace.','Six hours until it falls apart.'],
+ ['Tripa','Tripa',3.50,'Bien dorada. Si la pide blanda, avísele a Beto.','Crisped hard. If you want it soft, tell Beto.',1],
+ ['Nopal','Nopal',2.75,'Nopal asado con cebolla cambray. Sin carne.','Grilled cactus with spring onion. No meat.']]},
+{es:'De la casa',en:'House specials',ex:EXTRAS,q:QT,items:[
+ ['Quesabirria (3 pzas)','Quesabirria (3 pcs)',13.50,'Tortilla sumergida en el consomé y dorada con queso. Va con su vasito para mojar.','Tortillas dipped in consommé and crisped with cheese. Comes with a cup for dipping.'],
+ ['Mulita de asada','Asada mulita',6.50,'Dos tortillas, queso derretido en medio, carne al carbón.','Two tortillas, melted cheese between, charcoal beef.'],
+ ['Vampiro','Vampiro',5.75,'Tortilla tatemada hasta quedar tostada, queso y la carne que elija.','Tortilla charred until crisp, cheese, and the meat you pick.']]},
+{es:'Tortas y burritos',en:'Tortas & burritos',ex:EXTRAS,q:QB,items:[
+ ['Torta de milanesa','Milanesa torta',12.00,'Pan telera, milanesa de res, aguacate, frijoles, jalapeño.','Telera roll, breaded beef, avocado, beans, jalapeño.'],
+ ['Torta ahogada','Torta ahogada',11.50,'Bañada en salsa de chile de árbol. Pida servilletas de más.','Drowned in chile de árbol salsa. Ask for extra napkins.'],
+ ['Burrito de asada','Asada burrito',11.00,'Tortilla de harina, arroz, frijol, carne al carbón, guacamole.','Flour tortilla, rice, beans, charcoal beef, guacamole.']]},
+{es:'Antojitos',en:'Sides',ex:null,q:null,items:[
+ ['Elote entero','Whole elote',4.50,'Mayonesa, queso cotija, chile en polvo y limón.','Mayo, cotija, chile powder and lime.'],
+ ['Esquites','Esquites',5.00,'El mismo elote, en vaso, con caldo.','Same elote, in a cup, with broth.'],
+ ['Papas con queso','Loaded fries',8.50,'Papa frita, queso, carne al carbón y crema.','Fries, cheese, charcoal beef and crema.'],
+ ['Consomé de birria','Birria consommé',4.00,'Un vaso grande. Para el frío o para la cruda.','Large cup. For the cold or for the hangover.']]},
+{es:'Bebidas',en:'Drinks',ex:null,q:null,items:[
+ ['Agua de horchata','Horchata',3.50,'Arroz y canela, hecha en la mañana.','Rice and cinnamon, made this morning.'],
+ ['Agua de jamaica','Jamaica',3.50,'Flor de jamaica, poca azúcar.','Hibiscus, light on the sugar.'],
+ ['Jarritos','Jarritos',2.75,'Mandarina, tamarindo o toronja.','Mandarin, tamarind or grapefruit.'],
+ ['Coca de vidrio','Mexican Coke',3.25,'De caña. No es lo mismo y usted lo sabe.','Cane sugar. Not the same and you know it.']]}
+];
+
+const T={
+ es:{hours:'Abierto',closes:'cierra 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Los precios no incluyen impuesto (8.625%)',
+     out:'Se nos acabó',bar:'Ver pedido',qty:'¿Cuántos?',extras:'¿Le agregamos algo?',remove:'¿Le quitamos algo?',
+     note:'¿Algo más que debamos saber?',notePh:'Ej: sin picante, para llevar',cancel:'Cerrar',add:'Agregar',free:'Sin costo',
+     n:n=>n+' platillos'},
+ en:{hours:'Open',closes:'closes 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Prices do not include tax (8.625%)',
+     out:'Sold out',bar:'View order',qty:'How many?',extras:'Add anything?',remove:'Take anything off?',
+     note:'Anything else we should know?',notePh:'e.g. no spice, to go',cancel:'Close',add:'Add',free:'Free',
+     n:n=>n+' items'}
+};
+let lang='es',cart=0;
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toFixed(2);
+
+function paint(i){
+  const p=PALETTE[i],on=onColor(p.hex);
+  document.documentElement.style.setProperty('--primary',p.hex);
+  document.documentElement.style.setProperty('--on-primary',on);
+  $('#tagName').textContent=p[lang];
+  const r=ratio(p.hex,on);
+  $('#ratio').innerHTML='texto/acento <span class="'+(r>=4.5?'ok':'bad')+'">'+r.toFixed(2)+':1 '+(r>=4.5?'✓':'✕')+'</span>';
+  [...$('#sw').children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+}
+PALETTE.forEach((p,i)=>{
+  const b=document.createElement('button');
+  b.style.background=p.hex;b.title=p.es;b.setAttribute('aria-label',p.es);
+  b.onclick=()=>paint(i);$('#sw').appendChild(b);
+});
+
+function render(){
+  const t=T[lang];
+  $('#hours').textContent=t.hours;$('#closes').textContent=t.closes;
+  $('#truck').textContent=t.truck;$('#taxline').textContent=t.tax;$('#barTxt').textContent=t.bar;
+  $('#nav').innerHTML=MENU.map((c,ci)=>
+    '<button data-go="'+ci+'"'+(ci===0?' aria-current="true"':'')+'>'+c[lang]+'</button>').join('');
+  $('#menu').innerHTML=MENU.map((c,ci)=>
+    '<div class="cat" id="c'+ci+'"><h2>'+c[lang]+'</h2><span>'+t.n(c.items.length)+'</span></div>'+
+    c.items.map((it,ii)=>{
+      const out=it[5];
+      return '<button class="row'+(out?' out':'')+'" data-c="'+ci+'" data-i="'+ii+'"'+(out?' disabled':'')+'>'+
+        '<span class="line"><span class="rname">'+it[lang==='es'?0:1]+'</span>'+
+        '<span class="lead"></span><span class="rprice">'+money(it[2])+'</span></span>'+
+        '<span class="rdesc">'+it[lang==='es'?3:4]+(out?'</span><span class="tag">'+t.out+'</span>':'</span>')+
+        '</button>';
+    }).join('')
+  ).join('');
+  $('#menu').querySelectorAll('.row:not(.out)').forEach(b=>b.onclick=()=>openSheet(+b.dataset.c,+b.dataset.i));
+  $('#nav').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+    const el=document.getElementById('c'+b.dataset.go);
+    const off=el.getBoundingClientRect().top+window.scrollY-(document.body.classList.contains('clean')?46:84);
+    window.scrollTo({top:off});
+    $('#nav').querySelectorAll('button').forEach(x=>x.removeAttribute('aria-current'));
+    b.setAttribute('aria-current','true');
+  });
+}
+
+let q=1,picked=new Set(),removed=new Set(),cur=null;
+function openSheet(ci,ii){
+  const t=T[lang],c=MENU[ci],it=c.items[ii];cur={c,it};q=1;picked=new Set();removed=new Set();
+  $('#sheet').innerHTML=
+    '<div class="sheet-hd"><h2 id="shName">'+it[lang==='es'?0:1]+'</h2><p>'+it[lang==='es'?3:4]+'</p></div>'+
+    '<div class="step"><h3>'+t.qty+'</h3><div class="qty">'+
+      '<button data-q="-1" aria-label="−">−</button><output id="q">1</output><button data-q="1" aria-label="+">+</button></div></div>'+
+    (c.ex?'<div class="step"><h3>'+t.extras+'</h3><div class="opts">'+c.ex.map((e,j)=>
+      '<button class="opt" data-ex="'+j+'" aria-pressed="false">'+e[lang==='es'?0:1]+
+      '<small>'+(e[2]?'+'+money(e[2]):t.free)+'</small></button>').join('')+'</div></div>':'')+
+    (c.q?'<div class="step"><h3>'+t.remove+'</h3><div class="opts">'+c.q.map((e,j)=>
+      '<button class="opt" data-rm="'+j+'" aria-pressed="false">'+e[lang==='es'?0:1]+'</button>').join('')+'</div></div>':'')+
+    '<div class="step"><h3>'+t.note+'</h3><textarea class="note" placeholder="'+t.notePh+'"></textarea></div>'+
+    '<div class="sheet-ft"><button class="cancel" id="x">'+t.cancel+'</button>'+
+      '<button class="add" id="ok"><span>'+t.add+'</span><span id="tot"></span></button></div>';
+  const total=()=>{let s=cur.it[2];picked.forEach(j=>s+=cur.c.ex[j][2]);return s*q};
+  const sync=()=>{$('#q').textContent=q;$('#tot').textContent=money(total())};
+  $('#sheet').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{q=Math.max(1,q+ +b.dataset.q);sync()});
+  $('#sheet').querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.ex;picked.has(j)?picked.delete(j):picked.add(j);
+    b.setAttribute('aria-pressed',picked.has(j));sync()});
+  $('#sheet').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.rm;removed.has(j)?removed.delete(j):removed.add(j);
+    b.setAttribute('aria-pressed',removed.has(j))});
+  $('#x').onclick=close;
+  $('#ok').onclick=()=>{cart+=q;$('#barN').textContent=cart;$('#bar').hidden=false;close()};
+  sync();
+  $('#veil').classList.add('on');$('#sheet').classList.add('on');
+}
+function close(){$('#veil').classList.remove('on');$('#sheet').classList.remove('on')}
+$('#veil').onclick=close;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+$('#lang').onclick=()=>{lang=lang==='es'?'en':'es';$('#lang').textContent=lang==='es'?'EN':'ES';
+  document.documentElement.lang=lang;render();paint([...$('#sw').children].findIndex(b=>b.getAttribute('aria-pressed')==='true'))};
+$('#hide').onclick=()=>document.body.classList.add('clean');
+render();paint(0);
+</script>
+</body>
+</html>

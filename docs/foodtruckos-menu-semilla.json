@@ -1,0 +1,95 @@
+{
+  "_nota": "Menu completo de 'Taqueria El Farol' rescatado del prototipo ft_* del proyecto Supabase jetgo-os antes de pausarlo (2026-07-29). Sirve como datos de siembra para desarrollo y para las 3 propuestas del menu del comensal. NO es el menu real de La Villita (cliente piloto) — es contenido de prueba de alta calidad, con copy bilingue en la voz correcta.",
+  "negocio": {
+    "slug": "el-farol",
+    "nombre": "Taquería El Farol",
+    "color_primario": "#E6127D",
+    "zona_horaria": "America/Chicago",
+    "tax_mode": "added",
+    "tax_rate": 0.08625
+  },
+  "extras_comunes_tacos_y_especiales": [
+    { "name_es": "Queso", "name_en": "Cheese", "price": 1.0 },
+    { "name_es": "Aguacate", "name_en": "Avocado", "price": 1.5 },
+    { "name_es": "Doble carne", "name_en": "Double meat", "price": 2.5 },
+    { "name_es": "Salsa de la casa", "name_en": "House salsa", "price": 0.0 }
+  ],
+  "quitables_tacos": [
+    { "name_es": "Cebolla", "name_en": "Onion" },
+    { "name_es": "Cilantro", "name_en": "Cilantro" },
+    { "name_es": "Limón", "name_en": "Lime" }
+  ],
+  "quitables_tortas": [
+    { "name_es": "Jalapeño", "name_en": "Jalapeño" },
+    { "name_es": "Aguacate", "name_en": "Avocado" },
+    { "name_es": "Frijoles", "name_en": "Beans" },
+    { "name_es": "Crema", "name_en": "Crema" }
+  ],
+  "categorias": [
+    {
+      "sort_order": 1,
+      "name_es": "Tacos",
+      "name_en": "Tacos",
+      "extras": "extras_comunes_tacos_y_especiales",
+      "quitables": "quitables_tacos",
+      "productos": [
+        { "name_es": "Al pastor", "name_en": "Al pastor", "price": 3.25, "description_es": "Del trompo, marinado 24 horas en guajillo y achiote. Con piña asada.", "description_en": "Off the spit, 24-hour guajillo and achiote marinade. Grilled pineapple." },
+        { "name_es": "Asada", "name_en": "Asada", "price": 3.5, "description_es": "Res al carbón, picada gruesa para que se sienta.", "description_en": "Charcoal beef, chopped coarse so you can feel it." },
+        { "name_es": "Chorizo", "name_en": "Chorizo", "price": 3.0, "description_es": "Hecho en casa, con papa cuando la hay.", "description_en": "House-made, with potato when we have it." },
+        { "name_es": "Lengua", "name_en": "Lengua", "price": 3.75, "description_es": "Cocida seis horas hasta que se deshace.", "description_en": "Six hours until it falls apart." },
+        { "name_es": "Tripa", "name_en": "Tripa", "price": 3.5, "description_es": "Bien dorada. Si la pide blanda, avísele a Beto.", "description_en": "Crisped hard. If you want it soft, tell Beto." },
+        { "name_es": "Nopal", "name_en": "Nopal", "price": 2.75, "description_es": "Nopal asado con cebolla cambray. Sin carne.", "description_en": "Grilled cactus with spring onion. No meat." }
+      ]
+    },
+    {
+      "sort_order": 2,
+      "name_es": "De la casa",
+      "name_en": "House specials",
+      "extras": "extras_comunes_tacos_y_especiales",
+      "quitables": "quitables_tacos",
+      "productos": [
+        { "name_es": "Quesabirria (3 pzas)", "name_en": "Quesabirria (3 pcs)", "price": 13.5, "description_es": "Tortilla sumergida en el consomé y dorada con queso. Va con su vasito para mojar.", "description_en": "Tortillas dipped in consommé and crisped with cheese. Comes with a cup for dipping." },
+        { "name_es": "Mulita de asada", "name_en": "Asada mulita", "price": 6.5, "description_es": "Dos tortillas, queso derretido en medio, carne al carbón.", "description_en": "Two tortillas, melted cheese between, charcoal beef." },
+        { "name_es": "Vampiro", "name_en": "Vampiro", "price": 5.75, "description_es": "Tortilla tatemada hasta quedar tostada, queso y la carne que elija.", "description_en": "Tortilla charred until crisp, cheese, and the meat you pick." }
+      ]
+    },
+    {
+      "sort_order": 3,
+      "name_es": "Tortas y burritos",
+      "name_en": "Tortas & burritos",
+      "extras": "extras_comunes_tacos_y_especiales",
+      "quitables": "quitables_tortas",
+      "productos": [
+        { "name_es": "Torta de milanesa", "name_en": "Milanesa torta", "price": 12.0, "description_es": "Pan telera, milanesa de res, aguacate, frijoles, jalapeño.", "description_en": "Telera roll, breaded beef, avocado, beans, jalapeño." },
+        { "name_es": "Torta ahogada", "name_en": "Torta ahogada", "price": 11.5, "description_es": "Bañada en salsa de chile de árbol. Pida servilletas de más.", "description_en": "Drowned in chile de árbol salsa. Ask for extra napkins." },
+        { "name_es": "Burrito de asada", "name_en": "Asada burrito", "price": 11.0, "description_es": "Tortilla de harina, arroz, frijol, carne al carbón, guacamole.", "description_en": "Flour tortilla, rice, beans, charcoal beef, guacamole." }
+      ]
+    },
+    {
+      "sort_order": 4,
+      "name_es": "Antojitos",
+      "name_en": "Sides",
+      "extras": null,
+      "quitables": null,
+      "productos": [
+        { "name_es": "Elote entero", "name_en": "Whole elote", "price": 4.5, "description_es": "Mayonesa, queso cotija, chile en polvo y limón.", "description_en": "Mayo, cotija, chile powder and lime." },
+        { "name_es": "Esquites", "name_en": "Esquites", "price": 5.0, "description_es": "El mismo elote, en vaso, con caldo.", "description_en": "Same elote, in a cup, with broth." },
+        { "name_es": "Papas con queso", "name_en": "Loaded fries", "price": 8.5, "description_es": "Papa frita, queso, carne al carbón y crema.", "description_en": "Fries, cheese, charcoal beef and crema." },
+        { "name_es": "Consomé de birria", "name_en": "Birria consommé", "price": 4.0, "description_es": "Un vaso grande. Para el frío o para la cruda.", "description_en": "Large cup. For the cold or for the hangover." }
+      ]
+    },
+    {
+      "sort_order": 5,
+      "name_es": "Bebidas",
+      "name_en": "Drinks",
+      "extras": null,
+      "quitables": null,
+      "productos": [
+        { "name_es": "Agua de horchata", "name_en": "Horchata", "price": 3.5, "description_es": "Arroz y canela, hecha en la mañana.", "description_en": "Rice and cinnamon, made this morning." },
+        { "name_es": "Agua de jamaica", "name_en": "Jamaica", "price": 3.5, "description_es": "Flor de jamaica, poca azúcar.", "description_en": "Hibiscus, light on the sugar." },
+        { "name_es": "Jarritos", "name_en": "Jarritos", "price": 2.75, "description_es": "Mandarina, tamarindo o toronja.", "description_en": "Mandarin, tamarind or grapefruit." },
+        { "name_es": "Coca de vidrio", "name_en": "Mexican Coke", "price": 3.25, "description_es": "De caña. No es lo mismo y usted lo sabe.", "description_en": "Cane sugar. Not the same and you know it." }
+      ]
+    }
+  ]
+}

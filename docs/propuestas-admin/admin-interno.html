@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin interno — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;--page:#F7F7F5;--card:#FFF;
+ --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+ --f:'Inter',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.45;font-size:14px}
+.bar{background:#111;color:#EDEDEF;padding:10px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar b{font-weight:800;letter-spacing:-.01em}
+.bar .t{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;background:#333;border-radius:4px;padding:3px 8px}
+.bar a{margin-left:auto;color:#B9B7AF;font-size:12.5px;text-decoration:none;font-weight:600}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 18px 70px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.025em;margin:0 0 3px}
+.sub{font-size:13px;color:var(--ink2);margin:0 0 20px}
+
+.kpis{display:grid;gap:1px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));background:var(--line);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:22px}
+.k{background:var(--card);padding:14px 16px}
+.k b{display:block;font-size:26px;font-weight:900;letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums}
+.k span{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.k .d{font-size:11.5px;font-weight:700;margin-top:5px}
+.up{color:var(--good)}.dn{color:var(--bad)}
+
+h2{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin:26px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+  padding:10px 14px;border-bottom:1px solid var(--line);background:#FCFCFB;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.n{font-weight:700}
+td.num{font-variant-numeric:tabular-nums;text-align:right;font-weight:700;white-space:nowrap}
+.pill{display:inline-block;font-size:11px;font-weight:800;border-radius:100px;padding:2px 9px;white-space:nowrap}
+.pill.ok{background:var(--goodBg);color:var(--good)}
+.pill.due{background:var(--warnBg);color:var(--warn)}
+.pill.sus{background:var(--badBg);color:var(--bad)}
+.pill.new{background:#EEF3FB;color:#1F5FBF}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 11px;font:700 12px var(--f);cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.danger{color:var(--bad);border-color:#F0BFC0}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.off{color:var(--muted);cursor:not-allowed}
+.btn.off:hover{border-color:var(--line)}
+.acts{display:flex;gap:6px;justify-content:flex-end}
+.scroll{overflow-x:auto}
+.req{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.req:last-child{border-bottom:0}
+.req .w{flex:1;min-width:200px}
+.req .w b{font-size:14px}
+.req .w div{font-size:12.5px;color:var(--ink2);margin-top:1px}
+.note{background:#FCFCFB;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:22px;font-size:13px;color:var(--ink2);line-height:1.55}
+.note b{color:var(--ink)}
+
+/* estado del negocio: tendencia + cartera */
+.grid2{display:grid;gap:14px;grid-template-columns:1.4fr 1fr}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.panel .ph{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.panel .pv{font-size:19px;font-weight:900;letter-spacing:-.02em;margin-bottom:10px}
+.chart{width:100%;height:auto;overflow:visible}
+.chart .ax{fill:var(--muted);font-size:9.5px;font-weight:700}
+.chart .lbl{fill:var(--ink);font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.stat-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.stat-row .sk{width:88px;flex:none;font-size:12.5px;font-weight:700;color:var(--ink2)}
+.stat-row .sb{flex:1;height:9px;border-radius:5px;background:var(--page);overflow:hidden}
+.stat-row .sb i{display:block;height:100%;border-radius:5px}
+.stat-row .sn{width:20px;flex:none;text-align:right;font-weight:800;font-variant-numeric:tabular-nums;font-size:13px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:60;background:#111;color:#fff;border-radius:100px;padding:11px 20px;font-size:13.5px;font-weight:700;display:none}
+.toast.on{display:block}
+.pay{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+.pay.stripe{color:#5B4FE0}
+.prox{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;white-space:nowrap}
+
+/* modal: misma confirmación explícita que el resto del proyecto, nunca confirm() nativo */
+.veil{position:fixed;inset:0;z-index:80;background:rgba(11,11,11,.5);display:none;place-items:center;padding:20px}
+.veil.on{display:grid}
+.box{background:var(--card);border-radius:14px;padding:22px;max-width:420px;width:100%}
+.box h3{font-size:18px;font-weight:800;letter-spacing:-.01em;margin:0 0 8px}
+.box p{font-size:13.5px;color:var(--ink2);margin:0 0 16px;line-height:1.55}
+.box .acts2{display:flex;gap:9px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <b>FoodTruckOS</b><span class="t">Interno</span>
+  <a href="../propuestas-panel/panel-dueno.html">Ver el panel de un cliente →</a>
+</div>
+
+<div class="wrap">
+  <h1>Operación</h1>
+  <p class="sub">Clientes, suscripciones y solicitudes. Herramienta de trabajo, no producto de venta.</p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Cómo va la plataforma</h2>
+  <div class="grid2">
+    <div class="panel">
+      <div class="ph">Ingreso mensual</div>
+      <div class="pv" id="mrrNow"></div>
+      <svg class="chart" id="mrrChart" viewBox="0 0 420 130"></svg>
+    </div>
+    <div class="panel">
+      <div class="ph">Tu cartera hoy</div>
+      <div class="pv" id="carteraNow"></div>
+      <div id="cartera"></div>
+    </div>
+  </div>
+
+  <h2>Clientes</h2>
+  <div class="tbl scroll">
+    <table>
+      <thead><tr><th>Negocio</th><th>Trucks</th><th>Precio/truck</th><th class="num">Mensual</th>
+        <th>Estado</th><th>Cobro</th><th>Antigüedad</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <h2>Solicitudes pendientes</h2>
+  <div class="tbl" id="reqs"></div>
+
+  <div class="note">
+    <b>Cobro automático:</b> en Fase 1 la suscripción se cobra fuera del sistema y aquí solo se registra el estado.
+    Cada cliente ya lleva marcado si cobra por transferencia manual o si tiene Stripe conectado, para no tener que rehacer la tabla cuando se active — la conexión en sí entra en Fase 2. Hasta entonces, suspender por falta de pago es una acción manual.
+    <br><br>
+    <b>Regla de facturación:</b> los cambios de trucks aplican al siguiente periodo, nunca a mitad de mes. Aprobar una solicitud aquí <b>agenda</b> el cambio; no toca el cobro del mes en curso. Dar de baja un truck archiva su información dos años; no la borra.
+  </div>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const precio=t=>t>=3?29:t===2?39:49;
+
+/* pago: 'manual' (recibo por correo, hoy) o 'stripe' (Fase 2, cobro automático).
+   trucksProx/proxDesde: cambio ya aprobado pero agendado — no toca el cobro
+   del mes en curso, solo se muestra como vista previa (misma regla que
+   panel-cuenta.html usa del lado del dueño). */
+let CLI=[
+ {n:'Taquería El Farol',trucks:3,estado:'ok',meses:5,ciudad:'Norman, OK',pago:'manual',trucksProx:null,proxDesde:null},
+ {n:'Birriería Doña Cuca',trucks:1,estado:'ok',meses:3,ciudad:'Oklahoma City, OK',pago:'stripe',trucksProx:null,proxDesde:null},
+ {n:'Seoul Food OKC',trucks:2,estado:'due',meses:7,ciudad:'Oklahoma City, OK',pago:'manual',trucksProx:null,proxDesde:null},
+ {n:"Nonna's Pizza Van",trucks:1,estado:'new',meses:0,ciudad:'Edmond, OK',pago:'manual',trucksProx:null,proxDesde:null},
+ {n:'Wing It Mobile',trucks:1,estado:'sus',meses:9,ciudad:'Moore, OK',pago:'manual',trucksProx:null,proxDesde:null}
+];
+let REQ=[
+ {id:1,cli:'Taquería El Farol',que:'Alta de un cuarto truck',det:'Ubicación por confirmar · pasaría a $116/mes',prox:4,desde:'1 de septiembre'},
+ {id:2,cli:'Seoul Food OKC',que:'Baja de un truck',det:'Deja de facturarse el siguiente periodo · su histórico se archiva',prox:1,desde:'1 de septiembre'}
+];
+const EST={ok:['Al día','ok'],due:['Por cobrar','due'],sus:['Suspendido','sus'],new:['En alta','new']};
+const ESTCOLOR={ok:'var(--good)',due:'var(--warn)',sus:'var(--bad)',new:'#1F5FBF'};
+
+/* Histórico de los últimos 6 meses. El último valor de cada serie se
+   reemplaza por el dato real calculado de CLI, para que la gráfica y
+   el número de arriba nunca puedan desincronizarse. */
+const MESES=['Feb','Mar','Abr','May','Jun','Jul'];
+const MRR_HIST=[176,185,199,214,241,0];
+const NEG_HIST=[2,2,3,3,3,0];
+const TRK_HIST=[3,4,5,6,6,0];
+
+function drawMRR(hist){
+  const W=420,H=130,L=6,R=6,T=10,B=22,w=W-L-R,h=H-T-B;
+  const max=Math.max(...hist)*1.12,min=0;
+  const x=i=>L+(i/(hist.length-1))*w;
+  const y=v=>T+h-((v-min)/(max-min))*h;
+  let s='';
+  s+='<line class="gl" x1="'+L+'" y1="'+(T+h)+'" x2="'+(W-R)+'" y2="'+(T+h)+'"/>';
+  MESES.forEach((m,i)=>s+='<text class="ax" x="'+x(i)+'" y="'+(H-6)+'" text-anchor="middle">'+m+'</text>');
+  s+='<polyline fill="none" stroke="#2A78D6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="'+
+      hist.map((v,i)=>x(i)+','+y(v)).join(' ')+'"/>';
+  hist.forEach((v,i)=>s+='<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3.5" fill="#2A78D6" stroke="#fff" stroke-width="1.5"/>');
+  const last=hist.length-1;
+  s+='<text class="lbl" x="'+x(last)+'" y="'+(y(hist[last])-10)+'" text-anchor="end">'+money(hist[last])+'</text>';
+  $('#mrrChart').innerHTML=s;
+}
+
+function drawCartera(){
+  const total=CLI.length;
+  $('#cartera').innerHTML=Object.keys(EST).map(k=>{
+    const n=CLI.filter(c=>c.estado===k).length, pct=total?Math.round(n/total*100):0;
+    return '<div class="stat-row"><span class="sk">'+EST[k][0]+'</span>'+
+      '<span class="sb"><i style="width:'+pct+'%;background:'+ESTCOLOR[k]+'"></i></span>'+
+      '<span class="sn">'+n+'</span></div>'}).join('');
+}
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3200)}
+
+function draw(){
+  const facturables=CLI.filter(c=>c.estado==='ok'||c.estado==='due'||c.estado==='new');
+  const mrr=facturables.reduce((s,c)=>s+c.trucks*precio(c.trucks),0);
+  const trucks=facturables.reduce((s,c)=>s+c.trucks,0);
+  const perm=(CLI.reduce((s,c)=>s+c.meses,0)/CLI.length);
+  const dueCli=CLI.filter(c=>c.estado==='due');
+  const porCobrar=dueCli.reduce((s,c)=>s+c.trucks*precio(c.trucks),0);
+
+  /* el mes actual del histórico siempre es el dato real, nunca una cifra aparte */
+  MRR_HIST[MRR_HIST.length-1]=mrr;
+  NEG_HIST[NEG_HIST.length-1]=facturables.length;
+  TRK_HIST[TRK_HIST.length-1]=trucks;
+  const dMrr=mrr-MRR_HIST[MRR_HIST.length-2];
+  const dNeg=facturables.length-NEG_HIST[NEG_HIST.length-2];
+  const dTrk=trucks-TRK_HIST[TRK_HIST.length-2];
+  const delta=(v,suf)=>'<div class="d '+(v>=0?'up':'dn')+'">'+(v>=0?'+':'')+v+suf+' vs mes pasado</div>';
+
+  $('#kpis').innerHTML=
+    '<div class="k"><b>'+facturables.length+'</b><span>Negocios activos</span>'+delta(dNeg,'')+'</div>'+
+    '<div class="k"><b>'+trucks+'</b><span>Trucks facturados</span>'+delta(dTrk,'')+'</div>'+
+    '<div class="k"><b>'+money(mrr)+'</b><span>Ingreso mensual</span>'+
+      '<div class="'+(dMrr>=0?'d up':'d dn')+'">'+(dMrr>=0?'+':'')+money(dMrr)+' vs mes pasado</div></div>'+
+    '<div class="k"><b>'+money(porCobrar)+'</b><span>Por cobrar</span>'+
+      '<div class="d'+(dueCli.length?' dn':'')+'">'+dueCli.length+' negocio'+(dueCli.length===1?'':'s')+'</div></div>'+
+    '<div class="k"><b>'+perm.toFixed(1)+'</b><span>Meses de permanencia</span><div class="d">promedio</div></div>'+
+    '<div class="k"><b>'+(facturables.length?money(mrr/facturables.length):money(0))+'</b><span>Por cliente</span><div class="d">promedio</div></div>';
+
+  $('#mrrNow').textContent=money(mrr)+' este mes';
+  drawMRR(MRR_HIST);
+  $('#carteraNow').textContent=CLI.length+' negocios en total';
+  drawCartera();
+
+  $('#rows').innerHTML=CLI.map((c,i)=>{
+    const p=precio(c.trucks),facturando=c.estado!=='sus';
+    return '<tr><td class="n">'+c.n+'<div style="font-size:12px;color:var(--muted);font-weight:500">'+c.ciudad+'</div></td>'+
+      '<td class="num">'+c.trucks+(c.trucksProx?'<span class="prox">→ '+c.trucksProx+' desde el '+c.proxDesde+'</span>':'')+'</td>'+
+      '<td class="num">'+money(p)+'</td>'+
+      '<td class="num">'+(facturando?money(c.trucks*p):'—')+'</td>'+
+      '<td><span class="pill '+EST[c.estado][1]+'">'+EST[c.estado][0]+'</span></td>'+
+      '<td><span class="pay'+(c.pago==='stripe'?' stripe':'')+'">'+(c.pago==='stripe'?'Stripe':'Manual')+'</span></td>'+
+      '<td class="num">'+(c.meses?c.meses+' meses':'nuevo')+'</td>'+
+      '<td><div class="acts">'+
+        (c.estado==='sus'
+          ? '<button class="btn off" data-versus="'+i+'" title="Suspendido — reactívalo para verlo">Abrir</button>'
+          : '<button class="btn" data-ver="'+i+'">Abrir</button>')+
+        (c.estado==='sus'
+          ? '<button class="btn primary" data-on="'+i+'">Reactivar</button>'
+          : '<button class="btn danger" data-off="'+i+'">Suspender</button>')+
+      '</div></td></tr>'}).join('');
+
+  $('#reqs').innerHTML=REQ.length?REQ.map(r=>
+    '<div class="req"><div class="w"><b>'+r.cli+'</b><div>'+r.que+' · '+r.det+'</div></div>'+
+    '<button class="btn" data-no="'+r.id+'">Descartar</button>'+
+    '<button class="btn primary" data-si="'+r.id+'">Aprobar y configurar</button></div>').join('')
+    :'<div class="req" style="color:var(--muted);font-weight:600">Nada pendiente.</div>';
+
+  $('#rows').querySelectorAll('[data-off]').forEach(b=>b.onclick=()=>{
+    const c=CLI[+b.dataset.off];
+    openModal('¿Suspender a '+c.n+'?',
+      'Sus menús dejan de abrir y sus QR dejan de servir de inmediato. La información se conserva completa y reactivarlo toma minutos.',
+      'Sí, suspender','danger',()=>{c.estado='sus';draw();toast(c.n+' suspendido')})});
+  $('#rows').querySelectorAll('[data-on]').forEach(b=>b.onclick=()=>{
+    const c=CLI[+b.dataset.on];
+    openModal('¿Reactivar a '+c.n+'?',
+      'Sus menús y sus códigos QR vuelven a funcionar de inmediato, con el mismo menú y precios que tenía.',
+      'Sí, reactivar','primary',()=>{c.estado='ok';draw();toast(c.n+' reactivado')})});
+  $('#rows').querySelectorAll('[data-ver]').forEach(b=>b.onclick=()=>
+    location.href='../propuestas-panel/panel-dueno.html');
+  /* Un negocio suspendido no se puede abrir — es la misma regla que ya
+     le decimos al dueño ("sus menús dejan de abrir"). Sin esto, "Abrir"
+     llevaba al panel de siempre con ventas normales y todo funcionando,
+     lo cual se ve exactamente como si se hubiera reactivado solo. */
+  $('#rows').querySelectorAll('[data-versus]').forEach(b=>b.onclick=()=>{
+    const c=CLI[+b.dataset.versus];
+    toast(c.n+' está suspendido — reactívalo para ver su panel')});
+  $('#reqs').querySelectorAll('[data-si]').forEach(b=>b.onclick=()=>{
+    const r=REQ.find(x=>x.id==b.dataset.si), c=CLI.find(c=>c.n===r.cli);
+    if(c){c.trucksProx=r.prox;c.proxDesde=r.desde}
+    REQ=REQ.filter(x=>x.id!=b.dataset.si);draw();
+    toast('Agendado. El cobro de este mes no cambia — entra el '+r.desde)});
+  $('#reqs').querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>{
+    REQ=REQ.filter(x=>x.id!=b.dataset.no);draw();toast('Solicitud descartada')});
+}
+
+/* Modal propio con la consecuencia explícita, igual que el resto del
+   proyecto — nunca confirm() nativo, que no avisa qué va a pasar. */
+function openModal(titulo,cuerpo,accion,clase,onOk){
+  $('#veil').innerHTML='<div class="box" role="dialog" aria-modal="true">'+
+    '<h3>'+titulo+'</h3><p>'+cuerpo+'</p>'+
+    '<div class="acts2"><button class="btn" id="mC">Cancelar</button>'+
+    '<button class="btn '+clase+'" id="mOk">'+accion+'</button></div></div>';
+  $('#veil').classList.add('on');
+  $('#mC').onclick=closeModal;
+  $('#mOk').onclick=()=>{closeModal();onOk()};
+}
+function closeModal(){$('#veil').classList.remove('on')}
+$('#veil').onclick=e=>{if(e.target===$('#veil'))closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+draw();
+</script>
+</body>
+</html>

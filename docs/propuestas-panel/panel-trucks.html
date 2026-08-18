@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trucks — Panel del dueño · FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;
+  --page:#F9F9F7;--card:#FFFFFF;--ring:rgba(11,11,11,.10);
+  --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+  --f:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab a{background:#2F2C29;color:#D8D5D0;border-radius:4px;padding:5px 10px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.bd{display:flex;align-items:center;gap:9px;padding:14px 0}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.bd span{font-weight:800;letter-spacing:-.02em;font-size:15px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs a{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current]{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tabs a:not([aria-current]){opacity:.62}
+.acct{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);padding:14px 0}
+
+.wrap{max-width:1000px;margin:0 auto;padding:26px 22px 100px}
+h1{font-size:29px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-size:14px;color:var(--ink2);margin:6px 0 22px;max-width:66ch}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px 16px;font:700 13.5px var(--f);cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.mini{padding:7px 12px;font-size:12.5px}
+.btn.danger{color:var(--bad);border-color:#F0BFC0}
+.btn.warn{background:var(--warnBg);border-color:#E8C98A;color:#6B4A12}
+
+.card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:20px;margin-bottom:16px}
+.card h2{font-size:16px;font-weight:800;letter-spacing:-.02em;margin:0 0 3px}
+.card .hint{font-size:13px;color:var(--ink2);margin:0 0 16px}
+
+/* ajustes del negocio */
+.set{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+@media (max-width:760px){.set{grid-template-columns:1fr}}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:7px}
+.mins{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.mins input{width:74px;border:1.5px solid var(--line);border-radius:9px;padding:10px 12px;font:800 16px var(--f);color:var(--ink);font-variant-numeric:tabular-nums;text-align:center}
+.mins input:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.chip{font-size:12px;font-weight:800;border-radius:100px;padding:4px 11px}
+.chip.a{background:var(--warnBg);color:var(--warn)}
+.chip.r{background:var(--badBg);color:var(--bad)}
+.tip{font-size:12.5px;color:var(--ink2);background:var(--page);border-radius:9px;padding:11px 13px;margin-top:11px;line-height:1.5}
+.tip b{color:var(--ink)}
+.radios{display:grid;gap:9px}
+.radio{display:flex;gap:11px;align-items:flex-start;border:2px solid var(--line);border-radius:11px;padding:13px;cursor:pointer;background:var(--card);text-align:left;font:inherit;color:inherit}
+.radio[aria-pressed=true]{border-color:var(--ink)}
+.radio .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);flex:none;margin-top:1px;position:relative}
+.radio[aria-pressed=true] .dot{border-color:var(--ink)}
+.radio[aria-pressed=true] .dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ink)}
+.radio b{display:block;font-size:14px;font-weight:800}
+.radio span{display:block;font-size:12.5px;color:var(--ink2);margin-top:2px;line-height:1.4}
+
+/* trucks */
+.tk{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:20px;margin-bottom:14px}
+.tk.paused{border-color:#E8C98A;background:#FFFDF7}
+.thd{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.pic{width:64px;height:64px;border-radius:11px;background:#EFE9DE;color:var(--muted);display:grid;place-items:center;font-size:10px;font-weight:800;text-align:center;line-height:1.2;flex:none;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover}
+.pic.miss{border:1.5px dashed #C9C3B7;background:#F6F2EA}
+
+/* foto y datos del truck */
+.fotoBox{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.fotoPrev{width:104px;height:104px;border-radius:11px;background:#EFE9DE;color:var(--muted);display:grid;place-items:center;
+  font-size:11px;font-weight:700;text-align:center;line-height:1.3;flex:none;overflow:hidden;border:1.5px dashed #C9C3B7;padding:6px}
+.fotoPrev.has{border-style:solid;border-color:var(--line);padding:0}
+.fotoPrev img{width:100%;height:100%;object-fit:cover}
+.fotoAct{flex:1;min-width:0}
+.fotoAct .btn{margin:0 7px 7px 0}
+.fotoAct p{font-size:12px;color:var(--muted);margin:2px 0 0;line-height:1.45}
+input[type=file]{display:none}
+.box input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:12px 13px;
+  font:600 15px var(--f);color:var(--ink);margin-bottom:14px}
+.box input[type=text]:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.tinfo{min-width:0;flex:1}
+.tinfo b{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.tinfo .loc{font-size:13px;color:var(--ink2);margin-top:2px}
+.pill{font-size:11.5px;font-weight:800;border-radius:100px;padding:3px 11px;margin-left:9px;vertical-align:2px}
+.pill.on{background:var(--goodBg);color:var(--good)}
+.pill.off{background:var(--warnBg);color:var(--warn)}
+.rows{margin-top:15px;border-top:1px solid var(--line)}
+.r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.r:last-child{border-bottom:0}
+.r .k{color:var(--ink2);font-weight:600}
+.r .v{font-weight:700;text-align:right}
+.r .v em{font-style:normal;color:var(--muted);font-weight:600}
+.tacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.paused-msg{background:var(--warnBg);border:1px solid #E8C98A;border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13.5px;color:#6B4A12}
+.paused-msg b{display:block;margin-bottom:3px}
+
+.ask{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center}
+.ask b{display:block;font-size:15.5px;font-weight:800;margin-bottom:5px}
+.ask p{font-size:13.5px;color:var(--ink2);margin:0 auto 14px;max-width:56ch;line-height:1.55}
+
+/* modal */
+.veil{position:fixed;inset:0;z-index:80;background:rgba(11,11,11,.5);display:none;place-items:center;padding:20px}
+.veil.on{display:grid}
+.box{background:var(--card);border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:90vh;overflow:auto}
+.box h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.box p{font-size:14px;color:var(--ink2);margin:0 0 16px;line-height:1.55}
+.box label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:0 0 7px}
+.pick{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-bottom:16px}
+.pick button{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:11px;cursor:pointer;font:700 13.5px var(--f);color:var(--ink);text-align:left}
+.pick button[aria-pressed=true]{border-color:var(--ink)}
+.prev{background:#1A1512;color:#fff;border-radius:12px;padding:16px;margin-bottom:16px}
+.prev .k{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#9C948A;margin-bottom:8px}
+.prev .m{font-size:19px;font-weight:800;line-height:1.3}
+.prev .s{font-size:13px;color:#C9C2B8;margin-top:6px}
+.acts2{display:flex;gap:9px;justify-content:flex-end;margin-top:4px}
+
+/* horario día por día */
+.hgrid{border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:12px}
+.hrow{display:flex;align-items:center;gap:12px;padding:10px 13px;border-bottom:1px solid var(--line)}
+.hrow:last-child{border-bottom:0}
+.hrow.off{background:var(--page)}
+.hd{font-size:14px;font-weight:700;flex:1;min-width:0}
+.hrow.off .hd{color:var(--muted)}
+.hc{font-size:13px;font-weight:700;color:var(--muted)}
+.ht{display:flex;align-items:center;gap:7px}
+.ht em{font-style:normal;font-size:12.5px;color:var(--muted);font-weight:600}
+.ht input{border:1.5px solid var(--line);border-radius:8px;padding:7px 9px;font:700 13.5px var(--f);color:var(--ink);
+  font-variant-numeric:tabular-nums;background:var(--card)}
+.ht input:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.hsw{position:relative;width:44px;height:26px;border-radius:100px;border:0;background:var(--good);cursor:pointer;flex:none;padding:0}
+.hsw[aria-checked=false]{background:#C9C5BC}
+.hsw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .14s}
+.hsw[aria-checked=true] i{transform:translateX(18px)}
+.hsw:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.hsw i{transition:none}}
+.hall{margin-bottom:12px}
+.hres{background:var(--page);border-radius:9px;padding:11px 13px;font-size:13.5px;color:var(--ink2);margin-bottom:16px}
+.hres b{color:var(--ink)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:90;background:var(--ink);color:#fff;border-radius:100px;padding:13px 24px;font-size:14px;font-weight:700;display:none}
+.toast.on{display:block}
+
+.tabs .soon{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap;opacity:.55;display:flex;align-items:center;gap:6px}
+.tabs .soon i{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--line);color:var(--ink2);border-radius:100px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Panel del dueño · Trucks</b>
+  <a href="panel-dueno.html">← Resumen</a><a href="panel-menu.html">Menú</a>
+  <a href="panel-marca.html">Marca</a><a href="panel-personal.html">Personal</a>
+  <a href="panel-qr.html">Códigos QR</a>
+  <span class="sep">Pausa, horarios y tiempos de cocina</span>
+</div>
+
+<nav class="nav">
+  <div class="bd"><div class="logo">F</div><span>FoodTruckOS</span></div>
+  <div class="tabs"><a href="panel-dueno.html">Resumen</a><a href="panel-menu.html">Menú</a><a href="#" aria-current="page">Trucks</a><a href="panel-marca.html">Marca</a><a href="panel-personal.html">Personal</a><a href="panel-qr.html">Códigos QR</a><a href="panel-cuenta.html">Cuenta</a></div>
+  <div class="acct">Taquería El Farol</div>
+</nav>
+
+<div class="wrap">
+  <h1>Tus trucks</h1>
+  <p class="sub">Aquí pausas el servicio cuando se acaba el gas o cambias de turno, ajustas horarios, y decides a partir de cuántos minutos una orden se marca como atrasada en la pantalla de cocina.</p>
+
+  <div class="card">
+    <h2>Ajustes para los tres</h2>
+    <p class="hint">Valen para todo el negocio. Cualquier truck puede llevar los suyos si lo necesita.</p>
+    <div class="set">
+      <div class="fld">
+        <label>Cuándo avisar que una orden se está tardando</label>
+        <div class="mins">
+          <span class="chip a">Ámbar</span><input type="number" id="uA" min="1" max="60" value="8">
+          <span class="chip r">Rojo</span><input type="number" id="uR" min="2" max="90" value="15">
+          <span style="font-size:13px;color:var(--ink2)">minutos</span>
+        </div>
+        <div class="tip" id="tipU"></div>
+      </div>
+      <div class="fld">
+        <label>Cómo manejas el impuesto</label>
+        <div class="radios" id="tax">
+          <button class="radio" data-x="add" aria-pressed="true"><span class="dot"></span>
+            <span><b>Se agrega al total</b><span>El menú muestra $3.25 y al final se suma el impuesto.</span></span></button>
+          <button class="radio" data-x="inc" aria-pressed="false"><span class="dot"></span>
+            <span><b>Ya viene incluido</b><span>Lo que ve en el menú es lo que paga. Sin sorpresas al final.</span></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lista"></div>
+
+  <div class="ask">
+    <b>¿Vas a abrir otro truck?</b>
+    <p>Pídelo desde aquí y lo dejamos configurado con tu menú, tu marca y su código QR. Te contactamos para confirmar dónde va a estar y sus horarios. Se cobra desde el siguiente periodo, nunca a mitad de mes.</p>
+    <button class="btn primary" id="pedir">Pedir un truck nuevo</button>
+  </div>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const CFG={amber:8,red:15,tax:'add'};
+const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const h7=(ab,ci,abiertos)=>DIAS.map((d,i)=>({ab,ci,abierto:abiertos.includes(i)}));
+let TK=[
+ {id:1,n:'Truck 1',loc:'Main & Porter',pausa:null,um:null,h:h7('11:00','21:00',[0,1,2,3,4,5,6])},
+ {id:2,n:'Truck 2',loc:'Campus Corner',pausa:null,um:null,h:h7('11:00','21:00',[0,1,2,3,4,5])},
+ {id:3,n:'Truck 3',loc:'Lindsey & 24th',pausa:null,um:{amber:14,red:24},h:h7('12:00','20:00',[3,4,5,6])}
+];
+
+/* Resume los siete días en una frase corta: "11:00 – 21:00 · Lunes a domingo",
+   o "Varía por día" cuando los horarios no coinciden entre sí. */
+const hm=t=>{const[a,b]=t.split(':').map(Number);const p=a>=12?'pm':'am';
+  return ((a%12)||12)+(b?':'+String(b).padStart(2,'0'):'')+' '+p};
+function resumen(h){
+  const ab=h.map((d,i)=>({...d,i})).filter(d=>d.abierto);
+  if(!ab.length)return{hor:'Cerrado toda la semana',dias:''};
+  const mismo=ab.every(d=>d.ab===ab[0].ab&&d.ci===ab[0].ci);
+  const hor=mismo?hm(ab[0].ab)+' – '+hm(ab[0].ci):'Varía por día';
+  let dias;
+  if(ab.length===7)dias='Todos los días';
+  else{
+    const idx=ab.map(d=>d.i), seguido=idx.every((v,k)=>k===0||v===idx[k-1]+1);
+    dias=seguido&&ab.length>2 ? DIAS[idx[0]]+' a '+DIAS[idx[idx.length-1]].toLowerCase()
+       : ab.map(d=>DIAS[d.i].slice(0,3)).join(', ');
+  }
+  return{hor,dias};
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3600)}
+
+function tipU(){
+  $('#tipU').innerHTML='Tu promedio real de los últimos 30 días es de <b>6 minutos</b> por orden. '+
+    'Con estos números, una orden se pone ámbar a los <b>'+CFG.amber+'</b> y roja a los <b>'+CFG.red+
+    '</b>. Si los pones muy bajos, todo se ve rojo y el aviso deja de servir.';
+}
+
+function draw(){
+  tipU();
+  $('#lista').innerHTML=TK.map(t=>{
+    const u=t.um||CFG, r=resumen(t.h);
+    return '<div class="tk'+(t.pausa?' paused':'')+'">'+
+      '<div class="thd">'+(t.foto?'<div class="pic"><img src="'+t.foto+'" alt=""></div>'
+                                  :'<div class="pic miss">Falta<br>foto</div>')+
+      '<div class="tinfo"><b>'+t.n+'</b>'+
+        (t.pausa?'<span class="pill off">En pausa</span>':'<span class="pill on">Abierto</span>')+
+        '<div class="loc">'+t.loc+'</div></div></div>'+
+      (t.pausa?'<div class="paused-msg"><b>Tus clientes ven: "'+t.pausa.msg+'"</b>'+
+        'Motivo: '+t.pausa.mot+'. Reabre solo '+t.pausa.cuando+', sin que tengas que hacer nada.</div>':'')+
+      '<div class="rows">'+
+        '<div class="r"><span class="k">Horario</span><span class="v">'+r.hor+(r.dias?' <em>· '+r.dias+'</em>':'')+'</span></div>'+
+        '<div class="r"><span class="k">Avisos de cocina</span><span class="v">'+u.amber+' / '+u.red+' min '+
+          (t.um?'<em>· propios</em>':'<em>· los del negocio</em>')+'</span></div>'+
+      '</div>'+
+      '<div class="tacts">'+
+        (t.pausa
+          ? '<button class="btn primary" data-re="'+t.id+'">Reabrir ahora</button>'
+          : '<button class="btn warn" data-pa="'+t.id+'">Pausar servicio</button>')+
+        '<button class="btn" data-ed="'+t.id+'">Nombre y foto</button>'+
+        '<button class="btn" data-ho="'+t.id+'">Cambiar horario</button>'+
+        '<button class="btn" data-um="'+t.id+'">'+(t.um?'Quitar avisos propios':'Poner avisos propios')+'</button>'+
+        '<a class="btn" href="panel-qr.html">Ver su QR</a>'+
+        '<button class="btn danger mini" data-ba="'+t.id+'">Dar de baja</button>'+
+      '</div></div>'}).join('');
+  $('#lista').querySelectorAll('[data-pa]').forEach(b=>b.onclick=()=>pausar(+b.dataset.pa));
+  $('#lista').querySelectorAll('[data-re]').forEach(b=>b.onclick=()=>{
+    const t=TK.find(x=>x.id==b.dataset.re);t.pausa=null;draw();toast(t.n+' ya está recibiendo pedidos')});
+  $('#lista').querySelectorAll('[data-um]').forEach(b=>b.onclick=()=>umbral(+b.dataset.um));
+  $('#lista').querySelectorAll('[data-ho]').forEach(b=>b.onclick=()=>horario(+b.dataset.ho));
+  $('#lista').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>editarTruck(+b.dataset.ed));
+  $('#lista').querySelectorAll('[data-ba]').forEach(b=>b.onclick=()=>baja(+b.dataset.ba));
+}
+
+function open(h){$('#veil').innerHTML='<div class="box" role="dialog" aria-modal="true">'+h+'</div>';$('#veil').classList.add('on')}
+function close(){$('#veil').classList.remove('on')}
+$('#veil').onclick=e=>{if(e.target===$('#veil'))close()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+/* ---------- pausa con reapertura automática ---------- */
+const MOT=['Se acabó el gas','Cambio de turno','Se acabó la comida','Descanso del personal'];
+const DUR=[['30 minutos',30],['1 hora',60],['2 horas',120],['El resto del día',0]];
+function pausar(id){
+  const t=TK.find(x=>x.id===id);let mot=MOT[0],dur=DUR[0];
+  const hasta=m=>{if(!m)return null;const d=new Date(Date.now()+m*60000);
+    return d.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})};
+  const msg=()=>dur[1]?'Regresamos a las '+hasta(dur[1]):'Hoy ya cerramos';
+  const render=()=>open('<h3>Pausar '+t.n+'</h3>'+
+    '<p>Deja de recibir pedidos y se reabre solo. Tus clientes van a ver esto:</p>'+
+    '<div class="prev"><div class="k">Lo que ve tu cliente</div>'+
+      '<div class="m">'+msg()+'</div>'+
+      '<div class="s">'+(dur[1]?'Puede pedir que le avisemos cuando reabras.':'Vuelve mañana en tu horario.')+'</div></div>'+
+    '<label>¿Por qué?</label><div class="pick" id="pm">'+
+      MOT.map(m=>'<button data-m="'+m+'" aria-pressed="'+(m===mot)+'">'+m+'</button>').join('')+'</div>'+
+    '<label>¿Hasta cuándo?</label><div class="pick" id="pd">'+
+      DUR.map(d=>'<button data-d="'+d[1]+'" aria-pressed="'+(d[1]===dur[1])+'">'+d[0]+'</button>').join('')+'</div>'+
+    '<div class="acts2"><button class="btn" id="c">Cancelar</button>'+
+    '<button class="btn warn" id="ok">Pausar ahora</button></div>');
+  const wire=()=>{
+    $('#pm').querySelectorAll('button').forEach(b=>b.onclick=()=>{mot=b.dataset.m;render();wire()});
+    $('#pd').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+      dur=DUR.find(d=>String(d[1])===b.dataset.d);render();wire()});
+    $('#c').onclick=close;
+    $('#ok').onclick=()=>{
+      t.pausa={mot,msg:msg(),cuando:dur[1]?('a las '+hasta(dur[1])):'mañana en su horario'};
+      draw();close();
+      toast(t.n+' en pausa. '+(dur[1]?'Reabre solo a las '+hasta(dur[1]):'Reabre mañana'))}};
+  render();wire();
+}
+
+/* ---------- nombre, ubicación y foto del truck ----------
+   El comensal ve esto al escanear: así sabe que está en el truck correcto.
+   La foto es del truck real del cliente, nunca una imagen genérica. */
+let fotoTmp=null;
+function fotoPinta(){
+  const p=$('#fp');if(!p)return;
+  p.classList.toggle('has',!!fotoTmp);
+  p.innerHTML=fotoTmp?'<img src="'+fotoTmp+'" alt="">':'Sin foto<br>todavía';
+  $('#fPick').textContent=fotoTmp?'Cambiar foto':'Elegir foto';
+  $('#fDel').hidden=!fotoTmp;
+}
+function editarTruck(id){
+  const t=TK.find(x=>x.id===id);fotoTmp=t.foto||null;
+  open('<h3>'+t.n+'</h3><p>Esto es lo que ve tu cliente al escanear el código de este truck.</p>'+
+    '<label>Foto del truck</label>'+
+    '<div class="fotoBox"><div class="fotoPrev" id="fp"></div>'+
+      '<div class="fotoAct">'+
+        '<button type="button" class="btn" id="fPick"></button>'+
+        '<button type="button" class="btn" id="fDel" hidden>Quitar</button>'+
+        '<p>Una foto del truck como se ve por fuera. Sirve para que el cliente confirme que está en el correcto.</p>'+
+      '</div></div><input type="file" id="fIn" accept="image/*">'+
+    '<label for="tn">¿Cómo le dices a este truck?</label>'+
+    '<input type="text" id="tn" value="'+t.n.replace(/"/g,'&quot;')+'" autocomplete="off">'+
+    '<label for="tl">¿Dónde se para normalmente?</label>'+
+    '<input type="text" id="tl" value="'+t.loc.replace(/"/g,'&quot;')+'" autocomplete="off">'+
+    '<div class="acts2"><button class="btn" id="c">Cancelar</button>'+
+    '<button class="btn primary" id="ok">Guardar</button></div>');
+  fotoPinta();
+  $('#fPick').onclick=()=>$('#fIn').click();
+  $('#fDel').onclick=()=>{fotoTmp=null;fotoPinta()};
+  $('#fIn').onchange=()=>{const f=$('#fIn').files[0];if(!f)return;
+    fotoTmp=URL.createObjectURL(f);fotoPinta();$('#fIn').value=''};
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{
+    const n=$('#tn').value.trim(), l=$('#tl').value.trim();
+    if(!n){toast('El truck necesita un nombre');return}
+    const teniaFoto=!!t.foto;
+    t.n=n;t.loc=l||t.loc;t.foto=fotoTmp;
+    draw();close();
+    toast(!teniaFoto&&t.foto?n+' ya tiene foto':'Guardado')};
+}
+
+/* ---------- horario, día por día ---------- */
+function horario(id){
+  const t=TK.find(x=>x.id===id), h=JSON.parse(JSON.stringify(t.h));
+  const render=()=>{
+    const r=resumen(h);
+    open('<h3>Horario de '+t.n+'</h3>'+
+      '<p>Fuera de este horario tu menú avisa que están cerrados. Si un día no abres, apágalo.</p>'+
+      '<div class="hgrid" id="hg">'+h.map((d,i)=>
+        '<div class="hrow'+(d.abierto?'':' off')+'">'+
+          '<button class="hsw" role="switch" aria-checked="'+d.abierto+'" data-d="'+i+'" aria-label="'+DIAS[i]+'"><i></i></button>'+
+          '<span class="hd">'+DIAS[i]+'</span>'+
+          (d.abierto
+            ? '<span class="ht"><input type="time" data-ab="'+i+'" value="'+d.ab+'">'+
+              '<em>a</em><input type="time" data-ci="'+i+'" value="'+d.ci+'"></span>'
+            : '<span class="hc">Cerrado</span>')+
+        '</div>').join('')+'</div>'+
+      '<div class="hall"><button class="btn mini" id="hAll">Poner este horario todos los días</button></div>'+
+      '<div class="hres">Quedaría: <b>'+r.hor+(r.dias?' · '+r.dias:'')+'</b></div>'+
+      '<div class="acts2"><button class="btn" id="c">Cancelar</button>'+
+      '<button class="btn primary" id="ok">Guardar horario</button></div>');
+    wire();
+  };
+  const wire=()=>{
+    $('#hg').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.d;h[i].abierto=!h[i].abierto;render()});
+    $('#hg').querySelectorAll('[data-ab]').forEach(inp=>inp.onchange=()=>{
+      h[+inp.dataset.ab].ab=inp.value||'11:00';render()});
+    $('#hg').querySelectorAll('[data-ci]').forEach(inp=>inp.onchange=()=>{
+      h[+inp.dataset.ci].ci=inp.value||'21:00';render()});
+    $('#hAll').onclick=()=>{
+      const base=h.find(d=>d.abierto);
+      if(!base){toast('Enciende al menos un día primero');return}
+      h.forEach(d=>{if(d.abierto){d.ab=base.ab;d.ci=base.ci}});render();
+      toast('Mismo horario en todos los días que abres')};
+    $('#c').onclick=close;
+    $('#ok').onclick=()=>{
+      const malos=h.filter(d=>d.abierto&&d.ab>=d.ci);
+      if(malos.length){toast('Revisa: hay días donde la hora de cierre no va después de la de apertura');return}
+      t.h=h;draw();close();
+      const r=resumen(t.h);
+      toast(t.n+': '+r.hor+(r.dias?' · '+r.dias:''))};
+  };
+  render();
+}
+
+/* ---------- umbral propio por truck ---------- */
+function umbral(id){
+  const t=TK.find(x=>x.id===id);
+  if(t.um){t.um=null;draw();toast(t.n+' vuelve a usar los avisos del negocio');return}
+  let a=CFG.amber,r=CFG.red;
+  open('<h3>Avisos propios de '+t.n+'</h3>'+
+    '<p>Úsalo si este truck vende algo que tarda distinto, o si tiene mucha más fila que los otros. '+
+    'Ahora mismo usa los del negocio: '+CFG.amber+' y '+CFG.red+' minutos.</p>'+
+    '<label>Solo para '+t.n+'</label>'+
+    '<div class="mins" style="margin-bottom:18px"><span class="chip a">Ámbar</span>'+
+      '<input type="number" id="ma" min="1" max="60" value="'+a+'">'+
+      '<span class="chip r">Rojo</span><input type="number" id="mr" min="2" max="90" value="'+r+'">'+
+      '<span style="font-size:13px;color:var(--ink2)">minutos</span></div>'+
+    '<div class="acts2"><button class="btn" id="c">Cancelar</button>'+
+    '<button class="btn primary" id="ok">Guardar</button></div>');
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{
+    a=Math.max(1,+$('#ma').value||8);r=Math.max(a+1,+$('#mr').value||15);
+    t.um={amber:a,red:r};draw();close();toast(t.n+' ahora avisa a los '+a+' y '+r+' minutos')};
+}
+
+/* ---------- baja: archiva, no borra ---------- */
+function baja(id){const t=TK.find(x=>x.id===id);
+  open('<h3>¿Dar de baja '+t.n+'?</h3>'+
+    '<p>Deja de recibir pedidos y su código QR deja de servir. <b>Su información no se borra:</b> '+
+    'sus ventas siguen apareciendo en tus comparaciones, incluso las del año pasado. '+
+    'Lo guardamos dos años por si lo quieres reactivar — y reactivarlo toma minutos, no un alta nueva.</p>'+
+    '<p>Dejas de pagarlo desde el siguiente periodo. Este mes ya está cubierto.</p>'+
+    '<div class="acts2"><button class="btn" id="c">Mejor no</button>'+
+    '<button class="btn danger" id="ok">Pedir la baja</button></div>');
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{close();toast('Recibimos tu solicitud. Te confirmamos hoy mismo')}}
+
+$('#pedir').onclick=()=>{
+  open('<h3>Pedir un truck nuevo</h3>'+
+    '<p>Te llamamos para confirmar dónde va a estar, sus horarios y si vende algo distinto a los demás. '+
+    'Lo dejamos listo con tu menú, tu marca y su QR para imprimir.</p>'+
+    '<p><b>Con 4 trucks tu precio baja a $29 por unidad</b>, o sea $116 al mes en total. '+
+    'Empieza a contar desde el siguiente periodo.</p>'+
+    '<div class="acts2"><button class="btn" id="c">Ahora no</button>'+
+    '<button class="btn primary" id="ok">Sí, contáctenme</button></div>');
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{close();toast('Listo, te contactamos hoy mismo')}};
+
+$('#uA').oninput=e=>{CFG.amber=Math.max(1,+e.target.value||8);draw()};
+$('#uR').oninput=e=>{CFG.red=Math.max(CFG.amber+1,+e.target.value||15);draw()};
+$('#tax').querySelectorAll('.radio').forEach(b=>b.onclick=()=>{
+  CFG.tax=b.dataset.x;
+  $('#tax').querySelectorAll('.radio').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  toast(CFG.tax==='add'?'El impuesto se suma al final':'Los precios del menú ya incluyen impuesto')});
+
+draw();
+</script>
+</body>
+</html>

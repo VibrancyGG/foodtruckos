@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A · Rotulación — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#D62828;
+  --on-primary:#fff;
+  --ink:#1A1512;
+  --ink-soft:#6B615A;
+  --panel:#FFFDF9;
+  --line:#E4DCD0;
+  --sold:#9A8F86;
+  --display:'Anton','Haettenschweiler','Arial Narrow',sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#DDD6CC;
+  font-family:var(--body);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- barra de prueba (no es parte del producto) ---------- */
+.lab{position:sticky;top:0;z-index:60;background:#1D1D1F;color:#EDEDEF;font:500 12px/1.4 var(--body);padding:8px 12px}
+.lab-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.lab b{font-weight:600;letter-spacing:.02em}
+.lab-tag{background:#3A3A3E;padding:2px 7px;border-radius:3px;font-size:11px}
+.sw{display:flex;gap:5px}
+.sw button{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff}
+.lab select,.lab a,.lab .ghost{background:#3A3A3E;color:#EDEDEF;border:0;border-radius:4px;padding:4px 8px;font:500 12px var(--body);cursor:pointer;text-decoration:none}
+.lab .ratio{margin-left:auto;font-variant-numeric:tabular-nums}
+.lab .ok{color:#7CE38B}.lab .bad{color:#FF8A80}
+body.clean .lab{display:none}
+
+/* ---------- lienzo ---------- */
+.phone{max-width:430px;margin:0 auto;background:var(--panel);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.14)}
+
+/* ---------- encabezado: panel pintado ---------- */
+.top{background:var(--primary);color:var(--on-primary);padding:18px 18px 20px;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;inset:auto 0 0;height:6px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 14px,transparent 14px 28px)}
+.brandline{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;border-radius:50%;background:var(--on-primary);color:var(--primary);font-family:var(--display);font-size:26px;display:grid;place-items:center;flex:none;line-height:1}
+.bname{font-family:var(--display);font-size:30px;line-height:.95;letter-spacing:.01em;text-transform:uppercase;margin:0}
+.bsub{font-size:12.5px;opacity:.9;margin-top:3px;font-weight:500}
+.state{display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:rgba(0,0,0,.2);border-radius:100px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.28)}
+
+/* ---------- banda de categoría: rótulo pintado ---------- */
+.cat{background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:22px;letter-spacing:.06em;text-transform:uppercase;padding:9px 18px;position:sticky;top:0;z-index:20}
+body:not(.clean) .cat{top:38px}
+
+/* ---------- platillo ---------- */
+.item{display:grid;grid-template-columns:78px 1fr auto;gap:13px;align-items:start;padding:15px 18px;border-bottom:1px solid var(--line);background:var(--panel);width:100%;text-align:left;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;cursor:pointer}
+.item:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.thumb{width:78px;height:78px;border-radius:3px;background:var(--primary);display:grid;place-items:center;position:relative;overflow:hidden}
+.thumb span{font-family:var(--display);font-size:38px;color:var(--on-primary);opacity:.92;line-height:1}
+.thumb::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(0,0,0,.13) 0 6px,transparent 6px 12px)}
+.iname{display:block;font-family:var(--display);font-size:22px;line-height:1.02;text-transform:uppercase;letter-spacing:.01em;margin:2px 0 0;text-shadow:2px 2px 0 var(--line)}
+.idesc{display:block;font-size:13px;line-height:1.38;color:var(--ink-soft);margin:6px 0 0}
+.price{font-family:var(--display);font-size:23px;line-height:1;padding-top:3px;white-space:nowrap;text-shadow:2px 2px 0 var(--line)}
+.item.out{background:#F6F2EC}
+.item.out .thumb{background:var(--sold)}
+.item.out .iname,.item.out .price{color:var(--sold);text-shadow:none}
+.out-tag{display:inline-block;margin-top:7px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+
+/* ---------- pie ---------- */
+.foot{padding:26px 18px 120px;text-align:center;color:var(--ink-soft);font-size:12px}
+.foot .made{opacity:.6;margin-top:6px;font-size:11px}
+
+/* ---------- barra de pedido ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:430px;margin:0 auto;padding:11px 14px calc(11px + env(safe-area-inset-bottom));background:var(--ink)}
+.bar button{width:100%;border:0;border-radius:5px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:20px;letter-spacing:.04em;text-transform:uppercase;padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.bar button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.bar .n{background:rgba(0,0,0,.25);border-radius:100px;padding:2px 10px;font-size:15px}
+.bar[hidden]{display:none}
+
+/* ---------- hoja de personalización ---------- */
+.veil{position:fixed;inset:0;background:rgba(26,21,18,.55);z-index:70;opacity:0;pointer-events:none;transition:opacity .18s}
+.veil.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:80;max-width:430px;margin:0 auto;background:var(--panel);border-radius:14px 14px 0 0;max-height:92vh;overflow:auto;transform:translateY(100%);transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.sheet-hd{background:var(--primary);color:var(--on-primary);padding:16px 18px}
+.sheet-hd h2{font-family:var(--display);font-size:27px;text-transform:uppercase;margin:0;line-height:1.02}
+.sheet-hd p{margin:7px 0 0;font-size:13px;line-height:1.4;opacity:.92}
+.step{padding:16px 18px;border-bottom:1px solid var(--line)}
+.step h3{font-family:var(--display);font-size:16px;letter-spacing:.05em;text-transform:uppercase;margin:0 0 11px;color:var(--ink-soft)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:5px;padding:11px 14px;font:600 14.5px var(--body);color:var(--ink);cursor:pointer;min-height:46px}
+.opt[aria-pressed=true]{border-color:var(--primary);background:var(--primary);color:var(--on-primary)}
+.opt:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.opt small{display:block;font-weight:500;opacity:.75;font-size:12px}
+.qty{display:flex;align-items:center;gap:16px}
+.qty button{width:52px;height:52px;border-radius:5px;border:2px solid var(--ink);background:#fff;font-family:var(--display);font-size:26px;line-height:1;cursor:pointer;color:var(--ink)}
+.qty output{font-family:var(--display);font-size:30px;min-width:38px;text-align:center}
+.note{width:100%;border:2px solid var(--line);border-radius:5px;padding:11px;font:500 14.5px var(--body);min-height:60px;resize:vertical;color:var(--ink)}
+.note:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.sheet-ft{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:13px 18px calc(13px + env(safe-area-inset-bottom));display:flex;gap:11px}
+.sheet-ft .cancel{flex:none;border:2px solid var(--line);background:#fff;border-radius:5px;padding:0 17px;font:600 14.5px var(--body);cursor:pointer;color:var(--ink-soft)}
+.sheet-ft .add{flex:1;border:0;border-radius:5px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:19px;letter-spacing:.04em;text-transform:uppercase;padding:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <div class="lab-row">
+    <b>A · Rotulación</b><span class="lab-tag" id="tagName">Rojo chile</span>
+    <div class="sw" id="sw" role="group" aria-label="Paleta"></div>
+    <button class="ghost" id="lang">EN</button>
+    <a href="index.html">← Todas</a>
+    <button class="ghost" id="hide">Ocultar</button>
+    <span class="ratio" id="ratio"></span>
+  </div>
+</div>
+
+<div class="phone">
+  <header class="top">
+    <div class="brandline">
+      <div class="mark">EF</div>
+      <div>
+        <h1 class="bname">Taquería<br>El Farol</h1>
+        <p class="bsub" id="truck">Truck 1 · Main &amp; Porter</p>
+      </div>
+    </div>
+    <div class="state"><span class="dot"></span><span id="hours">Abierto · cierra 9:00 pm</span></div>
+  </header>
+  <main id="menu"></main>
+  <footer class="foot">
+    <div id="taxline">Los precios no incluyen impuesto (8.625%)</div>
+    <div class="made">FoodTruckOS</div>
+  </footer>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <button id="barBtn"><span id="barTxt">Ver pedido</span><span class="n" id="barN">0</span></button>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shName"></div>
+
+<script>
+/* ============ paleta curada (10 opciones) ============ */
+const PALETTE=[
+ {es:'Rojo chile',en:'Chile red',hex:'#D62828'},
+ {es:'Naranja trompo',en:'Trompo orange',hex:'#F4661B'},
+ {es:'Amarillo maíz',en:'Corn yellow',hex:'#F2A413'},
+ {es:'Verde nopal',en:'Nopal green',hex:'#257B4B'},
+ {es:'Verde limón',en:'Lime green',hex:'#7CB518'},
+ {es:'Turquesa',en:'Turquoise',hex:'#0C7979'},
+ {es:'Azul talavera',en:'Talavera blue',hex:'#1F5FBF'},
+ {es:'Morado jamaica',en:'Jamaica purple',hex:'#7B2D8E'},
+ {es:'Rosa mexicano',en:'Mexican pink',hex:'#D11072'},
+ {es:'Café mole',en:'Mole brown',hex:'#8A3B12'}
+];
+const INK='#1A1512';
+const lum=h=>{const c=h.slice(1).match(/../g).map(x=>{const v=parseInt(x,16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const ratio=(a,b)=>{const A=lum(a),B=lum(b);return (Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
+const onColor=h=>ratio(h,'#FFFFFF')>=ratio(h,INK)?'#FFFFFF':INK;
+
+/* ============ menú real de Taquería El Farol ============ */
+const EXTRAS=[['Queso','Cheese',1],['Aguacate','Avocado',1.5],['Doble carne','Double meat',2.5],['Salsa de la casa','House salsa',0]];
+const QT=[['Cebolla','Onion'],['Cilantro','Cilantro'],['Limón','Lime']];
+const QB=[['Jalapeño','Jalapeño'],['Aguacate','Avocado'],['Frijoles','Beans'],['Crema','Crema']];
+const MENU=[
+{es:'Tacos',en:'Tacos',ex:EXTRAS,q:QT,items:[
+ ['Al pastor','Al pastor',3.25,'Del trompo, marinado 24 horas en guajillo y achiote. Con piña asada.','Off the spit, 24-hour guajillo and achiote marinade. Grilled pineapple.'],
+ ['Asada','Asada',3.50,'Res al carbón, picada gruesa para que se sienta.','Charcoal beef, chopped coarse so you can feel it.'],
+ ['Chorizo','Chorizo',3.00,'Hecho en casa, con papa cuando la hay.','House-made, with potato when we have it.'],
+ ['Lengua','Lengua',3.75,'Cocida seis horas hasta que se deshace.','Six hours until it falls apart.'],
+ ['Tripa','Tripa',3.50,'Bien dorada. Si la pide blanda, avísele a Beto.','Crisped hard. If you want it soft, tell Beto.',1],
+ ['Nopal','Nopal',2.75,'Nopal asado con cebolla cambray. Sin carne.','Grilled cactus with spring onion. No meat.']]},
+{es:'De la casa',en:'House specials',ex:EXTRAS,q:QT,items:[
+ ['Quesabirria (3 pzas)','Quesabirria (3 pcs)',13.50,'Tortilla sumergida en el consomé y dorada con queso. Va con su vasito para mojar.','Tortillas dipped in consommé and crisped with cheese. Comes with a cup for dipping.'],
+ ['Mulita de asada','Asada mulita',6.50,'Dos tortillas, queso derretido en medio, carne al carbón.','Two tortillas, melted cheese between, charcoal beef.'],
+ ['Vampiro','Vampiro',5.75,'Tortilla tatemada hasta quedar tostada, queso y la carne que elija.','Tortilla charred until crisp, cheese, and the meat you pick.']]},
+{es:'Tortas y burritos',en:'Tortas & burritos',ex:EXTRAS,q:QB,items:[
+ ['Torta de milanesa','Milanesa torta',12.00,'Pan telera, milanesa de res, aguacate, frijoles, jalapeño.','Telera roll, breaded beef, avocado, beans, jalapeño.'],
+ ['Torta ahogada','Torta ahogada',11.50,'Bañada en salsa de chile de árbol. Pida servilletas de más.','Drowned in chile de árbol salsa. Ask for extra napkins.'],
+ ['Burrito de asada','Asada burrito',11.00,'Tortilla de harina, arroz, frijol, carne al carbón, guacamole.','Flour tortilla, rice, beans, charcoal beef, guacamole.']]},
+{es:'Antojitos',en:'Sides',ex:null,q:null,items:[
+ ['Elote entero','Whole elote',4.50,'Mayonesa, queso cotija, chile en polvo y limón.','Mayo, cotija, chile powder and lime.'],
+ ['Esquites','Esquites',5.00,'El mismo elote, en vaso, con caldo.','Same elote, in a cup, with broth.'],
+ ['Papas con queso','Loaded fries',8.50,'Papa frita, queso, carne al carbón y crema.','Fries, cheese, charcoal beef and crema.'],
+ ['Consomé de birria','Birria consommé',4.00,'Un vaso grande. Para el frío o para la cruda.','Large cup. For the cold or for the hangover.']]},
+{es:'Bebidas',en:'Drinks',ex:null,q:null,items:[
+ ['Agua de horchata','Horchata',3.50,'Arroz y canela, hecha en la mañana.','Rice and cinnamon, made this morning.'],
+ ['Agua de jamaica','Jamaica',3.50,'Flor de jamaica, poca azúcar.','Hibiscus, light on the sugar.'],
+ ['Jarritos','Jarritos',2.75,'Mandarina, tamarindo o toronja.','Mandarin, tamarind or grapefruit.'],
+ ['Coca de vidrio','Mexican Coke',3.25,'De caña. No es lo mismo y usted lo sabe.','Cane sugar. Not the same and you know it.']]}
+];
+
+/* ============ textos de interfaz ============ */
+const T={
+ es:{hours:'Abierto · cierra 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Los precios no incluyen impuesto (8.625%)',
+     out:'Se nos acabó',bar:'Ver pedido',qty:'¿Cuántos?',extras:'¿Le agregamos algo?',remove:'¿Le quitamos algo?',
+     note:'¿Algo más que debamos saber?',notePh:'Ej: sin picante, para llevar',cancel:'Cerrar',add:'Agregar',free:'Sin costo'},
+ en:{hours:'Open · closes 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Prices do not include tax (8.625%)',
+     out:'Sold out',bar:'View order',qty:'How many?',extras:'Add anything?',remove:'Take anything off?',
+     note:'Anything else we should know?',notePh:'e.g. no spice, to go',cancel:'Close',add:'Add',free:'Free'}
+};
+let lang='es',cart=0;
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toFixed(2);
+
+/* ============ paleta ============ */
+function paint(i){
+  const p=PALETTE[i],on=onColor(p.hex);
+  document.documentElement.style.setProperty('--primary',p.hex);
+  document.documentElement.style.setProperty('--on-primary',on);
+  $('#tagName').textContent=p[lang];
+  const r=ratio(p.hex,on);
+  $('#ratio').innerHTML='texto/acento <span class="'+(r>=4.5?'ok':'bad')+'">'+r.toFixed(2)+':1 '+(r>=4.5?'✓':'✕')+'</span>';
+  [...$('#sw').children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+}
+PALETTE.forEach((p,i)=>{
+  const b=document.createElement('button');
+  b.style.background=p.hex;b.title=p.es;b.setAttribute('aria-label',p.es);
+  b.onclick=()=>paint(i);$('#sw').appendChild(b);
+});
+
+/* ============ render ============ */
+function render(){
+  const t=T[lang];
+  $('#hours').textContent=t.hours;$('#truck').textContent=t.truck;$('#taxline').textContent=t.tax;
+  $('#barTxt').textContent=t.bar;
+  $('#menu').innerHTML=MENU.map((c,ci)=>
+    '<h2 class="cat">'+c[lang]+'</h2>'+
+    c.items.map((it,ii)=>{
+      const out=it[5];
+      return '<button class="item'+(out?' out':'')+'" data-c="'+ci+'" data-i="'+ii+'"'+(out?' disabled':'')+'>'+
+        '<span class="thumb"><span>'+it[lang==='es'?0:1][0]+'</span></span>'+
+        '<span><span class="iname">'+it[lang==='es'?0:1]+'</span>'+
+        '<span class="idesc">'+it[lang==='es'?3:4]+'</span>'+
+        (out?'<span class="out-tag">'+t.out+'</span>':'')+'</span>'+
+        '<span class="price">'+money(it[2])+'</span></button>';
+    }).join('')
+  ).join('');
+  $('#menu').querySelectorAll('.item:not(.out)').forEach(b=>b.onclick=()=>openSheet(+b.dataset.c,+b.dataset.i));
+}
+
+/* ============ hoja de personalización (pasos, no formulario) ============ */
+let q=1,picked=new Set(),removed=new Set(),cur=null;
+function openSheet(ci,ii){
+  const t=T[lang],c=MENU[ci],it=c.items[ii];cur={c,it};q=1;picked=new Set();removed=new Set();
+  $('#sheet').innerHTML=
+    '<div class="sheet-hd"><h2 id="shName">'+it[lang==='es'?0:1]+'</h2><p>'+it[lang==='es'?3:4]+'</p></div>'+
+    '<div class="step"><h3>'+t.qty+'</h3><div class="qty">'+
+      '<button data-q="-1" aria-label="−">−</button><output id="q">1</output><button data-q="1" aria-label="+">+</button></div></div>'+
+    (c.ex?'<div class="step"><h3>'+t.extras+'</h3><div class="opts">'+c.ex.map((e,j)=>
+      '<button class="opt" data-ex="'+j+'" aria-pressed="false">'+e[lang==='es'?0:1]+
+      '<small>'+(e[2]?'+'+money(e[2]):t.free)+'</small></button>').join('')+'</div></div>':'')+
+    (c.q?'<div class="step"><h3>'+t.remove+'</h3><div class="opts">'+c.q.map((e,j)=>
+      '<button class="opt" data-rm="'+j+'" aria-pressed="false">'+e[lang==='es'?0:1]+'</button>').join('')+'</div></div>':'')+
+    '<div class="step"><h3>'+t.note+'</h3><textarea class="note" placeholder="'+t.notePh+'"></textarea></div>'+
+    '<div class="sheet-ft"><button class="cancel" id="x">'+t.cancel+'</button>'+
+      '<button class="add" id="ok"><span>'+t.add+'</span><span id="tot"></span></button></div>';
+  const total=()=>{let s=cur.it[2];picked.forEach(j=>s+=cur.c.ex[j][2]);return s*q};
+  const sync=()=>{$('#q').textContent=q;$('#tot').textContent=money(total())};
+  $('#sheet').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{q=Math.max(1,q+ +b.dataset.q);sync()});
+  $('#sheet').querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.ex;picked.has(j)?picked.delete(j):picked.add(j);
+    b.setAttribute('aria-pressed',picked.has(j));sync()});
+  $('#sheet').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.rm;removed.has(j)?removed.delete(j):removed.add(j);
+    b.setAttribute('aria-pressed',removed.has(j))});
+  $('#x').onclick=close;
+  $('#ok').onclick=()=>{cart+=q;$('#barN').textContent=cart;$('#bar').hidden=false;close()};
+  sync();
+  $('#veil').classList.add('on');$('#sheet').classList.add('on');
+}
+function close(){$('#veil').classList.remove('on');$('#sheet').classList.remove('on')}
+$('#veil').onclick=close;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+/* ============ controles de prueba ============ */
+$('#lang').onclick=()=>{lang=lang==='es'?'en':'es';$('#lang').textContent=lang==='es'?'EN':'ES';
+  document.documentElement.lang=lang;render();paint([...$('#sw').children].findIndex(b=>b.getAttribute('aria-pressed')==='true'))};
+$('#hide').onclick=()=>document.body.classList.add('clean');
+render();paint(0);
+</script>
+</body>
+</html>

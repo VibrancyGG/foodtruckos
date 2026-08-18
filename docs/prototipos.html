@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoodTruckOS — Prototipos de Fase 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17171A;--soft:#6C6C72;--line:#E6E4DF;--bg:#FAFAF8;--card:#FFF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding:56px 24px 100px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:0}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:14px 0 0}
+.lede{font-size:17px;color:var(--soft);max-width:62ch;margin:18px 0 0}
+h2{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:52px 0 6px}
+.h2s{font-size:14px;color:var(--soft);margin:0 0 16px;max-width:62ch}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.c{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:19px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.c:hover,.c:focus-visible{border-color:var(--ink);transform:translateY(-2px)}
+.c:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.c b{display:block;font-size:17px;font-weight:800;letter-spacing:-.02em}
+.c p{font-size:13.5px;color:var(--soft);margin:7px 0 0}
+.c .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:3px 9px;margin-top:12px}
+.strip{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:15px}
+.strip i{flex:1}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--soft)}
+td:first-child{font-weight:600;white-space:nowrap}
+.ok{color:#006300;font-weight:700}
+.no{color:#B0700A;font-weight:700}
+.foot{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">FoodTruckOS · Taquería El Farol</p>
+<h1>Prototipos de Fase 1</h1>
+<p class="lede">Las cuatro superficies del producto, funcionando. No son maquetas: los pedidos avanzan, los precios se calculan, los códigos QR escanean de verdad y el menú se re-marca en vivo.</p>
+
+<h2>Lo que ve el comensal</h2>
+<p class="h2s">Con la marca del cliente. FoodTruckOS no aparece.</p>
+<div class="grid">
+  <a class="c" href="propuestas-menu/menu-comensal.html">
+    <div class="strip"><i style="background:#D62828"></i><i style="background:#F4661B"></i><i style="background:#F2A413"></i><i style="background:#257B4B"></i></div>
+    <b>Menú del comensal</b>
+    <p>Dos estilos intercambiables, diez colores, español e inglés, y el armado de tacos y burritos por pasos.</p>
+    <span class="tag">Vibrante · Tradicional</span>
+  </a>
+  <a class="c" href="propuestas-menu/seguimiento.html">
+    <b>Seguimiento del pedido</b>
+    <p>Después de ordenar: número grande, en qué va, cuánto debe y aviso cuando esté listo.</p>
+    <span class="tag">Sin cuenta</span>
+  </a>
+  <a class="c" href="propuestas-menu/index.html">
+    <b>Las tres propuestas</b>
+    <p>La exploración de la que salieron los dos estilos, con lo que costó cada dirección.</p>
+    <span class="tag">Referencia</span>
+  </a>
+</div>
+
+<h2>Lo que ve la cocina</h2>
+<p class="h2s">Color solo con función. El color de marca del cliente no entra aquí.</p>
+<div class="grid">
+  <a class="c" href="propuestas-cocina/pantalla-cocina.html">
+    <b>Pantalla de cocina</b>
+    <p>Tres columnas, un toque para avanzar. Simula pedidos entrando, pérdida de conexión y el paso del tiempo.</p>
+    <span class="tag">Cocina y cajero</span>
+  </a>
+  <a class="c" href="propuestas-cocina/vista-trucks.html">
+    <b>Los tres trucks</b>
+    <p>Vista de monitoreo para el dueño y el encargado. Nunca en la pantalla del cocinero.</p>
+    <span class="tag">Encargado</span>
+  </a>
+</div>
+
+<h2>Lo que ve el dueño</h2>
+<p class="h2s">Aquí sí manda la marca FoodTruckOS: moderno, sobrio, números grandes.</p>
+<div class="grid">
+  <a class="c" href="propuestas-panel/panel-dueno.html">
+    <b>Resumen</b>
+    <p>Crecimiento contra el mes pasado y contra el año pasado, comparación entre trucks y actividad de venta.</p>
+    <span class="tag">La pantalla que retiene</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-marca.html">
+    <b>Marca</b>
+    <p>Cuatro decisiones con vista previa en vivo. Sube un logo real y aparece al instante.</p>
+    <span class="tag">La pantalla que vende</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-menu.html">
+    <b>Menú</b>
+    <p>Precios, agotados y platillos exclusivos de un truck. Cambiar un precio no toca las ventas pasadas.</p>
+    <span class="tag">Uso diario</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-trucks.html">
+    <b>Trucks</b>
+    <p>Pausa con reapertura automática, horarios, impuesto y los umbrales de aviso de cocina.</p>
+    <span class="tag">Configuración</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-personal.html">
+    <b>Personal</b>
+    <p>PINs y aparatos conectados. Alta, baja y revocación inmediata, sin llamar a nadie.</p>
+    <span class="tag">Accesos</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-qr.html">
+    <b>Códigos QR</b>
+    <p>Un QR real por truck, descargable en PNG y con carteles listos para imprimir.</p>
+    <span class="tag">Escanéalos</span>
+  </a>
+  <a class="c" href="propuestas-panel/panel-cuenta.html">
+    <b>Cuenta</b>
+    <p>Lo que paga, cuándo se cobra, sus recibos y cómo cancelar. Con la escalera de precios a la vista.</p>
+    <span class="tag">Sin permanencia</span>
+  </a>
+</div>
+
+<h2>Lo que vemos nosotros</h2>
+<p class="h2s">Herramienta de trabajo interno, deliberadamente sin adornos.</p>
+<div class="grid">
+  <a class="c" href="propuestas-admin/admin-interno.html">
+    <b>Admin interno</b>
+    <p>Clientes, suscripciones, suspensiones y solicitudes de alta o baja de trucks.</p>
+    <span class="tag">Interno</span>
+  </a>
+</div>
+
+<h2>Alcance de Fase 1</h2>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>Requisito del brief</th><th>Dónde está</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>Pedido por QR con personalización</td><td>Menú del comensal</td><td class="ok">Listo</td></tr>
+<tr><td>Captura en ventanilla</td><td>Pantalla de cocina</td><td class="ok">Listo</td></tr>
+<tr><td>Cocina en vivo, un toque</td><td>Pantalla de cocina</td><td class="ok">Listo</td></tr>
+<tr><td>Marcar agotado desde cocina</td><td>Cocina y Menú</td><td class="ok">Listo</td></tr>
+<tr><td>Comparativas de crecimiento</td><td>Resumen</td><td class="ok">Listo</td></tr>
+<tr><td>Actividad de venta por truck</td><td>Resumen</td><td class="ok">Listo</td></tr>
+<tr><td>Marca configurable con vista previa</td><td>Marca</td><td class="ok">Listo</td></tr>
+<tr><td>Menú base + exclusivos por truck</td><td>Menú</td><td class="ok">Listo</td></tr>
+<tr><td>PINs y aparatos</td><td>Personal</td><td class="ok">Listo</td></tr>
+<tr><td>Pausa con reapertura automática</td><td>Trucks</td><td class="ok">Listo</td></tr>
+<tr><td>Umbrales de cocina configurables</td><td>Trucks</td><td class="ok">Listo</td></tr>
+<tr><td>Impuesto parametrizable</td><td>Trucks</td><td class="ok">Listo</td></tr>
+<tr><td>QR descargables</td><td>Códigos QR</td><td class="ok">Listo</td></tr>
+<tr><td>Alta de clientes y suscripciones</td><td>Admin interno</td><td class="ok">Listo</td></tr>
+<tr><td>Plan, recibos y cancelación del dueño</td><td>Cuenta</td><td class="ok">Listo</td></tr>
+<tr><td>Horarios por día de la semana</td><td>Trucks</td><td class="ok">Listo</td></tr>
+<tr><td>Seguimiento del pedido para el comensal</td><td>Seguimiento</td><td class="ok">Listo</td></tr>
+<tr><td>Base de datos y aislamiento entre negocios</td><td>Supabase</td><td class="no">Proyecto creado, esquema sin construir</td></tr>
+<tr><td>La aplicación real</td><td>C:\dev\foodtruckos</td><td class="no">Sin empezar</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="foot">
+  Datos de prueba: menú real de Taquería El Farol rescatado del prototipo anterior. Precios y textos de la carta son reales;
+  los del armado de tacos y burritos son de demostración. Ningún platillo tiene foto todavía, por eso los marcadores son honestos.
+  <br>
+  Los códigos QR se generan en el navegador y fueron verificados por lectura de vuelta — escanéalos para confirmarlo.
+</div>
+
+</div>
+</body>
+</html>

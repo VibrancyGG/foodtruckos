@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cómo usar la pantalla de cocina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#141210;--soft:#5A544E;--line:#E4DFD6;--bg:#FBF9F5;--card:#FFF;
+ --green:#1B7F4F;--greenBg:#E8F5EE;--amber:#B0700A;--amberBg:#FDF3E0;--red:#C4292E;--redBg:#FDECEC;
+ --blue:#1F5FBF;--blueBg:#EEF3FB;--f:'Inter',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+.top{background:var(--ink);color:#fff;padding:13px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+.top b{font-size:15px;font-weight:800}
+.lang{margin-left:auto;display:flex;gap:0;border-radius:8px;overflow:hidden}
+.lang button{border:0;background:#33302B;color:#D8D5D0;padding:8px 16px;font:800 13px var(--f);cursor:pointer}
+.lang button[aria-pressed=true]{background:#fff;color:var(--ink)}
+.top a{color:#B9B7AF;font-size:12.5px;text-decoration:none;font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:26px 20px 80px}
+h1{font-size:clamp(27px,6vw,36px);font-weight:900;letter-spacing:-.03em;line-height:1.08;margin:0}
+.lede{font-size:17px;color:var(--soft);margin:12px 0 0}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:16px;display:flex;gap:18px}
+.step .n{width:42px;height:42px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;
+  font-size:20px;font-weight:900;flex:none;line-height:1}
+.step .b{min-width:0;flex:1}
+.step h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:4px 0 8px;line-height:1.2}
+.step p{font-size:16px;color:var(--soft);margin:0}
+.step p+p{margin-top:10px}
+.step b{color:var(--ink);font-weight:800}
+.big{font-size:19px!important;font-weight:800;color:var(--ink)!important}
+
+.colors{display:grid;gap:10px;margin-top:14px}
+.c{display:flex;align-items:center;gap:14px;border-radius:12px;padding:14px 16px}
+.c .sw{width:30px;height:30px;border-radius:8px;flex:none}
+.c b{display:block;font-size:17px;font-weight:800}
+.c span{display:block;font-size:15px;margin-top:1px}
+.c.g{background:var(--greenBg)}.c.g .sw{background:var(--green)}.c.g b,.c.g span{color:#14603C}
+.c.a{background:var(--amberBg)}.c.a .sw{background:#F5A524}.c.a b,.c.a span{color:#6B4A12}
+.c.r{background:var(--redBg)}.c.r .sw{background:var(--red)}.c.r b,.c.r span{color:#8A1F23}
+
+.mods{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.mod{font-size:17px;font-weight:800;border-radius:8px;padding:9px 15px}
+.mod.add{background:#1F2E22;color:#7EE2A8}
+.mod.rm{background:#3A1E1F;color:#FF9EA1}
+
+.warn{background:var(--amberBg);border:1px solid #F0D9A8;border-radius:14px;padding:18px 20px;margin-top:16px}
+.warn b{display:block;font-size:17px;font-weight:800;color:#6B4A12;margin-bottom:5px}
+.warn p{margin:0;font-size:16px;color:#6B4A12}
+.no{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:26px}
+.no b{display:block;font-size:16px;font-weight:800;margin-bottom:7px}
+.no ul{margin:0;padding-left:20px}
+.no li{font-size:15.5px;color:var(--soft);margin-bottom:5px}
+.foot{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:#8A8078}
+.pr{margin-top:22px}
+.pr button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:12px 20px;font:800 14px var(--f);cursor:pointer;color:var(--ink)}
+[data-en]{display:none}
+body.en [data-es]{display:none}
+body.en [data-en]{display:revert}
+@media print{.top,.pr{display:none}body{background:#fff}.step,.warn,.no{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <b data-es>Pantalla de cocina</b><b data-en>Kitchen screen</b>
+  <a href="manual-proyecto.html" data-es>Manual del proyecto</a>
+  <a href="manual-proyecto.html" data-en>Project manual</a>
+  <div class="lang" id="lang">
+    <button data-l="es" aria-pressed="true">ES</button>
+    <button data-l="en" aria-pressed="false">EN</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <h1 data-es>Cómo usar la pantalla</h1>
+  <h1 data-en>How to use the screen</h1>
+  <p class="lede" data-es>Nueve cosas y ya. Si algo no está aquí, pregúntale al patrón.</p>
+  <p class="lede" data-en>Nine things, that's it. If it's not here, ask the owner.</p>
+
+  <div class="step"><div class="n">1</div><div class="b">
+    <h2 data-es>Entra con tu PIN</h2><h2 data-en>Sign in with your PIN</h2>
+    <p data-es>Son cuatro números. Te los da el patrón. <b>No los prestes</b> — sirven para saber quién atendió cada orden, y si algo sale mal se revisa por ahí.</p>
+    <p data-en>Four numbers. The owner gives them to you. <b>Don't share them</b> — they're how we know who handled each order, and that's what gets checked if something goes wrong.</p>
+  </div></div>
+
+  <div class="step"><div class="n">2</div><div class="b">
+    <h2 data-es>Tres columnas, de izquierda a derecha</h2><h2 data-en>Three columns, left to right</h2>
+    <p data-es><b>Nuevas</b> son las que acaban de entrar y nadie ha empezado. <b>Preparando</b> son las que ya están en el comal. <b>Listas</b> son las que esperan a que el cliente pase por ellas.</p>
+    <p data-en><b>New</b> just came in, nobody started them. <b>Preparing</b> are on the grill. <b>Ready</b> are waiting for the customer to pick up.</p>
+  </div></div>
+
+  <div class="step"><div class="n">3</div><div class="b">
+    <h2 data-es>Un toque y ya</h2><h2 data-en>One tap, that's all</h2>
+    <p class="big" data-es>El botón grande de abajo mueve la orden a la siguiente columna.</p>
+    <p class="big" data-en>The big button at the bottom moves the order to the next column.</p>
+    <p data-es>Empezar → Lista → Entregada. No hay nada más que tocar.</p>
+    <p data-en>Start → Ready → Delivered. Nothing else to tap.</p>
+    <p data-es>¿Le picaste de más? La <b>flechita de arriba a la derecha</b> la regresa. No pasa nada.</p>
+    <p data-en>Tapped by mistake? The <b>little arrow at the top right</b> puts it back. No harm done.</p>
+  </div></div>
+
+  <div class="step"><div class="n">4</div><div class="b">
+    <h2 data-es>Los colores te dicen qué sigue</h2><h2 data-en>The colors tell you what's next</h2>
+    <p data-es>No tienes que leer los minutos. Con ver el color sabes cuál urge.</p>
+    <p data-en>You don't have to read the minutes. The color tells you which one is urgent.</p>
+    <div class="colors">
+      <div class="c g"><span class="sw"></span><span><b data-es>Verde</b><b data-en>Green</b>
+        <span data-es>Ya está lista, esperando al cliente</span><span data-en>Ready, waiting for the customer</span></span></div>
+      <div class="c a"><span class="sw"></span><span><b data-es>Amarillo</b><b data-en>Amber</b>
+        <span data-es>Ya lleva rato. Apúrale a esa</span><span data-en>Taking a while. Move on that one</span></span></div>
+      <div class="c r"><span class="sw"></span><span><b data-es>Rojo</b><b data-en>Red</b>
+        <span data-es>Esa va primero, antes que cualquier otra</span><span data-en>That one goes first, before anything else</span></span></div>
+    </div>
+  </div></div>
+
+  <div class="step"><div class="n">5</div><div class="b">
+    <h2 data-es>Lo verde se agrega, lo rojo se quita</h2><h2 data-en>Green means add, red means leave out</h2>
+    <p data-es>Es lo que más se equivoca cuando hay prisa. Revísalo antes de mandar el platillo.</p>
+    <p data-en>This is what gets messed up most when it's busy. Check it before the plate goes out.</p>
+    <div class="mods"><span class="mod add">+ Queso</span><span class="mod rm" data-es>Sin cebolla</span><span class="mod rm" data-en>No onion</span></div>
+    <p data-es>Y si trae un recuadro con letra, es una nota del cliente. <b>Léela.</b></p>
+    <p data-en>And if there's a box with text, that's a note from the customer. <b>Read it.</b></p>
+  </div></div>
+
+  <div class="step"><div class="n">6</div><div class="b">
+    <h2 data-es>Cobrar y entregar</h2><h2 data-en>Charging and handing over</h2>
+    <p data-es>En la columna de Listas, la orden te dice si ya está pagada o si hay que cobrar, con el monto.</p>
+    <p data-en>In the Ready column, the order tells you if it's paid or if you need to charge, with the amount.</p>
+    <p data-es>Si ya estaba pagada, tocas <b>Entregada</b> y listo. Si no, te va a preguntar si cobraste. <b>Contesta la verdad</b>: si entregaste sin cobrar, dile que sí — así queda registrado y la caja cuadra al final del día.</p>
+    <p data-en>If it was already paid, tap <b>Delivered</b> and you're done. If not, it asks whether you charged. <b>Answer honestly</b>: if you handed it over without charging, say so — that way it's on record and the register adds up at the end of the day.</p>
+  </div></div>
+
+  <div class="step"><div class="n">7</div><div class="b">
+    <h2 data-es>Si llegan sin celular</h2><h2 data-en>If they come without a phone</h2>
+    <p data-es>Toca <b>Pedido en ventanilla</b> arriba. Sale el menú: <b>cada toque agrega uno</b>. Si tocas dos veces, van dos.</p>
+    <p data-en>Tap <b>Window order</b> at the top. The menu comes up: <b>each tap adds one</b>. Tap twice, that's two.</p>
+    <p data-es>¿Pide algo especial? En su renglón del ticket toca <b>+ Nota</b>: ahí le quitas ingredientes, le agregas extras o escribes lo que te dijo. Hay botones para lo más común — con todo, sin picante, bien dorado — y si prefieres, el botón del micrófono para dictarlo.</p>
+    <p data-en>Special request? On its line in the ticket tap <b>+ Note</b>: take ingredients off, add extras, or type what they told you. There are buttons for the usual ones, and a mic button if you'd rather say it.</p>
+    <p data-es>Al final di si <b>ya pagó</b> o <b>paga al recoger</b>, y manda a cocina. Entra igualito que los pedidos del celular.</p>
+    <p data-en>At the end say whether they <b>already paid</b> or <b>pay at pickup</b>, and send it to the kitchen. It comes in just like phone orders.</p>
+  </div></div>
+
+  <div class="step"><div class="n">8</div><div class="b">
+    <h2 data-es>Si se acaba algo</h2><h2 data-en>If you run out of something</h2>
+    <p data-es>Toca <b>Marcar agotado</b> arriba y escoge el platillo. Desaparece del menú de los clientes en ese momento, así nadie lo pide.</p>
+    <p data-en>Tap <b>Mark sold out</b> at the top and pick the dish. It disappears from the customers' menu right away, so nobody orders it.</p>
+    <p data-es>Cuando vuelva a haber, lo vuelves a activar igual.</p>
+    <p data-en>When you have it again, turn it back on the same way.</p>
+  </div></div>
+
+  <div class="step"><div class="n">9</div><div class="b">
+    <h2 data-es>Si se va el internet</h2><h2 data-en>If the internet goes down</h2>
+    <p class="big" data-es>Sigue trabajando igual. No pares.</p>
+    <p class="big" data-en>Keep working. Don't stop.</p>
+    <p data-es>Arriba te va a salir un aviso rojo que dice <b>Sin conexión</b>. Las órdenes que muevas se guardan solas y se mandan en cuanto vuelva la señal. <b>No se pierde nada.</b></p>
+    <p data-en>A red notice at the top says <b>Offline</b>. Whatever you move gets saved and sent as soon as the signal comes back. <b>Nothing gets lost.</b></p>
+    <p data-es>Lo único: mientras no haya señal, <b>no van a entrar pedidos nuevos del celular de los clientes</b>. Los que lleguen a la ventanilla se capturan normal.</p>
+    <p data-en>One thing: while it's down, <b>no new orders from customers' phones will come in</b>. Walk-ups get entered normally.</p>
+  </div></div>
+
+  <div class="warn">
+    <b data-es>El sonido déjalo encendido</b><b data-en>Leave the sound on</b>
+    <p data-es>Cuando entra un pedido nuevo suena. Nadie está viendo la pantalla en hora pico — el sonido es lo que evita que una orden se quede parada.</p>
+    <p data-en>A new order makes a sound. Nobody watches the screen when it's busy — the sound is what keeps an order from sitting there.</p>
+  </div>
+
+  <div class="no">
+    <b data-es>Cosas que no tienes que hacer</b><b data-en>Things you don't have to do</b>
+    <ul data-es>
+      <li>No tienes que apuntar nada en papel. Todo queda guardado.</li>
+      <li>No tienes que cerrar sesión al final del turno.</li>
+      <li>No tienes que cargar la tablet a mano si está conectada.</li>
+      <li>No tienes que cambiar precios ni el menú — eso es del patrón.</li>
+    </ul>
+    <ul data-en>
+      <li>You don't need to write anything on paper. It's all saved.</li>
+      <li>You don't need to sign out at the end of your shift.</li>
+      <li>You don't need to charge the tablet by hand if it's plugged in.</li>
+      <li>You don't change prices or the menu — that's the owner's job.</li>
+    </ul>
+  </div>
+
+  <div class="pr">
+    <button onclick="window.print()" data-es>Imprimir esta hoja</button>
+    <button onclick="window.print()" data-en>Print this page</button>
+  </div>
+
+  <div class="foot" data-es>Pégala junto a la tablet. Si algo no funciona como dice aquí, avísale al patrón — él lo arregla desde su teléfono.</div>
+  <div class="foot" data-en>Tape it next to the tablet. If something doesn't work like it says here, tell the owner — he fixes it from his phone.</div>
+</div>
+
+<script>
+document.getElementById('lang').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const en=b.dataset.l==='en';
+  document.body.classList.toggle('en',en);
+  document.documentElement.lang=en?'en':'es';
+  document.getElementById('lang').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+});
+</script>
+</body>
+</html>

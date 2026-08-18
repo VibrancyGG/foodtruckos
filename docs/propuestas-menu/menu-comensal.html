@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Menú del comensal — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#D62828;
+  --on-primary:#fff;
+  --ink:#1A1512;
+  --ink-soft:#6B615A;
+  --panel:#FFFDF9;
+  --line:#E4DCD0;
+  --sold:#9A8F86;
+  --display:'Anton','Haettenschweiler','Arial Narrow',sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#DDD6CC;font-family:var(--body);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* ---------- barra de prueba (no es parte del producto) ---------- */
+.lab{position:sticky;top:0;z-index:60;background:#1D1D1F;color:#EDEDEF;font:500 12px/1.4 var(--body);padding:8px 12px}
+.lab-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;max-width:920px;margin:0 auto}
+.lab b{font-weight:600}
+.lab-tag{background:#3A3A3E;padding:2px 7px;border-radius:3px;font-size:11px}
+.sw{display:flex;gap:5px}
+.sw button{width:21px;height:21px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff}
+.lab a,.lab .ghost{background:#3A3A3E;color:#EDEDEF;border:0;border-radius:4px;padding:4px 8px;font:500 12px var(--body);cursor:pointer;text-decoration:none}
+.skins{display:flex;gap:0;border-radius:4px;overflow:hidden}
+.skins button{background:#3A3A3E;color:#EDEDEF;border:0;padding:5px 11px;font:600 12px var(--body);cursor:pointer}
+.skins button[aria-pressed=true]{background:#EDEDEF;color:#1D1D1F}
+.lab .ratio{margin-left:auto;font-variant-numeric:tabular-nums}
+.lab .ok{color:#7CE38B}.lab .bad{color:#FF8A80}
+body.clean .lab{display:none}
+
+.phone{max-width:430px;margin:0 auto;background:var(--panel);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.14)}
+
+/* ---------- encabezado: bloque de color + trazo del oficio ---------- */
+.top{background:var(--primary);color:var(--on-primary);padding:18px 18px 20px;position:relative;overflow:hidden}
+.motif{position:absolute;inset:0;opacity:.17;pointer-events:none}
+.top-in{position:relative;z-index:2}
+.top::after{content:"";position:absolute;inset:auto 0 0;height:6px;z-index:3;background:repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 14px,transparent 14px 28px)}
+.brandline{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;border-radius:50%;background:var(--on-primary);color:var(--primary);font-family:var(--display);font-size:25px;display:grid;place-items:center;flex:none;line-height:1}
+.bname{font-family:var(--display);font-size:29px;line-height:.95;text-transform:uppercase;margin:0}
+.bsub{font-size:12.5px;opacity:.92;margin:3px 0 0;font-weight:500}
+.state{display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:rgba(0,0,0,.2);border-radius:100px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.28)}
+
+/* ---------- navegación por categoría ---------- */
+.nav{position:sticky;z-index:30;top:0;background:var(--panel);border-bottom:1px solid var(--line);display:flex;gap:7px;overflow-x:auto;padding:10px 18px;scrollbar-width:none}
+body:not(.clean) .nav{top:38px}
+.nav::-webkit-scrollbar{display:none}
+.nav button{flex:none;border:1.5px solid var(--line);background:var(--panel);border-radius:100px;padding:7px 14px;font:600 13px var(--body);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.nav button[aria-current=true]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.nav button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* ---------- filete de categoría con contador ---------- */
+.cat{border-top:5px solid var(--primary);margin-top:22px;padding:10px 18px 4px;display:flex;align-items:baseline;gap:9px}
+.cat:first-of-type{margin-top:0}
+.cat h2{font-family:var(--display);font-size:24px;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1}
+.cat span{font-size:11.5px;color:var(--ink-soft);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- tarjeta "arma el tuyo" ---------- */
+.build{display:block;width:100%;text-align:left;margin:10px 18px 4px;width:calc(100% - 36px);background:var(--panel);border:2px dashed var(--primary);border-radius:9px;padding:14px 15px;font:inherit;color:inherit;cursor:pointer}
+.build:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.build .bt{display:block;font-family:var(--display);font-size:20px;text-transform:uppercase;line-height:1.02;color:var(--primary)}
+.build .bd{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+.build .bg{display:inline-block;margin-top:9px;background:var(--primary);color:var(--on-primary);font-size:12px;font-weight:700;border-radius:100px;padding:5px 13px}
+
+/* ---------- renglón: piel VIBRANTE ---------- */
+.item{display:grid;grid-template-columns:74px 1fr auto;gap:13px;align-items:start;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel);width:100%;text-align:left;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;cursor:pointer}
+.item:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.thumb{display:grid;width:74px;height:74px;border-radius:3px;background:var(--primary);place-items:center;position:relative;overflow:hidden}
+.thumb span{font-family:var(--display);font-size:34px;color:var(--on-primary);opacity:.9;line-height:1;position:relative;z-index:2}
+.thumb::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(0,0,0,.13) 0 6px,transparent 6px 12px)}
+.iname{display:block;font-family:var(--display);font-size:21px;line-height:1.02;text-transform:uppercase;margin:1px 0 0;text-shadow:2px 2px 0 var(--line)}
+.idesc{display:block;font-size:13px;line-height:1.38;color:var(--ink-soft);margin:5px 0 0}
+.price{font-family:var(--display);font-size:22px;line-height:1;padding-top:3px;white-space:nowrap;text-shadow:2px 2px 0 var(--line)}
+
+/* ---------- renglón: piel TRADICIONAL ---------- */
+.row{display:block;width:100%;text-align:left;background:var(--panel);border:0;border-bottom:1px solid var(--line);padding:11px 18px 12px;font:inherit;color:inherit;cursor:pointer}
+.row:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.line{display:flex;align-items:baseline;gap:7px}
+.rname{font-family:var(--display);font-size:21px;text-transform:uppercase;line-height:1.05;flex:none;max-width:64%}
+.lead{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-5px);min-width:14px}
+.rprice{font-family:var(--display);font-size:20px;line-height:1;flex:none;text-shadow:2px 2px 0 var(--line)}
+.rdesc{display:block;font-size:12.5px;line-height:1.35;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- estados compartidos ---------- */
+.best{display:inline-block;background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-top:6px}
+.row .best{margin-top:5px}
+.out .thumb{background:var(--sold)}
+.out .iname,.out .price,.out .rname,.out .rprice{color:var(--sold);text-shadow:none}
+.out .rname,.out .rprice{text-decoration:line-through;text-decoration-thickness:1.5px}
+.out .idesc,.out .rdesc{color:var(--sold)}
+.item.out{background:#F6F2EC}
+.out-tag{display:inline-block;margin-top:6px;background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+
+.foot{padding:24px 18px 120px;text-align:center;color:var(--ink-soft);font-size:12px}
+.foot .made{opacity:.6;margin-top:6px;font-size:11px}
+
+/* ---------- barra de pedido ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:430px;margin:0 auto;padding:11px 14px calc(11px + env(safe-area-inset-bottom));background:var(--ink)}
+.bar button{width:100%;border:0;border-radius:5px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:20px;letter-spacing:.04em;text-transform:uppercase;padding:14px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.bar button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.bar .n{background:rgba(0,0,0,.25);border-radius:100px;padding:2px 10px;font-size:15px}
+.bar #barTxt{flex:1;text-align:left}
+
+/* ---------- el pedido ---------- */
+.cart{padding:4px 0}
+.cvac{padding:34px 18px;text-align:center;color:var(--ink-soft);font-size:14.5px}
+.cl{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);align-items:start}
+.clq{display:flex;align-items:center;gap:7px;flex:none}
+.clq button{width:32px;height:32px;border-radius:5px;border:2px solid var(--line);background:#fff;
+  font-family:var(--display);font-size:18px;line-height:1;cursor:pointer;color:var(--ink)}
+.clq button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.clq span{font-family:var(--display);font-size:19px;min-width:20px;text-align:center}
+.cln{min-width:0}
+.cln b{display:block;font-family:var(--display);font-size:17px;text-transform:uppercase;line-height:1.1}
+.clm{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.clm em{font-style:normal;font-size:11.5px;font-weight:800;border-radius:4px;padding:2px 7px}
+.clm .a{background:#E4F3EA;color:#14603C}
+.clm .r{background:#FBE7E7;color:#8A1F23}
+.cno{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:5px;line-height:1.35}
+.clx{background:none;border:0;padding:5px 0 0;font:700 12.5px var(--body);color:var(--ink-soft);
+  cursor:pointer;text-decoration:underline}
+.clp{font-family:var(--display);font-size:18px;white-space:nowrap}
+.ctot{padding:14px 18px;border-bottom:1px solid var(--line)}
+.cr{display:flex;justify-content:space-between;font-size:14.5px;color:var(--ink-soft);margin-bottom:6px}
+.cr.big{font-family:var(--display);font-size:23px;color:var(--ink);margin:10px 0 0;padding-top:10px;border-top:2px solid var(--line)}
+.cpay{font-size:12.5px;color:var(--ink-soft);margin:11px 0 0;line-height:1.4}
+.cname{width:100%;border:2px solid var(--line);border-radius:5px;padding:12px;font:600 15px var(--body);color:var(--ink)}
+.cname:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.okn{text-align:center;padding:26px 18px 22px}
+.okn .k{display:block;font-size:12px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft)}
+.okn .v{display:block;font-family:var(--display);font-size:74px;line-height:.95;margin-top:5px}
+.sheet-ft a.add{text-decoration:none;justify-content:center}
+.bar[hidden]{display:none}
+
+/* ---------- hoja de pedido ---------- */
+.veil{position:fixed;inset:0;background:rgba(26,21,18,.55);z-index:70;opacity:0;pointer-events:none;transition:opacity .18s}
+.veil.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:80;max-width:430px;margin:0 auto;background:var(--panel);border-radius:14px 14px 0 0;max-height:92vh;overflow:auto;transform:translateY(100%);transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.sheet.on{transform:none}
+.shot{display:block;position:relative;height:150px;background:var(--primary);overflow:hidden}
+.shot::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(0,0,0,.12) 0 7px,transparent 7px 14px)}
+.shot .pend{position:absolute;left:14px;top:14px;z-index:2;background:rgba(0,0,0,.34);color:#fff;font-size:11px;font-weight:600;padding:5px 10px;border-radius:100px}
+.shot .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:64px;color:var(--on-primary);opacity:.55;z-index:1}
+.sheet-hd{background:var(--primary);color:var(--on-primary);padding:15px 18px}
+.sheet-hd h2{font-family:var(--display);font-size:26px;text-transform:uppercase;margin:0;line-height:1.02}
+.sheet-hd p{margin:7px 0 0;font-size:13px;line-height:1.4;opacity:.93}
+.step{padding:16px 18px;border-bottom:1px solid var(--line)}
+.step h3{font-family:var(--display);font-size:16px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 11px;color:var(--ink-soft)}
+.step h3 em{font-style:normal;color:var(--primary)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:5px;padding:11px 14px;font:600 14.5px var(--body);color:var(--ink);cursor:pointer;min-height:46px;text-align:left}
+.opt[aria-pressed=true],.opt[aria-checked=true]{border-color:var(--primary);background:var(--primary);color:var(--on-primary)}
+.opt:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.opt:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.opt small{display:block;font-weight:500;opacity:.78;font-size:12px}
+.qty{display:flex;align-items:center;gap:16px}
+.qty button{width:52px;height:52px;border-radius:5px;border:2px solid var(--ink);background:#fff;font-family:var(--display);font-size:26px;line-height:1;cursor:pointer;color:var(--ink)}
+.qty output{font-family:var(--display);font-size:30px;min-width:38px;text-align:center}
+.note{width:100%;border:2px solid var(--line);border-radius:5px;padding:11px;font:500 14.5px var(--body);min-height:58px;resize:vertical;color:var(--ink)}
+.note:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.sheet-ft{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:13px 18px calc(13px + env(safe-area-inset-bottom));display:flex;gap:11px}
+.sheet-ft .cancel{flex:none;border:2px solid var(--line);background:#fff;border-radius:5px;padding:0 17px;font:600 14.5px var(--body);cursor:pointer;color:var(--ink-soft)}
+.sheet-ft .add{flex:1;border:0;border-radius:5px;background:var(--primary);color:var(--on-primary);font-family:var(--display);font-size:19px;letter-spacing:.04em;text-transform:uppercase;padding:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.sheet-ft .add:disabled{background:var(--line);color:var(--ink-soft);cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body data-skin="vibrante">
+
+<div class="lab">
+  <div class="lab-row">
+    <b>Menú del comensal</b>
+    <div class="skins" id="skins" role="group" aria-label="Estilo">
+      <button data-skin="vibrante" aria-pressed="true">Vibrante</button>
+      <button data-skin="tradicional" aria-pressed="false">Tradicional</button>
+    </div>
+    <span class="lab-tag" id="tagName">Rojo chile</span>
+    <div class="sw" id="sw" role="group" aria-label="Paleta"></div>
+    <button class="ghost" id="lang">EN</button>
+    <button class="ghost" id="simErrBtn">Simular error de envío</button>
+    <button class="ghost" id="hide">Ocultar</button>
+    <span class="ratio" id="ratio"></span>
+  </div>
+</div>
+
+<div class="phone">
+  <header class="top">
+    <svg class="motif" aria-hidden="true"><defs>
+      <pattern id="oficio" width="112" height="112" patternUnits="userSpaceOnUse">
+        <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <!-- taco -->
+          <path d="M8 34a13 13 0 0 1 26 0"/><path d="M8 34h26"/>
+          <path d="M13 28c2.2 2 4.2 2 6.4 0s4.2-2 6.4 0"/>
+          <!-- elote -->
+          <path d="M68 12c3.6 0 6 4.4 6 12.5S71.6 38 68 38s-6-5-6-13.5S64.4 12 68 12z"/>
+          <path d="M62 20h12M62 26h12M62 32h12"/><path d="M68 38v6"/>
+          <!-- chile -->
+          <path d="M20 78c0-5.5 4.4-9.6 9.8-9.6 5.6 0 9.4 4.6 9.4 10.4S34.8 90 28.6 90C23.8 90 20 86.4 20 82z"/>
+          <path d="M29.8 68.4c.4-3.6 2.6-5.4 5.6-5.4"/>
+          <!-- vaso -->
+          <path d="M82 70h18l-2.6 24H84.6z"/><path d="M83 76h16"/><path d="M92 70V60"/>
+        </g>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#oficio)"/>
+    </svg>
+    <div class="top-in">
+      <div class="brandline">
+        <div class="mark">EF</div>
+        <div>
+          <h1 class="bname">Taquería<br>El Farol</h1>
+          <p class="bsub" id="truck">Truck 1 · Main &amp; Porter</p>
+        </div>
+      </div>
+      <div class="state"><span class="dot"></span><span id="hours">Abierto · cierra 9:00 pm</span></div>
+    </div>
+  </header>
+  <nav class="nav" id="nav" aria-label="Categorías"></nav>
+  <main id="menu"></main>
+  <footer class="foot">
+    <div id="taxline">Los precios no incluyen impuesto (8.625%)</div>
+    <div class="made">FoodTruckOS</div>
+  </footer>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <button id="barBtn"><span class="n" id="barN">0</span><span id="barTxt">Ver pedido</span><span id="barTot"></span></button>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shName"></div>
+
+<script>
+/* ================= paleta curada, contraste verificado ================= */
+const PALETTE=[
+ {es:'Rojo chile',en:'Chile red',hex:'#D62828'},
+ {es:'Naranja trompo',en:'Trompo orange',hex:'#F4661B'},
+ {es:'Amarillo maíz',en:'Corn yellow',hex:'#F2A413'},
+ {es:'Verde nopal',en:'Nopal green',hex:'#257B4B'},
+ {es:'Verde limón',en:'Lime green',hex:'#7CB518'},
+ {es:'Turquesa',en:'Turquoise',hex:'#0C7979'},
+ {es:'Azul talavera',en:'Talavera blue',hex:'#1F5FBF'},
+ {es:'Morado jamaica',en:'Jamaica purple',hex:'#7B2D8E'},
+ {es:'Rosa mexicano',en:'Mexican pink',hex:'#D11072'},
+ {es:'Café mole',en:'Mole brown',hex:'#8A3B12'}
+];
+const INK='#1A1512';
+const lum=h=>{const c=h.slice(1).match(/../g).map(x=>{const v=parseInt(x,16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+const ratio=(a,b)=>{const A=lum(a),B=lum(b);return (Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
+const onColor=h=>ratio(h,'#FFFFFF')>=ratio(h,INK)?'#FFFFFF':INK;
+
+/* ================= datos: menú real de Taquería El Farol =================
+   [nombre_es, nombre_en, precio, desc_es, desc_en, agotado?, más_pedido?]   */
+const EXTRAS=[['Queso','Cheese',1],['Aguacate','Avocado',1.5],['Doble carne','Double meat',2.5],['Salsa de la casa','House salsa',0]];
+const QT=[['Cebolla','Onion'],['Cilantro','Cilantro'],['Limón','Lime']];
+const QB=[['Jalapeño','Jalapeño'],['Aguacate','Avocado'],['Frijoles','Beans'],['Crema','Crema']];
+const MENU=[
+{es:'Tacos',en:'Tacos',ex:EXTRAS,q:QT,build:'taco',items:[
+ ['Al pastor','Al pastor',3.25,'Del trompo, marinado 24 horas en guajillo y achiote. Con piña asada.','Off the spit, 24-hour guajillo and achiote marinade. Grilled pineapple.',0,1],
+ ['Asada','Asada',3.50,'Res al carbón, picada gruesa para que se sienta.','Charcoal beef, chopped coarse so you can feel it.'],
+ ['Chorizo','Chorizo',3.00,'Hecho en casa, con papa cuando la hay.','House-made, with potato when we have it.'],
+ ['Lengua','Lengua',3.75,'Cocida seis horas hasta que se deshace.','Six hours until it falls apart.'],
+ ['Tripa','Tripa',3.50,'Bien dorada. Si la pide blanda, avísele a Beto.','Crisped hard. If you want it soft, tell Beto.',1],
+ ['Nopal','Nopal',2.75,'Nopal asado con cebolla cambray. Sin carne.','Grilled cactus with spring onion. No meat.']]},
+{es:'De la casa',en:'House specials',ex:EXTRAS,q:QT,items:[
+ ['Quesabirria (3 pzas)','Quesabirria (3 pcs)',13.50,'Tortilla sumergida en el consomé y dorada con queso. Va con su vasito para mojar.','Tortillas dipped in consommé and crisped with cheese. Comes with a cup for dipping.',0,1],
+ ['Mulita de asada','Asada mulita',6.50,'Dos tortillas, queso derretido en medio, carne al carbón.','Two tortillas, melted cheese between, charcoal beef.'],
+ ['Vampiro','Vampiro',5.75,'Tortilla tatemada hasta quedar tostada, queso y la carne que elija.','Tortilla charred until crisp, cheese, and the meat you pick.']]},
+{es:'Tortas y burritos',en:'Tortas & burritos',ex:EXTRAS,q:QB,build:'burrito',items:[
+ ['Torta de milanesa','Milanesa torta',12.00,'Pan telera, milanesa de res, aguacate, frijoles, jalapeño.','Telera roll, breaded beef, avocado, beans, jalapeño.'],
+ ['Torta ahogada','Torta ahogada',11.50,'Bañada en salsa de chile de árbol. Pida servilletas de más.','Drowned in chile de árbol salsa. Ask for extra napkins.'],
+ ['Burrito de asada','Asada burrito',11.00,'Tortilla de harina, arroz, frijol, carne al carbón, guacamole.','Flour tortilla, rice, beans, charcoal beef, guacamole.']]},
+{es:'Antojitos',en:'Sides',ex:null,q:null,items:[
+ ['Elote entero','Whole elote',4.50,'Mayonesa, queso cotija, chile en polvo y limón.','Mayo, cotija, chile powder and lime.'],
+ ['Esquites','Esquites',5.00,'El mismo elote, en vaso, con caldo.','Same elote, in a cup, with broth.'],
+ ['Papas con queso','Loaded fries',8.50,'Papa frita, queso, carne al carbón y crema.','Fries, cheese, charcoal beef and crema.'],
+ ['Consomé de birria','Birria consommé',4.00,'Un vaso grande. Para el frío o para la cruda.','Large cup. For the cold or for the hangover.']]},
+{es:'Bebidas',en:'Drinks',ex:null,q:null,items:[
+ ['Agua de horchata','Horchata',3.50,'Arroz y canela, hecha en la mañana.','Rice and cinnamon, made this morning.'],
+ ['Agua de jamaica','Jamaica',3.50,'Flor de jamaica, poca azúcar.','Hibiscus, light on the sugar.'],
+ ['Jarritos','Jarritos',2.75,'Mandarina, tamarindo o toronja.','Mandarin, tamarind or grapefruit.'],
+ ['Coca de vidrio','Mexican Coke',3.25,'De caña. No es lo mismo y usted lo sabe.','Cane sugar. Not the same and you know it.']]}
+];
+
+/* ---- "arma el tuyo". OJO: precios de demostración, el menú real no trae armado ---- */
+const BUILD={
+ taco:{
+  es:{t:'Arma tu taco',d:'Elige la carne, la tortilla y lo que le va.',cta:'Empezar'},
+  en:{t:'Build your taco',d:'Pick the meat, the tortilla and what goes on it.',cta:'Start'},
+  base:0,
+  steps:[
+   {k:'carne',es:'¿Qué carne?',en:'Which meat?',one:true,opts:[
+     ['Al pastor','Al pastor',3.25],['Asada','Asada',3.50],['Chorizo','Chorizo',3.00],
+     ['Lengua','Lengua',3.75],['Tripa','Tripa',3.50,1],['Nopal','Nopal',2.75]]},
+   {k:'tortilla',es:'¿Qué tortilla?',en:'Which tortilla?',one:true,opts:[
+     ['Maíz','Corn',0],['Harina','Flour',0]]},
+   {k:'extras',es:'¿Le agregamos algo?',en:'Add anything?',opts:EXTRAS},
+   {k:'quita',es:'¿Le quitamos algo?',en:'Take anything off?',free:true,opts:QT}
+  ]},
+ burrito:{
+  es:{t:'Arma tu burrito',d:'Lleva arroz, frijol y guacamole. Tú eliges lo demás.',cta:'Empezar'},
+  en:{t:'Build your burrito',d:'Comes with rice, beans and guacamole. You pick the rest.',cta:'Start'},
+  base:8.50,
+  steps:[
+   {k:'carne',es:'¿Qué carne?',en:'Which meat?',one:true,opts:[
+     ['Al pastor','Al pastor',2.50],['Asada','Asada',2.50],['Chorizo','Chorizo',2.25],
+     ['Lengua','Lengua',2.75],['Nopal','Nopal',2.00]]},
+   {k:'extras',es:'¿Le agregamos algo?',en:'Add anything?',opts:EXTRAS},
+   {k:'quita',es:'¿Le quitamos algo?',en:'Take anything off?',free:true,opts:QB}
+  ]}
+};
+
+const T={
+ es:{hours:'Abierto · cierra 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Los precios no incluyen impuesto (8.625%)',
+     out:'Se nos acabó',best:'El más pedido',bar:'Ver pedido',qty:'¿Cuántos?',extras:'¿Le agregamos algo?',
+     remove:'¿Le quitamos algo?',note:'¿Algo más que debamos saber?',notePh:'Ej: sin picante, para llevar',
+     cancel:'Cerrar',add:'Agregar',free:'Sin costo',pend:'Foto en camino',pick:'Elige una',n:n=>n+' platillos',
+     myOrder:'Tu pedido',sub:'Subtotal',taxL:'Impuesto',totL:'Total',send:'Pedir',
+     seguir:'Seguir viendo',vacio:'Todavía no has agregado nada.',quitar:'Quitar',
+     quien:'¿A nombre de quién?',quienPh:'Tu nombre',
+     listoT:'¡Ya quedó!',listoS:'Tu pedido llegó a la cocina. Guarda tu número — con él te van a llamar.',
+     tuNum:'Tu número',verEstado:'Ver cómo va',pagaAl:'Pagas en la ventanilla al recogerlo.',
+     enviando:'Enviando tu pedido…',enviandoS:'Un momento, está llegando a la cocina.',
+     errT:'No pudimos enviar tu pedido',errS:'Revisa tu conexión e intenta otra vez. Nada de tu pedido se perdió.',
+     retry:'Intentar otra vez'},
+ en:{hours:'Open · closes 9:00 pm',truck:'Truck 1 · Main & Porter',tax:'Prices do not include tax (8.625%)',
+     out:'Sold out',best:'Most ordered',bar:'View order',qty:'How many?',extras:'Add anything?',
+     remove:'Take anything off?',note:'Anything else we should know?',notePh:'e.g. no spice, to go',
+     cancel:'Close',add:'Add',free:'Free',pend:'Photo coming',pick:'Pick one',n:n=>n+' items',
+     myOrder:'Your order',sub:'Subtotal',taxL:'Tax',totL:'Total',send:'Order',
+     seguir:'Keep looking',vacio:'You have not added anything yet.',quitar:'Remove',
+     quien:'What name is it under?',quienPh:'Your name',
+     listoT:'All set!',listoS:'Your order reached the kitchen. Keep your number — that is how they will call you.',
+     tuNum:'Your number',verEstado:'See how it is going',pagaAl:'You pay at the window when you pick it up.',
+     enviando:'Sending your order…',enviandoS:'One moment, it is reaching the kitchen.',
+     errT:'We could not send your order',errS:'Check your connection and try again. Nothing in your order was lost.',
+     retry:'Try again'}
+};
+let lang='es',skin='vibrante';
+let CART=[], makeLine=null;                 /* el pedido que arma el comensal */
+const TAX=0.08625;
+const cartN=()=>CART.reduce((s,l)=>s+l.q,0);
+const cartSub=()=>CART.reduce((s,l)=>s+l.q*l.p,0);
+function addToCart(l){
+  const igual=CART.find(x=>x.n===l.n&&x.p===l.p&&
+    x.add.join()===l.add.join()&&x.rm.join()===l.rm.join()&&x.nota===l.nota);
+  if(igual)igual.q+=l.q; else CART.push(l);
+  syncBar();
+}
+function syncBar(){
+  const n=cartN();
+  $('#bar').hidden=!n;
+  $('#barN').textContent=n;
+  $('#barTot').textContent=money(cartSub()*(1+TAX));
+}
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toFixed(2);
+const L=(a,i)=>a[lang==='es'?i:i+1];
+
+function paint(i){
+  const p=PALETTE[i],on=onColor(p.hex);
+  document.documentElement.style.setProperty('--primary',p.hex);
+  document.documentElement.style.setProperty('--on-primary',on);
+  $('#tagName').textContent=p[lang];
+  const r=ratio(p.hex,on);
+  $('#ratio').innerHTML='texto/acento <span class="'+(r>=4.5?'ok':'bad')+'">'+r.toFixed(2)+':1 '+(r>=4.5?'✓':'✕')+'</span>';
+  [...$('#sw').children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i));
+}
+PALETTE.forEach((p,i)=>{const b=document.createElement('button');
+  b.style.background=p.hex;b.title=p.es;b.setAttribute('aria-label',p.es);
+  b.onclick=()=>paint(i);$('#sw').appendChild(b)});
+
+/* ================= render ================= */
+function render(){
+  const t=T[lang];
+  $('#hours').textContent=t.hours;$('#truck').textContent=t.truck;
+  $('#taxline').textContent=t.tax;$('#barTxt').textContent=t.bar;
+  $('#nav').innerHTML=MENU.map((c,ci)=>
+    '<button data-go="'+ci+'"'+(ci===0?' aria-current="true"':'')+'>'+c[lang]+'</button>').join('');
+  $('#menu').innerHTML=MENU.map((c,ci)=>{
+    let h='<div class="cat" id="c'+ci+'"><h2>'+c[lang]+'</h2><span>'+t.n(c.items.length)+'</span></div>';
+    if(c.build){const b=BUILD[c.build][lang];
+      h+='<button class="build" data-build="'+c.build+'"><span class="bt">'+b.t+'</span>'+
+         '<span class="bd">'+b.d+'</span><span class="bg">'+b.cta+' →</span></button>';}
+    h+=c.items.map((it,ii)=>{
+      const out=it[5],best=it[6],nm=L(it,0),ds=L(it,3);
+      const tags=(best?'<span class="best">'+t.best+'</span>':'')+(out?'<span class="out-tag">'+t.out+'</span>':'');
+      if(skin==='vibrante')
+        return '<button class="item'+(out?' out':'')+'" data-c="'+ci+'" data-i="'+ii+'"'+(out?' disabled':'')+'>'+
+          '<span class="thumb"><span>'+nm[0]+'</span></span>'+
+          '<span><span class="iname">'+nm+'</span><span class="idesc">'+ds+'</span>'+tags+'</span>'+
+          '<span class="price">'+money(it[2])+'</span></button>';
+      return '<button class="row'+(out?' out':'')+'" data-c="'+ci+'" data-i="'+ii+'"'+(out?' disabled':'')+'>'+
+        '<span class="line"><span class="rname">'+nm+'</span><span class="lead"></span>'+
+        '<span class="rprice">'+money(it[2])+'</span></span>'+
+        '<span class="rdesc">'+ds+'</span>'+tags+'</button>';
+    }).join('');
+    return h;
+  }).join('');
+  $('#menu').querySelectorAll('[data-c]:not(.out)').forEach(b=>b.onclick=()=>openItem(+b.dataset.c,+b.dataset.i));
+  $('#menu').querySelectorAll('[data-build]').forEach(b=>b.onclick=()=>openBuild(b.dataset.build));
+  $('#nav').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+    const el=document.getElementById('c'+b.dataset.go);
+    window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-(document.body.classList.contains('clean')?46:84)});
+    $('#nav').querySelectorAll('button').forEach(x=>x.removeAttribute('aria-current'));
+    b.setAttribute('aria-current','true')});
+}
+
+/* ================= piezas compartidas de la hoja ================= */
+const shotHTML=(letter,t)=>'<div class="shot"><span class="ph">'+letter+'</span><span class="pend">'+t.pend+'</span></div>';
+const qtyHTML=t=>'<div class="step"><h3>'+t.qty+'</h3><div class="qty">'+
+  '<button data-q="-1" aria-label="−">−</button><output id="q">1</output><button data-q="1" aria-label="+">+</button></div></div>';
+const noteHTML=t=>'<div class="step"><h3>'+t.note+'</h3><textarea class="note" placeholder="'+t.notePh+'"></textarea></div>';
+const footHTML=(t,dis)=>'<div class="sheet-ft"><button class="cancel" id="x">'+t.cancel+'</button>'+
+  '<button class="add" id="ok"'+(dis?' disabled':'')+'><span>'+t.add+'</span><span id="tot"></span></button></div>';
+
+let q=1,sel={},cur=null;
+/* El foco entra al título de la hoja al abrir y regresa al botón que la
+   abrió al cerrar — para quien navega con teclado o lector de pantalla. */
+let lastFocus=null;
+function openSheet(html){
+  lastFocus=document.activeElement;
+  $('#sheet').innerHTML=html;$('#veil').classList.add('on');$('#sheet').classList.add('on');
+  const h=$('#shName');
+  if(h){h.setAttribute('tabindex','-1');setTimeout(()=>h.focus(),10)}
+}
+function close(){$('#veil').classList.remove('on');$('#sheet').classList.remove('on');
+  if(lastFocus&&document.contains(lastFocus))lastFocus.focus();lastFocus=null}
+$('#veil').onclick=close;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+/* ---------- platillo normal ---------- */
+function openItem(ci,ii){
+  const t=T[lang],c=MENU[ci],it=c.items[ii];cur={c,it};q=1;sel={extras:new Set(),quita:new Set()};
+  openSheet(
+    shotHTML(L(it,0)[0],t)+
+    '<div class="sheet-hd"><h2 id="shName">'+L(it,0)+'</h2><p>'+L(it,3)+'</p></div>'+
+    qtyHTML(t)+
+    (c.ex?'<div class="step"><h3>'+t.extras+'</h3><div class="opts">'+c.ex.map((e,j)=>
+      '<button class="opt" data-ex="'+j+'" aria-pressed="false">'+L(e,0)+
+      '<small>'+(e[2]?'+'+money(e[2]):t.free)+'</small></button>').join('')+'</div></div>':'')+
+    (c.q?'<div class="step"><h3>'+t.remove+'</h3><div class="opts">'+c.q.map((e,j)=>
+      '<button class="opt" data-rm="'+j+'" aria-pressed="false">'+L(e,0)+'</button>').join('')+'</div></div>':'')+
+    noteHTML(t)+footHTML(t,false));
+  const unit=()=>{let s=it[2];sel.extras.forEach(j=>s+=c.ex[j][2]);return s};
+  const total=()=>unit()*q;
+  const sync=()=>{$('#q').textContent=q;$('#tot').textContent=money(total())};
+  makeLine=()=>({n:L(it,0),p:unit(),q,
+    add:[...sel.extras].map(j=>L(c.ex[j],0)),
+    rm:[...sel.quita].map(j=>L(c.q[j],0)),
+    nota:($('#sheet .note')?.value||'').trim()});
+  wire(sync);sync();
+}
+
+/* ---------- arma el tuyo ---------- */
+function openBuild(kind){
+  const t=T[lang],B=BUILD[kind],b=B[lang];q=1;sel={};B.steps.forEach(s=>sel[s.k]=s.one?null:new Set());
+  openSheet(
+    shotHTML(b.t[0],t)+
+    '<div class="sheet-hd"><h2 id="shName">'+b.t+'</h2><p>'+b.d+'</p></div>'+
+    qtyHTML(t)+
+    B.steps.map(s=>'<div class="step"><h3>'+s[lang]+(s.one?' <em>· '+t.pick+'</em>':'')+'</h3><div class="opts">'+
+      s.opts.map((o,j)=>'<button class="opt" data-k="'+s.k+'" data-j="'+j+'"'+
+        (s.one?' aria-checked="false" role="radio"':' aria-pressed="false"')+
+        (o[3]?' disabled':'')+'>'+L(o,0)+
+        (s.free?'':'<small>'+(o[2]?(s.one&&!B.base?money(o[2]):'+'+money(o[2])):t.free)+'</small>')+
+        '</button>').join('')+'</div></div>').join('')+
+    noteHTML(t)+footHTML(t,true));
+  const total=()=>{let s=B.base;
+    B.steps.forEach(st=>{const v=sel[st.k];
+      if(st.free)return;
+      if(st.one){if(v!==null)s+=st.opts[v][2]||0}
+      else v.forEach(j=>s+=st.opts[j][2]||0)});
+    return s*q};
+  const ready=()=>B.steps.every(s=>!s.one||sel[s.k]!==null);
+  const sync=()=>{$('#q').textContent=q;$('#tot').textContent=money(total());$('#ok').disabled=!ready()};
+  makeLine=()=>{
+    const elegidos=B.steps.filter(s=>s.one&&sel[s.k]!==null).map(s=>L(s.opts[sel[s.k]],0));
+    const extras=[],quita=[];
+    B.steps.forEach(s=>{if(s.one)return;
+      [...sel[s.k]].forEach(j=>(s.free?quita:extras).push(L(s.opts[j],0)))});
+    return{n:b.t+': '+elegidos.join(', '),p:total()/q,q,add:extras,rm:quita,
+      nota:($('#sheet .note')?.value||'').trim()};
+  };
+  wire(sync,B);sync();
+}
+
+/* ---------- cableado común de la hoja ---------- */
+function wire(sync,B){
+  $('#sheet').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{q=Math.max(1,q+ +b.dataset.q);sync()});
+  $('#sheet').querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.ex;sel.extras.has(j)?sel.extras.delete(j):sel.extras.add(j);
+    b.setAttribute('aria-pressed',sel.extras.has(j));sync()});
+  $('#sheet').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.rm;sel.quita.has(j)?sel.quita.delete(j):sel.quita.add(j);
+    b.setAttribute('aria-pressed',sel.quita.has(j))});
+  if(B)$('#sheet').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.k,j=+b.dataset.j,st=B.steps.find(s=>s.k===k);
+    if(st.one){sel[k]=j;
+      $('#sheet').querySelectorAll('[data-k="'+k+'"]').forEach(o=>o.setAttribute('aria-checked',+o.dataset.j===j));}
+    else{sel[k].has(j)?sel[k].delete(j):sel[k].add(j);b.setAttribute('aria-pressed',sel[k].has(j));}
+    sync()});
+  $('#x').onclick=close;
+  $('#ok').onclick=()=>{if(makeLine)addToCart(makeLine());close()};
+}
+
+/* ================= el pedido y su envío ================= */
+function openCart(){
+  const t=T[lang];
+  const lineas=()=>CART.map((l,k)=>
+    '<div class="cl"><div class="clq">'+
+      '<button data-cm="'+k+'" aria-label="−">−</button><span>'+l.q+'</span>'+
+      '<button data-cp="'+k+'" aria-label="+">+</button></div>'+
+    '<div class="cln"><b>'+l.n+'</b>'+
+      ((l.add.length||l.rm.length)?'<span class="clm">'+
+        l.add.map(a=>'<em class="a">+ '+a+'</em>').join('')+
+        l.rm.map(r=>'<em class="r">'+(lang==='es'?'Sin ':'No ')+r.toLowerCase()+'</em>').join('')+'</span>':'')+
+      (l.nota?'<span class="cno">“'+l.nota+'”</span>':'')+
+      '<button class="clx" data-cx="'+k+'">'+t.quitar+'</button>'+
+    '</div><div class="clp">'+money(l.q*l.p)+'</div></div>').join('');
+  const sub=cartSub(), tax=sub*TAX;
+  openSheet(
+    '<div class="sheet-hd"><h2 id="shName">'+t.myOrder+'</h2></div>'+
+    '<div class="cart" id="cartL">'+(CART.length?lineas():'<p class="cvac">'+t.vacio+'</p>')+'</div>'+
+    (CART.length?'<div class="ctot">'+
+      '<div class="cr"><span>'+t.sub+'</span><span>'+money(sub)+'</span></div>'+
+      '<div class="cr"><span>'+t.taxL+'</span><span>'+money(tax)+'</span></div>'+
+      '<div class="cr big"><span>'+t.totL+'</span><span>'+money(sub+tax)+'</span></div>'+
+      '<p class="cpay">'+t.pagaAl+'</p></div>'+
+      '<div class="step"><h3>'+t.quien+'</h3>'+
+        '<input class="cname" id="cName" type="text" value="'+cliente.replace(/"/g,'&quot;')+
+        '" placeholder="'+t.quienPh+'" autocomplete="name"></div>':'')+
+    '<div class="sheet-ft"><button class="cancel" id="x">'+t.seguir+'</button>'+
+      '<button class="add" id="ok"'+(CART.length?'':' disabled')+'>'+
+        '<span>'+t.send+'</span><span>'+money(sub+tax)+'</span></button></div>');
+  /* redibuja la hoja en el sitio: sin parpadeo y sin perder lo escrito */
+  const re=()=>{const n=$('#cName');if(n)cliente=n.value;openCart()};
+  const nm=$('#cName');if(nm)nm.oninput=()=>cliente=nm.value;
+  $('#sheet').querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{CART[+b.dataset.cp].q++;syncBar();re()});
+  $('#sheet').querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{
+    const l=CART[+b.dataset.cm];l.q--;if(l.q<1)CART.splice(CART.indexOf(l),1);syncBar();re()});
+  $('#sheet').querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>{
+    CART.splice(+b.dataset.cx,1);syncBar();re()});
+  $('#x').onclick=close;
+  $('#ok').onclick=enviar;
+}
+/* El folio del pedido sale de un contador COMPARTIDO en localStorage, no de
+   un número fijo en el código. Antes cada recarga del menú volvía a empezar
+   en el #48 — y cocina ya trae un #48 de muestra desde el primer momento,
+   así que el pedido real chocaba con el de ejemplo y se descartaba en
+   silencio. Con un folio compartido (y arrancando en 100, lejos de los
+   números de muestra 45-51) eso deja de poder pasar. */
+function folioNuevo(){
+  let n;
+  try{n=parseInt(localStorage.getItem('ftFolio')||'100',10);if(!n||n<100)n=100}
+  catch(e){n=100}
+  try{localStorage.setItem('ftFolio',String(n+1))}catch(e){}
+  return n;
+}
+let cliente='', simErr=false, folioPendiente=null;
+/* Simula el viaje real del pedido: un momento "enviando", luego éxito o error.
+   Nunca instantáneo — así se ve honesto y deja hueco para el caso que falla.
+   El folio se saca UNA vez y se conserva si hay que reintentar — un reintento
+   no debe quemar un número nuevo cada vez. */
+function enviar(){
+  const t=T[lang];
+  if(folioPendiente==null)folioPendiente=folioNuevo();
+  const n=folioPendiente;
+  openSheet('<div class="sheet-hd"><h2 id="shName">'+t.enviando+'</h2><p>'+t.enviandoS+'</p></div>'+
+    '<div class="okn"><span class="k">'+t.tuNum+'</span><span class="v">'+n+'</span></div>');
+  setTimeout(()=>{
+    if(simErr){
+      openSheet('<div class="sheet-hd"><h2 id="shName">'+t.errT+'</h2><p>'+t.errS+'</p></div>'+
+        '<div class="sheet-ft"><button class="cancel" id="x">'+t.cancel+'</button>'+
+          '<button class="add" id="retry"><span>'+t.retry+'</span></button></div>');
+      $('#x').onclick=close;$('#retry').onclick=enviar;
+      return;
+    }
+    folioPendiente=null;
+    const snap={n,cliente:cliente||null,truck:'Truck 1 · Main & Porter',
+      sub:cartSub(),tax:TAX,pagado:false,s:'recibido',lang,
+      items:CART.map(l=>({q:l.q,n:l.n,add:l.add,rm:l.rm,nota:l.nota||''}))};
+    /* El pedido viaja EN LA PROPIA URL hacia seguimiento.html — mismos productos,
+       total y nombre — en vez de datos de muestra. localStorage no sirve de
+       puente aquí: al abrir dos archivos file:// por separado, muchos navegadores
+       no comparten su almacenamiento entre ellos, así que confiar solo en eso
+       rompía la continuidad. Se guarda también en localStorage como respaldo,
+       útil cuando esto viva en un dominio real y sea el mismo origen. */
+    let link='seguimiento.html?orden='+n;
+    try{
+      link+='&d='+encodeURIComponent(JSON.stringify(snap));
+      localStorage.setItem('ftPedido_'+n,JSON.stringify(snap));
+      /* Avisa a la pantalla de cocina si está abierta en otra pestaña del
+         mismo navegador — mismo puente de localStorage, mismo límite: no
+         cruza archivos abiertos por separado, solo pestañas de un origen. */
+      const cola=JSON.parse(localStorage.getItem('ftCola')||'[]');
+      cola.push(n);localStorage.setItem('ftCola',JSON.stringify(cola));
+    }catch(e){}
+    CART=[];cliente='';syncBar();
+    openSheet(
+      '<div class="sheet-hd"><h2 id="shName">'+t.listoT+'</h2><p>'+t.listoS+'</p></div>'+
+      '<div class="okn"><span class="k">'+t.tuNum+'</span><span class="v">'+n+'</span></div>'+
+      '<div class="sheet-ft"><button class="cancel" id="x">'+t.cancel+'</button>'+
+        '<a class="add" href="'+link+'">'+t.verEstado+' →</a></div>');
+    $('#x').onclick=close;
+  },900);
+}
+
+/* ================= controles de prueba ================= */
+$('#skins').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  skin=b.dataset.skin;document.body.dataset.skin=skin;
+  $('#skins').querySelectorAll('button').forEach(o=>o.setAttribute('aria-pressed',o===b));
+  render()});
+$('#lang').onclick=()=>{lang=lang==='es'?'en':'es';$('#lang').textContent=lang==='es'?'EN':'ES';
+  document.documentElement.lang=lang;render();
+  paint([...$('#sw').children].findIndex(b=>b.getAttribute('aria-pressed')==='true'))};
+$('#hide').onclick=()=>document.body.classList.add('clean');
+$('#simErrBtn').onclick=()=>{simErr=!simErr;
+  $('#simErrBtn').textContent=(simErr?'✕ ':'')+'Simular error de envío';
+  $('#simErrBtn').style.background=simErr?'#5A1B1E':''};
+$('#barBtn').onclick=openCart;
+render();paint(0);syncBar();
+</script>
+</body>
+</html>

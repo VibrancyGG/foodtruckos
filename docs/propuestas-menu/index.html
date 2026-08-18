@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menú del comensal — FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17171A;--soft:#6C6C72;--line:#E6E4DF;--bg:#FAFAF8;--card:#FFF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
+.wrap{max-width:920px;margin:0 auto;padding:56px 24px 100px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:0}
+h1{font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:14px 0 0}
+.lede{font-size:17px;color:var(--soft);max-width:62ch;margin:18px 0 0}
+h2{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin:52px 0 18px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.hero{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.hero:hover,.hero:focus-visible{border-color:var(--ink);transform:translateY(-2px)}
+.hero:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.strip{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.strip i{flex:1}
+.hero h3{font-size:27px;font-weight:800;letter-spacing:-.03em;margin:0}
+.hero p{font-size:15.5px;color:var(--soft);margin:11px 0 0;max-width:58ch}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.pill{font-size:12.5px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:100px;padding:5px 12px}
+.two{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.box{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px}
+.box h4{font-size:15.5px;font-weight:700;margin:0 0 9px;letter-spacing:-.01em}
+.box ul{margin:0;padding-left:18px}
+.box li{font-size:14px;color:var(--soft);margin-bottom:6px}
+.note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--ink);border-radius:10px;padding:18px 20px;margin-top:14px}
+.note h3{font-size:15.5px;font-weight:700;margin:0 0 7px;letter-spacing:-.01em}
+.note p{margin:0;font-size:14.5px;color:var(--soft)}
+.note p+p{margin-top:9px}
+ol{padding-left:20px;margin:0}
+ol li{margin-bottom:12px;font-size:14.5px}
+.old{display:flex;flex-wrap:wrap;gap:10px}
+.old a{font-size:13.5px;font-weight:600;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 14px}
+.old a:hover{border-color:var(--ink)}
+.foot{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">FoodTruckOS · Fase de diseño</p>
+<h1>Menú del comensal</h1>
+<p class="lede">Tras explorar tres direcciones, se eligió A · Rotulación como base y C · Pizarrón como segunda piel. Ya no son dos diseños: son <b>dos estilos de un mismo sistema</b>, y el conmutador de arriba a la izquierda es exactamente la función que el dueño tendrá en su panel.</p>
+
+<h2>La propuesta</h2>
+<a class="hero" href="menu-comensal.html">
+  <div class="strip"><i style="background:#D62828"></i><i style="background:#F4661B"></i><i style="background:#F2A413"></i><i style="background:#257B4B"></i><i style="background:#0C7979"></i><i style="background:#1F5FBF"></i><i style="background:#7B2D8E"></i><i style="background:#D11072"></i></div>
+  <h3>Vibrante &amp; Tradicional →</h3>
+  <p>Un solo archivo con las dos pieles intercambiables en vivo. Cambia el estilo, el color de marca y el idioma sin recargar, y comprueba que ambas comparten el mismo esqueleto.</p>
+  <div class="pills">
+    <span class="pill">2 estilos</span><span class="pill">10 colores</span><span class="pill">ES / EN</span>
+    <span class="pill">Arma tu taco</span><span class="pill">Arma tu burrito</span><span class="pill">El más pedido</span>
+  </div>
+</a>
+
+<h2>Qué comparten y qué las separa</h2>
+<div class="two">
+  <div class="box">
+    <h4>Idéntico en las dos</h4>
+    <ul>
+      <li>Encabezado de bloque de color con logo y trazo del oficio</li>
+      <li>Filete grueso de categoría con contador de platillos</li>
+      <li>Precio condensado con sombra dura</li>
+      <li>Botones de categoría pegados arriba</li>
+      <li>Hoja de pedido, con imagen del platillo</li>
+      <li>Distintivo del más pedido y marca de agotado</li>
+    </ul>
+  </div>
+  <div class="box">
+    <h4>Lo único que cambia</h4>
+    <ul>
+      <li><b>Vibrante:</b> miniatura + nombre + precio. 7 platillos por pantalla. Aguanta bien sin fotos.</li>
+      <li><b>Tradicional:</b> nombre con línea punteada al precio, descripción en una línea. 12 platillos por pantalla. La más rápida en un celular viejo.</li>
+      <li>En las dos, al tocar el platillo la hoja muestra la imagen — el que elige Tradicional no renuncia a la foto, solo la mueve.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Lo nuevo de esta versión</h2>
+
+<div class="note">
+  <h3>Trazo del oficio en el encabezado</h3>
+  <p>Tacos, elotes, chiles y vasos dibujados solo con línea, sin relleno, al 17% sobre el color de marca. Da textura sin quitar legibilidad bajo el sol.</p>
+  <p>Está pensado como <b>parte del sistema, no como decoración fija</b>: cada tipo de negocio tendría su propio juego de trazos — hamburguesas, mariscos, café — y se elige en el alta junto con el color. Un cliente nuevo lo recibe sin trabajo de diseño de por medio.</p>
+</div>
+
+<div class="note">
+  <h3>El más pedido</h3>
+  <p>Hoy está marcado a mano en dos platillos, pero <b>el sistema ya tendrá el dato</b>: sabe cuántas veces se pidió cada cosa. Lo natural es que el distintivo aparezca solo, calculado sobre las ventas reales de las últimas semanas, sin que el dueño tenga que mantenerlo.</p>
+  <p>Conviene limitarlo a uno o dos por categoría. Si todo es el más pedido, nada lo es.</p>
+</div>
+
+<div class="note">
+  <h3>Arma tu taco y arma tu burrito</h3>
+  <p>Pasos con botones grandes, nunca un formulario. El botón de agregar permanece bloqueado hasta elegir lo obligatorio, y una carne agotada aparece tachada y deshabilitada también aquí — el agotado se propaga solo.</p>
+  <p><b>Los precios del armado son de demostración</b>, porque el menú real de El Farol no tiene esta opción. Están calibrados para no competir contra la carta: un burrito armado con asada cuesta $11.00, exactamente lo mismo que el burrito de asada fijo. Esa regla hay que mantenerla — si armarlo sale más barato, el cliente deja de pedir de la carta.</p>
+</div>
+
+<h2>Cómo probarla antes de decidir</h2>
+<ol>
+  <li><b>La prueba del sol.</b> Ábrela en tu celular, sal a la luz directa y míralas. Usa “Ocultar” para quitar la barra de prueba y ver la pantalla limpia.</li>
+  <li><b>La prueba de la paleta.</b> Cambia el color varias veces en cada estilo. Los diez pasan el contraste mínimo; el más bajo queda en 5.01:1 y se muestra arriba a la derecha.</li>
+  <li><b>La prueba del idioma.</b> Alterna ES/EN en ambos estilos. El texto cambia de largo y el diseño no debe romperse.</li>
+  <li><b>La prueba del hambre.</b> Arma un taco completo. Si en algún punto se siente como llenar un formulario, hay que rediseñar ese paso.</li>
+</ol>
+
+<h2>Exploración anterior</h2>
+<p class="lede" style="font-size:14.5px;margin-bottom:14px">Se conservan como referencia de por qué se decidió lo que se decidió.</p>
+<div class="old">
+  <a href="a-rotulacion.html">A · Rotulación</a>
+  <a href="b-ventanilla.html">B · Ventanilla</a>
+  <a href="c-pizarron.html">C · Pizarrón</a>
+</div>
+
+<div class="foot">Menú de prueba: Taquería El Farol, rescatado del prototipo anterior. Precios y textos de la carta son reales; los del armado son de demostración. Ningún platillo tiene foto todavía, por eso los marcadores son honestos y no imágenes de banco.</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cuenta — Panel del dueño · FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;
+  --page:#F9F9F7;--card:#FFFFFF;--ring:rgba(11,11,11,.10);
+  --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+  --f:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab a{background:#2F2C29;color:#D8D5D0;border-radius:4px;padding:5px 10px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.bd{display:flex;align-items:center;gap:9px;padding:14px 0}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.bd span{font-weight:800;letter-spacing:-.02em;font-size:15px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs a{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current]{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tabs a:not([aria-current]){opacity:.62}
+.acct{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);padding:14px 0}
+
+.wrap{max-width:1000px;margin:0 auto;padding:26px 22px 90px}
+h1{font-size:29px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-size:14px;color:var(--ink2);margin:6px 0 22px;max-width:66ch}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px 16px;font:700 13.5px var(--f);cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.mini{padding:7px 12px;font-size:12.5px}
+.btn.danger{color:var(--bad);border-color:#F0BFC0}
+.btn.danger:hover{background:var(--badBg);border-color:var(--bad)}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.c12{grid-column:span 12}.c7{grid-column:span 7}.c5{grid-column:span 5}.c6{grid-column:span 6}
+@media (max-width:820px){.c7,.c5,.c6{grid-column:span 12}}
+.card{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:20px}
+.card h2{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.card .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+
+/* plan */
+.plan .big{font-size:52px;font-weight:800;letter-spacing:-.045em;line-height:1;margin:10px 0 0}
+.plan .big em{font-style:normal;font-size:20px;font-weight:700;color:var(--ink2);letter-spacing:-.01em}
+.plan .det{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px}
+.plan .det div b{display:block;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.plan .det div span{font-size:12.5px;color:var(--ink2)}
+.next{background:var(--page);border-radius:11px;padding:15px 16px;margin-top:18px}
+.next b{display:block;font-size:15px;font-weight:800}
+.next p{margin:5px 0 0;font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* escalera */
+.lad{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+.lad th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+.lad td{padding:11px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.lad tr:last-child td{border-bottom:0}
+.lad tr.now td{background:var(--goodBg);font-weight:800}
+.lad tr.now td:first-child{border-radius:8px 0 0 8px}
+.lad tr.now td:last-child{border-radius:0 8px 8px 0}
+.lad .tag{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--good);color:#fff;border-radius:100px;padding:2px 8px;margin-left:8px}
+
+.nocom{background:var(--goodBg);border:1px solid #BFE3CE;border-radius:12px;padding:16px 18px}
+.nocom b{display:block;font-size:15px;font-weight:800;color:#14603C;margin-bottom:4px}
+.nocom p{margin:0;font-size:13.5px;color:#1E5236;line-height:1.55}
+
+.pend{background:var(--warnBg);border:1px solid #F0D9A8;border-radius:12px;padding:16px 18px}
+.pend b{display:block;font-size:15px;font-weight:800;color:#6B4A12;margin-bottom:4px}
+.pend p{margin:0;font-size:13.5px;color:#6B4A12;line-height:1.55}
+
+/* recibos */
+.rec{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.rec .m{flex:1;min-width:0}
+.rec .m b{display:block;font-size:14.5px;font-weight:700}
+.rec .m span{font-size:12.5px;color:var(--ink2)}
+.rec .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{font-size:11px;font-weight:800;border-radius:100px;padding:2px 9px;background:var(--goodBg);color:var(--good);white-space:nowrap}
+
+/* datos */
+.fila{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fila:last-child{border-bottom:0}
+.fila .k{font-size:13px;color:var(--ink2);width:88px;flex:none;font-weight:600}
+.fila .v{font-size:14.5px;font-weight:700;flex:1;min-width:0;overflow-wrap:anywhere}
+.fila .btn{flex:none}
+
+.leave{border:1px dashed var(--line);border-radius:14px;padding:20px;margin-top:16px;background:var(--card)}
+.leave b{display:block;font-size:15px;font-weight:800;margin-bottom:5px}
+.leave p{font-size:13.5px;color:var(--ink2);margin:0 0 14px;line-height:1.55;max-width:66ch}
+
+/* modal */
+.veil{position:fixed;inset:0;z-index:80;background:rgba(11,11,11,.5);display:none;place-items:center;padding:20px}
+.veil.on{display:grid}
+.box{background:var(--card);border-radius:16px;padding:24px;max-width:470px;width:100%;max-height:90vh;overflow:auto}
+.box h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.box p{font-size:14px;color:var(--ink2);margin:0 0 16px;line-height:1.55}
+.box ul{margin:0 0 16px;padding-left:20px}
+.box li{font-size:14px;color:var(--ink2);margin-bottom:7px}
+.acts2{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:90;background:var(--ink);color:#fff;border-radius:100px;padding:13px 24px;font-size:14px;font-weight:700;display:none}
+.toast.on{display:block}
+.tabs .soon{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap;opacity:.55;display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Panel del dueño · Cuenta</b>
+  <a href="panel-dueno.html">← Resumen</a><a href="panel-trucks.html">Trucks</a>
+  <a href="../prototipos.html">Todos los prototipos</a>
+  <span class="sep">Sin comisión por pedido · sin permanencia</span>
+</div>
+
+<nav class="nav">
+  <div class="bd"><div class="logo">F</div><span>FoodTruckOS</span></div>
+  <div class="tabs"><a href="panel-dueno.html">Resumen</a><a href="panel-menu.html">Menú</a><a href="panel-trucks.html">Trucks</a><a href="panel-marca.html">Marca</a><a href="panel-personal.html">Personal</a><a href="panel-qr.html">Códigos QR</a><a href="#" aria-current="page">Cuenta</a></div>
+  <div class="acct">Taquería El Farol</div>
+</nav>
+
+<div class="wrap">
+  <h1>Tu cuenta</h1>
+  <p class="sub">Lo que pagas, cuándo se cobra y tus recibos. Aquí no hay letras chiquitas: el precio depende solo de cuántos trucks tienes activos.</p>
+
+  <div class="grid">
+
+    <div class="card plan c7">
+      <h2>Tu plan</h2>
+      <p class="hint">Cliente desde marzo de 2026</p>
+      <div class="big" id="total"></div>
+      <div class="det">
+        <div><b id="nTrucks"></b><span>trucks activos</span></div>
+        <div><b id="pTruck"></b><span>por truck al mes</span></div>
+        <div><b id="antig"></b><span>meses con nosotros</span></div>
+      </div>
+      <div class="next">
+        <b id="proxT"></b>
+        <p id="proxP"></p>
+      </div>
+    </div>
+
+    <div class="card c5">
+      <h2>Cómo funciona el precio</h2>
+      <p class="hint">Entre más trucks, menos pagas por cada uno</p>
+      <table class="lad" id="lad">
+        <thead><tr><th>Trucks</th><th>Por truck</th><th>Al mes</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="c12" id="pendBox"></div>
+
+    <div class="c6">
+      <div class="nocom">
+        <b>Nunca te cobramos comisión por pedido</b>
+        <p>Vendas $500 o $5,000 en el mes, pagas lo mismo. Lo que cobras es tuyo completo — no pasamos por tu dinero.</p>
+      </div>
+    </div>
+
+    <div class="card c6">
+      <h2>Cómo pagas hoy</h2>
+      <p class="hint">Fase piloto</p>
+      <p style="font-size:14px;color:var(--ink2);margin:0;line-height:1.55">
+        Te mandamos el recibo por correo y lo pagas por transferencia. <b style="color:var(--ink)">El cobro automático con tarjeta llega pronto</b>; cuando esté, lo activas desde aquí y dejas de recibir el correo.</p>
+    </div>
+
+    <div class="card c7">
+      <h2>Tus recibos</h2>
+      <p class="hint">Se guardan todos, siempre</p>
+      <div id="recs"></div>
+    </div>
+
+    <div class="card c5">
+      <h2>Tus datos</h2>
+      <p class="hint">Lo que sale en el recibo</p>
+      <div class="fila"><span class="k">Negocio</span><span class="v">Taquería El Farol</span>
+        <button class="btn mini" data-ed="negocio">Cambiar</button></div>
+      <div class="fila"><span class="k">Correo</span><span class="v">beto@elfarol.com</span>
+        <button class="btn mini" data-ed="correo">Cambiar</button></div>
+      <div class="fila"><span class="k">Entras con</span><span class="v">Cuenta de Google</span>
+        <button class="btn mini" data-ed="acceso">Ver</button></div>
+    </div>
+
+    <div class="c12">
+      <div class="leave">
+        <b>¿Te quieres ir?</b>
+        <p>No hay contrato ni permanencia. Puedes cancelar cuando quieras y tus trucks siguen funcionando hasta que termine el mes que ya pagaste. Tu información se guarda dos años por si regresas.</p>
+        <button class="btn danger" id="cancel">Cancelar mi suscripción</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const precio=t=>t>=3?29:t===2?39:49;
+
+/* Escalera: agregar un truck siempre sube el total, y baja el precio unitario.
+   Nunca hay un salto hacia abajo — eso rompería la confianza. */
+const CTA={trucks:3,desde:'marzo de 2026',meses:5,
+  proximo:{fecha:'1 de agosto',monto:87},
+  pendiente:{que:'Pediste un cuarto truck',cuando:'1 de septiembre',monto:116},
+  recibos:[
+    {mes:'Julio 2026',t:3,monto:87,fecha:'1 de julio'},
+    {mes:'Junio 2026',t:3,monto:87,fecha:'1 de junio'},
+    {mes:'Mayo 2026',t:2,monto:78,fecha:'1 de mayo'},
+    {mes:'Abril 2026',t:2,monto:78,fecha:'1 de abril'},
+    {mes:'Marzo 2026',t:1,monto:49,fecha:'12 de marzo'}
+  ]};
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),Math.max(3600,m.length*45))}
+
+function draw(){
+  const p=precio(CTA.trucks), tot=CTA.trucks*p;
+  $('#total').innerHTML=money(tot)+' <em>al mes</em>';
+  $('#nTrucks').textContent=CTA.trucks;
+  $('#pTruck').textContent=money(p);
+  $('#antig').textContent=CTA.meses;
+  $('#proxT').textContent='Tu próximo cobro: '+money(CTA.proximo.monto)+' el '+CTA.proximo.fecha;
+  $('#proxP').textContent='El mes se paga al empezar. Si cambias de trucks a mitad de mes, '+
+    'el precio nuevo entra hasta el siguiente cobro — nunca te cobramos días sueltos.';
+
+  $('#lad tbody').innerHTML=[1,2,3,4,5].map(n=>{
+    const es=n===CTA.trucks, pr=precio(n);
+    return '<tr'+(es?' class="now"':'')+'><td>'+(n===5?'5 o más':n)+
+      (es?'<span class="tag">Tu plan</span>':'')+'</td>'+
+      '<td>'+money(pr)+'</td><td>'+money(n*pr)+'</td></tr>'}).join('');
+
+  $('#pendBox').innerHTML=CTA.pendiente
+    ? '<div class="pend"><b>'+CTA.pendiente.que+'</b>'+
+      '<p>Te contactamos para confirmar dónde va a estar y sus horarios. Si queda listo, desde el '+
+      CTA.pendiente.cuando+' pagarías '+money(CTA.pendiente.monto)+' al mes — '+
+      money(precio(CTA.trucks+1))+' por truck. Este mes no cambia nada.</p></div>'
+    : '';
+
+  $('#recs').innerHTML=CTA.recibos.map((r,i)=>
+    '<div class="rec"><div class="m"><b>'+r.mes+'</b>'+
+      '<span>'+r.t+' truck'+(r.t>1?'s':'')+' · cobrado el '+r.fecha+'</span></div>'+
+    '<span class="pill">Pagado</span>'+
+    '<span class="v">'+money(r.monto)+'</span>'+
+    '<button class="btn mini" data-rec="'+i+'">Recibo</button></div>').join('');
+  $('#recs').querySelectorAll('[data-rec]').forEach(b=>b.onclick=()=>{
+    const r=CTA.recibos[+b.dataset.rec];descargarRecibo(r)});
+}
+
+/* Genera un recibo de ejemplo de verdad — un archivo real que se descarga,
+   en vez de un botón que solo dice "descargando" y no entrega nada. En la
+   app final este mismo botón traería el PDF real emitido para ese cobro. */
+function descargarRecibo(r){
+  const texto=
+'FoodTruckOS — Recibo de ejemplo\n'+
+'--------------------------------\n'+
+'Negocio:   Taquería El Farol\n'+
+'Periodo:   '+r.mes+'\n'+
+'Cobrado:   '+r.fecha+'\n'+
+'Trucks:    '+r.t+'\n'+
+'Total:     '+money(r.monto)+'\n'+
+'--------------------------------\n'+
+'Este es un ejemplo del prototipo.\n'+
+'El recibo real de tu negocio se vería así, con tus datos oficiales.\n';
+  const blob=new Blob([texto],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='ejemplo-recibo-'+r.mes.replace(' ','-').toLowerCase()+'.txt';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('Ejemplo de recibo descargado — el real llegará en PDF con tus datos');
+}
+
+/* ---------- modales ---------- */
+function open(h){$('#veil').innerHTML='<div class="box" role="dialog" aria-modal="true">'+h+'</div>';
+  $('#veil').classList.add('on')}
+function close(){$('#veil').classList.remove('on')}
+$('#veil').onclick=e=>{if(e.target===$('#veil'))close()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+const EDITS={
+ negocio:{t:'Nombre del negocio',p:'Es el que sale en tus recibos. El nombre que ve tu cliente en el menú se cambia en Marca.'},
+ correo:{t:'Correo de la cuenta',p:'Aquí te llegan los recibos y los avisos. Es el mismo con el que entras al panel.'},
+ acceso:{t:'Cómo entras',p:'Entras con tu cuenta de Google, así que la contraseña la manejas allá — nosotros no la guardamos ni la podemos ver. Si algún día quieres entrar con correo y contraseña, avísanos y lo cambiamos.'}
+};
+$('#recs');
+document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{
+  const e=EDITS[b.dataset.ed];
+  open('<h3>'+e.t+'</h3><p>'+e.p+'</p>'+
+    '<div class="acts2"><button class="btn" id="c">Cerrar</button></div>');
+  $('#c').onclick=close});
+
+/* Cancelar: sin trucos, sin esconder el botón, y diciendo exactamente qué pasa. */
+$('#cancel').onclick=()=>{
+  open('<h3>¿Cancelar tu suscripción?</h3>'+
+    '<p>Antes de que decidas, esto es lo que va a pasar:</p>'+
+    '<ul>'+
+      '<li>Tus tres trucks <b>siguen funcionando hasta el 31 de agosto</b>, que es el mes que ya pagaste.</li>'+
+      '<li>Después, tus códigos QR dejan de abrir el menú.</li>'+
+      '<li><b>Tu información no se borra.</b> Ventas, menú y marca se guardan dos años. Si regresas, reactivar toma minutos.</li>'+
+      '<li>No te cobramos nada más. No hay penalización.</li>'+
+    '</ul>'+
+    '<p>Si es por algo que podemos arreglar, dínoslo primero — a veces es más fácil de lo que parece.</p>'+
+    '<div class="acts2"><button class="btn" id="c">Mejor no</button>'+
+      '<button class="btn" id="hab">Quiero hablarlo</button>'+
+      '<button class="btn danger" id="ok">Sí, cancelar</button></div>');
+  $('#c').onclick=close;
+  $('#hab').onclick=()=>{close();toast('Prototipo: aquí se abriría un chat con nuestro equipo')};
+  $('#ok').onclick=()=>{close();
+    toast('Simulación: tu suscripción quedaría cancelada el 31 de agosto. Nada se cancela de verdad en esta demostración')};
+};
+
+draw();
+</script>
+</body>
+</html>

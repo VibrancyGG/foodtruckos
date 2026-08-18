@@ -1,0 +1,767 @@
+<title>Bitácora de la P047</title>
+
+<style>
+  :root {
+    --bg: #E9E8E3;
+    --surface: #FAF9F6;
+    --surface-2: #F1F0EC;
+    --ink: #1A1815;
+    --ink-soft: #5E5A52;
+    --ink-faint: #8A857B;
+    --line: #D2D0C8;
+    --line-strong: #B8B5AB;
+    --accent: #B4670A;
+    --accent-bg: #F7E9CF;
+    --go: #1B6E52;
+    --go-bg: #DCEFE5;
+    --go-line: #9CCDB6;
+    --stop: #A32229;
+    --stop-bg: #F7DFDE;
+    --stop-line: #E2A9A6;
+    --field: #FFFFFF;
+
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #100F0D;
+      --surface: #1B1917;
+      --surface-2: #232019;
+      --ink: #F6F3ED;
+      --ink-soft: #9C948A;
+      --ink-faint: #79726A;
+      --line: #332F29;
+      --line-strong: #453F37;
+      --accent: #F5A524;
+      --accent-bg: #3A2A12;
+      --go: #6FD3A6;
+      --go-bg: #14291F;
+      --go-line: #2A5943;
+      --stop: #FFB3B5;
+      --stop-bg: #3A1E1F;
+      --stop-line: #6B3336;
+      --field: #14120F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #100F0D;
+    --surface: #1B1917;
+    --surface-2: #232019;
+    --ink: #F6F3ED;
+    --ink-soft: #9C948A;
+    --ink-faint: #79726A;
+    --line: #332F29;
+    --line-strong: #453F37;
+    --accent: #F5A524;
+    --accent-bg: #3A2A12;
+    --go: #6FD3A6;
+    --go-bg: #14291F;
+    --go-line: #2A5943;
+    --stop: #FFB3B5;
+    --stop-bg: #3A1E1F;
+    --stop-line: #6B3336;
+    --field: #14120F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; }
+
+  /* ---------- Encabezado ---------- */
+
+  .top { padding: 52px 0 0; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+
+  h1 {
+    font-size: clamp(29px, 6vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+    max-width: 58ch;
+  }
+
+  /* ---------- Avance ---------- */
+
+  .progress {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 12px;
+  }
+
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .progress-count {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-count em { font-style: normal; color: var(--ink-faint); font-weight: 500; }
+
+  .tally { display: flex; gap: 8px; font-family: var(--mono); font-size: 12px; }
+  .tally span { padding: 3px 9px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+  .tally .t-ok   { background: var(--go-bg);   color: var(--go); }
+  .tally .t-bad  { background: var(--stop-bg); color: var(--stop); }
+
+  .bar { height: 7px; background: var(--surface-2); border-radius: 999px; overflow: hidden; display: flex; }
+  .bar i { display: block; height: 100%; transition: width .3s ease; }
+  .bar .b-ok  { background: var(--go); }
+  .bar .b-bad { background: var(--stop); }
+
+  @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+  .warnbar {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-size: 14.5px;
+    margin-bottom: 12px;
+  }
+
+  /* ---------- Secciones ---------- */
+
+  section { padding-top: 42px; }
+
+  h2 {
+    font-size: 13px;
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  .block-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+
+  .block-note { color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
+
+  p { margin: 0 0 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ---------- Datos del aparato ---------- */
+
+  .fields {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 8px 22px;
+  }
+
+  .field {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .field:last-child { border-bottom: 0; }
+
+  .field label {
+    font-size: 14px;
+    font-weight: 600;
+    flex: none;
+    width: 210px;
+  }
+  .field label small { display: block; font-weight: 400; color: var(--ink-faint); font-size: 12.5px; line-height: 1.4; }
+
+  input[type="text"] {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    padding: 8px 11px;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  input[type="text"]::placeholder { color: var(--ink-faint); opacity: 1; }
+
+  input[type="text"]:focus-visible,
+  input[type="radio"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Pruebas ---------- */
+
+  .tests { display: flex; flex-direction: column; gap: 14px; }
+
+  .test {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+    transition: border-color .2s ease;
+  }
+
+  .test.decisive { border-color: var(--accent); border-width: 2px; }
+
+  .test:has(input[value="ok"]:checked)   { border-color: var(--go-line); }
+  .test:has(input[value="bad"]:checked)  { border-color: var(--stop-line); background: var(--stop-bg); }
+
+  .test-head { display: flex; gap: 13px; align-items: baseline; margin-bottom: 13px; }
+
+  .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    padding-top: 2px;
+  }
+
+  .test h3 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .row { display: flex; gap: 12px; align-items: baseline; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    flex: none;
+    width: 74px;
+    text-align: center;
+  }
+
+  .tag.do   { background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); }
+  .tag.pass { background: var(--go-bg);     color: var(--go); }
+  .tag.fail { background: var(--stop-bg);   color: var(--stop); }
+  .tag.note { background: transparent;      color: var(--ink-faint); border: 1px dashed var(--line-strong); }
+
+  .row div { flex: 1; min-width: 0; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  strong { font-weight: 700; }
+
+  /* ---------- El bloque que se llena ---------- */
+
+  .result {
+    border-top: 1px dashed var(--line-strong);
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .verdict { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+
+  .verdict label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .verdict label:has(input[value="ok"]:checked)  { background: var(--go-bg);   border-color: var(--go);   color: var(--go); }
+  .verdict label:has(input[value="bad"]:checked) { background: var(--stop-bg); border-color: var(--stop); color: var(--stop); }
+
+  .verdict input[type="radio"] { accent-color: var(--accent); margin: 0; }
+
+  .result input[type="text"] { width: 100%; }
+
+  /* ---------- Corte entre bloques ---------- */
+
+  .gate {
+    margin-top: 24px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: var(--go-bg);
+  }
+  .gate p { color: var(--go); font-weight: 600; margin: 0; font-size: 15px; }
+
+  /* ---------- Veredicto ---------- */
+
+  .final {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .final:has(input[value="ok"]:checked)  { border-color: var(--go-line); background: var(--go-bg); }
+  .final:has(input[value="bad"]:checked) { border-color: var(--stop-line); background: var(--stop-bg); }
+  .final .result { border-top: 0; padding-top: 0; }
+
+  footer {
+    margin-top: 52px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 14px;
+  }
+
+  footer a { color: var(--accent); }
+
+  @media (max-width: 580px) {
+    .row { flex-direction: column; gap: 5px; }
+    .tag { width: auto; align-self: flex-start; }
+    .field label { width: 100%; }
+    body { padding: 0 16px 72px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <p class="eyebrow">FoodTruckOS · Comanda impresa · Etapa 1</p>
+    <h1>Bitácora de pruebas</h1>
+    <p class="standfirst">
+      Marca cada prueba y escribe lo que viste. Se guarda solo, en cuanto lo tocas —
+      puedes cerrar la página y volver mañana.
+    </p>
+  </div>
+
+  <div id="avisoLectura" class="warnbar" hidden>
+    Esta vista es de solo lectura: lo que marques aquí no se va a guardar.
+  </div>
+
+  <div class="progress">
+    <div class="progress-top">
+      <span class="progress-count"><span id="hechas">0</span> <em>de 15 pruebas</em></span>
+      <span class="tally">
+        <span class="t-ok"><span id="nOk">0</span> pasaron</span>
+        <span class="t-bad"><span id="nBad">0</span> fallaron</span>
+      </span>
+    </div>
+    <div class="bar">
+      <i class="b-ok" id="barOk" style="width:0%"></i>
+      <i class="b-bad" id="barBad" style="width:0%"></i>
+    </div>
+  </div>
+
+  <section>
+    <h2>Primero</h2>
+    <p class="block-title">Datos del aparato</p>
+    <p class="block-note">
+      Esto es lo que después va al documento de equipos aprobados — lo que el cliente
+      lee cuando le decimos "compra ésta". Llénalo conforme lo vayas descubriendo.
+    </p>
+    <div class="fields" artifact-sync>
+      <div class="field">
+        <label>Nombre Bluetooth<small>El que ve el cliente al emparejar</small></label>
+        <input type="text" placeholder="p. ej. TM-m30-b001">
+      </div>
+      <div class="field">
+        <label>Dirección MAC<small>Sale en el autotest</small></label>
+        <input type="text" placeholder="00:11:22:33:44:55">
+      </div>
+      <div class="field">
+        <label>PIN de emparejamiento<small>Si no es 0000, hay que avisarlo</small></label>
+        <input type="text" placeholder="0000">
+      </div>
+      <div class="field">
+        <label>Versión de firmware</label>
+        <input type="text" placeholder="—">
+      </div>
+      <div class="field">
+        <label>Segundos en reconectar<small>Predice cuánto soporte va a costar</small></label>
+        <input type="text" placeholder="p. ej. 4 s">
+      </div>
+      <div class="field">
+        <label>Rollo que usa<small>Ancho y diámetro máximo</small></label>
+        <input type="text" placeholder="80 mm × ? mm">
+      </div>
+      <div class="field">
+        <label>Papel de sobra al cortar<small>Si sobra mucho, se ajusta</small></label>
+        <input type="text" placeholder="p. ej. 18 mm">
+      </div>
+      <div class="field">
+        <label>Fecha de las pruebas</label>
+        <input type="text" placeholder="—">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bloque A · sin código</h2>
+    <p class="block-title">El día que llega la caja</p>
+    <p class="block-note">
+      Estas siete las corres tú solo, sin esperar el caparazón de Android. Media hora.
+    </p>
+
+    <div class="tests">
+
+      <div class="test">
+        <div class="test-head"><span class="num">A0</span><h3>Autotest de fábrica</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Apágala. Mantén apretado <code>FEED</code> y préndela. Suelta cuando empiece a imprimir.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Sale una hoja con el modelo, el firmware y <strong>el nombre y la MAC de Bluetooth</strong>.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>Si sale en blanco, dale la vuelta al rollo: el papel térmico solo imprime de un lado. Es el error número uno.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a0" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a0" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Qué viste…">
+        </div>
+      </div>
+
+      <div class="test decisive">
+        <div class="test-head"><span class="num">A1</span><h3>La que decide: Bluetooth clásico, sin SDK del fabricante</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Empareja desde <strong>Ajustes › Bluetooth</strong> como cualquier bocina (PIN <code>0000</code> o <code>1234</code>). Luego manda texto desde una app genérica de ESC/POS — <code>RawBT</code> o similar, <strong>no</strong> la de MUNBYN.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Imprime desde una app que no es del fabricante. Eso prueba que habla Bluetooth estándar, que es lo único que necesita nuestro caparazón.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div><strong>Detente y avísame.</strong> No sigas con las demás: cambia el diseño de la aplicación y hay que decidir antes de invertir semanas.</div></div>
+          <div class="row"><span class="tag note">Ojo</span><div>Debería aparecer como <code>TM-m30-b001</code> o <code>TM-m30III</code>. Ese nombre es buena señal.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a1" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a1" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Qué app usaste y qué pasó…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A2</span><h3>Acentos y eñes</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Manda tal cual: <code>PIÑA · jalapeño · sin azúcar · ¿algo más?</code></div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se lee igual en el papel.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>Si sale <code>PIÃ‘A</code> o cuadritos, <strong>no es la impresora</strong>: es la tabla de caracteres y se arregla en código. Anota qué salió y sigue.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a2" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a2" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Qué salió exactamente en el papel…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A3</span><h3>El corte</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Manda una comanda larga, de diez o doce renglones, y deja que corte sola.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>El papel se separa completo y <strong>no se come la última línea</strong>, que es donde va el total.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a3" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a3" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Cuánto papel sobró, si quedó colgando…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A4</span><h3>La chicharra</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Manda estos cuatro bytes en crudo: <code>1B 42 03 02</code></div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Suena. Entonces la dejamos activada y cocina escucha la orden sin ver la tablet.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>Si imprime basura o no hace nada, la apagamos — es un parámetro. <strong>No es motivo de rechazo:</strong> el aviso sonoro ya lo da la tablet.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a4" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a4" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="¿Sonó, imprimió basura, o nada?">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A5</span><h3>Reconexión — la que más falla en la práctica</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Apaga y prende la impresora <strong>tres veces seguidas</strong>, mandando algo después de cada una. Luego llévala a otro cuarto hasta que pierda señal, y regrésala.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Vuelve sola las tres veces y al regresar de rango, <strong>sin volver a emparejar</strong>.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>Si basta con reabrir la app, se puede automatizar. Si hay que reemparejar, es motivo de rechazo.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a5" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a5" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Qué tuviste que hacer para recuperarla, cuántos segundos…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A6</span><h3>Que se acabe el papel</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Deja que el rollo se termine a media impresión. Pon uno nuevo.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se recupera sola al cerrar la tapa, sin apagarla ni reemparejar.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-a6" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-a6" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Qué rollo usa, cómo se recuperó…">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="gate">
+      <p>Si el Bloque A pasa completo, la arquitectura está confirmada y arranco el caparazón de Android.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bloque B · con el caparazón</h2>
+    <p class="block-title">Ya con la aplicación instalada</p>
+    <p class="block-note">Estas las corremos juntos cuando la app esté lista.</p>
+
+    <div class="tests">
+
+      <div class="test">
+        <div class="test-head"><span class="num">B1</span><h3>Una orden por QR sale impresa</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>Un comensal ordena desde su celular y la comanda sale sin que nadie toque la tablet.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b1" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b1" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B2</span><h3>Una orden de ventanilla sale impresa</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se captura en ventanilla y la comanda sale al instante, sin pasos extra.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b2" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b2" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test decisive">
+        <div class="test-head"><span class="num">B3</span><h3>Modo avión — la prueba que justifica toda la arquitectura</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Tablet en modo avión, y vuelve a prender solo el Bluetooth. Captura una orden en ventanilla.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div><strong>Imprime igual.</strong> Por esto descartamos las impresoras de nube: el truck se queda sin señal y la cocina sigue.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b3" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b3" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B4</span><h3>Impresora apagada: la comanda no se pierde</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Con la impresora apagada, mete dos órdenes. Luego préndela.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Salen las dos, en orden, sin que nadie haga nada.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b4" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b4" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B5</span><h3>Pantalla apagada</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Deja la tablet con la pantalla apagada diez minutos. Manda una orden.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Imprime. Prueba que Android no está matando la aplicación en segundo plano.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b5" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b5" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B6</span><h3>Dos órdenes al mismo tiempo</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Que entren dos pedidos casi simultáneos, uno por QR y otro por ventanilla.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Salen <strong>dos</strong> comandas, no una.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b6" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b6" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B7</span><h3>Reimprimir y dos copias</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>El botón de reimprimir saca una comanda idéntica con <code>COPIA</code> arriba, para que cocina no prepare el platillo dos veces. Y con dos copias configuradas, salen dos.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b7" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b7" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B8</span><h3>Aislamiento entre negocios</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Con dos negocios distintos y sus tablets emparejadas, manda órdenes a los dos.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Ninguno imprime lo del otro.</div></div>
+        </div>
+        <div class="result" artifact-sync>
+          <div class="verdict">
+            <label><input type="radio" name="v-b8" value="ok"> Pasó</label>
+            <label><input type="radio" name="v-b8" value="bad"> Falló</label>
+          </div>
+          <input type="text" placeholder="Notas…">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Al final</h2>
+    <p class="block-title">Veredicto</p>
+    <p class="block-note">¿Entra a la lista de equipos aprobados o no?</p>
+    <div class="final">
+      <div class="result" artifact-sync>
+        <div class="verdict">
+          <label><input type="radio" name="v-final" value="ok"> Aprobada</label>
+          <label><input type="radio" name="v-final" value="bad"> Rechazada</label>
+        </div>
+        <input type="text" placeholder="Por qué, y qué le decimos al cliente…">
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Si algo del Bloque A falla, mándame la foto del papel: casi siempre se diagnostica
+    con eso. La única prueba que detiene todo es la A1.
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var TOTAL = 15;
+
+    function recontar() {
+      var vistos = {}, ok = 0, bad = 0;
+      var marcados = document.querySelectorAll('.test input[type="radio"]:checked');
+      for (var i = 0; i < marcados.length; i++) {
+        var r = marcados[i];
+        if (vistos[r.name]) continue;
+        vistos[r.name] = true;
+        if (r.value === "ok") ok++; else bad++;
+      }
+      document.getElementById("nOk").textContent = ok;
+      document.getElementById("nBad").textContent = bad;
+      document.getElementById("hechas").textContent = ok + bad;
+      document.getElementById("barOk").style.width = (ok / TOTAL * 100) + "%";
+      document.getElementById("barBad").style.width = (bad / TOTAL * 100) + "%";
+    }
+
+    // El contador vive fuera de las regiones que se guardan: es cuenta de esta
+    // vista, no parte del documento.
+    document.addEventListener("change", function (e) {
+      if (e.target && e.target.type === "radio") recontar();
+    });
+
+    // Cuando alguien más marca algo, su cambio llega a este DOM: hay que
+    // recontar para que la barra no quede vieja.
+    document.addEventListener("claude:edit", recontar);
+
+    // Si la vista es de solo lectura, lo que marque no se guarda. Mejor decirlo
+    // que dejar que llene media bitácora y la pierda.
+    document.addEventListener("claude:sync-off", function () {
+      document.getElementById("avisoLectura").hidden = false;
+    });
+
+    recontar();
+  })();
+</script>

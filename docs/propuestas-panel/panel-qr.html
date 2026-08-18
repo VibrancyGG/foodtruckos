@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Códigos QR — Panel del dueño · FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;
+  --page:#F9F9F7;--card:#FFFFFF;--ring:rgba(11,11,11,.10);
+  --good:#006300;--goodBg:#E9F6EF;
+  --brand:#D62828;--onBrand:#fff;
+  --f:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab a{background:#2F2C29;color:#D8D5D0;border-radius:4px;padding:5px 10px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.bd{display:flex;align-items:center;gap:9px;padding:14px 0}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.bd span{font-weight:800;letter-spacing:-.02em;font-size:15px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs a{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current]{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tabs a:not([aria-current]){opacity:.62}
+.acct{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);padding:14px 0}
+
+.wrap{max-width:1000px;margin:0 auto;padding:26px 22px 90px}
+h1{font-size:29px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-size:14px;color:var(--ink2);margin:6px 0 22px;max-width:66ch}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px 16px;font:700 13.5px var(--f);cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.mini{padding:7px 12px;font-size:12.5px}
+
+.note{background:var(--goodBg);border:1px solid #BFE3CE;border-radius:12px;padding:16px 18px;margin-bottom:22px}
+.note b{display:block;font-size:14.5px;font-weight:800;margin-bottom:5px}
+.note p{margin:0;font-size:13.5px;color:#1E5236;line-height:1.55}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.qc{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:20px;text-align:center}
+.qc h2{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0}
+.qc .loc{font-size:13px;color:var(--ink2);margin:3px 0 15px}
+.qwrap{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;display:inline-block;line-height:0}
+canvas{display:block;image-rendering:pixelated}
+.url{font-size:12.5px;color:var(--ink2);font-weight:600;margin:13px 0 15px;word-break:break-all}
+.qacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+.how{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:22px;margin-top:20px}
+.how h2{font-size:16px;font-weight:800;margin:0 0 12px}
+.how ol{margin:0;padding-left:20px}
+.how li{font-size:14px;margin-bottom:9px;color:var(--ink2)}
+.how li b{color:var(--ink)}
+
+/* hoja para imprimir */
+.sheet{display:none}
+@media print{
+  .lab,.nav,.wrap{display:none!important}
+  .sheet{display:block}
+  @page{margin:12mm}
+  .poster{page-break-after:always;text-align:center;padding-top:14mm}
+  .poster:last-child{page-break-after:auto}
+  .pband{background:var(--brand)!important;color:var(--onBrand)!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    padding:12mm 8mm;border-radius:6mm 6mm 0 0}
+  .pband h2{font-family:'Anton',sans-serif;font-size:34pt;text-transform:uppercase;margin:0;line-height:.98}
+  .pband p{font-size:13pt;margin:4mm 0 0;font-weight:600}
+  .pq{border:1px solid #ddd;border-top:0;border-radius:0 0 6mm 6mm;padding:10mm}
+  .pq canvas{margin:0 auto}
+  .pmsg{font-size:20pt;font-weight:800;margin:8mm 0 2mm}
+  .pmsg2{font-size:15pt;font-weight:600;color:#555;margin:0}
+  .pfoot{font-size:9pt;color:#888;margin-top:8mm}
+}
+
+.tabs .soon{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap;opacity:.55;display:flex;align-items:center;gap:6px}
+.tabs .soon i{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--line);color:var(--ink2);border-radius:100px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Panel del dueño · Códigos QR</b>
+  <a href="panel-dueno.html">← Resumen</a><a href="panel-trucks.html">Trucks</a>
+  <a href="panel-marca.html">Marca</a><a href="panel-menu.html">Menú</a>
+  <span class="sep">QR reales · escanéalos con tu celular</span>
+</div>
+
+<nav class="nav">
+  <div class="bd"><div class="logo">F</div><span>FoodTruckOS</span></div>
+  <div class="tabs"><a href="panel-dueno.html">Resumen</a><a href="panel-menu.html">Menú</a><a href="panel-trucks.html">Trucks</a><a href="panel-marca.html">Marca</a><a href="panel-personal.html">Personal</a><a href="#" aria-current="page">Códigos QR</a><a href="panel-cuenta.html">Cuenta</a></div>
+  <div class="acct">Taquería El Farol</div>
+</nav>
+
+<div class="wrap">
+  <h1>Tus códigos QR</h1>
+  <p class="sub">Cada truck tiene el suyo. Descárgalo, imprímelo y pégalo donde tu cliente lo vea mientras hace fila. No caducan: aunque cambies el menú o los precios, el mismo código sigue sirviendo.</p>
+
+  <div class="note">
+    <b>Estos códigos son de verdad</b>
+    <p>Escanéalos ahorita con la cámara de tu celular para comprobarlo. Te va a mandar a la dirección que aparece debajo de cada uno.</p>
+  </div>
+
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px">
+    <button class="btn primary" onclick="window.print()">Imprimir los tres carteles</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="how">
+    <h2>Qué hacer con ellos</h2>
+    <ol>
+      <li><b>Imprímelos en grande</b>, mínimo del tamaño de una hoja carta. Un QR chiquito no se escanea desde la fila.</li>
+      <li><b>Pégalos donde se vean mientras esperan</b>: la ventanilla, un costado del truck, las mesas si tienes.</li>
+      <li><b>Plastifícalos o mételos en un micapa.</b> Van a aguantar sol, grasa y lluvia.</li>
+      <li><b>No los tapes con nada</b> ni les pegues cosas encima. Si se raya o se despinta, imprime otro — es el mismo código.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="sheet" id="sheet"></div>
+
+<script>
+/* =====================================================================
+   Codificador QR — versión 3, corrección M, modo byte, un bloque.
+   Verificado con: 567 posiciones de datos, residuo Reed-Solomon en cero,
+   y lectura de vuelta que devuelve el texto original.
+   ===================================================================== */
+const VER=3,SIZE=17+4*VER,DATA_CW=44,EC_CW=26,REMAINDER=7;
+const EXP=new Uint8Array(512),LOG=new Uint8Array(256);
+(()=>{let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&0x100)x^=0x11D}
+  for(let i=255;i<512;i++)EXP[i]=EXP[i-255]})();
+const mul=(a,b)=>(a&&b)?EXP[LOG[a]+LOG[b]]:0;
+function genPoly(n){let g=[1];
+  for(let i=0;i<n;i++){const ng=new Array(g.length+1).fill(0);
+    for(let j=0;j<g.length;j++){ng[j]^=mul(g[j],1);ng[j+1]^=mul(g[j],EXP[i])}g=ng}
+  return g}
+function rsEncode(d,n){const g=genPoly(n),res=new Array(n).fill(0);
+  for(const b of d){const f=b^res[0];res.shift();res.push(0);
+    for(let i=0;i<n;i++)res[i]^=mul(g[i+1],f)}
+  return res}
+function encodeData(t){
+  const bytes=Array.from(new TextEncoder().encode(t));
+  if(bytes.length>DATA_CW-2)throw new Error('texto muy largo');
+  const bits=[],push=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>i)&1)};
+  push(0b0100,4);push(bytes.length,8);bytes.forEach(b=>push(b,8));
+  for(let i=0;i<4&&bits.length<DATA_CW*8;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  const cw=[];for(let i=0;i<bits.length;i+=8)cw.push(parseInt(bits.slice(i,i+8).join(''),2));
+  const pad=[0xEC,0x11];let k=0;while(cw.length<DATA_CW)cw.push(pad[k++%2]);
+  return cw}
+const NEW=()=>({m:Array.from({length:SIZE},()=>new Array(SIZE).fill(0)),
+                f:Array.from({length:SIZE},()=>new Array(SIZE).fill(false))});
+function finder(g,r,c){for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){
+  const y=r+i,x=c+j;if(y<0||y>=SIZE||x<0||x>=SIZE)continue;
+  const on=(i>=0&&i<=6&&(j===0||j===6))||(j>=0&&j<=6&&(i===0||i===6))||(i>=2&&i<=4&&j>=2&&j<=4);
+  g.m[y][x]=on?1:0;g.f[y][x]=true}}
+function align(g,r,c){for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){
+  g.m[r+i][c+j]=(Math.max(Math.abs(i),Math.abs(j))!==1)?1:0;g.f[r+i][c+j]=true}}
+function patterns(g){
+  finder(g,0,0);finder(g,0,SIZE-7);finder(g,SIZE-7,0);align(g,SIZE-7,SIZE-7);
+  for(let i=8;i<SIZE-8;i++){const v=i%2===0?1:0;
+    g.m[6][i]=v;g.f[6][i]=true;g.m[i][6]=v;g.f[i][6]=true}
+  g.m[SIZE-8][8]=1;g.f[SIZE-8][8]=true;
+  for(let i=0;i<=8;i++){if(!g.f[8][i]){g.f[8][i]=true}if(!g.f[i][8]){g.f[i][8]=true}}
+  for(let i=0;i<8;i++){g.f[8][SIZE-1-i]=true;g.f[SIZE-1-i][8]=true}}
+function order(g){const pos=[];let up=true;
+  for(let right=SIZE-1;right>0;right-=2){if(right===6)right=5;
+    for(let k=0;k<SIZE;k++){const y=up?SIZE-1-k:k;
+      for(let d=0;d<2;d++){const x=right-d;if(!g.f[y][x])pos.push([y,x])}}
+    up=!up}
+  return pos}
+const MASK=[(i,j)=>(i+j)%2===0,(i,j)=>i%2===0,(i,j)=>j%3===0,(i,j)=>(i+j)%3===0,
+ (i,j)=>(Math.floor(i/2)+Math.floor(j/3))%2===0,(i,j)=>((i*j)%2+(i*j)%3)===0,
+ (i,j)=>(((i*j)%2+(i*j)%3)%2)===0,(i,j)=>(((i+j)%2+(i*j)%3)%2)===0];
+function formatBits(mask){const d=(0b00<<3|mask);let v=d<<10;
+  for(let i=4;i>=0;i--)if((v>>(i+10))&1)v^=0x537<<i;
+  return ((d<<10)|v)^0x5412}
+function putFormat(g,mask){const f=formatBits(mask),bit=i=>(f>>i)&1;
+  for(let i=0;i<=5;i++)g.m[8][i]=bit(i);
+  g.m[8][7]=bit(6);g.m[8][8]=bit(7);g.m[7][8]=bit(8);
+  for(let i=9;i<=14;i++)g.m[14-i][8]=bit(i);
+  for(let i=0;i<=7;i++)g.m[SIZE-1-i][8]=bit(i);
+  for(let i=8;i<=14;i++)g.m[8][SIZE-15+i]=bit(i);
+  g.m[SIZE-8][8]=1}
+function penalty(m){let p=0;
+  const run=l=>{let n=1,q=0;for(let i=1;i<SIZE;i++){if(l[i]===l[i-1])n++;else{if(n>=5)q+=3+(n-5);n=1}}
+    if(n>=5)q+=3+(n-5);return q};
+  for(let i=0;i<SIZE;i++){p+=run(m[i]);p+=run(m.map(r=>r[i]))}
+  for(let i=0;i<SIZE-1;i++)for(let j=0;j<SIZE-1;j++)
+    if(m[i][j]===m[i][j+1]&&m[i][j]===m[i+1][j]&&m[i][j]===m[i+1][j+1])p+=3;
+  const A=[1,0,1,1,1,0,1,0,0,0,0],B=[0,0,0,0,1,0,1,1,1,0,1];
+  const scan=l=>{let c=0;for(let i=0;i<=SIZE-11;i++){const s=l.slice(i,i+11);
+    if(A.every((v,k)=>v===s[k])||B.every((v,k)=>v===s[k]))c+=40}return c};
+  for(let i=0;i<SIZE;i++){p+=scan(m[i]);p+=scan(m.map(r=>r[i]))}
+  const dark=m.flat().filter(v=>v===1).length;
+  p+=Math.floor(Math.abs(dark*100/(SIZE*SIZE)-50)/5)*10;return p}
+function buildQR(text){
+  const cw=encodeData(text),bits=[];
+  cw.concat(rsEncode(cw,EC_CW)).forEach(b=>{for(let i=7;i>=0;i--)bits.push((b>>i)&1)});
+  for(let i=0;i<REMAINDER;i++)bits.push(0);
+  const base=NEW();patterns(base);const pos=order(base);
+  let best=null,bp=Infinity;
+  for(let mk=0;mk<8;mk++){const g=NEW();patterns(g);
+    pos.forEach(([y,x],i)=>{g.m[y][x]=MASK[mk](y,x)?bits[i]^1:bits[i]});
+    putFormat(g,mk);const p=penalty(g.m);if(p<bp){bp=p;best=g.m}}
+  return best}
+function drawQR(cv,text,scale){
+  const m=buildQR(text),q=4,n=m.length+q*2;
+  cv.width=n*scale;cv.height=n*scale;
+  const c=cv.getContext('2d');
+  c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);
+  c.fillStyle='#000';
+  for(let y=0;y<m.length;y++)for(let x=0;x<m.length;x++)
+    if(m[y][x])c.fillRect((x+q)*scale,(y+q)*scale,scale,scale);
+  return cv}
+
+/* ============ pantalla ============ */
+const TK=[
+ {n:'Truck 1',loc:'Main & Porter',slug:'t1'},
+ {n:'Truck 2',loc:'Campus Corner',slug:'t2'},
+ {n:'Truck 3',loc:'Lindsey & 24th',slug:'t3'}
+];
+const url=t=>'elfarol.foodtruckos.com/'+t.slug;
+
+document.getElementById('grid').innerHTML=TK.map((t,i)=>
+  '<div class="qc"><h2>'+t.n+'</h2><div class="loc">'+t.loc+'</div>'+
+  '<div class="qwrap"><canvas id="q'+i+'"></canvas></div>'+
+  '<div class="url">'+url(t)+'</div>'+
+  '<div class="qacts"><button class="btn mini" data-dl="'+i+'">Descargar PNG</button>'+
+  '<a class="btn mini" href="https://'+url(t)+'" target="_blank" rel="noopener">Abrir el menú</a></div></div>').join('');
+
+TK.forEach((t,i)=>drawQR(document.getElementById('q'+i),url(t),7));
+
+document.querySelectorAll('[data-dl]').forEach(b=>b.onclick=()=>{
+  const t=TK[+b.dataset.dl],cv=document.createElement('canvas');
+  drawQR(cv,url(t),24);                                   /* grande, para imprimir bien */
+  cv.toBlob(bl=>{const a=document.createElement('a');
+    a.href=URL.createObjectURL(bl);
+    a.download='QR-'+t.n.replace(/\s/g,'')+'-ElFarol.png';
+    a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)})});
+
+/* carteles para imprimir */
+document.getElementById('sheet').innerHTML=TK.map((t,i)=>
+  '<div class="poster"><div class="pband"><h2>Taquería El Farol</h2><p>'+t.n+' · '+t.loc+'</p></div>'+
+  '<div class="pq"><canvas id="p'+i+'"></canvas>'+
+  '<p class="pmsg">Escanea y pide desde tu celular</p>'+
+  '<p class="pmsg2">Scan to order from your phone</p>'+
+  '<p class="pfoot">'+url(t)+'</p></div></div>').join('');
+TK.forEach((t,i)=>drawQR(document.getElementById('p'+i),url(t),12));
+</script>
+</body>
+</html>

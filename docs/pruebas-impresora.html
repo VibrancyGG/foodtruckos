@@ -1,0 +1,624 @@
+<title>Pruebas de la P047</title>
+
+<style>
+  :root {
+    --bg: #E9E8E3;
+    --surface: #FAF9F6;
+    --surface-2: #F1F0EC;
+    --ink: #1A1815;
+    --ink-soft: #5E5A52;
+    --ink-faint: #8A857B;
+    --line: #D2D0C8;
+    --line-strong: #B8B5AB;
+    --accent: #B4670A;
+    --accent-bg: #F7E9CF;
+    --go: #1B6E52;
+    --go-bg: #DCEFE5;
+    --stop: #A32229;
+    --stop-bg: #F7DFDE;
+    --paper: #FBFAF7;
+
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #100F0D;
+      --surface: #1B1917;
+      --surface-2: #232019;
+      --ink: #F6F3ED;
+      --ink-soft: #9C948A;
+      --ink-faint: #79726A;
+      --line: #332F29;
+      --line-strong: #453F37;
+      --accent: #F5A524;
+      --accent-bg: #3A2A12;
+      --go: #6FD3A6;
+      --go-bg: #14291F;
+      --stop: #FFB3B5;
+      --stop-bg: #3A1E1F;
+      --paper: #232019;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #100F0D;
+    --surface: #1B1917;
+    --surface-2: #232019;
+    --ink: #F6F3ED;
+    --ink-soft: #9C948A;
+    --ink-faint: #79726A;
+    --line: #332F29;
+    --line-strong: #453F37;
+    --accent: #F5A524;
+    --accent-bg: #3A2A12;
+    --go: #6FD3A6;
+    --go-bg: #14291F;
+    --stop: #FFB3B5;
+    --stop-bg: #3A1E1F;
+    --paper: #232019;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ---------- Encabezado ---------- */
+
+  .top { padding: 56px 0 0; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-size: clamp(30px, 6.2vw, 44px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin: 0 0 16px;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 17.5px;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    max-width: 60ch;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Secciones ---------- */
+
+  section { padding-top: 44px; }
+
+  h2 {
+    font-size: 13px;
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  .block-title {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+
+  .block-note {
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+    max-width: 62ch;
+  }
+
+  p { margin: 0 0 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin-bottom: 7px; }
+  li:last-child { margin-bottom: 0; }
+
+  /* ---------- Lista de material ---------- */
+
+  .kit {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+
+  .kit ul { margin: 0; list-style: none; padding: 0; }
+  .kit li {
+    display: flex;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .kit li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .kit li:first-child { padding-top: 0; }
+  .kit .box {
+    font-family: var(--mono);
+    color: var(--ink-faint);
+    flex: none;
+  }
+
+  /* ---------- Pruebas ---------- */
+
+  .tests { display: flex; flex-direction: column; gap: 14px; }
+
+  .test {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+
+  .test.decisive {
+    border-color: var(--accent);
+    border-width: 2px;
+    background: var(--accent-bg);
+  }
+
+  .test-head {
+    display: flex;
+    gap: 13px;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+
+  .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    padding-top: 2px;
+  }
+
+  .test h3 {
+    font-size: 18.5px;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .rows { display: flex; flex-direction: column; gap: 11px; }
+
+  .row { display: flex; gap: 12px; align-items: baseline; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    flex: none;
+    width: 74px;
+    text-align: center;
+  }
+
+  .tag.do   { background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); }
+  .tag.pass { background: var(--go-bg);     color: var(--go);       border: 1px solid transparent; }
+  .tag.fail { background: var(--stop-bg);   color: var(--stop);     border: 1px solid transparent; }
+  .tag.note { background: transparent;      color: var(--ink-faint); border: 1px dashed var(--line-strong); }
+
+  .row div { flex: 1; min-width: 0; }
+  .row div p { margin: 0 0 8px; }
+  .row div p:last-child { margin-bottom: 0; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .test.decisive code { background: var(--surface); }
+
+  strong { font-weight: 700; }
+
+  /* ---------- Corte entre bloques ---------- */
+
+  .gate {
+    margin-top: 26px;
+    padding: 20px 22px;
+    border-radius: 14px;
+    background: var(--go-bg);
+    border: 1px solid transparent;
+  }
+  .gate p { color: var(--go); font-weight: 600; margin: 0; }
+
+  /* ---------- La comanda de muestra ---------- */
+
+  .ticket-wrap {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px 0 30px;
+    overflow-x: auto;
+  }
+
+  pre.ticket {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 26px;
+    color: var(--ink);
+    white-space: pre;
+  }
+
+  /* ---------- Tabla de datos ---------- */
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+
+  th, td { text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td:last-child { color: var(--ink-faint); font-family: var(--mono); font-size: 13px; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 26px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 14px;
+  }
+
+  @media (max-width: 560px) {
+    .row { flex-direction: column; gap: 5px; }
+    .tag { width: auto; align-self: flex-start; }
+    body { padding: 0 16px 72px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <p class="eyebrow">FoodTruckOS · Comanda impresa · Etapa 1</p>
+    <h1>Aceptar o rechazar la impresora</h1>
+    <p class="standfirst">
+      Todo lo que hay que probarle a la MUNBYN P047 antes de ponerla en la lista de
+      equipos aprobados. Van en orden a propósito: la primera decide si la
+      arquitectura completa se sostiene.
+    </p>
+    <div class="meta">
+      <span class="chip">MUNBYN P047</span>
+      <span class="chip">80 mm · ESC/POS</span>
+      <span class="chip">$135.99</span>
+      <span class="chip">Pedida 18 ago 2026</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>Antes de empezar</h2>
+    <p class="block-title">Qué necesitas a la mano</p>
+    <p class="block-note">Media hora y estas cuatro cosas. El Bloque A no necesita nada de código.</p>
+    <div class="kit">
+      <ul>
+        <li><span class="box">01</span><div><strong>Un rollo de papel térmico de 80 mm</strong> (3⅛"). Revisa si vino uno en la caja — casi siempre traen uno corto de muestra, que alcanza para estas pruebas pero no para un día de venta.</div></li>
+        <li><span class="box">02</span><div><strong>Una tablet o celular Android.</strong> Cualquiera sirve para el Bloque A; no tiene que ser la del truck.</div></li>
+        <li><span class="box">03</span><div><strong>Una app genérica de ESC/POS</strong> de Play Store — <code>RawBT</code> o <code>Bluetooth Thermal Printer</code>. Que <em>no</em> sea la app de MUNBYN: de eso se trata la prueba 1.</div></li>
+        <li><span class="box">04</span><div><strong>Dónde anotar.</strong> Al final de esta página está la tabla con los datos que hay que capturar.</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bloque A · sin código</h2>
+    <p class="block-title">El día que llega la caja</p>
+    <p class="block-note">
+      Esto lo puedes correr tú solo, sin esperar a que yo tenga listo el caparazón de
+      Android. Si el bloque pasa completo, la arquitectura queda confirmada.
+    </p>
+
+    <div class="tests">
+
+      <div class="test">
+        <div class="test-head"><span class="num">A0</span><h3>Autotest de fábrica</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            Apágala. Mantén apretado el botón <code>FEED</code> y préndela. Suelta cuando empiece a imprimir.
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            Sale una hoja con el modelo, la versión de firmware y —lo importante— <strong>el nombre y la dirección MAC de Bluetooth</strong>.
+          </div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>
+            Si el papel sale en blanco, dale la vuelta al rollo: el papel térmico solo imprime de un lado. Es el error número uno y no es defecto de la impresora.
+          </div></div>
+          <div class="row"><span class="tag note">Anota</span><div>Nombre Bluetooth, MAC y versión de firmware.</div></div>
+        </div>
+      </div>
+
+      <div class="test decisive">
+        <div class="test-head"><span class="num">A1</span><h3>La prueba que decide: Bluetooth clásico, sin SDK del fabricante</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            <p>Empareja desde <strong>Ajustes › Bluetooth</strong> de Android, como cualquier bocina. Si pide PIN, casi siempre es <code>0000</code> o <code>1234</code>.</p>
+            <p>Luego, desde la app genérica de ESC/POS (no la de MUNBYN), manda cualquier texto.</p>
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            <strong>Imprime desde una app que no es del fabricante.</strong> Eso demuestra que habla Bluetooth clásico estándar, que es lo único que nuestro caparazón necesita: abrir el socket y escribir bytes.
+          </div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>
+            Si solo imprime desde la app de MUNBYN, <strong>detente ahí y avísame</strong>. No sigas con las demás pruebas: cambia el diseño de la aplicación y hay que decidir antes de invertir semanas.
+          </div></div>
+          <div class="row"><span class="tag note">Ojo</span><div>
+            Debería aparecer en la lista como <code>TM-m30-b001</code> o <code>TM-m30III</code>. Ese nombre es buena señal: significa que se hace pasar por una Epson, o sea protocolo estándar.
+          </div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A2</span><h3>Acentos y eñes</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            Manda este texto tal cual: <code>PIÑA · jalapeño · sin azúcar · ¿algo más?</code>
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se lee igual en el papel.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>
+            Si sale <code>PIÃ‘A</code> o cuadritos, <strong>no es defecto de la impresora</strong>: es la tabla de caracteres, y se ajusta en nuestro código. Anota exactamente qué salió y sigue con la siguiente.
+          </div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A3</span><h3>El corte</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Manda una comanda larga —diez o doce renglones— y deja que corte sola.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            El papel se separa completo (no queda colgando de una esquina) y <strong>no se come la última línea</strong>, que es donde va el total.
+          </div></div>
+          <div class="row"><span class="tag note">Anota</span><div>Cuántos milímetros de papel deja de sobra después del corte. Si son muchos, se ajusta y le ahorramos rollo al cliente.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A4</span><h3>La chicharra</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            Manda estos cuatro bytes en crudo: <code>1B 42 03 02</code>
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Suena. Entonces la dejamos activada y la cocina escucha la orden aunque no vea la tablet.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>
+            Si imprime caracteres raros en vez de sonar, la apagamos — es un parámetro, no una modificación. Si simplemente no hace nada, también la apagamos. En ninguno de los dos casos se rechaza la impresora: el aviso sonoro ya lo da la tablet.
+          </div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A5</span><h3>Reconexión — la que más falla en la práctica</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            <p>Apaga y prende la impresora <strong>tres veces seguidas</strong>, mandando algo después de cada una.</p>
+            <p>Luego llévala a otro cuarto hasta que pierda la señal, y regrésala.</p>
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Vuelve sola las tres veces y al regresar de rango, <strong>sin volver a emparejar</strong>.</div></div>
+          <div class="row"><span class="tag fail">Si falla</span><div>
+            Es el punto que más soporte va a costar a la larga. Anota exactamente qué tuviste que hacer para recuperarla — si basta con reabrir la app, se puede automatizar; si hay que reemparejar, es motivo de rechazo.
+          </div></div>
+          <div class="row"><span class="tag note">Anota</span><div>Cuántos segundos tarda en volver.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">A6</span><h3>Que se acabe el papel</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Deja que el rollo se termine a media comanda. Pon uno nuevo.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se recupera sola al cerrar la tapa, sin apagarla ni reemparejar.</div></div>
+          <div class="row"><span class="tag note">Anota</span><div>
+            Qué rollo usa: ancho y diámetro máximo. Va en la lista de compra que le damos al cliente, junto con la impresora.
+          </div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="gate">
+      <p>Si el Bloque A pasa completo, la arquitectura está confirmada y arranco el caparazón de Android.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bloque B · con el caparazón</h2>
+    <p class="block-title">Ya con la aplicación instalada</p>
+    <p class="block-note">
+      Estas las corremos juntos cuando la app esté lista. Las dejo escritas desde ahora
+      para que no se nos olvide ninguna.
+    </p>
+
+    <div class="tests">
+
+      <div class="test">
+        <div class="test-head"><span class="num">B1</span><h3>Una orden por QR sale impresa</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>Un comensal ordena desde su celular y la comanda sale sin que nadie toque la tablet.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B2</span><h3>Una orden de ventanilla sale impresa</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>Se captura en ventanilla y la comanda sale al instante, sin pasos extra.</div></div>
+        </div>
+      </div>
+
+      <div class="test decisive">
+        <div class="test-head"><span class="num">B3</span><h3>Modo avión — la prueba que justifica toda la arquitectura</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>
+            Pon la tablet en modo avión y vuelve a prender solo el Bluetooth. Captura una orden en ventanilla.
+          </div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            <strong>Imprime igual.</strong> Esta es la razón por la que descartamos las impresoras de nube: el truck se queda sin señal y la cocina sigue trabajando.
+          </div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B4</span><h3>Impresora apagada: la comanda no se pierde</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Con la impresora apagada, mete dos órdenes. Luego préndela.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Salen las dos, en orden, sin que nadie haga nada.</div></div>
+          <div class="row"><span class="tag note">Ojo</span><div>Esto ya está probado en código con una impresora simulada. Falta verlo con el fierro.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B5</span><h3>Pantalla apagada</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Deja la tablet con la pantalla apagada diez minutos. Manda una orden.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Imprime. Es lo que prueba que Android no está matando la aplicación en segundo plano.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B6</span><h3>Dos órdenes al mismo tiempo</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Que entren dos pedidos casi simultáneos, uno por QR y otro por ventanilla.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>Salen <strong>dos</strong> comandas, no una.</div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B7</span><h3>Reimprimir y dos copias</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            El botón de reimprimir saca una comanda idéntica a la original, con <code>COPIA</code> arriba para que cocina no prepare el platillo dos veces. Y con dos copias configuradas, salen dos.
+          </div></div>
+        </div>
+      </div>
+
+      <div class="test">
+        <div class="test-head"><span class="num">B8</span><h3>Aislamiento entre negocios</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Haz esto</span><div>Con dos negocios distintos y sus tablets emparejadas, manda órdenes a los dos.</div></div>
+          <div class="row"><span class="tag pass">Pasa si</span><div>
+            Ninguno imprime lo del otro. No debería haber forma —la impresión cuelga de la sesión que ya existe y no agrega ningún camino nuevo— pero se verifica igual.
+          </div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Referencia</h2>
+    <p class="block-title">La comanda que debe salir</p>
+    <p class="block-note">
+      Así se ve la salida del generador que ya está en producción. Compara el papel
+      contra esto: mismos acentos, misma alineación, lo que se quita en mayúsculas.
+    </p>
+    <div class="ticket-wrap">
+<pre class="ticket">           ANTOJITOS ESTELA'S TRUCK 1
+
+------------------------------------------------
+                  ORDEN #25
+------------------------------------------------
+
+ 2  TACO AL PASTOR
+      + Queso extra
+      - CEBOLLA
+
+ 1  AGUA DE HORCHATA GRANDE CON MUCHO HIELO
+      "sin azúcar"
+
+------------------------------------------------
+Nota: para llevar
+------------------------------------------------
+QR Sofía                             11:42 a. m.
+POR COBRAR                                $64.00</pre>
+    </div>
+  </section>
+
+  <section>
+    <h2>Al terminar</h2>
+    <p class="block-title">Qué anotar para la lista aprobada</p>
+    <p class="block-note">
+      Estos son los datos que vive el cliente cuando le decimos "compra ésta". Van al
+      documento de equipos aprobados.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dato</th><th>Por qué importa</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Modelo exacto y ASIN</td><td>Para que el cliente compre el mismo aparato y no un primo parecido</td><td>—</td></tr>
+          <tr><td>Precio pagado y fecha</td><td>Los precios se mueven; la lista necesita saber de cuándo es el dato</td><td>—</td></tr>
+          <tr><td>Nombre Bluetooth de fábrica</td><td>Es lo que el cliente va a ver al emparejar, y va en el manual</td><td>—</td></tr>
+          <tr><td>PIN de emparejamiento</td><td>Si no es <code>0000</code>, hay que decirlo antes de que llamen</td><td>—</td></tr>
+          <tr><td>Chicharra: sirve o no</td><td>Decide si la dejamos activada por omisión</td><td>—</td></tr>
+          <tr><td>Segundos en reconectar</td><td>Es el número que predice cuánto soporte va a costar</td><td>—</td></tr>
+          <tr><td>Rollo que usa</td><td>Va en la misma lista de compra que la impresora</td><td>—</td></tr>
+          <tr><td>Sobrante de papel al cortar</td><td>Se puede ajustar y ahorrarle rollo al cliente</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Si algo del Bloque A falla, mándame la foto del papel: casi siempre se diagnostica
+    con eso. La única prueba que detiene todo es la A1.
+  </footer>
+
+</div>

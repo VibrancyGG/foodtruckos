@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Personal — Panel del dueño · FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;
+  --page:#F9F9F7;--card:#FFFFFF;--ring:rgba(11,11,11,.10);
+  --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+  --f:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab a{background:#2F2C29;color:#D8D5D0;border-radius:4px;padding:5px 10px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.bd{display:flex;align-items:center;gap:9px;padding:14px 0}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.bd span{font-weight:800;letter-spacing:-.02em;font-size:15px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs a{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current]{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tabs a:not([aria-current]){opacity:.62}
+.acct{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);padding:14px 0}
+
+.wrap{max-width:980px;margin:0 auto;padding:26px 22px 90px}
+h1{font-size:29px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-size:14px;color:var(--ink2);margin:6px 0 24px;max-width:66ch}
+
+.card{background:var(--card);border:1px solid var(--ring);border-radius:14px;margin-bottom:18px;overflow:hidden}
+.chd{display:flex;align-items:center;gap:12px;padding:18px 20px;flex-wrap:wrap}
+.chd h2{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0}
+.chd p{font-size:13px;color:var(--ink2);margin:4px 0 0;width:100%;order:3}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px 16px;font:700 13.5px var(--f);cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:#000}
+.btn.mini{padding:7px 12px;font-size:12.5px}
+.btn.danger{color:var(--bad);border-color:#F0BFC0}
+.btn.danger:hover{background:var(--badBg);border-color:var(--bad)}
+.chd .btn{margin-left:auto;order:2}
+
+.row{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:15px 20px;border-top:1px solid var(--line)}
+@media (max-width:700px){.row{grid-template-columns:1fr;gap:10px}.row .acts{justify-content:flex-start}}
+.who{min-width:0}
+.who b{font-size:15.5px;font-weight:700;display:block}
+.who .meta{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.who .meta em{font-style:normal;color:var(--muted)}
+.tag{display:inline-block;font-size:11.5px;font-weight:800;border-radius:100px;padding:3px 10px;margin-left:7px}
+.tag.rol{background:#F1F0EC;color:var(--ink2)}
+.tag.ok{background:var(--goodBg);color:var(--good)}
+.tag.warn{background:var(--warnBg);color:var(--warn)}
+.pin{font-size:20px;font-weight:900;letter-spacing:.16em;font-variant-numeric:tabular-nums;min-width:92px;text-align:right}
+.pin.hidden{letter-spacing:.1em;color:var(--muted)}
+.acts{display:flex;gap:8px;align-items:center}
+
+.empty{padding:28px 20px;text-align:center;color:var(--muted);font-size:14px;font-weight:600;border-top:1px solid var(--line)}
+
+/* aviso lateral */
+.self{background:var(--goodBg);border:1px solid #BFE3CE;border-radius:12px;padding:16px 18px;margin-bottom:22px}
+.self b{display:block;font-size:14.5px;font-weight:800;margin-bottom:5px}
+.self p{margin:0;font-size:13.5px;color:#1E5236;line-height:1.55}
+
+/* modales */
+.veil{position:fixed;inset:0;z-index:80;background:rgba(11,11,11,.5);display:none;place-items:center;padding:20px}
+.veil.on{display:grid}
+.box{background:var(--card);border-radius:16px;padding:24px;max-width:440px;width:100%}
+.box h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.box p{font-size:14px;color:var(--ink2);margin:0 0 18px;line-height:1.55}
+label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:0 0 6px}
+input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:12px 13px;font:600 15px var(--f);color:var(--ink);margin-bottom:14px}
+input[type=text]:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.pick{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-bottom:16px}
+.pick button{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:12px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.pick button[aria-pressed=true]{border-color:var(--ink)}
+.pick b{display:block;font-size:14px;font-weight:800}
+.pick span{display:block;font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.35}
+.acts2{display:flex;gap:9px;justify-content:flex-end;margin-top:4px}
+
+/* código grande */
+.big{background:var(--page);border:1px dashed var(--line);border-radius:12px;padding:22px;text-align:center;margin-bottom:16px}
+.big .n{font-size:46px;font-weight:900;letter-spacing:.14em;font-variant-numeric:tabular-nums;line-height:1}
+.big .c{font-size:38px;font-weight:900;letter-spacing:.18em;line-height:1}
+.big .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.cd{font-size:13px;font-weight:700;color:var(--warn);margin-top:8px;font-variant-numeric:tabular-nums}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:90;background:var(--ink);color:#fff;border-radius:100px;padding:13px 24px;font-size:14px;font-weight:700;display:none}
+.toast.on{display:block}
+
+.tabs .soon{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap;opacity:.55;display:flex;align-items:center;gap:6px}
+.tabs .soon i{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--line);color:var(--ink2);border-radius:100px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Panel del dueño · Personal</b>
+  <a href="panel-dueno.html">← Resumen</a>
+  <a href="panel-marca.html">Marca</a>
+  <a href="../propuestas-cocina/pantalla-cocina.html">Pantalla de cocina</a>
+  <span class="sep">Todo se resuelve sin llamar a nadie</span>
+</div>
+
+<nav class="nav">
+  <div class="bd"><div class="logo">F</div><span>FoodTruckOS</span></div>
+  <div class="tabs"><a href="panel-dueno.html">Resumen</a><a href="panel-menu.html">Menú</a><a href="panel-trucks.html">Trucks</a><a href="panel-marca.html">Marca</a><a href="#" aria-current="page">Personal</a><a href="panel-qr.html">Códigos QR</a><a href="panel-cuenta.html">Cuenta</a></div>
+  <div class="acct">Taquería El Farol</div>
+</nav>
+
+<div class="wrap">
+  <h1>Quién puede usar el sistema</h1>
+  <p class="sub">Tu personal no necesita correo ni contraseña. La tablet del truck se conecta una vez y se queda conectada; cada persona entra con su PIN de cuatro dígitos.</p>
+
+  <div class="self">
+    <b>Esto lo manejas tú, cuando quieras</b>
+    <p>Entra alguien nuevo, le creas un PIN. Se va, lo borras y deja de funcionar en ese momento. Se pierde una tablet, revocas su acceso desde aquí. No tienes que avisarnos ni esperar a nadie.</p>
+  </div>
+
+  <div class="card">
+    <div class="chd">
+      <div><h2>Personas</h2></div>
+      <button class="btn primary" id="addP">Agregar persona</button>
+      <p>Cada quien con su PIN, para saber quién atendió cada orden.</p>
+    </div>
+    <div id="people"></div>
+  </div>
+
+  <div class="card">
+    <div class="chd">
+      <div><h2>Tablets y celulares conectados</h2></div>
+      <button class="btn primary" id="addD">Conectar un aparato</button>
+      <p>Los aparatos que ya están dentro del sistema. Se conectan una sola vez.</p>
+    </div>
+    <div id="devs"></div>
+  </div>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let PEOPLE=[
+ {id:1,n:'Beto Ramírez',rol:'Cocina',truck:'Truck 1',pin:'4417',visto:0},
+ {id:2,n:'Lupita Sánchez',rol:'Cajero',truck:'Truck 1',pin:'2903',visto:0},
+ {id:3,n:'Karla Medina',rol:'Encargado',truck:'Truck 2',pin:'7781',visto:2},
+ {id:4,n:'Chuy Ortega',rol:'Cocina',truck:'Truck 2',pin:'5560',visto:26}
+];
+let DEVS=[
+ {id:1,n:'Tablet de cocina',truck:'Truck 1',desde:'12 mar 2026',visto:0},
+ {id:2,n:'Celular de la ventanilla',truck:'Truck 1',desde:'12 mar 2026',visto:0},
+ {id:3,n:'Tablet de cocina',truck:'Truck 2',desde:'3 abr 2026',visto:1},
+ {id:4,n:'Tablet de cocina',truck:'Truck 3',desde:'21 may 2026',visto:0}
+];
+let seen=new Set(), nid=90;
+
+const dias=d=>d===0?'Hoy':d===1?'Ayer':'Hace '+d+' días';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3400)}
+
+function drawP(){
+  $('#people').innerHTML=PEOPLE.length?PEOPLE.map(p=>{
+    const viejo=p.visto>=21;
+    return '<div class="row"><div class="who"><b>'+p.n+
+      '<span class="tag rol">'+p.rol+'</span></b>'+
+      '<div class="meta">'+p.truck+' · <em>usó su PIN '+dias(p.visto).toLowerCase()+'</em>'+
+        (viejo?'<span class="tag warn">¿sigue aquí?</span>':'')+'</div></div>'+
+      '<div class="pin'+(seen.has(p.id)?'':' hidden')+'">'+(seen.has(p.id)?p.pin:'••••')+'</div>'+
+      '<div class="acts"><button class="btn mini" data-ver="'+p.id+'">'+(seen.has(p.id)?'Ocultar':'Ver PIN')+'</button>'+
+      '<button class="btn mini danger" data-delp="'+p.id+'">Quitar</button></div></div>'}).join('')
+    :'<div class="empty">Todavía no has dado de alta a nadie. Agrega a la primera persona.</div>';
+  $('#people').querySelectorAll('[data-ver]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.ver;seen.has(i)?seen.delete(i):seen.add(i);drawP()});
+  $('#people').querySelectorAll('[data-delp]').forEach(b=>b.onclick=()=>askDelP(+b.dataset.delp));
+}
+function drawD(){
+  $('#devs').innerHTML=DEVS.map(d=>
+    '<div class="row"><div class="who"><b>'+d.n+'<span class="tag rol">'+d.truck+'</span></b>'+
+      '<div class="meta">Conectado desde el '+d.desde+' · <em>última vez '+dias(d.visto).toLowerCase()+'</em></div></div>'+
+    '<div><span class="tag ok">Activo</span></div>'+
+    '<div class="acts"><button class="btn mini danger" data-deld="'+d.id+'">Desconectar</button></div></div>').join('');
+  $('#devs').querySelectorAll('[data-deld]').forEach(b=>b.onclick=()=>askDelD(+b.dataset.deld));
+}
+
+/* ---------- modales ---------- */
+function open(html){$('#veil').innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';
+  $('#veil').classList.add('on')}
+function close(){$('#veil').classList.remove('on')}
+$('#veil').onclick=e=>{if(e.target===$('#veil'))close()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+/* alta de persona */
+let nRol='Cocina',nTruck='Truck 1';
+$('#addP').onclick=()=>{nRol='Cocina';nTruck='Truck 1';
+  open('<h3>Agregar a alguien</h3><p>Le vamos a crear un PIN de cuatro dígitos. Solo eso necesita para entrar.</p>'+
+    '<label for="nn">¿Cómo se llama?</label><input type="text" id="nn" placeholder="Nombre y apellido" autocomplete="off">'+
+    '<label>¿Qué va a hacer?</label><div class="pick" id="rr">'+
+      '<button data-r="Cocina" aria-pressed="true"><b>Cocina</b><span>Ve las órdenes y las va marcando</span></button>'+
+      '<button data-r="Cajero" aria-pressed="false"><b>Cajero</b><span>Además captura pedidos y cobra</span></button>'+
+      '<button data-r="Encargado" aria-pressed="false"><b>Encargado</b><span>También ve las ventas de su truck</span></button>'+
+    '</div>'+
+    '<label>¿En qué truck?</label><div class="pick" id="tt">'+
+      ['Truck 1','Truck 2','Truck 3'].map((t,i)=>'<button data-t="'+t+'" aria-pressed="'+(i===0)+'"><b>'+t+'</b></button>').join('')+
+    '</div>'+
+    '<div class="acts2"><button class="btn" id="c1">Cancelar</button>'+
+    '<button class="btn primary" id="ok1">Crear su PIN</button></div>');
+  $('#rr').querySelectorAll('button').forEach(b=>b.onclick=()=>{nRol=b.dataset.r;
+    $('#rr').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  $('#tt').querySelectorAll('button').forEach(b=>b.onclick=()=>{nTruck=b.dataset.t;
+    $('#tt').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  $('#c1').onclick=close;
+  $('#nn').focus();
+  $('#ok1').onclick=()=>{
+    const nom=$('#nn').value.trim();
+    if(!nom){$('#nn').focus();toast('Falta el nombre');return}
+    let pin;const usados=new Set(PEOPLE.map(p=>p.pin));
+    do{pin=String(Math.floor(1000+Math.random()*9000))}while(usados.has(pin));
+    const p={id:++nid,n:nom,rol:nRol,truck:nTruck,pin,visto:0};
+    PEOPLE.push(p);seen.add(p.id);drawP();
+    open('<h3>Listo, ya puede entrar</h3><p>Este es el PIN de '+nom+'. Anótalo o mándaselo — lo puedes volver a ver cuando quieras desde la lista.</p>'+
+      '<div class="big"><div class="n">'+pin+'</div><div class="k">PIN de '+nom+' · '+nTruck+'</div></div>'+
+      '<div class="acts2"><button class="btn primary" id="c2">Entendido</button></div>');
+    $('#c2').onclick=close};
+};
+
+/* baja de persona — decir exactamente qué va a pasar */
+function askDelP(id){const p=PEOPLE.find(x=>x.id===id);
+  open('<h3>¿Quitar a '+p.n+'?</h3>'+
+    '<p>Su PIN deja de servir en este momento. Si está usando la tablet ahorita, se le cierra la sesión. '+
+    'Las órdenes que ya atendió se conservan tal cual en tus reportes.</p>'+
+    '<div class="acts2"><button class="btn" id="c3">Mejor no</button>'+
+    '<button class="btn danger" id="ok3">Sí, quitar a '+p.n.split(' ')[0]+'</button></div>');
+  $('#c3').onclick=close;
+  $('#ok3').onclick=()=>{PEOPLE=PEOPLE.filter(x=>x.id!==id);seen.delete(id);drawP();close();
+    toast('El PIN de '+p.n.split(' ')[0]+' ya no funciona')}}
+
+/* conectar aparato */
+let cdT;
+$('#addD').onclick=()=>{
+  const cod=Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
+  let seg=900;
+  open('<h3>Conectar un aparato</h3><p>En la tablet o el celular, abre la página del sistema y escribe este código. Con eso queda conectado y ya no lo vuelve a pedir.</p>'+
+    '<div class="big"><div class="c">'+cod.slice(0,3)+'-'+cod.slice(3)+'</div>'+
+    '<div class="k">Código para conectar</div><div class="cd" id="cd"></div></div>'+
+    '<div class="acts2"><button class="btn primary" id="c4">Cerrar</button></div>');
+  const tick=()=>{const m=Math.floor(seg/60),s=seg%60;
+    const el=$('#cd');if(!el){clearInterval(cdT);return}
+    el.textContent=seg>0?('Sirve por '+m+':'+String(s).padStart(2,'0')+' más'):'Se venció. Genera otro.';
+    if(seg<=0)clearInterval(cdT);seg--};
+  clearInterval(cdT);tick();cdT=setInterval(tick,1000);
+  $('#c4').onclick=()=>{clearInterval(cdT);close()}};
+
+/* desconectar aparato */
+function askDelD(id){const d=DEVS.find(x=>x.id===id);
+  open('<h3>¿Desconectar '+d.n.toLowerCase()+'?</h3>'+
+    '<p>Ese aparato deja de entrar al sistema ahora mismo. Si lo recuperas, lo vuelves a conectar con un código nuevo. '+
+    'Las órdenes que se tomaron ahí se conservan.</p>'+
+    '<div class="acts2"><button class="btn" id="c5">Mejor no</button>'+
+    '<button class="btn danger" id="ok5">Sí, desconectar</button></div>');
+  $('#c5').onclick=close;
+  $('#ok5').onclick=()=>{DEVS=DEVS.filter(x=>x.id!==id);drawD();close();
+    toast(d.n+' de '+d.truck+' ya no tiene acceso')}}
+
+drawP();drawD();
+</script>
+</body>
+</html>

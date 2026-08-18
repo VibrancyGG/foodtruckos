@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoodTruckOS — Manual del proyecto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17171A;--soft:#5C5C63;--muted:#8A8A90;--line:#E4E2DD;--bg:#FAFAF8;--card:#FFF;
+ --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+ --f:'Inter',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.62}
+
+.top{position:sticky;top:0;z-index:40;background:rgba(250,250,248,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:11px 22px;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.logo{width:25px;height:25px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px}
+.top b{font-weight:800;letter-spacing:-.02em;font-size:14.5px}
+.top .t{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.top a{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--soft);text-decoration:none;
+  border:1px solid var(--line);border-radius:8px;padding:6px 12px;background:var(--card)}
+.top a:hover{border-color:var(--ink);color:var(--ink)}
+
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);gap:34px;max-width:1220px;margin:0 auto;padding:30px 22px 100px}
+@media (max-width:900px){.shell{grid-template-columns:1fr;gap:0}.side{position:static!important;margin-bottom:26px}}
+.side{position:sticky;top:74px;align-self:start;max-height:calc(100vh - 96px);overflow:auto}
+.side h4{font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.side h4+h4{margin-top:20px}
+.side a{display:block;font-size:13.5px;font-weight:600;color:var(--soft);text-decoration:none;padding:5px 9px;border-radius:7px;margin-left:-9px}
+.side a:hover{background:var(--card);color:var(--ink)}
+
+.hero{margin-bottom:14px}
+.eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-size:clamp(29px,4.4vw,40px);font-weight:800;letter-spacing:-.033em;line-height:1.07;margin:12px 0 0}
+.lede{font-size:17px;color:var(--soft);max-width:64ch;margin:16px 0 0}
+
+h2{font-size:23px;font-weight:800;letter-spacing:-.028em;margin:52px 0 4px;scroll-margin-top:74px}
+h2 .num{color:var(--muted);font-weight:700;margin-right:9px}
+.h2s{font-size:14.5px;color:var(--soft);margin:0 0 20px;max-width:64ch}
+h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:30px 0 6px;scroll-margin-top:74px}
+p{font-size:15px;color:var(--soft);max-width:66ch}
+p strong,li strong{color:var(--ink);font-weight:700}
+ul,ol{max-width:66ch;padding-left:20px}
+li{font-size:15px;color:var(--soft);margin-bottom:7px}
+
+.rule{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;gap:14px}
+.rule .n{font-size:19px;font-weight:900;color:var(--muted);flex:none;min-width:24px;letter-spacing:-.03em}
+.rule b{display:block;font-size:15px;font-weight:800;margin-bottom:3px}
+.rule span{font-size:14px;color:var(--soft);display:block}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:19px 21px;margin:16px 0}
+.card h4{font-size:15px;font-weight:800;margin:0 0 7px}
+.card p{margin:0;font-size:14.5px}
+.card p+p{margin-top:9px}
+.card.why{border-left:3px solid var(--ink)}
+.card.warn{background:var(--warnBg);border-color:#F0D9A8}
+.card.warn h4,.card.warn p{color:#6B4A12}
+.card.ok{background:var(--goodBg);border-color:#BFE3CE}
+.card.ok h4,.card.ok p{color:#1E5236}
+
+/* pantalla incrustada */
+.demo{margin:20px 0 8px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.dhd{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dhd b{font-size:13px;font-weight:800}
+.dhd .p{font-size:11.5px;color:var(--muted);font-weight:600}
+.dhd a{margin-left:auto;font-size:12px;font-weight:700;color:var(--soft);text-decoration:none;
+  border:1px solid var(--line);border-radius:7px;padding:5px 11px}
+.dhd a:hover{border-color:var(--ink);color:var(--ink)}
+iframe{display:block;width:100%;border:0;background:#fff}
+.dcap{font-size:12.5px;color:var(--muted);margin:0 0 24px}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}
+th,td{text-align:left;padding:10px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+td:first-child{font-weight:600}
+.scroll{overflow-x:auto}
+.si{color:var(--good);font-weight:700;white-space:nowrap}
+.no{color:var(--warn);font-weight:700;white-space:nowrap}
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">F</div><b>FoodTruckOS</b><span class="t">Manual del proyecto</span>
+  <a href="manual-personal.html">Manual del personal →</a>
+</div>
+
+<div class="shell">
+  <nav class="side">
+    <h4>Empezar</h4>
+    <a href="#que">Qué es y para quién</a>
+    <a href="#reglas">Las ocho reglas</a>
+    <a href="#decisiones">Decisiones tomadas</a>
+    <h4>Las pantallas</h4>
+    <a href="#comensal">Menú del comensal</a>
+    <a href="#pedido">Armar y mandar el pedido</a>
+    <a href="#seguimiento">Seguimiento del pedido</a>
+    <a href="#cocina">Pantalla de cocina</a>
+    <a href="#ventanilla">Pedido en ventanilla</a>
+    <a href="#agotados">Marcar agotados</a>
+    <a href="#trucks-vista">Los tres trucks</a>
+    <a href="#resumen">Panel · Resumen</a>
+    <a href="#marca">Panel · Marca</a>
+    <a href="#menu">Panel · Menú</a>
+    <a href="#trucks">Panel · Trucks</a>
+    <a href="#personal">Panel · Personal</a>
+    <a href="#qr">Panel · Códigos QR</a>
+    <a href="#cuenta">Panel · Cuenta</a>
+    <a href="#admin">Admin interno</a>
+    <h4>Cerrar</h4>
+    <a href="#restaurantes">Restaurantes, Fase 4</a>
+    <a href="#leccion">Lo que aprendimos</a>
+    <a href="#estado">Qué falta</a>
+    <a href="#sigue">Lo que sigue</a>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <p class="eyebrow">Taquería El Farol · Julio 2026</p>
+      <h1>Manual del proyecto</h1>
+      <p class="lede">Todo lo que llevamos construido, pantalla por pantalla, con el porqué de cada decisión. El porqué es la parte que se pierde con el tiempo y la que más cuesta reconstruir.</p>
+    </div>
+
+    <h2 id="que"><span class="num">01</span>Qué es y para quién</h2>
+    <p class="h2s">Tres frases para que cualquiera entienda el producto.</p>
+    <p>El comensal escanea un código QR pegado en el truck, ve el menú con la marca del negocio en su propio celular, arma su pedido y lo envía. La orden aparece de inmediato en la pantalla de la cocina. El dueño ve desde su panel cómo van sus ventas y si está creciendo.</p>
+    <p><strong>Lo que lo hace distinto:</strong> no hay que comprar equipo. Funciona en los celulares y tablets que el negocio ya tiene. Y no cobramos comisión por pedido — nunca.</p>
+
+    <div class="card why">
+      <h4>Tres usuarios que no se parecen en nada</h4>
+      <p><strong>El comensal</strong> está parado en la calle, con sol en la pantalla, con hambre y prisa, en un celular que probablemente no es nuevo. Cada paso que le pidas es un cliente que se va a la fila normal.</p>
+      <p><strong>El cocinero</strong> tiene las manos ocupadas y grasosas, lee de reojo a metro y medio, en plena hora pico. El éxito se mide en qué tan poco tiene que pensar.</p>
+      <p><strong>El dueño</strong> nunca ha pagado por software y no va a leer un manual. Si una función necesita explicación larga, está mal diseñada.</p>
+    </div>
+
+    <h2 id="reglas"><span class="num">02</span>Las ocho reglas</h2>
+    <p class="h2s">Esto no se negocia. Si una decisión futura choca con alguna, la decisión está mal.</p>
+
+    <div class="rule"><span class="n">1</span><span><b>Cada negocio solo ve lo suyo, garantizado por la base de datos</b><span>No por el código. La aplicación depende de que ningún programador olvide un filtro; la base de datos no olvida.</span></span></div>
+    <div class="rule"><span class="n">2</span><span><b>El histórico jamás se destruye</b><span>Cada pedido guarda su propia copia del nombre, el precio y las personalizaciones. Si un reporte del año pasado cambia porque hoy editaron el menú, hay un error grave.</span></span></div>
+    <div class="rule"><span class="n">3</span><span><b>El comensal nunca tiene cuenta</b><span>En ninguna fase. No es una simplificación temporal: es parte central de la propuesta.</span></span></div>
+    <div class="rule"><span class="n">4</span><span><b>Dos marcas</b><span>Lo que ve el comensal es del cliente. El panel del dueño es de FoodTruckOS. Nunca se mezclan.</span></span></div>
+    <div class="rule"><span class="n">5</span><span><b>Avanzar una orden toma un solo toque</b><span>Si toma dos, la cocina abandona el sistema y vuelve al papel.</span></span></div>
+    <div class="rule"><span class="n">6</span><span><b>Toda venta vive en el mismo registro</b><span>Da igual si llegó por QR o se capturó en la ventanilla. Si el dueño sospecha que sus números están incompletos, deja de confiar en todo.</span></span></div>
+    <div class="rule"><span class="n">7</span><span><b>La actividad de venta nunca se presenta como asistencia</b><span>El PIN no marca la llegada del empleado. Registrar horas para pago tiene consecuencias legales en Estados Unidos.</span></span></div>
+    <div class="rule"><span class="n">8</span><span><b>Ninguna orden se pierde por mala conexión</b><span>Se guarda en el aparato antes de enviarse y se reintenta sola. Un pedido perdido una sola vez cuesta la confianza para siempre.</span></span></div>
+
+    <h2 id="decisiones"><span class="num">03</span>Decisiones tomadas</h2>
+    <p class="h2s">Cosas que ya se resolvieron y no hace falta volver a discutir.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+      <tbody>
+        <tr><td>Precio</td><td>$49 por truck con uno, $39 con dos, $29 con tres o más. Sin comisión por pedido.</td><td>La ausencia de comisión es el diferenciador frente a las apps de delivery. La escalera nunca baja al agregar una unidad.</td></tr>
+        <tr><td>Pago del pedido</td><td>En ventanilla, y puede pagarse al ordenar o al recoger.</td><td>No hay cobro en línea en Fase 1. El riesgo de pedido fantasma se acepta; pedirle tarjeta al comensal rompería la regla 3.</td></tr>
+        <tr><td>Avisar al comensal</td><td>Notificación web, con la página abierta y sonido como respaldo. WhatsApp en Fase 2.</td><td>La notificación web es poco confiable en iPhone, así que no puede ser el único canal.</td></tr>
+        <tr><td>Impuesto</td><td>Lo elige el dueño: incluido en el precio, o agregado al total.</td><td>Varía por negocio y afecta menú, ticket y reportes.</td></tr>
+        <tr><td>Fotos de platillos</td><td>Siempre del platillo real del cliente. Se pueden mejorar con IA; nunca generar de cero.</td><td>El comensal no puede ver una imagen de un plato distinto al que va a recibir.</td></tr>
+        <tr><td>Instalable</td><td>Cocina y panel del dueño se instalan como aplicación, con bloqueo de apagado de pantalla.</td><td>Que la tablet no se duerma a media hora pico.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="comensal"><span class="num">04</span>Menú del comensal</h2>
+    <p class="h2s">La pantalla que vende el producto y la que más se verá.</p>
+    <p><strong>Qué resuelve:</strong> reemplaza el menú en PDF o el banner impreso. El dueño cambia un precio y el cliente lo ve al instante, sin reimprimir nada.</p>
+    <p><strong>Dos estilos, un solo esqueleto.</strong> Vibrante muestra miniatura por platillo y entran 7 por pantalla; Tradicional usa línea punteada al precio y entran 12, cargando más rápido. Comparten los mismos componentes: cambiar de estilo no duplica el trabajo de mantenimiento.</p>
+
+    <div class="card why">
+      <h4>Por qué la paleta es cerrada y no un selector libre de color</h4>
+      <p>Con libertad total aparecen combinaciones ilegibles y el menú deja de leerse bajo el sol. Con diez opciones ya probadas, cualquier elección funciona.</p>
+      <p>Al construirlo descubrimos que <strong>tres de los diez colores no pasaban el contraste mínimo</strong> ni con texto blanco ni con negro — o sea que el ajuste automático no podía salvarlos. Se oscurecieron lo justo y ahora los diez pasan, el más bajo en 5.01:1. La lección: el problema no lo resuelve el algoritmo, lo resuelve elegir bien los diez colores.</p>
+    </div>
+
+    <div class="card warn">
+      <h4>Ningún platillo tiene foto todavía</h4>
+      <p>Los veinte productos del menú de prueba vienen sin imagen, así que las pantallas muestran el estado real del primer día de un cliente: marcadores honestos, nunca fotos de banco ni generadas. Si se elige el estilo Vibrante, conseguir y tratar las fotos deja de ser un extra y se vuelve parte obligatoria del alta.</p>
+    </div>
+
+    <div class="demo">
+      <div class="dhd"><b>Menú del comensal</b><span class="p">Cambia el estilo, el color y el idioma arriba</span>
+        <a href="propuestas-menu/menu-comensal.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-menu/menu-comensal.html" height="620" loading="lazy" title="Menú del comensal"></iframe>
+    </div>
+    <p class="dcap">El armado de tacos y burritos vive dentro: toca “Arma tu taco”. Bloquea el botón de agregar hasta elegir lo obligatorio, y una carne agotada aparece tachada también ahí.</p>
+
+    <h3 id="pedido">Armar el pedido y mandarlo</h3>
+    <p>La barra de abajo aparece en cuanto agrega el primer platillo, con el conteo y el total ya con impuesto. Al tocarla ve su pedido completo: cada línea con sus extras, lo que quitó y su nota, con botones para cambiar cantidades o quitar.</p>
+    <p>El nombre se pide <strong>al final y es opcional</strong>. Pedirlo antes sería una barrera; pedirlo al final es solo para que sepan a quién llamar. <strong>Nunca se le pide cuenta, correo ni tarjeta</strong> — eso no cambia en ninguna fase.</p>
+    <p>Al mandarlo recibe su número grande y de ahí pasa al seguimiento.</p>
+
+    <div class="card warn">
+      <h4>El envío ya no es instantáneo, y la continuidad con el seguimiento era falsa</h4>
+      <p>Mandar el pedido ahora pasa por un momento de <strong>“Enviando tu pedido…”</strong> antes de confirmar — así se ve el viaje real, no un salto mágico. Hay un botón de prueba, “Simular error de envío”, que muestra el otro camino: <em>“No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez”</em>, sin perder nada de lo que ya armó — el carrito no se vacía hasta que el envío sí funciona.</p>
+      <p><strong>El bug real:</strong> el menú siempre mandaba a la orden #48 y el seguimiento siempre mostraba la #47 — eran dos ejemplos sueltos, no el mismo pedido. El primer intento de arreglo usó <code>localStorage</code> para pasar el pedido de una pantalla a otra, y parecía funcionar hasta que se probó de verdad: <strong>muchos navegadores no comparten almacenamiento entre dos archivos abiertos por separado</strong>, así que la continuidad seguía rota. La solución que sí aguanta: el pedido completo — número, platillos, nombre, total — viaja codificado en la propia dirección del enlace. Así no depende de que el navegador comparta nada.</p>
+      <p>De ahí salió una pantalla que faltaba: si el enlace es viejo o algo no cuadra, el seguimiento dice <strong>“No encontramos ese pedido”</strong> en vez de mostrar datos de otro cliente.</p>
+    </div>
+
+    <h3 id="seguimiento">Después de ordenar: el seguimiento</h3>
+    <p>El comensal no tiene cuenta, así que su pedido vive en la dirección que se le abre al ordenar. Si cierra la página y vuelve, ve el estado actual — nunca hay que pedirle que se identifique.</p>
+    <div class="card why">
+      <h4>Por qué “listo” se come toda la pantalla</h4>
+      <p>Los cuatro estados no pesan igual. Recibido y preparando son informativos; <strong>listo es el único que exige que la persona se levante y camine</strong>. Por eso ese estado toma el color de la marca a pantalla completa, late suavemente y suena, mientras los demás son discretos.</p>
+      <p>El aviso sonoro importa más de lo que parece: el comensal está platicando, no mirando el teléfono. La notificación web es poco confiable en iPhone, así que el sonido con la página abierta es el respaldo que sí funciona siempre.</p>
+    </div>
+    <p>El botón “Avísame cuando esté listo” daba a entender que ya existía una notificación real. Ahora, al activarlo, aclara que es una demostración — y si el navegador niega el permiso, lo dice también, sin dejar de ofrecer el sonido como respaldo.</p>
+
+    <div class="card warn">
+      <h4>Cocina avanzaba el pedido y el comensal nunca se enteraba</h4>
+      <p>Los cuatro pasos (recibido, preparando, listo, entregado) eran un temporizador de mentira: avanzaban solos cada 30 segundos, sin importar lo que pasara en cocina de verdad. Marcar “Lista” en cocina no movía nada en la pantalla del comensal.</p>
+      <p>Se conectó con el mismo puente que ya unía menú → cocina, ahora en la dirección contraria: <strong>cada toque en cocina (“Empezar”, “Lista”, “Entregada”) publica el nuevo estado</strong> en el mismo pedido guardado, y el seguimiento lo recoge solo — por aviso inmediato si están en pestañas del mismo navegador, y por sondeo cada pocos segundos como respaldo. El sonido y la animación de “listo” ya responden a un cambio real, no al reloj.</p>
+      <p>El botón “Avanzar estado” de la barra de prueba se queda como atajo de laboratorio — útil para ver los cuatro momentos sin tener cocina abierta — pero ya no es la única forma en que el estado cambia.</p>
+    </div>
+
+    <div class="demo">
+      <div class="dhd"><b>Seguimiento del pedido</b><span class="p">Usa “Avanzar estado” para ver los cuatro momentos</span>
+        <a href="propuestas-menu/seguimiento.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-menu/seguimiento.html" height="620" loading="lazy" title="Seguimiento del pedido"></iframe>
+    </div>
+
+    <h2 id="cocina"><span class="num">05</span>Pantalla de cocina</h2>
+    <p class="h2s">Donde el producto se adopta o se abandona.</p>
+    <p><strong>Qué resuelve:</strong> las órdenes entran solas y el personal las avanza con un toque. La comparten cocina y cajero.</p>
+
+    <div class="card warn">
+      <h4>Al principio, un pedido del menú jamás llegaba aquí — y el motivo tuvo dos capas</h4>
+      <p><strong>La primera:</strong> el menú y la cocina son archivos completamente separados, sin ninguna variable en común. Mandar un pedido lo guardaba y avisaba al seguimiento — pero cocina no tenía forma de enterarse. Se conectó con <code>localStorage</code> aplicado donde sí funciona: cruza pestañas de un mismo navegador, a diferencia de abrir dos archivos por separado, que ya sabíamos que no comparte nada.</p>
+      <p><strong>La segunda, más escondida:</strong> con eso conectado, el pedido seguía sin aparecer. El menú siempre reiniciaba su numeración en <strong>#48 cada vez que se recargaba</strong> — y cocina ya trae un <strong>#48 de muestra</strong> desde el primer instante. El pedido real chocaba contra el de ejemplo, y el código que evita duplicados lo descartaba en silencio, sin ningún aviso. Se veía como si la conexión no existiera, cuando en realidad sí llegaba — solo que a un número ya ocupado.</p>
+      <p>La solución: un <strong>folio compartido de verdad</strong> entre las dos pantallas, guardado también en <code>localStorage</code> y arrancando en 100 — lejos de los números 45 a 51 que trae la muestra. Ni el menú ni cocina vuelven a repetir un número, ni siquiera recargando la página. Botón de prueba: “Revisar pedidos del menú”, para no depender de esperar el aviso automático.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Por qué esta pantalla no lleva el color del cliente</h4>
+      <p>Es la única superficie donde la personalización no entra. Aquí el color significa estado: verde es lista, ámbar lleva tiempo, rojo urge. Si un negocio eligiera verde nopal como color de marca, el código dejaría de leerse.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Cómo se resolvió el dinero</h4>
+      <p>En las columnas Nuevas y Preparando aparece la marca <strong>“Por cobrar” sin el importe</strong>: el cocinero no necesita totales. En Listas sí se muestra el monto, porque ahí es donde alguien cobra.</p>
+      <p>Al entregar una orden pagada basta un toque. Si no está pagada, se pregunta con <strong>dos salidas honestas</strong> — “Sí, cobré” o “Entregar sin cobrar”. Esa segunda opción existe porque a veces sí se entrega sin cobrar; si la única salida fuera “Sí”, la gente la tocaría igual y los números quedarían sucios sin que nadie lo supiera. Lo entregado sin cobrar se registra y no suma al cobrado del día.</p>
+    </div>
+
+    <div class="demo">
+      <div class="dhd"><b>Pantalla de cocina</b><span class="p">La barra negra simula un turno real</span>
+        <a href="propuestas-cocina/pantalla-cocina.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-cocina/pantalla-cocina.html" height="600" loading="lazy" title="Pantalla de cocina"></iframe>
+    </div>
+    <p class="dcap">Prueba “Cortar conexión” y avanza una orden: sigue funcionando y avisa cuántos cambios quedaron en espera. Ninguna orden se bloquea por falta de internet.</p>
+
+    <h3 id="ventanilla">Pedido en ventanilla</h3>
+    <p>Para quien llega sin celular. Entra <strong>al mismo tablero y al mismo registro de ventas</strong>, marcado como Ventanilla — es la regla 6 en la práctica: si el dueño sospecha que sus números están incompletos, deja de confiar en todo el sistema.</p>
+    <p>Está pensada para velocidad: <strong>un toque agrega</strong>, sin diálogos de por medio. Solo si el cliente pide un cambio se abre la hoja de esa línea.</p>
+    <div class="card why">
+      <h4>Las notas: dos niveles, y por qué</h4>
+      <p>Al principio puse todas las notas a nivel de orden y estaba mal: si alguien pide tres tacos y una torta y dice “sin picante”, <strong>la cocina no sabe a cuál aplica</strong>.</p>
+      <p>Ahora lo que describe un platillo vive en su línea, y arriba solo quedan cosas que sí aplican a todo el pedido: “para llevar”, “para comer aquí”, “todo junto”, “cubiertos extra”.</p>
+      <p>Y “con todo” / “sin picante” dejaron de ser notas de texto: son <strong>atajos que escriben sobre los ingredientes</strong>. Tocar “con todo” limpia la lista, así que es imposible que queden contradiciéndose. No hay regla que validar porque el estado inválido dejó de existir.</p>
+    </div>
+    <div class="card why">
+      <h4>El dictado por voz: disponible, pero no es el camino principal</h4>
+      <p>Hay micrófono junto al campo de nota. Funciona, pero este es el peor entorno posible para el reconocimiento de voz: plancha, tráfico, música, y vocabulario que los motores no manejan bien. Y la mayoría de implementaciones mandan el audio a un servidor, así que <strong>sin señal no sirve</strong>.</p>
+      <p>Por eso los botones de un toque son el camino principal: en una taquería las notas son casi siempre las mismas seis, y tocarlas es más rápido que dictar. El dictado queda para lo excepcional, con mensajes honestos cuando falla — incluido el caso de estar sin internet.</p>
+    </div>
+
+    <h3 id="agotados">Marcar lo que se acabó</h3>
+    <p>Desde la misma pantalla, sin llamar al dueño. Lo que se apaga <strong>desaparece del menú del comensal al instante</strong> y además <strong>deja de poder capturarse en ventanilla</strong> — las dos funciones comparten el mismo dato, así que no pueden desincronizarse.</p>
+
+    <h3 id="ventasdia">Cómo va el día</h3>
+    <p>El cajero necesita saber cómo van las ventas, pero un bloque de cifras compitiendo con las órdenes en hora pico va contra lo único que esta pantalla debe lograr. La solución: <strong>el conteo de órdenes siempre a la vista, el dinero detrás de un toque</strong>, y el panel se cierra solo en cuanto entra una orden nueva.</p>
+    <p>Una decisión de contabilidad: cuando alguien elige “entregar sin cobrar”, la orden cuenta pero <strong>el dinero no sube</strong>, y queda registrada. Si sumáramos lo que no se cobró, el panel del dueño mentiría y la caja no cuadraría al cierre.</p>
+
+    <h2 id="trucks-vista"><span class="num">06</span>Los tres trucks</h2>
+    <p class="h2s">Monitoreo para el dueño y el encargado — nunca en la pantalla del cocinero.</p>
+    <p><strong>Por qué está aparte:</strong> el aparato de cocina vive dentro de un truck y ver órdenes de otra unidad solo agrega ruido y riesgo de error. Quien necesita la vista de conjunto es quien supervisa, no quien cocina.</p>
+    <div class="demo">
+      <div class="dhd"><b>Los tres trucks</b><span class="p">Pausa uno o tírale la conexión</span>
+        <a href="propuestas-cocina/vista-trucks.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-cocina/vista-trucks.html" height="560" loading="lazy" title="Vista de los tres trucks"></iframe>
+    </div>
+
+    <h2 id="resumen"><span class="num">07</span>Panel · Resumen</h2>
+    <p class="h2s">La pantalla por la que el dueño sigue pagando mes a mes.</p>
+    <p><strong>Qué resuelve:</strong> la venta del día la ve en cualquier lado. Lo que nadie le da hoy es <strong>saber si está creciendo</strong>. Por eso el número grande viene siempre con dos comparaciones: contra el mes pasado y contra el mismo mes del año pasado.</p>
+
+    <div class="card ok">
+      <h4>La comparación es honesta y eso importa</h4>
+      <p>Hoy es día 30 de julio, o sea que el mes va incompleto. Comparar julio a medias contra un julio completo del año pasado infla el resultado — es la mentira clásica de los tableros. El panel compara los mismos 30 días en ambos periodos y lo dice arriba.</p>
+    </div>
+
+    <div class="card why">
+      <h4>La actividad de venta, y el cuidado con las palabras</h4>
+      <p>El sistema sabe a qué hora entró la primera orden de cada truck y la compara con el horario publicado. En el ejemplo, Truck 2 abre a las 11:00 y su primera orden entra en promedio a las 11:38 — casi 40 minutos de venta perdidos todos los días en una unidad donde el dueño no está.</p>
+      <p><strong>Esto no es un reloj checador y no debe presentarse como tal, en ninguna pantalla ni en material de venta.</strong> El personal llega antes a encender la plancha; la última orden no marca la salida. Se llama actividad de venta. Nunca “entrada”, “salida”, “horas trabajadas” ni “asistencia”.</p>
+    </div>
+
+    <div class="card warn">
+      <h4>Pendiente: este panel no está conectado a las ventas del día</h4>
+      <p>A diferencia del menú, la cocina y el seguimiento — que ya se avisan entre sí en vivo — <strong>el panel del dueño no tiene ningún puente con ellos</strong>. Sus números (venta de julio, comparativas, actividad de venta) son datos de ejemplo fijos; un pedido nuevo en cocina no los mueve.</p>
+      <p>Es intencional dejarlo así por ahora: este panel reporta totales y comparativas, no el estado de un pedido puntual, así que no necesita el mismo truco de <code>localStorage</code> entre pestañas. Cuando exista Supabase, va a sacar estos números con una consulta directa a la base de datos — funciona correcto ese día sin construir nada intermedio ahora. Ni el panel de personal ni el de cuenta están conectados tampoco, por la misma razón.</p>
+    </div>
+
+    <div class="demo">
+      <div class="dhd"><b>Panel · Resumen</b><span class="p">Las gráficas responden al pasar el cursor</span>
+        <a href="propuestas-panel/panel-dueno.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-dueno.html" height="640" loading="lazy" title="Panel del dueño, resumen"></iframe>
+    </div>
+
+    <h2 id="marca"><span class="num">08</span>Panel · Marca</h2>
+    <p class="h2s">La pantalla que vende el producto en una demostración.</p>
+    <p><strong>Qué resuelve:</strong> que el dueño sienta que compró algo hecho a su medida, sin que elegir se vuelva difícil. Se le piden <strong>cuatro cosas y ninguna más</strong>: logo, un color de la paleta, foto de portada y estilo visual.</p>
+    <p>La vista previa en vivo no es un adorno: es el momento exacto en que el producto se siente personalizado. Sin ella, esto sería un formulario más. Puedes subir un logo real de tu computadora y verlo aparecer al instante — en una demostración eso vale más que cualquier explicación.</p>
+    <div class="demo">
+      <div class="dhd"><b>Panel · Marca</b><span class="p">Sube un logo y cambia el color</span>
+        <a href="propuestas-panel/panel-marca.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-marca.html" height="640" loading="lazy" title="Panel del dueño, marca"></iframe>
+    </div>
+    <p class="dcap">El trazo de fondo del encabezado son cuatro juegos según lo que vende el negocio — tacos, hamburguesas, mariscos, café — dibujados solo con línea. Es parte del sistema, no decoración fija: un cliente nuevo elige el suyo en el alta y recibe un encabezado con carácter sin que nadie diseñe nada.</p>
+    <p>Dentro del desplegable “¿Un truck con otra marca?” está la excepción que pide el brief: darle a un truck su propio color. Vive escondida a propósito — está disponible, pero no es una decisión que todos tengan que tomar.</p>
+
+    <h2 id="menu"><span class="num">09</span>Panel · Menú</h2>
+    <p class="h2s">Uso diario: precios, agotados y platillos exclusivos de un truck.</p>
+    <div class="card why">
+      <h4>Dos acciones que se confunden y cuestan caro</h4>
+      <p>El <strong>interruptor de agotado</strong> es para “se me acabó hoy”: un toque, desaparece del menú del cliente, y vuelve con otro toque. <strong>Quitar del menú</strong> es permanente y vive dentro de Editar.</p>
+      <p>Sin esa separación, el dueño borra platillos cada vez que se le termina la birria y se lleva su histórico por delante. Por eso la confirmación de quitar sugiere explícitamente usar el interruptor si solo se acabó por hoy.</p>
+    </div>
+    <div class="demo">
+      <div class="dhd"><b>Panel · Menú</b><span class="p">Filtra por truck y cambia un precio</span>
+        <a href="propuestas-panel/panel-menu.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-menu.html" height="620" loading="lazy" title="Panel del dueño, menú"></iframe>
+    </div>
+    <p class="dcap">La foto de cada platillo se sube desde “Editar”. Arriba hay un contador de cuántos van sin foto — que es el dato que decide si el estilo Vibrante funciona para ese cliente: con veinte platillos sin foto, el menú con miniaturas se ve vacío y conviene el Tradicional.</p>
+
+    <div class="card">
+      <h4>Pendiente definido: cómo se mejoran las fotos</h4>
+      <p>La promesa está tomada — las fotos de platillos <strong>sí se retocan</strong> (luz, fondo, acabado consistente) siempre a partir de la foto real que sube el dueño, nunca generadas de cero. Lo que faltaba resolver era el <em>cómo</em>: en el piloto, ese tratamiento es <strong>manual, con revisión humana durante el onboarding</strong> — el dueño sube la foto tal cual, y alguien del equipo la trata antes de publicarla. No se conecta ninguna herramienta de mejora automática al producto todavía.</p>
+      <p>Misma lógica que ya aplicamos a la lectura del menú: automatizar antes de ver fotos reales de varios clientes construye el proceso equivocado. Se reconsidera cuando el volumen de clientes lo justifique.</p>
+    </div>
+
+    <h2 id="trucks"><span class="num">10</span>Panel · Trucks</h2>
+    <p class="h2s">Pausa, horarios, impuesto y los avisos de la cocina.</p>
+    <p><strong>La pausa con reapertura automática</strong> resuelve algo muy concreto del food truck: se acaba el gas, hay cambio de turno, el personal descansa. Hoy la única opción es cerrar la ventanilla y perder los pedidos de esa hora. Aquí el dueño indica hasta cuándo y por qué, y <strong>ve el mensaje exacto que verá su cliente</strong> antes de confirmar.</p>
+    <div class="card why">
+      <h4>Los umbrales: qué son y por qué los configura el dueño</h4>
+      <p>Son los minutos a partir de los cuales una orden se pinta de ámbar y luego de rojo en la cocina. No hacen nada con la orden: solo le ahorran al cocinero comparar números en plena prisa.</p>
+      <p>Un taco sale en tres minutos; una birria no. Con el corte fijo, un negocio de birrias tendría la pantalla roja todo el día — y <strong>si todo se pone rojo, el rojo deja de significar algo</strong>. Por eso son configurables, con un valor para el negocio y la opción de sobrescribirlo en un truck concreto.</p>
+    </div>
+    <div class="demo">
+      <div class="dhd"><b>Panel · Trucks</b><span class="p">Pausa un truck y mira el mensaje al cliente</span>
+        <a href="propuestas-panel/panel-trucks.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-trucks.html" height="620" loading="lazy" title="Panel del dueño, trucks"></iframe>
+    </div>
+    <p class="dcap">“Nombre y foto” cambia lo que ve el comensal al escanear ese truck: su nombre, dónde se para y una foto de cómo se ve por fuera, para que confirme que está en el correcto. “Cambiar horario” abre los siete días por separado, con interruptor para cerrar un día completo y un atajo para igualar los demás; abajo muestra en vivo cómo va a quedar resumido.</p>
+
+    <h2 id="personal"><span class="num">11</span>Panel · Personal</h2>
+    <p class="h2s">El principio: ningún problema de acceso debería llegar hasta nosotros.</p>
+    <p>El personal <strong>no tiene correo ni contraseña</strong>. Rota con frecuencia, comparte la misma tablet y muchas veces no tiene correo de trabajo. El esquema es de dos capas: el aparato se conecta una vez con un código, y cada persona entra con un PIN de cuatro dígitos.</p>
+    <p>Entra alguien nuevo, el dueño le crea un PIN. Se va, lo borra y deja de funcionar en ese momento. Se pierde una tablet, la desconecta. <strong>Cada uno de estos casos que requiriera nuestra intervención sería un costo recurrente que se multiplica con cada cliente nuevo.</strong></p>
+    <div class="demo">
+      <div class="dhd"><b>Panel · Personal</b><span class="p">Agrega a alguien y mira el PIN que se genera</span>
+        <a href="propuestas-panel/panel-personal.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-personal.html" height="600" loading="lazy" title="Panel del dueño, personal"></iframe>
+    </div>
+
+    <h2 id="qr"><span class="num">12</span>Panel · Códigos QR</h2>
+    <p class="h2s">Un código por truck, descargable e imprimible sin depender de nosotros.</p>
+    <div class="card ok">
+      <h4>Son códigos reales, no dibujos</h4>
+      <p>Un QR falso que parezca bueno es peligroso: alguien lo imprime, lo pega en el truck y no escanea. Por eso se generan de verdad en el navegador, con un codificador propio verificado por lectura de vuelta — se codifica la dirección y se vuelve a leer del resultado para confirmar que coincide. <strong>Escanéalos con tu celular para comprobarlo tú mismo.</strong></p>
+    </div>
+    <div class="demo">
+      <div class="dhd"><b>Panel · Códigos QR</b><span class="p">Escanéalos con la cámara</span>
+        <a href="propuestas-panel/panel-qr.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-qr.html" height="620" loading="lazy" title="Panel del dueño, códigos QR"></iframe>
+    </div>
+
+    <h2 id="cuenta"><span class="num">13</span>Panel · Cuenta</h2>
+    <p class="h2s">Donde el modelo de negocio se le explica al dueño cada mes.</p>
+    <p><strong>Qué resuelve:</strong> cuánto paga, cuándo se cobra, sus recibos y cómo irse. Sin letras chiquitas — el precio depende solo de cuántos trucks tiene activos.</p>
+
+    <div class="card why">
+      <h4>La escalera de precios se ve, y por eso funciona</h4>
+      <p>La tabla muestra las cinco filas con la del dueño marcada. Ver que con cuatro trucks pagaría $29 por unidad en vez de los $39 de dos <strong>convierte agregar un truck en algo atractivo</strong> en vez de doloroso.</p>
+      <p>La regla que sostiene eso: <strong>el total nunca baja al agregar una unidad</strong> — $49, $78, $87, $116, $145. Si hubiera un escalón hacia abajo, el dueño sentiría que le cobramos de más antes y perdería la confianza en todo el precio.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Cancelar está a la vista y es fácil</h4>
+      <p>“Sin permanencia” es parte de la propuesta de valor. Esconder el botón de cancelar la contradiría, y el dueño lo notaría justo cuando más importa.</p>
+      <p>La confirmación dice exactamente qué pasa: los trucks siguen hasta que termine el mes pagado, los QR dejan de abrir después, <strong>la información se guarda dos años</strong> y no hay penalización. Hay una tercera opción — “quiero hablarlo” — porque muchas cancelaciones son un problema concreto que se puede resolver, pero <strong>no está puesta para estorbar</strong>: “Sí, cancelar” sigue ahí, al mismo alcance.</p>
+    </div>
+
+    <p>También lleva un recordatorio permanente de que <strong>nunca hay comisión por pedido</strong>. Verlo cada mes en la pantalla de cobro refuerza el diferenciador justo cuando el dueño está pensando en lo que paga. Y dice con honestidad cómo se cobra hoy: recibo por correo y transferencia, con el cobro automático marcado como algo que llega después.</p>
+
+    <div class="card warn">
+      <h4>Dos botones que sonaban a que ya habían pasado de verdad</h4>
+      <p><strong>“Descargando el recibo…”</strong> no descargaba nada — solo era un aviso. Ahora el botón genera y descarga un archivo real de ejemplo, con los datos de ese cobro. No es el PDF final, pero es honesto: algo se entrega de verdad.</p>
+      <p><strong>“Recibimos tu cancelación. Te mandamos la confirmación por correo”</strong> afirmaba una consecuencia real que el prototipo no puede cumplir. Ahora dice <em>“Simulación: tu suscripción quedaría cancelada el 31 de agosto. Nada se cancela de verdad en esta demostración.”</em> — mismo tono, sin prometer de más.</p>
+    </div>
+
+    <div class="demo">
+      <div class="dhd"><b>Panel · Cuenta</b><span class="p">Prueba el botón de cancelar</span>
+        <a href="propuestas-panel/panel-cuenta.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-panel/panel-cuenta.html" height="620" loading="lazy" title="Panel del dueño, cuenta"></iframe>
+    </div>
+
+    <h2 id="admin"><span class="num">14</span>Admin interno</h2>
+    <p class="h2s">Herramienta de trabajo, deliberadamente sin adornos.</p>
+    <p>Clientes, suscripciones, suspensiones y solicitudes de alta o baja de trucks. No debe consumir tiempo de diseño: no es producto de venta.</p>
+    <p>Una regla que vive aquí: <strong>los cambios de trucks aplican al siguiente periodo, nunca a mitad de mes</strong>. Una sola regla para altas y bajas, sin cálculos proporcionales por días. Y dar de baja un truck archiva su información dos años — no la borra — precisamente para que las comparaciones interanuales sigan funcionando.</p>
+
+    <div class="card why">
+      <h4>Los KPIs, calculados de verdad</h4>
+      <p>Las seis cifras de arriba traían deltas escritos a mano — "+1 este mes" como texto fijo, no como cálculo. Se veían bien pero mentían en cuanto algo cambiaba. Ahora salen de un histórico de 6 meses cuyo último punto <strong>siempre se reemplaza por el dato real de la cartera actual</strong>, así que un KPI y su tendencia nunca pueden desincronizarse.</p>
+      <p>Se agregó la gráfica de ingreso mensual y el desglose de cartera por estado, que es lo que el brief pide para esta pantalla: mostrar el estado del negocio, no solo la lista de clientes. Suspende o reactiva a alguien y compruébalo — las tres cosas se mueven juntas.</p>
+    </div>
+
+    <div class="card warn">
+      <h4>Tres errores reales que aparecieron al construir esto</h4>
+      <p><strong>Aprobar una solicitud cobraba de más este mismo mes.</strong> Aceptar la alta de un cuarto truck subía el ingreso mensual al instante, contradiciendo la regla impresa una línea abajo en la propia pantalla. Ahora aprobar solo <strong>agenda</strong> el cambio — la fila muestra “→ 4 desde el 1 de septiembre” sin tocar el cobro del mes en curso, igual que ya hacía la vista del dueño en Cuenta.</p>
+      <p><strong>Reactivar no pedía confirmación, y Suspender usaba el diálogo del navegador.</strong> Los dos botones quedaban pegados en el mismo lugar de la fila, y el de reactivar respondía a un solo toque sin explicar la consecuencia — la receta para reactivar sin querer. Los dos usan ahora el mismo modal con la consecuencia explícita que el resto del proyecto, y “Abrir” pasó a ser el primer botón, no el que está junto a la acción sensible.</p>
+      <p><strong>“Abrir” hacía parecer que un negocio suspendido se reactivaba solo.</strong> El botón siempre llevaba al mismo panel de demostración — con ventas, gráficas y todo funcionando — sin importar cuál cliente estaba suspendido. El dato de fondo nunca cambiaba, pero <strong>lo que se veía en pantalla sí</strong>, y eso es lo único que importa para quien lo está usando. Ahora un negocio suspendido no se puede abrir: el botón se identifica como tal y explica que hay que reactivarlo primero, la misma regla que ya le decimos al dueño.</p>
+    </div>
+
+    <p>La columna <strong>Cobro</strong> ya distingue Manual de Stripe por cliente, para no tener que rehacer la tabla cuando la conexión con Stripe se active en Fase 2 — hoy es solo un dato visible, sin ninguna llamada real.</p>
+
+    <div class="demo">
+      <div class="dhd"><b>Admin interno</b><span class="p">Suspende un cliente o aprueba una solicitud</span>
+        <a href="propuestas-admin/admin-interno.html" target="_blank">Abrir aparte ↗</a></div>
+      <iframe src="propuestas-admin/admin-interno.html" height="580" loading="lazy" title="Admin interno"></iframe>
+    </div>
+
+    <h2 id="restaurantes"><span class="num">15</span>Restaurantes: la puerta queda abierta</h2>
+    <p class="h2s">Decidido en julio de 2026. No se construye ahora.</p>
+    <p>El producto podrá servir también a <strong>restaurantes con control por mesa</strong>, y en general a cualquier negocio de comida que hoy dependa de un punto de venta caro con equipo de terceros. Va en <strong>el mismo producto, no en una plataforma aparte</strong>: se reutiliza el menú, la marca, la cocina, los accesos, la analítica, la suscripción y los QR. Se estima cerca del 70%.</p>
+    <p>Lo genuinamente nuevo sería la <strong>cuenta abierta por mesa</strong> — en un restaurante se pide por rondas y todo se acumula hasta que piden pagar, mientras que en un truck cada pedido es una venta cerrada —, el estado de la mesa, dividir la cuenta, la propina y el rol de mesero.</p>
+
+    <div class="card warn">
+      <h4>El freno, y por qué importa</h4>
+      <p>No se construye hasta tener clientes de food truck pagando de forma consistente. Va a ser <strong>el “sí” más tentador y más caro</strong> que pongan enfrente.</p>
+      <p>Además el terreno cambia: el mercado de restaurantes está lleno de competidores muy financiados, mientras que los food trucks están desatendidos — que es toda la tesis del producto. Si algún día se entra, el ángulo defendible es el mismo de siempre: sin comisión por pedido y sin comprar equipo. Y se cobraría <strong>por sucursal, nunca por mesa</strong>, porque por mesa castiga al restaurante grande y lo invita a registrar de menos.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Lo único que aplica desde ya</h4>
+      <p>Quedó escrito como <strong>Regla 7 en la skill de datos</strong>, que es la que se consulta obligatoriamente antes de tocar el esquema. Cuatro restricciones que hoy no cuestan nada y después salen caras: nombrar la unidad de operación en genérico y no “truck”; no asumir un solo código QR por unidad; no amarrar el esquema a que un pedido sea siempre una venta cerrada; y roles que puedan crecer.</p>
+      <p>Nada de mesas, cuentas, propinas ni selector de tipo de negocio. <strong>La puerta queda abierta en el esquema, no en el producto.</strong></p>
+    </div>
+
+    <h2 id="leccion"><span class="num">16</span>Lo que aprendimos construyendo</h2>
+    <p class="h2s">Cinco cosas que conviene recordar cuando se escriba la aplicación real.</p>
+
+    <div class="card why">
+      <h4>Los marcadores que prometen lo que no existe</h4>
+      <p>Apareció cinco veces: un espacio de “falta foto” sin forma de subirla, un botón que solo describía lo que haría, pestañas que no llevaban a ningún lado, y un carrito que contaba piezas pero no podía mandarse.</p>
+      <p>La lección para la construcción: <strong>que un elemento no pueda dibujarse en estado vacío sin declarar qué acción lo llena</strong>. Así el hueco se vuelve imposible en vez de quedar a que alguien lo note.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Los nombres de estilo que chocan entre sí</h4>
+      <p>Tres veces una clase nueva heredó estilos de otra con el mismo nombre y rompió la maquetación en silencio — cantidades que se estiraban a todo lo ancho, listas que salían en fila. En la aplicación real conviene estilos con alcance por componente para que esto no pueda pasar.</p>
+    </div>
+
+    <div class="card why">
+      <h4>El falso vacío</h4>
+      <p>Un error real: al capturar en ventanilla, elegir “paga al recoger” guarda <em>falso</em>, y la comprobación trataba ese falso como “todavía no eligió”. El botón de mandar a cocina se quedaba bloqueado para la mitad de los casos. Cuidado al distinguir <strong>“vacío” de “dijo que no”</strong>.</p>
+    </div>
+
+    <div class="card why">
+      <h4>El almacenamiento del navegador no cruza archivos</h4>
+      <p>El primer intento de dar continuidad entre el menú y el seguimiento guardaba el pedido en <code>localStorage</code> y confiaba en que la siguiente pantalla lo leyera. Se veía bien hasta que se probó de verdad: <strong>abrir dos archivos por separado no garantiza compartir almacenamiento</strong>, ni siquiera viviendo en la misma carpeta. La solución robusta fue que el dato viajara en la propia dirección del enlace, no en una promesa de que algo quedó guardado en otro lado. Cuando exista el backend real esto deja de ser un problema — pero mientras el prototipo sea archivos sueltos, cualquier “puente” entre pantallas hay que probarlo navegando de verdad, no solo revisando el código.</p>
+    </div>
+
+    <div class="card why">
+      <h4>Decir “esto es una demostración” cuando de verdad lo es</h4>
+      <p>Varios botones sonaban a que ya habían hecho algo real: “descargando tu recibo” sin generar ningún archivo, “recibimos tu cancelación” sin cancelar nada. La corrección no fue esconder esos botones ni llenarlos de advertencias — fue hacer que la acción fuera honesta: el recibo ahora sí se descarga, y la cancelación dice explícitamente que es una simulación. <strong>Cuando algo no se puede cumplir de verdad, es mejor decirlo que fingirlo.</strong></p>
+    </div>
+
+    <h2 id="estado"><span class="num">17</span>Qué falta</h2>
+    <p class="h2s">Estas pantallas son prototipos de diseño. Esto todavía no existe.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Pendiente</th><th>Dónde</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td>Base de datos y aislamiento entre negocios</td><td>Supabase</td><td class="no">Proyecto creado, esquema sin construir</td></tr>
+        <tr><td>La aplicación real</td><td>C:\dev\foodtruckos</td><td class="no">Sin empezar</td></tr>
+        <tr><td>Pantalla de Cuenta del dueño</td><td>Panel</td><td class="no">Marcada como “pronto” en la navegación</td></tr>
+        <tr><td>Guardado de verdad</td><td>Todas</td><td class="no">Los prototipos olvidan todo al recargar</td></tr>
+        <tr><td>Panel del dueño conectado a las ventas reales</td><td>Panel</td><td class="no">Sus números son de ejemplo; un pedido nuevo no los mueve — pendiente hasta Supabase</td></tr>
+        <tr><td>Herramienta de mejora de fotos conectada al producto</td><td>Menú y Trucks</td><td class="no">Decisión tomada: en el piloto se trata a mano en el onboarding, no en vivo — ver sección 09</td></tr>
+      </tbody>
+    </table></div>
+    <p>Las diez pantallas están completas como prototipo: <strong>no queda ningún botón sin función ni ningún enlace muerto</strong>. Lo que falta es todo lo que vive por debajo.</p>
+
+    <h2 id="sigue"><span class="num">18</span>Lo que sigue</h2>
+    <p class="h2s">En este orden, y hay una razón.</p>
+    <ol>
+      <li><strong>Autorizar el conector de Supabase</strong> incluyendo la organización VibrancyGG. Sin eso no se pueden crear las tablas ni sus políticas de aislamiento desde aquí.</li>
+      <li><strong>El esquema de la base de datos, primero.</strong> Ahí vive la regla que no se puede arreglar después: el aislamiento entre negocios y la preservación del histórico. Es el error más fácil de cometer y el más difícil de detectar, porque el sistema se ve perfecto el día que se comete.</li>
+      <li><strong>La aplicación</strong> en Next.js, portando estos prototipos como referencia de comportamiento, no solo de aspecto.</li>
+      <li><strong>Enseñarle esto a La Villita</strong> antes de construir de más. Son diez minutos y te dice qué sobra y qué falta — con tres trucks es el cliente que más te conviene escuchar.</li>
+    </ol>
+
+    <div class="foot">
+      Menú de prueba: Taquería El Farol, rescatado del prototipo anterior. Precios y textos de la carta son reales; los del armado de tacos y burritos son de demostración.<br>
+      Este manual carga las pantallas reales desde esta misma carpeta. Si mueves los archivos, los recuadros dejan de cargar.
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

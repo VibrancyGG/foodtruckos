@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Menú — Panel del dueño · FoodTruckOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0B;--ink2:#52514E;--muted:#898781;--line:#E1E0D9;
+  --page:#F9F9F7;--card:#FFFFFF;--ring:rgba(11,11,11,.10);
+  --good:#006300;--goodBg:#E9F6EF;--warn:#B0700A;--warnBg:#FDF3E0;--bad:#C4292E;--badBg:#FDECEC;
+  --f:'Inter',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--f);-webkit-font-smoothing:antialiased;line-height:1.5}
+
+.lab{background:#1D1D1F;color:#D8D5D0;font:500 12px var(--f);padding:7px 12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.lab b{color:#fff}
+.lab a{background:#2F2C29;color:#D8D5D0;border-radius:4px;padding:5px 10px;text-decoration:none;font-weight:600}
+.lab .sep{margin-left:auto;color:#6F675E}
+
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.bd{display:flex;align-items:center;gap:9px;padding:14px 0}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.bd span{font-weight:800;letter-spacing:-.02em;font-size:15px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tabs a{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current]{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+.tabs a:not([aria-current]){opacity:.62}
+.acct{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink2);padding:14px 0}
+
+.wrap{max-width:1000px;margin:0 auto;padding:26px 22px 100px}
+h1{font-size:29px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-size:14px;color:var(--ink2);margin:6px 0 20px;max-width:66ch}
+
+/* filtro por truck */
+.filters{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:none;padding:10px 15px;font:700 13.5px var(--f);color:var(--ink2);cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.seg button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.fh{font-size:13px;color:var(--ink2)}
+
+.btn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:10px 16px;font:700 13.5px var(--f);cursor:pointer;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.mini{padding:7px 12px;font-size:12.5px}
+.btn.danger{color:var(--bad);border-color:#F0BFC0}
+
+.cat{background:var(--card);border:1px solid var(--ring);border-radius:14px;margin-bottom:16px;overflow:hidden}
+.chd{display:flex;align-items:center;gap:11px;padding:15px 18px;flex-wrap:wrap}
+.chd h2{font-size:16px;font-weight:800;letter-spacing:-.02em;margin:0}
+.chd .n{font-size:12px;font-weight:700;color:var(--muted)}
+.chd .btn{margin-left:auto}
+
+.it{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid var(--line)}
+@media (max-width:760px){.it{grid-template-columns:auto 1fr;gap:9px}.it .price,.it .acts{grid-column:2}}
+.ph{width:46px;height:46px;border-radius:8px;background:#EFE9DE;color:var(--muted);display:grid;place-items:center;font-size:10px;font-weight:800;text-align:center;line-height:1.15;flex:none;overflow:hidden;position:relative}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph.miss{border:1.5px dashed #C9C3B7;background:#F6F2EA}
+
+/* foto dentro del formulario */
+.fotoBox{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.fotoPrev{width:104px;height:104px;border-radius:11px;background:#EFE9DE;color:var(--muted);display:grid;place-items:center;
+  font-size:11px;font-weight:700;text-align:center;line-height:1.3;flex:none;overflow:hidden;border:1.5px dashed #C9C3B7;padding:6px}
+.fotoPrev.has{border-style:solid;border-color:var(--line);padding:0}
+.fotoPrev img{width:100%;height:100%;object-fit:cover}
+.fotoAct{flex:1;min-width:0}
+.fotoAct .btn{margin:0 7px 7px 0}
+.fotoAct p{font-size:12px;color:var(--muted);margin:2px 0 0;line-height:1.45}
+input[type=file]{display:none}
+.nm{min-width:0}
+.nm b{font-size:15px;font-weight:700;display:block}
+.nm .d{font-size:12.5px;color:var(--ink2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:800;border-radius:100px;padding:2px 9px;margin-left:7px;vertical-align:1px}
+.tag.solo{background:#EEF3FB;color:#1F5FBF}
+.tag.out{background:var(--badBg);color:var(--bad)}
+.price{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.it.off .nm b,.it.off .price{color:var(--muted)}
+.it.off .ph{opacity:.5}
+.acts{display:flex;gap:7px;align-items:center}
+
+/* interruptor agotado */
+.sw{position:relative;width:46px;height:27px;border-radius:100px;border:0;background:var(--good);cursor:pointer;flex:none;padding:0}
+.sw[aria-checked=false]{background:#C9C5BC}
+.sw i{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw[aria-checked=true] i{transform:translateX(19px)}
+.sw:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.sw i{transition:none}}
+
+.note{background:var(--warnBg);border:1px solid #F0D9A8;border-radius:11px;padding:15px 17px;margin-bottom:20px}
+.note b{display:block;font-size:14px;font-weight:800;margin-bottom:4px}
+.note p{margin:0;font-size:13.5px;color:#6B4A12;line-height:1.55}
+
+/* modal */
+.veil{position:fixed;inset:0;z-index:80;background:rgba(11,11,11,.5);display:none;place-items:center;padding:20px}
+.veil.on{display:grid}
+.box{background:var(--card);border-radius:16px;padding:24px;max-width:460px;width:100%;max-height:90vh;overflow:auto}
+.box h3{font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.box p{font-size:14px;color:var(--ink2);margin:0 0 18px;line-height:1.55}
+label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:0 0 6px}
+input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:12px 13px;font:600 15px var(--f);color:var(--ink);margin-bottom:14px}
+input:focus-visible{outline:3px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pick{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-bottom:16px}
+.pick button{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:11px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.pick button[aria-pressed=true]{border-color:var(--ink)}
+.pick b{display:block;font-size:13.5px;font-weight:800}
+.pick span{display:block;font-size:11.5px;color:var(--ink2);margin-top:2px;line-height:1.3}
+.acts2{display:flex;gap:9px;justify-content:flex-end;margin-top:4px}
+.warnbox{background:var(--warnBg);border-radius:9px;padding:12px 14px;font-size:13px;color:#6B4A12;margin-bottom:16px;line-height:1.5}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:90;background:var(--ink);color:#fff;border-radius:100px;padding:13px 24px;font-size:14px;font-weight:700;display:none}
+.toast.on{display:block}
+
+.tabs .soon{padding:16px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap;opacity:.55;display:flex;align-items:center;gap:6px}
+.tabs .soon i{font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--line);color:var(--ink2);border-radius:100px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <b>Panel del dueño · Menú</b>
+  <a href="panel-dueno.html">← Resumen</a>
+  <a href="panel-marca.html">Marca</a>
+  <a href="panel-personal.html">Personal</a>
+  <span class="sep">Un menú base, con platillos propios por truck</span>
+</div>
+
+<nav class="nav">
+  <div class="bd"><div class="logo">F</div><span>FoodTruckOS</span></div>
+  <div class="tabs"><a href="panel-dueno.html">Resumen</a><a href="#" aria-current="page">Menú</a><a href="panel-trucks.html">Trucks</a><a href="panel-marca.html">Marca</a><a href="panel-personal.html">Personal</a><a href="panel-qr.html">Códigos QR</a><a href="panel-cuenta.html">Cuenta</a></div>
+  <div class="acct">Taquería El Farol</div>
+</nav>
+
+<div class="wrap">
+  <h1>Tu menú</h1>
+  <p class="sub">Lo que cambies aquí lo ven tus clientes al momento, sin reimprimir nada. Tus tres trucks comparten el mismo menú, y cada uno puede tener platillos que solo él vende.</p>
+
+  <div class="note">
+    <b>Cambiar un precio no toca tus ventas pasadas</b>
+    <p>Si hoy le subes a los tacos, los pedidos de ayer siguen mostrando lo que el cliente pagó en su momento. Tus reportes del mes pasado no se mueven.</p>
+  </div>
+
+  <div class="filters">
+    <div class="seg" id="seg">
+      <button data-t="todos" aria-pressed="true">Todos los trucks</button>
+      <button data-t="Truck 1" aria-pressed="false">Truck 1</button>
+      <button data-t="Truck 2" aria-pressed="false">Truck 2</button>
+      <button data-t="Truck 3" aria-pressed="false">Truck 3</button>
+    </div>
+    <span class="fh" id="fh"></span>
+    <button class="btn primary" id="add" style="margin-left:auto">Agregar platillo</button>
+  </div>
+
+  <div id="lista"></div>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>'$'+n.toFixed(2);
+let filtro='todos', nid=500;
+
+/* solo:null = del menú base (lo venden los tres) · solo:'Truck 2' = exclusivo de ese truck */
+let CATS=[
+ {c:'Tacos',items:[
+  {id:1,n:'Al pastor',d:'Del trompo, marinado 24 horas en guajillo y achiote.',p:3.25,ok:true,solo:null},
+  {id:2,n:'Asada',d:'Res al carbón, picada gruesa para que se sienta.',p:3.50,ok:true,solo:null},
+  {id:3,n:'Chorizo',d:'Hecho en casa, con papa cuando la hay.',p:3.00,ok:true,solo:null},
+  {id:4,n:'Lengua',d:'Cocida seis horas hasta que se deshace.',p:3.75,ok:true,solo:null},
+  {id:5,n:'Tripa',d:'Bien dorada. Si la pide blanda, avísele a Beto.',p:3.50,ok:false,solo:null},
+  {id:6,n:'Nopal',d:'Nopal asado con cebolla cambray. Sin carne.',p:2.75,ok:true,solo:null}]},
+ {c:'De la casa',items:[
+  {id:7,n:'Quesabirria (3 pzas)',d:'Tortilla en el consomé y dorada con queso.',p:13.50,ok:true,solo:null},
+  {id:8,n:'Mulita de asada',d:'Dos tortillas, queso derretido en medio.',p:6.50,ok:true,solo:null},
+  {id:9,n:'Vampiro',d:'Tortilla tatemada, queso y la carne que elija.',p:5.75,ok:true,solo:'Truck 2'}]},
+ {c:'Tortas y burritos',items:[
+  {id:10,n:'Torta de milanesa',d:'Pan telera, milanesa de res, aguacate, frijoles.',p:12.00,ok:true,solo:null},
+  {id:11,n:'Torta ahogada',d:'Bañada en salsa de chile de árbol.',p:11.50,ok:true,solo:null},
+  {id:12,n:'Burrito de asada',d:'Tortilla de harina, arroz, frijol, guacamole.',p:11.00,ok:true,solo:null}]},
+ {c:'Antojitos',items:[
+  {id:13,n:'Elote entero',d:'Mayonesa, queso cotija, chile en polvo y limón.',p:4.50,ok:true,solo:null},
+  {id:14,n:'Esquites',d:'El mismo elote, en vaso, con caldo.',p:5.00,ok:true,solo:null},
+  {id:15,n:'Papas con queso',d:'Papa frita, queso, carne al carbón y crema.',p:8.50,ok:true,solo:null},
+  {id:16,n:'Consomé de birria',d:'Un vaso grande. Para el frío o para la cruda.',p:4.00,ok:true,solo:'Truck 1'}]},
+ {c:'Bebidas',items:[
+  {id:17,n:'Agua de horchata',d:'Arroz y canela, hecha en la mañana.',p:3.50,ok:true,solo:null},
+  {id:18,n:'Agua de jamaica',d:'Flor de jamaica, poca azúcar.',p:3.50,ok:true,solo:null},
+  {id:19,n:'Jarritos',d:'Mandarina, tamarindo o toronja.',p:2.75,ok:true,solo:null},
+  {id:20,n:'Coca de vidrio',d:'De caña. No es lo mismo y usted lo sabe.',p:3.25,ok:true,solo:null}]}
+];
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3400)}
+const visible=i=>filtro==='todos'||!i.solo||i.solo===filtro;
+
+function draw(){
+  const total=CATS.reduce((s,c)=>s+c.items.filter(visible).length,0);
+  const outs=CATS.reduce((s,c)=>s+c.items.filter(i=>visible(i)&&!i.ok).length,0);
+  const sinFoto=CATS.reduce((s,c)=>s+c.items.filter(i=>visible(i)&&!i.f).length,0);
+  $('#fh').textContent=(filtro==='todos'?total+' platillos en total':total+' platillos se venden en '+filtro)+
+    (outs?' · '+outs+' agotado'+(outs>1?'s':''):'')+
+    (sinFoto?' · '+sinFoto+' sin foto':' · todos con foto');
+
+  $('#lista').innerHTML=CATS.map((c,ci)=>{
+    const its=c.items.filter(visible);
+    if(!its.length)return '';
+    return '<div class="cat"><div class="chd"><h2>'+c.c+'</h2>'+
+      '<span class="n">'+its.length+' platillos</span></div>'+
+      its.map(i=>{
+        const gi=c.items.indexOf(i);
+        return '<div class="it'+(i.ok?'':' off')+'">'+
+          (i.f?'<div class="ph"><img src="'+i.f+'" alt=""></div>'
+              :'<div class="ph miss">Falta<br>foto</div>')+
+          '<div class="nm"><b>'+i.n+
+            (i.solo?'<span class="tag solo">Solo '+i.solo+'</span>':'')+
+            (i.ok?'':'<span class="tag out">Se acabó</span>')+
+          '</b><div class="d">'+i.d+'</div></div>'+
+          '<div class="price">'+money(i.p)+'</div>'+
+          '<div class="acts">'+
+            '<button class="sw" role="switch" aria-checked="'+i.ok+'" aria-label="Disponible" '+
+              'data-ok="'+ci+','+gi+'"><i></i></button>'+
+            '<button class="btn mini" data-ed="'+ci+','+gi+'">Editar</button>'+
+          '</div></div>'}).join('')+
+    '</div>'}).join('')||'<div class="cat"><div class="empty" style="padding:28px;text-align:center;color:var(--muted);font-weight:600">Este truck no tiene platillos propios todavía.</div></div>';
+
+  $('#lista').querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>{
+    const [ci,ii]=b.dataset.ok.split(',').map(Number),i=CATS[ci].items[ii];
+    i.ok=!i.ok;draw();
+    toast(i.ok?i.n+' vuelve a aparecer en el menú':i.n+' desapareció del menú de tus clientes')});
+  $('#lista').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{
+    const [ci,ii]=b.dataset.ed.split(',').map(Number);edit(ci,ii)});
+}
+
+/* ---------- foto del platillo ----------
+   Siempre la foto real del cliente. La IA la mejora (luz, fondo, encuadre),
+   nunca inventa el platillo. Si falta, se muestra un espacio marcado. */
+let fotoTmp=null;
+function fotoHTML(){
+  return '<label>Foto del platillo</label>'+
+    '<div class="fotoBox">'+
+      '<div class="fotoPrev" id="fp"></div>'+
+      '<div class="fotoAct">'+
+        '<button type="button" class="btn" id="fPick"></button>'+
+        '<button type="button" class="btn" id="fDel" hidden>Quitar</button>'+
+        '<p>Tómale la foto al platillo tal como sale de tu cocina. Nosotros le emparejamos la luz y el fondo con las demás. Nunca ponemos la foto de otro plato.</p>'+
+      '</div>'+
+    '</div><input type="file" id="fIn" accept="image/*">';
+}
+function fotoPinta(){
+  const p=$('#fp');if(!p)return;
+  p.classList.toggle('has',!!fotoTmp);
+  p.innerHTML=fotoTmp?'<img src="'+fotoTmp+'" alt="">':'Sin foto<br>todavía';
+  $('#fPick').textContent=fotoTmp?'Cambiar foto':'Elegir foto';
+  $('#fDel').hidden=!fotoTmp;
+}
+function fotoWire(){
+  fotoPinta();
+  $('#fPick').onclick=()=>$('#fIn').click();
+  $('#fDel').onclick=()=>{fotoTmp=null;fotoPinta()};
+  $('#fIn').onchange=()=>{const f=$('#fIn').files[0];if(!f)return;
+    fotoTmp=URL.createObjectURL(f);fotoPinta();$('#fIn').value=''};
+}
+
+/* ---------- modal ---------- */
+function open(html){$('#veil').innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';
+  $('#veil').classList.add('on')}
+function close(){$('#veil').classList.remove('on')}
+$('#veil').onclick=e=>{if(e.target===$('#veil'))close()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+const soloPicker=(sel)=>'<label>¿Quién lo vende?</label><div class="pick" id="sp">'+
+  ['todos','Truck 1','Truck 2','Truck 3'].map(t=>
+    '<button data-s="'+t+'" aria-pressed="'+((sel||'todos')===t)+'"><b>'+
+    (t==='todos'?'Los tres':'Solo '+t)+'</b><span>'+
+    (t==='todos'?'Va en el menú base':'Exclusivo de esa unidad')+'</span></button>').join('')+'</div>';
+
+function edit(ci,ii){
+  const i=CATS[ci].items[ii];let solo=i.solo||'todos';fotoTmp=i.f||null;
+  open('<h3>'+i.n+'</h3><p>Los cambios se ven en el menú de tus clientes de inmediato.</p>'+
+    fotoHTML()+
+    '<label for="en">Nombre</label><input type="text" id="en" value="'+i.n.replace(/"/g,'&quot;')+'">'+
+    '<label for="ed">Descripción</label><input type="text" id="ed" value="'+i.d.replace(/"/g,'&quot;')+'">'+
+    '<label for="ep">Precio</label><input type="text" id="ep" value="'+i.p.toFixed(2)+'" inputmode="decimal">'+
+    soloPicker(i.solo)+
+    '<div class="acts2"><button class="btn danger" id="del">Quitar del menú</button>'+
+    '<button class="btn" id="c">Cancelar</button>'+
+    '<button class="btn primary" id="ok">Guardar</button></div>');
+  $('#sp').querySelectorAll('button').forEach(b=>b.onclick=()=>{solo=b.dataset.s;
+    $('#sp').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  fotoWire();
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{
+    const p=parseFloat($('#ep').value.replace(/[^\d.]/g,''));
+    if(!$('#en').value.trim()||isNaN(p)){toast('Revisa el nombre y el precio');return}
+    const antes=i.p, teniaFoto=!!i.f;
+    i.n=$('#en').value.trim();i.d=$('#ed').value.trim();i.p=p;i.solo=solo==='todos'?null:solo;i.f=fotoTmp;
+    draw();close();
+    toast(antes!==p?i.n+': '+money(antes)+' → '+money(p)
+      :(!teniaFoto&&i.f)?i.n+' ya tiene foto':'Guardado');
+  };
+  $('#del').onclick=()=>{
+    open('<h3>¿Quitar '+i.n+' del menú?</h3>'+
+      '<div class="warnbox">Deja de aparecerle a tus clientes desde ahorita. '+
+      '<b>Las ventas que ya tuvo se conservan</b> y lo vas a seguir viendo en tus reportes de meses pasados.</div>'+
+      '<p style="margin:0 0 14px">Si solo se te acabó por hoy, mejor usa el interruptor de la lista — así vuelve con un toque.</p>'+
+      '<div class="acts2"><button class="btn" id="c2">Mejor no</button>'+
+      '<button class="btn danger" id="ok2">Sí, quitarlo</button></div>');
+    $('#c2').onclick=close;
+    $('#ok2').onclick=()=>{CATS[ci].items.splice(ii,1);draw();close();
+      toast(i.n+' ya no está en el menú. Sus ventas anteriores se conservan')}};
+}
+
+$('#add').onclick=()=>{
+  let cat=CATS[0].c,solo=filtro==='todos'?'todos':filtro;fotoTmp=null;
+  open('<h3>Agregar platillo</h3><p>Aparece en el menú de tus clientes en cuanto lo guardes.</p>'+
+    fotoHTML()+
+    '<label for="an">Nombre</label><input type="text" id="an" placeholder="Ej: Taco de birria" autocomplete="off">'+
+    '<label for="ad">Descripción</label><input type="text" id="ad" placeholder="Cómo lo describirías tú" autocomplete="off">'+
+    '<label for="ap">Precio</label><input type="text" id="ap" placeholder="0.00" inputmode="decimal">'+
+    '<label>¿En qué parte del menú?</label><div class="pick" id="ac">'+
+      CATS.map((c,i)=>'<button data-c="'+c.c+'" aria-pressed="'+(i===0)+'"><b>'+c.c+'</b></button>').join('')+'</div>'+
+    soloPicker(solo==='todos'?null:solo)+
+    '<div class="warnbox">Si todavía no tienes la foto, guárdalo sin ella: en el menú se muestra un espacio marcado y la agregas cuando puedas. Nunca ponemos la imagen de otro plato.</div>'+
+    '<div class="acts2"><button class="btn" id="c">Cancelar</button>'+
+    '<button class="btn primary" id="ok">Agregar al menú</button></div>');
+  $('#ac').querySelectorAll('button').forEach(b=>b.onclick=()=>{cat=b.dataset.c;
+    $('#ac').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  $('#sp').querySelectorAll('button').forEach(b=>b.onclick=()=>{solo=b.dataset.s;
+    $('#sp').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  fotoWire();
+  $('#an').focus();
+  $('#c').onclick=close;
+  $('#ok').onclick=()=>{
+    const n=$('#an').value.trim(),p=parseFloat(($('#ap').value||'').replace(/[^\d.]/g,''));
+    if(!n||isNaN(p)){toast('Falta el nombre o el precio');return}
+    CATS.find(c=>c.c===cat).items.push({id:++nid,n,d:$('#ad').value.trim()||'—',p,ok:true,
+      solo:solo==='todos'?null:solo,f:fotoTmp});
+    draw();close();toast(n+' ya aparece en el menú')};
+};
+
+$('#seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  filtro=b.dataset.t;
+  $('#seg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  draw()});
+
+draw();
+</script>
+</body>
+</html>
