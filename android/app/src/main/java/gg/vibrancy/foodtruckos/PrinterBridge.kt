@@ -17,6 +17,9 @@ class PrinterBridge(
     private val avisar: (String) -> Unit,
 ) {
 
+    /** Último estado ya avisado, para no repetir el mismo mensaje. */
+    private var ultimoAvisado: String? = null
+
     /** Lanza si no se pudo imprimir, y ESO ES A PROPÓSITO: printBridge.ts lo
      *  atrapa y conserva el ticket en su cola para reintentarlo. Si aquí se
      *  devolviera "ok" a la brava, la web daría el ticket por impreso y la
@@ -24,8 +27,8 @@ class PrinterBridge(
      *
      *  Pero fallar callado tampoco sirve: en la primera prueba real el botón
      *  de imprimir "no hacía nada" y no había forma de saber si faltaba
-     *  elegir impresora o si no conectaba. Ahora cada fallo se dice en
-     *  pantalla. */
+     *  elegir impresora o si no conectaba. Se avisa, pero solo al cambiar de
+     *  estado — ver abajo. */
     @JavascriptInterface
     fun print(base64: String, copies: Int) {
         if (Ajustes.impresoraMac == null) {
@@ -40,8 +43,16 @@ class PrinterBridge(
         val veces = copies.coerceIn(1, 3)
         try {
             repeat(veces) { PrinterLink.escribir(bytes) }
+            ultimoAvisado = null
         } catch (e: Exception) {
-            avisar("No se pudo imprimir: ${PrinterLink.estado()}. Se reintenta solo.")
+            // Solo se avisa cuando el estado CAMBIA. Repetirlo cada pocos
+            // segundos tapaba el tablero de órdenes y parecía una falla de la
+            // app; el estado continuo vive en la notificación del servicio.
+            val ahora = PrinterLink.estado()
+            if (ahora != ultimoAvisado) {
+                ultimoAvisado = ahora
+                avisar("No se pudo imprimir: $ahora. Se reintenta solo.")
+            }
             throw e
         }
     }

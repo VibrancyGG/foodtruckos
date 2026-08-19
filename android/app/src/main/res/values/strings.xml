@@ -14,4 +14,6 @@
     <string name="bt_needed">Sin permiso de Bluetooth no se pueden imprimir comandas. La pantalla de cocina funciona igual.</string>
     <string name="settings">Ajustes de Bluetooth</string>
     <string name="cancel">Cancelar</string>
+    <string name="sin_impresora">Falta elegir la impresora — abre la app</string>
+    <string name="impresora_estado">Impresora: %1$s</string>
 </resources>
