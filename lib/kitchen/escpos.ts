@@ -15,6 +15,12 @@ const GS = 0x1d
 // ñ del español. Sin esto la impresora escupe "Ã±" en vez de "ñ".
 const CODE_PAGE_CP850 = 2
 
+// Papel que se avanza antes de cortar, en puntos (203 ppp: 8 puntos ≈ 1 mm).
+// 220 ≈ 27 mm, con holgura sobre los ~8 renglones que retiene la P047.
+// Si un modelo desperdicia papel, se baja midiendo: imprime, corta, y mide
+// cuánto sobra en blanco debajo del último renglón.
+const CORTE_AVANCE_PUNTOS = 220
+
 // CP850 solo para lo que de verdad aparece en un menú en español. Lo que no
 // esté aquí cae al equivalente sin acento antes que imprimir basura.
 const CP850: Record<string, number> = {
@@ -91,8 +97,9 @@ export type TicketInput = {
   labels: TicketLabels
   /** 48 para 80 mm en fuente A. 32 para 58 mm. */
   widthChars?: number
-  /** La chicharra que avisa que entró una orden. El comando varía entre
-   *  fabricantes — verificar con la impresora real antes de darlo por bueno. */
+  /** Chicharra al entrar una orden. APAGADA por omisión: la P047 no soporta
+   *  `ESC B` y lo imprime como texto (probado 18/08/2026). Solo encender en un
+   *  modelo donde se haya verificado que suena. */
   buzzer?: boolean
   /** Marca el ticket como copia, para que cocina no prepare el platillo dos veces. */
   isReprint?: boolean
@@ -257,15 +264,22 @@ export function buildTicket(input: TicketInput): Uint8Array {
   bold(false)
   feed()
 
-  feed(4)
-
-  if (input.buzzer !== false) {
-    // Chicharra. ESC B n t es lo más extendido, pero cada fabricante tiene lo
-    // suyo — es de lo primero que hay que verificar con la impresora real.
+  if (input.buzzer === true) {
+    // Apagada por omisión, y no por prudencia: se probó en la MUNBYN P047 el
+    // 18/08/2026 y NO entiende ESC B — imprime los bytes como texto en vez de
+    // sonar. Dejarla activada ensuciaría cada comanda en la impresora que
+    // justamente recomendamos. Queda como opción por si algún modelo futuro sí
+    // la soporta; el aviso sonoro real lo da la tablet.
     raw(ESC, 0x42, 3, 2)
   }
 
-  raw(GS, 0x56, 0x42, 0x00) // cortar con avance
+  // Cortar avanzando primero. La cuchilla está más arriba que el cabezal, así
+  // que al cortar sin avance los últimos renglones siguen dentro del mecanismo
+  // y el ticket sale partido a la mitad — pasó en la P047, que retiene unos
+  // 8 renglones.
+  //
+  // GS V 66 n corta avanzando n puntos. A 203 ppp, 8 puntos ≈ 1 mm.
+  raw(GS, 0x56, 0x42, CORTE_AVANCE_PUNTOS)
 
   return new Uint8Array(bytes)
 }
