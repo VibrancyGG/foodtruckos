@@ -95,6 +95,7 @@ export function KitchenBoard({
   const [showLookup, setShowLookup] = useState(false)
   const [askPayFor, setAskPayFor] = useState<string | null>(null)
   const [askCancelFor, setAskCancelFor] = useState<string | null>(null)
+  const [askCollectFor, setAskCollectFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [confirmingLogout, setConfirmingLogout] = useState(false)
   const [now, setNow] = useState(() => Date.now())
@@ -345,6 +346,15 @@ export function KitchenBoard({
     setTodayCount((n) => n + 1)
   }
 
+  // Cobrar sin entregar: el comensal pidió por QR y vino a pagar mientras su
+  // orden se prepara. No mueve la orden de columna — pagar y preparar son dos
+  // cosas distintas, y confundirlas sacaría el platillo de la fila del cocinero.
+  function markPaid(orderId: string, paymentMethod: "efectivo" | "tarjeta") {
+    setOrders((os) => os.map((o) => (o.id === orderId ? { ...o, payment_status: "pagada" } : o)))
+    act({ action: "markPaid", orderId, paymentMethod })
+    setAskCollectFor(null)
+  }
+
   function cancelOrder(orderId: string) {
     setOrders((os) => os.filter((o) => o.id !== orderId))
     act({ action: "cancel", orderId })
@@ -575,12 +585,55 @@ export function KitchenBoard({
                           {o.channel === "ventanilla" ? t.kitchen.ventanilla : "QR"}
                         </span>
                       </div>
-                      {o.payment_status !== "pagada" && col !== "listo" && (
-                        <div
-                          className="mb-2.5 inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-[13px] font-black uppercase tracking-wide"
-                          style={{ background: "#3A2A12", color: "#FFCB6B", border: "1px solid #6B4A12" }}
-                        >
-                          {t.kitchen.unpaidBadge}
+                      <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+                        {o.payment_status !== "pagada" && col !== "listo" && (
+                          <span
+                            className="inline-flex items-center rounded px-2.5 py-1 text-[13px] font-black uppercase tracking-wide"
+                            style={{ background: "#3A2A12", color: "#FFCB6B", border: "1px solid #6B4A12" }}
+                          >
+                            {t.kitchen.unpaidBadge}
+                          </span>
+                        )}
+                        {/* El comensal avisó que ya está enfrente. En hora pico
+                            es lo que separa a quien espera parado de quien pidió
+                            desde su casa y llega en media hora. */}
+                        {o.customer_arrived_at && (
+                          <span
+                            className="inline-flex items-center rounded px-2.5 py-1 text-[13px] font-black uppercase tracking-wide"
+                            style={{ background: "#14291F", color: "#6FD3A6", border: "1px solid #2A5943" }}
+                          >
+                            {t.kitchen.arrivedBadge}
+                          </span>
+                        )}
+                        {/* Cobrar sin sacar la orden de la fila. Solo donde
+                            tiene sentido: aún no está entregada y no se ha
+                            pagado. En "listo" ya existe el cobro al entregar. */}
+                        {!readOnly && o.payment_status !== "pagada" && col !== "listo" && askCollectFor !== o.id && (
+                          <button
+                            onClick={() => setAskCollectFor(o.id)}
+                            className="ml-auto rounded-lg px-3 py-1 text-[13px] font-extrabold"
+                            style={{ background: "#232019", color: "#6FD3A6", border: "1px solid #2A5943" }}
+                          >
+                            {t.kitchen.collectNow}
+                          </button>
+                        )}
+                      </div>
+                      {askCollectFor === o.id && (
+                        <div className="mb-2.5 space-y-1.5">
+                          <div className="text-center text-[11px] font-bold uppercase tracking-wide text-neutral-400">
+                            {t.kitchen.paymentMethodPrompt} ${o.total.toFixed(2)}
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <button onClick={() => markPaid(o.id, "efectivo")} className="rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
+                              {t.kitchen.paymentMethodCash}
+                            </button>
+                            <button onClick={() => markPaid(o.id, "tarjeta")} className="rounded-lg py-2.5 text-sm font-extrabold" style={{ background: "#30A46C", color: "#04200F" }}>
+                              {t.kitchen.paymentMethodCard}
+                            </button>
+                          </div>
+                          <button onClick={() => setAskCollectFor(null)} className="w-full rounded-lg py-2 text-xs font-bold" style={{ background: "#232019", color: "#9C948A" }}>
+                            {t.menu.cancel}
+                          </button>
                         </div>
                       )}
                       <ul className="flex flex-col gap-2.5">

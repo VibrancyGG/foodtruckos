@@ -23,6 +23,36 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
   const [order, setOrder] = useState(initial.order)
   const [online, setOnline] = useState(true)
   const [notifyOn, setNotifyOn] = useState(false)
+  const [avisando, setAvisando] = useState(false)
+
+  // La hora de llegada llega sola por Realtime (el refetch trae la orden
+  // completa), así que el aviso sobrevive a recargar la página o a cambiar de
+  // celular — no vive solo en esta pestaña.
+  const arrived = Boolean(order.customer_arrived_at)
+
+  // Se escribe directo con el cliente anónimo, sin ruta propia: la base tiene
+  // un permiso por columna que deja al comensal tocar SOLO customer_arrived_at
+  // de un pedido que siga vivo. Cualquier otro campo lo rechaza Postgres, así
+  // que no hace falta una ruta de servidor que salte RLS.
+  //
+  // El `.is(null)` hace que la primera vez mande: volver a tocar el botón no
+  // reescribe la hora, y la cocina sigue viendo hace cuánto está esperando.
+  async function avisarLlegue() {
+    setAvisando(true)
+    try {
+      const supabase = createClient()
+      await supabase
+        .from("orders")
+        .update({ customer_arrived_at: new Date().toISOString() })
+        .eq("id", order.id)
+        .is("customer_arrived_at", null)
+      await refetch(supabase)
+    } catch {
+      // Sin red no pasa nada: el botón sigue ahí para volver a intentarlo.
+    } finally {
+      setAvisando(false)
+    }
+  }
   const [now, setNow] = useState(() => Date.now())
   const audioCtx = useRef<AudioContext | null>(null)
 
@@ -221,16 +251,54 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
             ))}
           </div>
 
-          {!isDone && (
-            <div
-              className="mb-3 rounded-xl px-4 py-3 text-sm font-bold"
-              style={
-                order.payment_status === "pagada"
-                  ? { background: "#E8F5EE", color: "#14603C" }
-                  : { background: "#FDF3E0", color: "#6B4A12" }
-              }
-            >
-              {order.payment_status === "pagada" ? t.tracking.paid : `${t.tracking.due}: $${order.total.toFixed(2)}`}
+          {!isDone &&
+            (order.payment_status === "pagada" ? (
+              <div className="mb-3 rounded-xl px-4 py-3 text-sm font-bold" style={{ background: "#E8F5EE", color: "#14603C" }}>
+                {t.tracking.paid}
+              </div>
+            ) : (
+              // Invitación, no obligación. Que el comensal pague al pedir en
+              // vez de al recoger es lo que evita el pedido fantasma — el que
+              // se prepara y nadie recoge, y que el truck paga de su bolsa.
+              // Por eso el monto va grande y el mensaje es un ofrecimiento.
+              <div className="mb-3 rounded-xl px-4 py-3.5" style={{ background: "#FDF3E0", border: "1px solid #F0D9A8" }}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-sm font-extrabold" style={{ color: "#6B4A12" }}>
+                    {t.tracking.payInviteTitle}
+                  </span>
+                  <span className="text-lg font-black tabular-nums" style={{ color: "#6B4A12" }}>
+                    ${order.total.toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[13px] leading-snug" style={{ color: "#7A5A20" }}>
+                  {t.tracking.payInviteBody}
+                </p>
+              </div>
+            ))}
+
+          {/* "Ya llegué" solo mientras el pedido sigue vivo: avisar que llegaste
+              cuando ya te lo entregaron no le sirve a nadie. */}
+          {!isDone && order.status !== "cancelado" && (
+            <div className="mb-3">
+              {arrived ? (
+                <div className="rounded-xl px-4 py-3 text-center text-sm font-bold" style={{ background: "#E8F5EE", color: "#14603C" }}>
+                  {t.tracking.imHereDone}
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={avisarLlegue}
+                    disabled={avisando}
+                    className="w-full rounded-xl border-2 py-3.5 text-sm font-extrabold disabled:opacity-60"
+                    style={{ background: "#FFFDF9", borderColor: INK, color: INK }}
+                  >
+                    {t.tracking.imHere}
+                  </button>
+                  <p className="mt-1.5 text-center text-xs leading-relaxed" style={{ color: INK_SOFT }}>
+                    {t.tracking.imHereHint}
+                  </p>
+                </>
+              )}
             </div>
           )}
 

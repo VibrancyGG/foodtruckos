@@ -11,12 +11,12 @@ export default async function PanelQrPage() {
   const supabase = await createClient()
   const [codes, { data: business }] = await Promise.all([
     getOwnerQrCodes(businessId),
-    supabase.from("businesses").select("name, brand_color").eq("id", businessId).single(),
+    supabase.from("businesses").select("name, brand_color, logo_url").eq("id", businessId).single(),
   ])
 
   return (
     <div className="mx-auto max-w-3xl">
-      <QrScreen codes={codes} businessName={business?.name ?? ""} brandColor={business?.brand_color || "#D62828"} />
+      <QrScreen codes={codes} businessName={business?.name ?? ""} brandColor={business?.brand_color || "#D62828"} logoUrl={business?.logo_url ?? null} />
     </div>
   )
 }

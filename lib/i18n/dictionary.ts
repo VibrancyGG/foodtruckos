@@ -52,6 +52,11 @@ export type Dictionary = {
     notFoundSub: string
     backToMenu: string
     due: string
+    payInviteTitle: string
+    payInviteBody: string
+    imHere: string
+    imHereDone: string
+    imHereHint: string
     paid: string
     offline: string
     live: string
@@ -109,6 +114,8 @@ export type Dictionary = {
     unpaidBadge: string
     paidBadge: string
     collectBadge: string
+    collectNow: string
+    arrivedBadge: string
     cancelOrder: string
     confirmCancelOrder: string
     keepOrder: string
@@ -614,6 +621,12 @@ export type Dictionary = {
       printAll: string
       posterMsg: string
       posterMsg2: string
+      posterStepsTitle: string
+      posterStep1: string
+      posterStep2: string
+      posterStep3: string
+      posterStep4: string
+      posterPayNote: string
     }
     cuentaPage: {
       title: string
@@ -1019,6 +1032,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       notFoundSub: "El enlace puede estar viejo o el pedido ya se entregó hace rato.",
       backToMenu: "Volver al menú",
       due: "Paga en la ventanilla",
+      payInviteTitle: "¿Pasas a pagar ahora?",
+      payInviteBody: "Tu pedido ya va en camino. Si te acercas a la ventanilla con tu número y pagas ahora, adelantas tu entrega.",
+      imHere: "Ya estoy aquí",
+      imHereDone: "El truck ya sabe que llegaste",
+      imHereHint: "Tócalo cuando llegues al truck. La cocina lo ve al instante.",
       paid: "Ya está pagado",
       offline: "Sin conexión — reintentando",
       live: "En vivo",
@@ -1081,6 +1099,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       confirmCancelOrder: "Sí, cancelar — no se cobró",
       keepOrder: "No, mantener la orden",
       collectBadge: "Cobrar",
+      collectNow: "Cobrar",
+      arrivedBadge: "Ya llegó",
       ventanillaSubtitle: "Para quien llegó sin celular. Entra al mismo tablero y al mismo registro de ventas.",
       notesLabel: "Nota",
       notesHint: "toca lo común o escríbela",
@@ -1597,6 +1617,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         printAll: "Imprimir los carteles",
         posterMsg: "Escanea y pide desde tu celular",
         posterMsg2: "Scan to order from your phone",
+        posterStepsTitle: "Cómo funciona",
+        posterStep1: "Escanea este código",
+        posterStep2: "Elige tus platillos",
+        posterStep3: "Recibe tu número de orden",
+        posterStep4: "Te avisamos cuando esté listo",
+        posterPayNote: "Paga en la ventanilla — antes o al recogerlo.",
       },
       cuentaPage: {
         title: "Tu cuenta",
@@ -2000,6 +2026,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       notFoundSub: "The link may be old, or the order was already picked up a while ago.",
       backToMenu: "Back to the menu",
       due: "Pay at the window",
+      payInviteTitle: "Want to pay now?",
+      payInviteBody: "Your order is already on its way. Come to the window with your number and pay now — it speeds up your pickup.",
+      imHere: "I am here",
+      imHereDone: "The truck knows you are here",
+      imHereHint: "Tap this when you get to the truck. The kitchen sees it right away.",
       paid: "Already paid",
       offline: "Offline — retrying",
       live: "Live",
@@ -2058,6 +2089,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       unpaidBadge: "Unpaid",
       paidBadge: "Paid",
       collectBadge: "Collect",
+      collectNow: "Collect",
+      arrivedBadge: "Here now",
       cancelOrder: "Customer never showed / cancel",
       confirmCancelOrder: "Yes, cancel — nothing was charged",
       keepOrder: "No, keep the order",
@@ -2577,6 +2610,12 @@ export const dictionary: Record<Lang, Dictionary> = {
         printAll: "Print the posters",
         posterMsg: "Escanea y pide desde tu celular",
         posterMsg2: "Scan to order from your phone",
+        posterStepsTitle: "How it works",
+        posterStep1: "Scan this code",
+        posterStep2: "Pick your food",
+        posterStep3: "Get your order number",
+        posterStep4: "We tell you when it is ready",
+        posterPayNote: "Pay at the window — before or when you pick it up.",
       },
       cuentaPage: {
         title: "Your account",

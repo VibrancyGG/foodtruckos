@@ -4,16 +4,18 @@ import Link from "next/link"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { Button } from "./ui/Button"
 
-type QrCode = { unitName: string; label: string; url: string; qrDataUrl: string }
+type QrCode = { unitName: string; label: string; location: string | null; url: string; qrDataUrl: string }
 
 export function QrScreen({
   codes,
   businessName,
   brandColor,
+  logoUrl,
 }: {
   codes: QrCode[]
   businessName: string
   brandColor: string
+  logoUrl: string | null
 }) {
   const { t } = useLang()
   const p = t.panel.qrPage
@@ -104,22 +106,56 @@ export function QrScreen({
         {codes.map((c) => (
           <div key={c.url} className="break-after-page text-center last:break-after-auto">
             <div
-              className="rounded-t-2xl px-6 pt-10 pb-8"
+              className="rounded-t-2xl px-6 pt-8 pb-7"
               style={{ background: brandColor, color: "#fff", printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}
             >
+              {/* El logo va en blanco sobre el color de marca: es lo primero
+                  que reconoce alguien parado a tres metros del truck. */}
+              {logoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="" className="mx-auto mb-3 h-20 w-20 rounded-full bg-white object-cover p-1" />
+              )}
               <h2 className="text-4xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
                 {businessName}
               </h2>
               <p className="mt-2 text-sm font-semibold">
                 {c.unitName} · {c.label}
               </p>
+              {/* La ubicación solo si el dueño la puso. Un truck que se mueve
+                  cada día no la tiene, y un póster mintiendo es peor que uno
+                  sin dato. */}
+              {c.location && <p className="mt-1 text-xs font-medium opacity-90">{c.location}</p>}
             </div>
-            <div className="rounded-b-2xl border border-t-0 border-neutral-300 p-10">
+            <div className="rounded-b-2xl border border-t-0 border-neutral-300 px-10 pt-8 pb-9">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={c.qrDataUrl} alt={`QR — ${c.unitName}`} className="mx-auto h-64 w-64" />
-              <p className="mt-6 text-xl font-extrabold">{p.posterMsg}</p>
+              <img src={c.qrDataUrl} alt={`QR — ${c.unitName}`} className="mx-auto h-56 w-56" />
+              <p className="mt-5 text-xl font-extrabold">{p.posterMsg}</p>
               <p className="mt-1 text-base font-semibold text-neutral-500">{p.posterMsg2}</p>
-              <p className="mt-6 text-xs text-neutral-400">{c.url}</p>
+
+              {/* Los cuatro pasos. Quien nunca ha pedido por QR no sabe qué
+                  sigue después de escanear, y esa duda es la que lo hace
+                  desistir y formarse en la fila. */}
+              <div className="mt-7 border-t border-neutral-200 pt-6 text-left">
+                <p className="mb-3 text-center text-[11px] font-black uppercase tracking-[0.14em] text-neutral-400">
+                  {p.posterStepsTitle}
+                </p>
+                <ol className="mx-auto grid max-w-sm gap-2.5">
+                  {[p.posterStep1, p.posterStep2, p.posterStep3, p.posterStep4].map((paso, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <span
+                        className="grid h-7 w-7 flex-none place-items-center rounded-full text-xs font-black text-white"
+                        style={{ background: brandColor, printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}
+                      >
+                        {i + 1}
+                      </span>
+                      <span className="text-sm font-semibold">{paso}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-5 text-center text-xs font-semibold text-neutral-500">{p.posterPayNote}</p>
+              </div>
+
+              <p className="mt-6 text-[10px] text-neutral-400">{c.url}</p>
             </div>
           </div>
         ))}

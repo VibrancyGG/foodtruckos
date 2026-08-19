@@ -17,7 +17,7 @@ export async function getOwnerQrCodes(businessId: string) {
 
   const { data: units } = await supabase
     .from("units")
-    .select("id, name")
+    .select("id, name, location")
     .eq("business_id", businessId)
     .neq("status", "archived")
 
@@ -35,7 +35,7 @@ export async function getOwnerQrCodes(businessId: string) {
       if (!unit) return null
       const url = `${SITE_URL}/${business.slug}/${slugify(unit.name)}/${op.qr_slug}`
       const qrDataUrl = await QRCode.toDataURL(url, { margin: 1, width: 480 })
-      return { unitName: unit.name, label: op.label, url, qrDataUrl }
+      return { unitName: unit.name, label: op.label, location: unit.location, url, qrDataUrl }
     }),
   )
 

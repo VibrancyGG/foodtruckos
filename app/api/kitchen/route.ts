@@ -16,6 +16,7 @@ type Body =
   | { action: "advance"; orderId: string; unitId?: string }
   | { action: "regress"; orderId: string; unitId?: string }
   | { action: "deliver"; orderId: string; paid: boolean; paymentMethod?: string; unitId?: string }
+  | { action: "markPaid"; orderId: string; paymentMethod?: string; unitId?: string }
   | { action: "cancel"; orderId: string; unitId?: string }
   | { action: "soldOut"; unitProductId: string; soldOut: boolean; unitId?: string }
   | { action: "optionSoldOut"; optionId: string; soldOut: boolean }
@@ -152,6 +153,34 @@ export async function POST(req: NextRequest) {
       actor_id: session.staffId,
     })
     return NextResponse.json({ status: "entregado" })
+  }
+
+  // Cobrar SIN entregar. Es el caso más común del truck: el comensal pide por
+  // QR, camina a la ventanilla y paga mientras su orden se prepara. Antes solo
+  // se podía cobrar al entregar, así que la cajera tenía que recordarlo de
+  // memoria hasta que el platillo saliera.
+  //
+  // No toca el estado de preparación a propósito: pago y preparación son ejes
+  // distintos, y una orden puede estar pagada y todavía en la plancha.
+  if (body.action === "markPaid") {
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id, status, payment_status")
+      .eq("id", body.orderId)
+      .eq("unit_id", unit.id)
+      .maybeSingle()
+    if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
+    // Cancelada no se cobra, y ya pagada no se vuelve a cobrar: dos toques
+    // seguidos en una pantalla táctil con prisa no pueden duplicar un cobro.
+    if (order.status === "cancelado" || order.payment_status === "pagada") {
+      return NextResponse.json({ ok: true, payment_status: order.payment_status })
+    }
+
+    await supabase
+      .from("orders")
+      .update({ payment_status: "pagada", payment_method: body.paymentMethod ?? null })
+      .eq("id", order.id)
+    return NextResponse.json({ ok: true, payment_status: "pagada" })
   }
 
   if (body.action === "cancel") {

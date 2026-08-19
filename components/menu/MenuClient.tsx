@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { createOrder, type CartItemInput } from "@/lib/orders/actions"
@@ -125,6 +125,60 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   }, [data.optionGroups, data.options])
 
 
+  // Qué categoría se está viendo. Antes ninguna se marcaba: las pastillas se
+  // pintaban todas iguales siempre, y en un menú largo el comensal perdía de
+  // vista en qué parte iba.
+  const [catActiva, setCatActiva] = useState<string | null>(null)
+  const navRef = useRef<HTMLElement | null>(null)
+
+  // Se resuelve leyendo posiciones en el scroll, no con IntersectionObserver.
+  // No es por gusto: IO existe pero puede no entregar nada en navegadores
+  // empotrados, y ahí el realce simplemente no aparecería sin ningún error que
+  // lo delate. Un detector de scroll funciona en todo y se puede comprobar.
+  useEffect(() => {
+    // Un poco más abajo de la barra pegajosa: la categoría se marca cuando su
+    // título cruza la barra, que es justo cuando el comensal deja de verlo.
+    const CORTE = 88
+    let programado = false
+
+    const recalcular = () => {
+      programado = false
+      const secciones = [...document.querySelectorAll<HTMLElement>("section[id^='cat-']")]
+      if (!secciones.length) return
+      // La última que ya pasó el corte es en la que vas parado. Si ninguna
+      // pasó todavía (estás hasta arriba), manda la primera.
+      let actual = secciones[0]
+      for (const s of secciones) {
+        if (s.getBoundingClientRect().top <= CORTE) actual = s
+      }
+      setCatActiva(actual.id.replace("cat-", ""))
+    }
+
+    // Se agrupa por cuadro: en un celular de gama baja, recalcular en cada
+    // evento de scroll es de las cosas que hacen sentir la página pegajosa.
+    const alHacerScroll = () => {
+      if (programado) return
+      programado = true
+      requestAnimationFrame(recalcular)
+    }
+
+    recalcular()
+    window.addEventListener("scroll", alHacerScroll, { passive: true })
+    window.addEventListener("resize", alHacerScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", alHacerScroll)
+      window.removeEventListener("resize", alHacerScroll)
+    }
+  }, [])
+
+  // La pastilla marcada tiene que verse: con seis categorías, la activa puede
+  // quedar fuera del scroll horizontal y el realce no serviría de nada.
+  useEffect(() => {
+    if (!catActiva || !navRef.current) return
+    const chip = navRef.current.querySelector<HTMLElement>(`[data-cat="${catActiva}"]`)
+    chip?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" })
+  }, [catActiva])
+
   const productsByCategory = useMemo(() => {
     const groups = new Map<string | null, typeof data.products>()
     for (const p of data.products) {
@@ -237,7 +291,38 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const todayLabel = WEEKDAY_FULL[lang][WEEKDAY_INDEX[today.dayKey]]
 
   return (
-    <div className={`${displayFont.variable} mx-auto max-w-lg pb-8`} style={{ background: PANEL, color: INK }}>
+    <div className={`${displayFont.variable} relative mx-auto max-w-lg pb-8`} style={{ background: PANEL, color: INK }}>
+      {/* El fondo liso se sentía genérico. La textura es el MISMO motivo que
+          el dueño ya eligió para su marca — tacos, mariscos, café — así que
+          cada cliente tiene un fondo distinto sin que nadie lo diseñe aparte,
+          y no hay un color nuevo en juego: es el suyo, casi transparente.
+
+          Al 3.5% no compite con nada ni estorba bajo el sol: la información
+          sigue siendo el platillo y el precio. pointer-events-none para que
+          no se coma ningún toque. */}
+      <svg
+        width="100%"
+        height="100%"
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{ color: "var(--brand-primary)", opacity: 0.035 }}
+        aria-hidden="true"
+      >
+        <defs>
+          <pattern id="menuPageMotif" width="112" height="112" patternUnits="userSpaceOnUse">
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              dangerouslySetInnerHTML={{ __html: MOTIFS[motif].pat }}
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#menuPageMotif)" />
+      </svg>
+
+      <div className="relative z-[1]">
       {data.unit.photo_url && (
         // Foto de portada del truck, la que el dueño sube en Trucks — no
         // tenía dónde mostrarse en el menú del comensal hasta ahora.
@@ -331,19 +416,36 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
       </header>
 
       <nav
+        ref={navRef}
         className="sticky top-0 z-10 flex gap-2 overflow-x-auto border-b px-4 py-2.5"
         style={{ background: PANEL, borderColor: LINE, scrollbarWidth: "none" }}
       >
-        {data.categories.map((cat) => (
-          <a
-            key={cat.id}
-            href={`#cat-${cat.id}`}
-            className="flex-none rounded-full border px-3.5 py-1.5 text-xs font-semibold"
-            style={{ borderColor: LINE, color: INK_SOFT }}
-          >
-            {lang === "es" ? cat.name_es : cat.name_en}
-          </a>
-        ))}
+        {data.categories.map((cat) => {
+          const activa = cat.id === catActiva
+          return (
+            <a
+              key={cat.id}
+              href={`#cat-${cat.id}`}
+              data-cat={cat.id}
+              // Se marca al tocar, sin esperar a que el scroll llegue: en un
+              // celular lento el rebote de medio segundo se siente a avería.
+              onClick={() => setCatActiva(cat.id)}
+              aria-current={activa ? "true" : undefined}
+              className="flex-none rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors"
+              style={
+                activa
+                  ? // El color de marca del cliente, con el texto que
+                    // onColorFor() ya calcula por contraste. Así el realce se
+                    // sostiene con las diez opciones de la paleta y no solo
+                    // con la que se ve bien en el monitor.
+                    { borderColor: "var(--brand-primary)", backgroundColor: "var(--brand-primary)", color: "var(--brand-on-primary)" }
+                  : { borderColor: LINE, color: INK_SOFT }
+              }
+            >
+              {lang === "es" ? cat.name_es : cat.name_en}
+            </a>
+          )
+        })}
       </nav>
 
       <div className="space-y-7 px-4 pt-5">
@@ -570,6 +672,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
@@ -582,12 +685,18 @@ function SoldOutTag({ label }: { label: string }) {
   )
 }
 
+// Antes era gris sobre gris y desaparecía. Ahora el color de marca lo lleva el
+// BORDE y el punto, nunca el texto: así el realce cambia con cada cliente pero
+// la palabra se sigue leyendo igual de negra con las diez opciones de la
+// paleta — incluidas las claras, donde texto de color perdería contraste bajo
+// el sol.
 function CustomizableTag({ lang }: { lang: "es" | "en" }) {
   return (
     <span
-      className="mt-1.5 inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-      style={{ background: LINE, color: INK_SOFT }}
+      className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-[3px] text-[10px] font-black uppercase tracking-[0.06em]"
+      style={{ borderColor: "var(--brand-primary)", color: INK, background: PANEL }}
     >
+      <span className="h-[5px] w-[5px] flex-none rounded-full" style={{ background: "var(--brand-primary)" }} aria-hidden="true" />
       {lang === "es" ? "Personalizable" : "Customizable"}
     </span>
   )

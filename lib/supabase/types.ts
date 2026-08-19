@@ -659,6 +659,7 @@ export type Database = {
           business_id: string
           channel: string
           created_at: string
+          customer_arrived_at: string | null
           customer_name: string | null
           folio: number | null
           id: string
@@ -679,6 +680,7 @@ export type Database = {
           business_id: string
           channel: string
           created_at?: string
+          customer_arrived_at?: string | null
           customer_name?: string | null
           folio?: number | null
           id?: string
@@ -699,6 +701,7 @@ export type Database = {
           business_id?: string
           channel?: string
           created_at?: string
+          customer_arrived_at?: string | null
           customer_name?: string | null
           folio?: number | null
           id?: string
