@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FoodTruckOS Cocina</string>
+
+    <!-- Todo lo que ve el personal está en español, igual que el resto de la
+         pantalla de cocina. La app es un caparazón: casi no tiene textos
+         propios, y los que tiene aparecen solo cuando algo falla. -->
+    <string name="notif_channel">Impresión de comandas</string>
+    <string name="notif_title">Cocina activa</string>
+    <string name="notif_body">La pantalla y la impresora siguen trabajando.</string>
+
+    <string name="pick_printer">Elige la impresora</string>
+    <string name="no_paired">No hay impresoras emparejadas. Empareja la impresora en Ajustes › Bluetooth y vuelve a abrir la app.</string>
+    <string name="bt_needed">Sin permiso de Bluetooth no se pueden imprimir comandas. La pantalla de cocina funciona igual.</string>
+    <string name="settings">Ajustes de Bluetooth</string>
+    <string name="cancel">Cancelar</string>
+</resources>

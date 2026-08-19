@@ -2,20 +2,49 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Bluetooth clásico. Android 12 partió el permiso viejo en dos y ambos se
+         piden en caliente; en versiones anteriores basta con declararlos. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+
+    <!-- El servicio en primer plano es lo que evita que Android mate el proceso
+         cuando la tablet lleva horas en la misma pantalla. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- Android 13 exige pedir permiso para su propia notificación. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
     <application
-        android:label="FoodTruckOS Cocina"
-        android:usesCleartextTraffic="false">
+        android:label="@string/app_name"
+        android:usesCleartextTraffic="false"
+        android:supportsRtl="true">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="landscape">
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".PrinterService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
     </application>
 
