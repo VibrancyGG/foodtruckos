@@ -64,7 +64,13 @@ class MainActivity : Activity() {
         CookieManager.getInstance().setAcceptCookie(true)
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, false)
 
-        web.addJavascriptInterface(PrinterBridge { elegirImpresora() }, "FoodTruckOSPrinter")
+        // Las dos devoluciones saltan al hilo principal: el puente corre en un
+        // hilo de fondo y tocar interfaz desde ahí revienta.
+        val puente = PrinterBridge(
+            alElegir = { runOnUiThread { elegirImpresora() } },
+            avisar = { texto -> runOnUiThread { avisoLimitado(texto) } },
+        )
+        web.addJavascriptInterface(puente, "FoodTruckOSPrinter")
 
         web.webViewClient = object : WebViewClient() {
             // Una tablet de cocina no es un navegador. Lo que no sea nuestro
@@ -109,8 +115,12 @@ class MainActivity : Activity() {
         if (Ajustes.impresoraMac == null) elegirImpresora() else PrinterLink.reconectar()
     }
 
+    private var eligiendo = false
+
     @SuppressLint("MissingPermission")
     private fun elegirImpresora() {
+        // Sin este freno el diálogo se reabriría cada 4 s con cada reintento.
+        if (eligiendo || isFinishing) return
         if (!puedeBluetooth()) {
             aviso(getString(R.string.bt_needed))
             return
@@ -130,10 +140,15 @@ class MainActivity : Activity() {
             return
         }
         val nombres = aparatos.map { "${it.name ?: "?"}\n${it.address}" }.toTypedArray()
+        eligiendo = true
         AlertDialog.Builder(this)
             .setTitle(R.string.pick_printer)
-            .setItems(nombres) { _, i -> PrinterLink.elegir(this, aparatos[i].address) }
+            .setItems(nombres) { _, i ->
+                PrinterLink.elegir(this, aparatos[i].address)
+                aviso("Impresora elegida: " + (aparatos[i].name ?: aparatos[i].address))
+            }
             .setNegativeButton(R.string.cancel, null)
+            .setOnDismissListener { eligiendo = false }
             .show()
     }
 
@@ -145,6 +160,17 @@ class MainActivity : Activity() {
         checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED
 
     private fun aviso(texto: String) = Toast.makeText(this, texto, Toast.LENGTH_LONG).show()
+
+    // La web reintenta cada 4 s. Sin freno, un fallo de impresora llenaría la
+    // pantalla de avisos encimados y taparía el tablero de órdenes.
+    private var ultimoAviso = 0L
+
+    private fun avisoLimitado(texto: String) {
+        val ahora = System.currentTimeMillis()
+        if (ahora - ultimoAviso < 15_000) return
+        ultimoAviso = ahora
+        aviso(texto)
+    }
 
     override fun onResume() {
         super.onResume()
