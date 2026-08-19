@@ -49,6 +49,12 @@ class MainActivity : Activity() {
         pedirPermisos()
 
         if (savedInstanceState == null) web.loadUrl(COCINA)
+
+        // Se dice la versión al arrancar. Durante estas semanas la app cambia
+        // varias veces al día, y sin esto es imposible saber si la tablet
+        // tiene la corrección que se acaba de publicar — ya nos costó una
+        // ronda entera de diagnóstico equivocado.
+        web.postDelayed({ aviso("FoodTruckOS Cocina v" + version() + " · impresora: " + PrinterLink.estado()) }, 2_500)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -162,6 +168,13 @@ class MainActivity : Activity() {
 
     private fun tienePermiso(p: String) =
         checkSelfPermission(p) == PackageManager.PERMISSION_GRANTED
+
+    private fun version(): String =
+        try {
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "?"
+        } catch (_: Exception) {
+            "?"
+        }
 
     private fun aviso(texto: String) = Toast.makeText(this, texto, Toast.LENGTH_LONG).show()
 
