@@ -1,6 +1,7 @@
 package gg.vibrancy.foodtruckos
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
@@ -29,21 +30,22 @@ object PrinterLink {
 
     private const val TAG = "PrinterLink"
 
-    // El contexto de aplicación se guarda al arrancar: hace falta para pedirle
-    // el adaptador al sistema, que es como se hace desde Android 12.
     private var app: Context? = null
+    private var socket: BluetoothSocket? = null
+    private val io = Executors.newSingleThreadExecutor()
+    private val reconector = Executors.newSingleThreadExecutor()
+    @Volatile private var reconectando = false
+
+    /** Última razón real por la que no se pudo conectar. Se muestra al usuario:
+     *  "no se pudo imprimir" a secas no le sirve a nadie parado en la cocina. */
+    @Volatile var ultimoError: String? = null
+        private set
 
     fun iniciar(context: Context) {
         app = context.applicationContext
     }
 
-    private fun adaptador() =
-        app?.getSystemService(BluetoothManager::class.java)?.adapter
-
-    private var socket: BluetoothSocket? = null
-    private val io = Executors.newSingleThreadExecutor()
-    private val reconector = Executors.newSingleThreadExecutor()
-    @Volatile private var reconectando = false
+    private fun adaptador() = app?.getSystemService(BluetoothManager::class.java)?.adapter
 
     val conectado: Boolean
         get() = socket?.isConnected == true
@@ -51,11 +53,10 @@ object PrinterLink {
     fun estado(): String = when {
         conectado -> "listo"
         reconectando -> "conectando"
-        else -> "sin-conexion"
+        ultimoError != null -> "sin conexión (${ultimoError})"
+        else -> "sin conexión"
     }
 
-    /** Escribe los bytes tal cual. Lanza si no se pudo — el llamador NO debe
-     *  tragarse el error: es lo que le dice a la web que conserve el ticket. */
     @Throws(IOException::class)
     fun escribir(bytes: ByteArray) {
         val s = socket
@@ -88,16 +89,24 @@ object PrinterLink {
             try {
                 cerrar()
                 val adapter = adaptador()
-                if (adapter == null || !adapter.isEnabled) return@execute
-                val device = adapter.getRemoteDevice(mac)
-                // Cancelar el descubrimiento antes de conectar: si sigue
-                // buscando, la conexión falla o tarda muchísimo.
+                if (adapter == null) {
+                    ultimoError = "sin Bluetooth"
+                    return@execute
+                }
+                if (!adapter.isEnabled) {
+                    ultimoError = "Bluetooth apagado"
+                    return@execute
+                }
+                // Buscar aparatos mientras se conecta hace fallar la conexión o
+                // la vuelve lentísima.
                 if (adapter.isDiscovering) adapter.cancelDiscovery()
-                val nuevo = device.createRfcommSocketToServiceRecord(SPP)
-                nuevo.connect()
-                socket = nuevo
+
+                val device = adapter.getRemoteDevice(mac)
+                socket = abrir(device)
+                ultimoError = null
                 Log.i(TAG, "conectada a $mac")
             } catch (e: Exception) {
+                ultimoError = e.message?.take(60) ?: e.javaClass.simpleName
                 Log.w(TAG, "no se pudo conectar: ${e.message}")
                 cerrar()
             } finally {
@@ -106,9 +115,45 @@ object PrinterLink {
         }
     }
 
+    /**
+     * Tres caminos, en orden de preferencia.
+     *
+     * El primero es el correcto y el que dice la documentación. Los otros dos
+     * existen porque en buena parte de las impresoras térmicas económicas —las
+     * que justamente recomendamos por precio— el camino correcto falla con
+     * "read failed, socket might closed", y el único que funciona es el canal
+     * fijo por reflexión. Es un truco viejo y feo, pero es lo que hace que
+     * estas impresoras conecten en el mundo real.
+     */
     @SuppressLint("MissingPermission")
+    private fun abrir(device: BluetoothDevice): BluetoothSocket {
+        val intentos = listOf<Pair<String, () -> BluetoothSocket>>(
+            "seguro" to { device.createRfcommSocketToServiceRecord(SPP) },
+            "inseguro" to { device.createInsecureRfcommSocketToServiceRecord(SPP) },
+            "canal 1" to {
+                val m = device.javaClass.getMethod("createRfcommSocket", Int::class.javaPrimitiveType)
+                m.invoke(device, 1) as BluetoothSocket
+            },
+        )
+
+        var ultima: Exception? = null
+        for ((nombre, crear) in intentos) {
+            try {
+                val s = crear()
+                s.connect()
+                Log.i(TAG, "conectada por camino: $nombre")
+                return s
+            } catch (e: Exception) {
+                Log.w(TAG, "camino $nombre falló: ${e.message}")
+                ultima = e
+            }
+        }
+        throw ultima ?: IOException("no se pudo abrir el socket")
+    }
+
     fun elegir(context: Context, mac: String) {
         Ajustes.guardarImpresora(context, mac)
+        ultimoError = null
         cerrar()
         reconectar()
     }

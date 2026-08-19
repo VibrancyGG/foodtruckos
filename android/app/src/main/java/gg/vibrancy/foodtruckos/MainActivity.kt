@@ -145,7 +145,11 @@ class MainActivity : Activity() {
             .setTitle(R.string.pick_printer)
             .setItems(nombres) { _, i ->
                 PrinterLink.elegir(this, aparatos[i].address)
-                aviso("Impresora elegida: " + (aparatos[i].name ?: aparatos[i].address))
+                aviso("Conectando con " + (aparatos[i].name ?: aparatos[i].address) + "…")
+                // La conexión es asíncrona. Sin esta confirmación, elegir la
+                // impresora se siente como que ya quedó, y no hay forma de
+                // saber que falló hasta que alguien intenta imprimir.
+                web.postDelayed({ aviso("Impresora: " + PrinterLink.estado()) }, 6_000)
             }
             .setNegativeButton(R.string.cancel, null)
             .setOnDismissListener { eligiendo = false }
