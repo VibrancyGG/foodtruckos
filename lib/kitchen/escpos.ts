@@ -7,7 +7,8 @@
 //
 // OJO, no confundir con operar sin internet: capturar en ventanilla SÍ exige
 // conexión, porque el folio lo asigna el servidor. Probado en modo avión el
-// 19/08/2026: la orden ni siquiera se crea. Ver docs/foodtruckos-tiemporeal.
+// 19/08/2026: la orden no se crea. Lo tecleado se conserva y se reenvía al
+// volver la señal. Ver docs/foodtruckos-tiemporeal.
 //
 // El caparazón nativo solo recibe estos bytes y los escribe al socket
 // Bluetooth. No interpreta nada.

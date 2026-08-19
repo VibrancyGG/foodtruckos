@@ -73,7 +73,7 @@ Dos consecuencias al tocar esa parte:
 
 Y como el ticket se arma en el cliente, **imprimir no depende de que la red responda**: los bytes nunca salen a internet.
 
-**Lo que esto NO significa, y se afirmó mal durante un tiempo:** que el truck pueda operar sin internet. Capturar en ventanilla exige conexión, porque el folio lo asigna el servidor y es el número que el comensal escucha. Probado en modo avión el 19/08/2026: la orden no se crea y el cajero pierde lo que capturó.
+**Lo que esto NO significa, y se afirmó mal durante un tiempo:** que el truck pueda operar sin internet. Capturar en ventanilla exige conexión, porque el folio lo asigna el servidor y es el número que el comensal escucha. Probado en modo avión el 19/08/2026: la orden no se crea. Lo capturado **sí se conserva** en pantalla —el carrito no se limpia al fallar— y basta volver a enviar cuando regresa la señal, así que no hay pérdida de trabajo.
 
 Eso **viola la Regla de Oro 8** (*persistir localmente antes de enviar, reintentar siempre*), que hoy solo cumplen las acciones sobre órdenes existentes — avanzar, regresar, entregar, cancelar—, no la creación de una orden de ventanilla.
 
