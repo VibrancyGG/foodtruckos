@@ -4,10 +4,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Bluetooth clásico. Android 12 partió el permiso viejo en dos y ambos se
-         piden en caliente; en versiones anteriores basta con declararlos. -->
+    <!-- Bluetooth clásico. Solo CONNECT: esta app nunca busca aparatos — el
+         emparejamiento lo hace Android en sus Ajustes. Pedir SCAN sobraba, y
+         consultarlo sin haberlo pedido rompía la conexión. -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />

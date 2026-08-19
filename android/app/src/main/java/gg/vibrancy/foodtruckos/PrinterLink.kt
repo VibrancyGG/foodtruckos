@@ -97,10 +97,6 @@ object PrinterLink {
                     ultimoError = "Bluetooth apagado"
                     return@execute
                 }
-                // Buscar aparatos mientras se conecta hace fallar la conexión o
-                // la vuelve lentísima.
-                if (adapter.isDiscovering) adapter.cancelDiscovery()
-
                 val device = adapter.getRemoteDevice(mac)
                 socket = abrir(device)
                 ultimoError = null
