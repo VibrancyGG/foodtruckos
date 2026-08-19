@@ -81,6 +81,16 @@ Resolverlo de verdad pide **reservar bloques de folios por tablet** mientras hay
 
 ---
 
+### Límite conocido: con la pantalla apagada, la comanda tarda minutos
+
+Probado el 19/08/2026 en la tablet real: con la pantalla apagada diez minutos, la orden **sí llegó y sí se imprimió**, pero tardó varios minutos en vez de salir al instante. Android estrangula temporizadores y conexiones en cuanto la pantalla se apaga.
+
+**Se deja así a propósito.** La pantalla de cocina no debe apagarse nunca —hay wake lock desde la web y el caparazón lo refuerza con `FLAG_KEEP_SCREEN_ON`—, así que esto solo ocurre si alguien presiona el botón físico. El servicio en primer plano cumple lo suyo: el proceso sobrevive y la comanda acaba saliendo.
+
+La única mejora real sería pedir exención de optimización de batería, y eso obliga al cliente a aceptar un diálogo de Android que asusta y que no siempre se concede. No compensa para un caso que no debería ocurrir.
+
+---
+
 ## Regla 6 — Diseñado para el peor dispositivo, no el mejor
 
 - El comensal usa un celular de gama baja con señal irregular: del escaneo del QR al menú visible deben pasar segundos, con imágenes optimizadas y sin bibliotecas pesadas.

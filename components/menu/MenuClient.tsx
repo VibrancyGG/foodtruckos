@@ -124,6 +124,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     return map
   }, [data.optionGroups, data.options])
 
+
   const productsByCategory = useMemo(() => {
     const groups = new Map<string | null, typeof data.products>()
     for (const p of data.products) {
@@ -183,6 +184,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   }
 
   const cartCount = cart.reduce((s, l) => s + l.quantity, 0)
+
   const cartSubtotal = cart.reduce((s, l) => s + (l.unitPrice + l.customizations.reduce((a, c) => a + c.priceDelta, 0)) * l.quantity, 0)
 
   async function handleCheckout() {
@@ -235,7 +237,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const todayLabel = WEEKDAY_FULL[lang][WEEKDAY_INDEX[today.dayKey]]
 
   return (
-    <div className={`${displayFont.variable} mx-auto max-w-lg pb-40`} style={{ background: PANEL, color: INK }}>
+    <div className={`${displayFont.variable} mx-auto max-w-lg pb-8`} style={{ background: PANEL, color: INK }}>
       {data.unit.photo_url && (
         // Foto de portada del truck, la que el dueño sube en Trucks — no
         // tenía dónde mostrarse en el menú del comensal hasta ahora.
@@ -497,7 +499,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
       </footer>
 
       {cartCount > 0 && (
-        <div className="fixed inset-x-0 bottom-0 p-3" style={{ background: INK }}>
+        <div className="sticky bottom-0 p-3" style={{ background: INK }}>
           <div className="mx-auto max-w-lg space-y-2.5">
             <div className="max-h-36 space-y-2 overflow-y-auto">
               {cart.map((l) => (
