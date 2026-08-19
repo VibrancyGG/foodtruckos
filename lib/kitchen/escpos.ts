@@ -2,8 +2,12 @@
 //
 // Vive en la web a propósito: así el formato del ticket se cambia publicando
 // como cualquier otro cambio, sin republicar la app nativa en la tienda. Y
-// como corre en el cliente, el pedido de ventanilla se imprime aunque el
-// truck esté sin señal — que es la razón de ser de toda esta arquitectura.
+// como corre en el cliente, imprimir no depende de que la red responda: los
+// bytes se arman en la tablet y salen por Bluetooth.
+//
+// OJO, no confundir con operar sin internet: capturar en ventanilla SÍ exige
+// conexión, porque el folio lo asigna el servidor. Probado en modo avión el
+// 19/08/2026: la orden ni siquiera se crea. Ver docs/foodtruckos-tiemporeal.
 //
 // El caparazón nativo solo recibe estos bytes y los escribe al socket
 // Bluetooth. No interpreta nada.

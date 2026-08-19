@@ -71,7 +71,13 @@ Dos consecuencias al tocar esa parte:
 - **Las órdenes nuevas se manejan como lista, nunca como booleano.** Si entran dos en el mismo ciclo, son dos comandas y dos avisos — no uno.
 - **La cola de impresión sigue la Regla 1:** el ticket se guarda antes de mandarlo y se reintenta solo. Si la impresora está apagada, sin papel o fuera de alcance, la comanda sale cuando vuelva.
 
-Y como el ticket se arma en el cliente, **el pedido de ventanilla imprime aunque el truck esté sin señal** — nunca sale a la red.
+Y como el ticket se arma en el cliente, **imprimir no depende de que la red responda**: los bytes nunca salen a internet.
+
+**Lo que esto NO significa, y se afirmó mal durante un tiempo:** que el truck pueda operar sin internet. Capturar en ventanilla exige conexión, porque el folio lo asigna el servidor y es el número que el comensal escucha. Probado en modo avión el 19/08/2026: la orden no se crea y el cajero pierde lo que capturó.
+
+Eso **viola la Regla de Oro 8** (*persistir localmente antes de enviar, reintentar siempre*), que hoy solo cumplen las acciones sobre órdenes existentes — avanzar, regresar, entregar, cancelar—, no la creación de una orden de ventanilla.
+
+Resolverlo de verdad pide **reservar bloques de folios por tablet** mientras hay conexión, y reconciliar al volver. Está pospuesto a propósito hasta ver con el piloto qué tan seguido se cae el hotspot: cuando no hay internet tampoco entran pedidos por QR, así que el truck ya está parado por otro lado.
 
 ---
 
