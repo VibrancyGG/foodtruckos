@@ -109,11 +109,15 @@ export function QrScreen({
               className="rounded-t-2xl px-6 pt-8 pb-7"
               style={{ background: brandColor, color: "#fff", printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}
             >
-              {/* El logo va en blanco sobre el color de marca: es lo primero
-                  que reconoce alguien parado a tres metros del truck. */}
+              {/* Montado directo sobre el color de marca, sin placa ni recorte
+                  — mismo criterio que el menú del comensal y el seguimiento.
+                  Los logos se suben con fondo transparente, así que una placa
+                  blanca detrás le inventa un recuadro que el dueño no puso.
+                  Y contain, no cover: un logo vertical dentro de un cuadro se
+                  recorta por arriba y por abajo. */}
               {logoUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="" className="mx-auto mb-3 h-20 w-20 rounded-full bg-white object-cover p-1" />
+                <img src={logoUrl} alt="" className="mx-auto mb-3 h-24 w-auto max-w-[45%] object-contain" />
               )}
               <h2 className="text-4xl font-black uppercase tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
                 {businessName}
