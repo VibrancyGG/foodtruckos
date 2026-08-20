@@ -3,6 +3,7 @@
 import { createPublicClient } from "@/lib/supabase/public"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 import { accessBlocked } from "@/lib/billing/trial"
+import { avisarAdmin } from "@/lib/notificaciones/avisoAdmin"
 
 const TAX_RATE = 0.08625 // Norman, Oklahoma — mover a configuración por negocio cuando haya más de un estado.
 
@@ -20,6 +21,50 @@ export type CartItemInput = {
 // que tenga activo en ese momento — el servidor no sabe en qué idioma está
 // viendo la pantalla quien pidió.
 export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed" | "badCart"
+
+// Un pedido que no se pudo guardar es una venta perdida que NADIE ve: el
+// comensal se va, el dueño no se entera, y nosotros tampoco. Un truck podría
+// estar sin recibir pedidos toda una tarde sin que suene una alarma.
+//
+// Ojo con qué se avisa: "cerrado", "en pausa" y "carrito vacío" son respuestas
+// normales del negocio, no fallas. Avisarlas volvería el correo ruido, y el
+// ruido hace que nadie mire el correo el día que sí importa.
+const CODIGOS_QUE_ALARMAN: CreateOrderErrorCode[] = ["verifyFailed", "sendFailed", "badCart"]
+
+// Freno para que un truck averiado no mande cien correos en una hora. Vive en
+// memoria: si el servidor levanta otra instancia puede colarse algún aviso
+// repetido, y está bien — el error de repetir un aviso es mucho más barato que
+// el de callarse uno.
+const ultimoAviso = new Map<string, number>()
+const ESPERA_ENTRE_AVISOS_MS = 10 * 60 * 1000
+
+function avisarPedidoFallido(input: {
+  codigo: CreateOrderErrorCode
+  negocio: string
+  truck: string
+  businessId: string
+  detalle?: string
+}) {
+  if (!CODIGOS_QUE_ALARMAN.includes(input.codigo)) return
+
+  const ahora = Date.now()
+  const previo = ultimoAviso.get(input.businessId)
+  if (previo && ahora - previo < ESPERA_ENTRE_AVISOS_MS) return
+  ultimoAviso.set(input.businessId, ahora)
+
+  avisarAdmin({
+    asunto: `Pedido fallido: ${input.negocio}`,
+    titulo: "Un comensal no pudo hacer su pedido",
+    datos: [
+      ["Negocio", input.negocio],
+      ["Truck", input.truck],
+      ["Motivo", input.codigo],
+      ["Detalle", input.detalle ?? ""],
+    ],
+    nota: "El comensal vio un error y probablemente se fue. Revisa este truck cuanto antes.",
+    destino: "/admin",
+  })
+}
 
 export async function createOrder(input: {
   businessId: string
@@ -43,15 +88,17 @@ export async function createOrder(input: {
   // igual que ya recalcula el precio en vez de confiar en lo que mandó el
   // navegador.
   const [{ data: unit }, { data: business }] = await Promise.all([
-    supabase.from("units").select("status, hours, paused_until").eq("id", input.unitId).single(),
+    supabase.from("units").select("name, status, hours, paused_until").eq("id", input.unitId).single(),
     supabase
       .from("businesses")
-      .select("timezone, subscription_status, trial_ends_at")
+      .select("name, timezone, subscription_status, trial_ends_at")
       .eq("id", input.businessId)
       .single(),
   ])
 
   if (!unit || !business) {
+    console.error("[createOrder] no se pudo leer truck o negocio", { unitId: input.unitId, businessId: input.businessId })
+    avisarPedidoFallido({ codigo: "verifyFailed", negocio: business?.name ?? "?", truck: unit?.name ?? "?", businessId: input.businessId })
     return { error: "verifyFailed" }
   }
   // Mismo criterio que el menú: prueba vencida bloquea igual que suspensión.
@@ -89,6 +136,7 @@ export async function createOrder(input: {
   // El precio sí se exige válido: dar por bueno un cero aquí regalaría comida.
   if (lines.some((l) => !Number.isFinite(l.lineTotal))) {
     console.error("[createOrder] carrito con importes inválidos", JSON.stringify(input.items))
+    avisarPedidoFallido({ codigo: "badCart", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: "importes de línea inválidos" })
     return { error: "badCart" }
   }
 
@@ -98,6 +146,7 @@ export async function createOrder(input: {
 
   if (!Number.isFinite(subtotal) || !Number.isFinite(taxAmount) || !Number.isFinite(total)) {
     console.error("[createOrder] totales inválidos", { subtotal, taxAmount, total })
+    avisarPedidoFallido({ codigo: "badCart", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: "totales inválidos" })
     return { error: "badCart" }
   }
 
@@ -134,6 +183,7 @@ export async function createOrder(input: {
       subtotal,
       total,
     })
+    avisarPedidoFallido({ codigo: "sendFailed", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: orderError?.code ? "base: " + orderError.code : "no se creó el pedido" })
     return { error: "sendFailed" }
   }
 
@@ -173,10 +223,13 @@ export async function createOrder(input: {
         motivo: cancelError.message,
       })
     }
+    avisarPedidoFallido({ codigo: "sendFailed", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: "no se guardaron los platillos: " + (itemsError.code ?? "?") })
     return { error: "sendFailed" }
   }
 
   if (!order.folio) {
+    console.error("[createOrder] el pedido quedó sin folio", { orderId: order.id })
+    avisarPedidoFallido({ codigo: "sendFailed", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: "pedido sin folio" })
     return { error: "sendFailed" }
   }
 
