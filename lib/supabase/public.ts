@@ -18,6 +18,11 @@ import type { Database } from "./types"
 //
 // Pedir comida por un QR público no depende de quién eres. Este cliente lo
 // hace cierto en el código, no solo en la intención.
+// Sirve igual en el servidor y en el navegador: no toca cookies ni almacena
+// sesión en ninguno de los dos. La pantalla de seguimiento del comensal lo usa
+// desde el navegador por el mismo motivo que el servidor lo usa al crear el
+// pedido — y porque ya nos mordió: el aviso de "ya llegué" quedaba rechazado
+// en silencio si ese celular traía una sesión de dueño encima.
 export function createPublicClient() {
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

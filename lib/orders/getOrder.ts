@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { toNumber } from "@/lib/supabase/numeric"
 
 // "Normalmente tardan unos X min" nunca se inventa: se calcula de los
 // últimos pedidos reales de este truck que llegaron a "listo", y si no hay
 // al menos 3 para promediar, sencillamente no se muestra esa comparación.
 async function getAvgPrepMinutes(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createPublicClient>,
   unitId: string,
 ) {
   const { data: events } = await supabase
@@ -36,7 +36,9 @@ async function getAvgPrepMinutes(
 }
 
 export async function getOrderWithItems(orderId: string) {
-  const supabase = await createClient()
+  // Sin cookies: la pantalla de seguimiento es del comensal, y no puede
+  // depender de si ese celular trae una sesión encima.
+  const supabase = createPublicClient()
 
   const { data: order } = await supabase
     .from("orders")

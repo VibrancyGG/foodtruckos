@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { createPublicClient } from "@/lib/supabase/public"
 import { toNumber } from "@/lib/supabase/numeric"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { BrandProvider } from "@/lib/branding/BrandProvider"
@@ -40,7 +40,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
   async function avisarLlegue() {
     setAvisando(true)
     try {
-      const supabase = createClient()
+      const supabase = createPublicClient()
       await supabase
         .from("orders")
         .update({ customer_arrived_at: new Date().toISOString() })
@@ -93,7 +93,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
     }
   }
 
-  async function refetch(supabase: ReturnType<typeof createClient>) {
+  async function refetch(supabase: ReturnType<typeof createPublicClient>) {
     const { data } = await supabase.from("orders").select("*").eq("id", initial.order.id).maybeSingle()
     if (data) {
       setOrder((prev) => {
@@ -110,7 +110,7 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
   }
 
   useEffect(() => {
-    const supabase = createClient()
+    const supabase = createPublicClient()
 
     const channel = supabase
       .channel(`order-${initial.order.id}`)
