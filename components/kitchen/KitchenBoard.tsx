@@ -265,6 +265,14 @@ export function KitchenBoard({
             const local = prevById.get(o.id)
             if (local) return { ...mapped, status: local.status }
           }
+          // El cobro que todavía no se confirma se respeta igual que un avance.
+          // Sin esto, la cajera cobra, ve "pagado", y unos segundos después la
+          // consulta de respaldo trae el estado viejo y vuelve a decir "por
+          // cobrar" — que en hora pico termina en un doble cobro.
+          if (action === "markPaid") {
+            const local = prevById.get(o.id)
+            if (local) return { ...mapped, payment_status: local.payment_status, payment_method: local.payment_method }
+          }
           return mapped
         })
     })
