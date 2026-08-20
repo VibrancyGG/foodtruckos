@@ -46,6 +46,32 @@ function beep() {
   }
 }
 
+// Aviso de que un comensal llegó a la ventanilla. A propósito NO se parece al
+// de orden nueva: aquel sube (784 → 1046) y este baja, con tres toques cortos.
+// En hora pico la cajera tiene que poder distinguirlos sin mirar la pantalla.
+function tinLlegada() {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ac = new Ctx()
+    ;[0, 0.13, 0.26].forEach((d, i) => {
+      const o = ac.createOscillator()
+      const g = ac.createGain()
+      o.connect(g)
+      g.connect(ac.destination)
+      o.type = "triangle"
+      o.frequency.value = [880, 740, 620][i]
+      const t = ac.currentTime + d
+      g.gain.setValueAtTime(0.0001, t)
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.01)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16)
+      o.start(t)
+      o.stop(t + 0.18)
+    })
+  } catch {
+    // sin audio la insignia y el latido siguen avisando igual
+  }
+}
+
 export function KitchenBoard({
   unitId,
   businessId,
@@ -105,6 +131,11 @@ export function KitchenBoard({
   useWakeLock()
   const [todayCount, setTodayCount] = useState(0)
   const knownOrderIds = useRef<Set<string>>(new Set(initial.orders.map((o) => o.id)))
+  // Se siembra con lo que ya venía marcado: si no, al abrir la pantalla sonaría
+  // una llegada por cada comensal que avisó hace rato.
+  const yaLlegaron = useRef<Set<string>>(
+    new Set(initial.orders.filter((o) => o.customer_arrived_at).map((o) => o.id)),
+  )
 
   // El sonido y la impresión se leen por ref, no por dependencia: si entraran
   // en las deps de refetch, tocar el botón de sonido destruiría y recrearía el
@@ -238,6 +269,19 @@ export function KitchenBoard({
     const nuevas = (freshOrders ?? []).filter((o) => o.status === "recibido" && isNew(o.id))
     knownOrderIds.current = new Set((freshOrders ?? []).map((o) => o.id))
     if (nuevas.length && soundOnRef.current) beep()
+
+    // Quién avisó que ya llegó al truck. Se compara contra la foto anterior
+    // para sonar SOLO en la llegada nueva: al abrir la pantalla no debe sonar
+    // por cada comensal que ya estaba esperando desde antes.
+    const reciénLlegadas = (freshOrders ?? []).filter(
+      (o) => o.customer_arrived_at && !yaLlegaron.current.has(o.id),
+    )
+    yaLlegaron.current = new Set(
+      (freshOrders ?? []).filter((o) => o.customer_arrived_at).map((o) => o.id),
+    )
+    // Sonido distinto al de orden nueva: la cajera necesita distinguir "entró
+    // un pedido" de "hay alguien parado en la ventanilla esperando".
+    if (reciénLlegadas.length && soundOnRef.current) tinLlegada()
     for (const o of nuevas) {
       printOrder(
         { ...o, total: toNumber(o.total) },
@@ -523,7 +567,27 @@ export function KitchenBoard({
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-px md:grid-cols-3" style={{ background: "#332F29" }}>
         {COLUMNS.map((col) => {
-          const list = orders.filter((o) => o.status === col).sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+          // En NUEVAS mandan primero las pagadas, y dentro de cada grupo la más
+          // vieja arriba. Una orden pagada es dinero comprometido; una sin pagar
+          // puede no reclamarse nunca, y ese es el desperdicio que queremos
+          // reducir.
+          //
+          // Las otras dos columnas se quedan por antigüedad pura: ahí ya se está
+          // cocinando y reordenar cambiaría el trabajo a media plancha.
+          //
+          // Una orden sin pagar no se hunde en silencio: el color de la tarjeta
+          // pasa a ámbar y luego a rojo con los minutos, así que sigue gritando
+          // aunque quede abajo.
+          const list = orders
+            .filter((o) => o.status === col)
+            .sort((a, b) => {
+              if (col === "recibido") {
+                const pagadaA = a.payment_status === "pagada" ? 0 : 1
+                const pagadaB = b.payment_status === "pagada" ? 0 : 1
+                if (pagadaA !== pagadaB) return pagadaA - pagadaB
+              }
+              return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            })
           return (
             <div
               key={col}
@@ -546,10 +610,15 @@ export function KitchenBoard({
                 )}
                 {list.map((o) => {
                   const lv = level(o, col)
+                  // Late mientras haya alguien esperando enfrente Y sin pagar:
+                  // ese es el momento en que la cajera tiene algo que hacer.
+                  // Al cobrar deja de latir, aunque la insignia se queda — si
+                  // latiera para siempre, dejaría de significar nada.
+                  const esperandoCobro = Boolean(o.customer_arrived_at) && o.payment_status !== "pagada"
                   return (
                     <article
                       key={o.id}
-                      className="rounded-[10px] border p-3.5 pb-4"
+                      className={`rounded-[10px] border p-3.5 pb-4${esperandoCobro ? " ft-latido" : ""}`}
                       style={{ background: "#1B1917", borderColor: "#332F29", borderLeftWidth: 6, borderLeftColor: LEVEL_COLOR[lv] }}
                     >
                       <div className="mb-1 flex items-baseline gap-2.5">
