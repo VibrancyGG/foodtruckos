@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { toNumber } from "@/lib/supabase/numeric"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 import { accessBlocked } from "@/lib/billing/trial"
@@ -8,7 +8,9 @@ import { accessBlocked } from "@/lib/billing/trial"
 // coinciden con lo que el qr_slug resuelve, quien llama a esta función debe
 // redirigir a la ruta canónica en vez de confiar en ellos.
 export async function getMenuData(qrSlug: string) {
-  const supabase = await createClient()
+  // Sin cookies, igual que al crear el pedido: el menú del comensal se ve
+  // idéntico traiga o no una sesión encima ese celular.
+  const supabase = createPublicClient()
 
   // OJO: nunca "units(*)" aquí — esto se sirve a un comensal sin cuenta. Se
   // listan las columnas explícitamente para que agregar una columna sensible

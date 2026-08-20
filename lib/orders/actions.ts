@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 import { accessBlocked } from "@/lib/billing/trial"
 
@@ -33,7 +33,9 @@ export async function createOrder(input: {
     return { error: "emptyCart" }
   }
 
-  const supabase = await createClient()
+  // Cliente sin cookies: el pedido del comensal no debe depender de si ese
+  // celular trae una sesión encima, vigente o vencida.
+  const supabase = createPublicClient()
 
   // Nunca se confía en que la pantalla del comensal esté al día — pudo cargar
   // el menú minutos antes de que el truck cerrara o se pausara. El servidor
@@ -156,9 +158,21 @@ export async function createOrder(input: {
       detalle: itemsError.details,
       orderId: order.id,
     })
-    // El pedido ya existe sin líneas — no lo dejamos así de silencio; se marca
-    // cancelado para que nadie en cocina lo prepare vacío por error.
-    await supabase.from("orders").update({ status: "cancelado" }).eq("id", order.id)
+    // El pedido ya existe sin líneas: se intenta cancelar para que nadie en
+    // cocina lo prepare vacío. Ojo — el comensal no tiene permiso de cambiar
+    // pedidos (y no debe tenerlo), así que esta limpieza puede no pasar. Se
+    // registra si falla en vez de darla por hecha: una orden vacía colgada en
+    // el tablero confunde a la cocina y hay que poder detectarla.
+    const { error: cancelError } = await supabase
+      .from("orders")
+      .update({ status: "cancelado" })
+      .eq("id", order.id)
+    if (cancelError) {
+      console.error("[createOrder] quedó un pedido vacío sin cancelar", {
+        orderId: order.id,
+        motivo: cancelError.message,
+      })
+    }
     return { error: "sendFailed" }
   }
 
