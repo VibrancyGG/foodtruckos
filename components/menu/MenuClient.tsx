@@ -72,6 +72,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const [staleReload, setStaleReload] = useState(false)
+  const [cartCleared, setCartCleared] = useState(false)
   const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
   const [hydrated, setHydrated] = useState(false)
 
@@ -269,6 +270,24 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
     }
     setSending(false)
     if ("error" in result) {
+      // Un carrito que el servidor no puede procesar se tira aquí mismo. Si no,
+      // se queda guardado, se restaura al volver a escanear el QR, y el
+      // comensal repite el mismo error para siempre sin forma de salir.
+      if (result.error === "badCart") {
+        setCart([])
+        setCustomerName("")
+        try {
+          window.localStorage.removeItem(storageKey)
+        } catch {
+          // sin almacenamiento el carrito ya vive solo en memoria, y acaba de vaciarse
+        }
+        // El aviso va aparte del carrito a propósito: al vaciarlo desaparece
+        // toda la barra de abajo, y con ella se iría el mensaje. El comensal
+        // vería su pedido esfumarse sin ninguna explicación.
+        setCartCleared(true)
+        setSendError(null)
+        return
+      }
       // El servidor manda un código (truck cerrado, en pausa, suspendido,
       // etc.), nunca el texto — mostrar siempre el mismo mensaje genérico
       // aquí escondía el motivo real, y un texto fijo en español no habría
@@ -447,6 +466,15 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           )
         })}
       </nav>
+
+      {cartCleared && (
+        <div className="mx-4 mt-4 rounded-xl border-2 px-4 py-3 text-sm font-semibold" style={{ background: "#FDF3E0", borderColor: "#F0D9A8", color: "#6B4A12" }}>
+          {t.menu.orderError.badCart}
+          <button onClick={() => setCartCleared(false)} className="mt-1.5 block font-bold underline">
+            {t.menu.cancel}
+          </button>
+        </div>
+      )}
 
       <div className="space-y-7 px-4 pt-5">
         {[...productsByCategory.entries()].map(([catId, products]) => {
@@ -656,7 +684,27 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
               <div className="rounded-lg bg-amber-50 p-2 text-sm text-amber-800">{t.menu.updatedReloading}</div>
             ) : (
               sendError && (
-                <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{sendError}</div>
+                <div className="rounded-lg bg-red-50 p-2 text-sm text-red-700">
+                  {sendError}
+                  {/* Salida de emergencia. Si el pedido falla por algo que
+                      viene del propio carrito, reintentar con el mismo carrito
+                      falla igual y el comensal se queda encerrado. */}
+                  <button
+                    onClick={() => {
+                      setCart([])
+                      setCustomerName("")
+                      setSendError(null)
+                      try {
+                        window.localStorage.removeItem(storageKey)
+                      } catch {
+                        // ya se vació en memoria, que es lo que importa
+                      }
+                    }}
+                    className="mt-1.5 block font-bold underline"
+                  >
+                    {t.menu.emptyCart}
+                  </button>
+                </div>
               )
             )}
             <button

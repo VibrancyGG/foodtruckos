@@ -19,7 +19,7 @@ export type CartItemInput = {
 // cliente con el diccionario bilingüe (t.menu.orderError.*), según el idioma
 // que tenga activo en ese momento — el servidor no sabe en qué idioma está
 // viendo la pantalla quien pidió.
-export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed"
+export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed" | "badCart"
 
 export async function createOrder(input: {
   businessId: string
@@ -71,15 +71,33 @@ export async function createOrder(input: {
   // que el cliente mandó como personalización — nunca se confía en un total
   // armado en el navegador, aunque RLS ya bloquee cruzar de negocio.
   const lines = input.items.map((item) => {
-    const optionsDelta = item.customizations.reduce((s, c) => s + c.priceDelta, 0)
-    const lineUnitPrice = item.unitPrice
-    const lineTotal = Math.round((lineUnitPrice + optionsDelta) * item.quantity * 100) / 100
+    // Un carrito guardado en el celular puede venir de una versión anterior de
+    // la pantalla y traer un dato faltante. Sin esta defensa, ese dato produce
+    // NaN, NaN viaja como null, y la columna NOT NULL rechaza la inserción: el
+    // comensal ve "revisa tu conexión" para siempre, porque el carrito malo
+    // sigue guardado y se restaura en cada intento.
+    const optionsDelta = item.customizations.reduce(
+      (s, c) => s + (Number.isFinite(c.priceDelta) ? c.priceDelta : 0),
+      0,
+    )
+    const lineTotal = Math.round((item.unitPrice + optionsDelta) * item.quantity * 100) / 100
     return { ...item, lineTotal }
   })
+
+  // El precio sí se exige válido: dar por bueno un cero aquí regalaría comida.
+  if (lines.some((l) => !Number.isFinite(l.lineTotal))) {
+    console.error("[createOrder] carrito con importes inválidos", JSON.stringify(input.items))
+    return { error: "badCart" }
+  }
 
   const subtotal = Math.round(lines.reduce((s, l) => s + l.lineTotal, 0) * 100) / 100
   const taxAmount = input.taxIncluded ? 0 : Math.round(subtotal * TAX_RATE * 100) / 100
   const total = Math.round((subtotal + taxAmount) * 100) / 100
+
+  if (!Number.isFinite(subtotal) || !Number.isFinite(taxAmount) || !Number.isFinite(total)) {
+    console.error("[createOrder] totales inválidos", { subtotal, taxAmount, total })
+    return { error: "badCart" }
+  }
 
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -100,6 +118,20 @@ export async function createOrder(input: {
     .single()
 
   if (orderError || !order) {
+    // Sin esto, cualquier motivo —una regla de seguridad, una columna que no
+    // admite nulos, un dato fuera de rango— se le presenta al comensal como
+    // "revisa tu conexión", y desde fuera es imposible saber qué pasó. Cuando
+    // falló en producción nos costó horas de diagnóstico a ciegas.
+    console.error("[createOrder] no se pudo crear el pedido", {
+      motivo: orderError?.message,
+      codigo: orderError?.code,
+      detalle: orderError?.details,
+      businessId: input.businessId,
+      unitId: input.unitId,
+      orderPointId: input.orderPointId,
+      subtotal,
+      total,
+    })
     return { error: "sendFailed" }
   }
 
@@ -118,6 +150,12 @@ export async function createOrder(input: {
   )
 
   if (itemsError) {
+    console.error("[createOrder] no se pudieron guardar los platillos", {
+      motivo: itemsError.message,
+      codigo: itemsError.code,
+      detalle: itemsError.details,
+      orderId: order.id,
+    })
     // El pedido ya existe sin líneas — no lo dejamos así de silencio; se marca
     // cancelado para que nadie en cocina lo prepare vacío por error.
     await supabase.from("orders").update({ status: "cancelado" }).eq("id", order.id)

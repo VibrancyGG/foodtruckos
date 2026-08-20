@@ -19,9 +19,11 @@ export type Dictionary = {
       paused: string
       closed: string
       sendFailed: string
+      badCart: string
     }
     updatedReloading: string
     retry: string
+    emptyCart: string
     cancel: string
     customerNameLabel: string
     quantity: string
@@ -984,9 +986,11 @@ export const dictionary: Record<Lang, Dictionary> = {
         paused: "Este truck está en pausa ahora mismo",
         closed: "Este truck está cerrado ahora mismo — vuelve dentro de su horario",
         sendFailed: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
+        badCart: "Algo de tu pedido quedó desactualizado. Lo vaciamos — vuelve a elegir tus platillos.",
       },
       updatedReloading: "Actualizamos el menú — recargando tu pantalla. Tu pedido sigue en el carrito, solo dale a enviar otra vez.",
       retry: "Reintentar",
+      emptyCart: "Vaciar el carrito y empezar de nuevo",
       cancel: "Cancelar",
       customerNameLabel: "Tu nombre (opcional)",
       quantity: "Cantidad",
@@ -1978,9 +1982,11 @@ export const dictionary: Record<Lang, Dictionary> = {
         paused: "This truck is paused right now",
         closed: "This truck is closed right now — come back during its hours",
         sendFailed: "We couldn't send your order. Check your connection and try again",
+        badCart: "Something in your cart is out of date. We emptied it — please add your food again.",
       },
       updatedReloading: "We just updated the menu — reloading your screen. Your order is still in your cart, just tap send again.",
       retry: "Retry",
+      emptyCart: "Empty the cart and start over",
       cancel: "Cancel",
       customerNameLabel: "Your name (optional)",
       quantity: "Quantity",
