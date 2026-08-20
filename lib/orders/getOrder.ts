@@ -48,9 +48,26 @@ export async function getOrderWithItems(orderId: string) {
 
   if (!order) return null
 
-  const [{ data: items }, avgPrepMinutes] = await Promise.all([
+  // "Listo hace 3 min" necesita el momento real en que la cocina lo marcó, y
+  // orders.updated_at no sirve: nada lo escribe, se queda en la hora de
+  // creación. El evento de estado sí es la verdad, y solo hace falta
+  // consultarlo cuando el pedido ya está listo.
+  const readyEvent =
+    order.status === "listo"
+      ? supabase
+          .from("order_status_events")
+          .select("created_at")
+          .eq("order_id", orderId)
+          .eq("to_status", "listo")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null as { created_at: string } | null })
+
+  const [{ data: items }, avgPrepMinutes, { data: ready }] = await Promise.all([
     supabase.from("order_items").select("*").eq("order_id", orderId),
     getAvgPrepMinutes(supabase, order.unit_id),
+    readyEvent,
   ])
 
   return {
@@ -66,6 +83,7 @@ export async function getOrderWithItems(orderId: string) {
       line_total: toNumber(i.line_total),
     })),
     avgPrepMinutes,
+    readyAt: ready?.created_at ?? null,
   }
 }
 

@@ -46,22 +46,27 @@ export type Dictionary = {
     title: string
     yourNumber: string
     steps: { recibido: string; preparando: string; listo: string; entregado: string }
-    titles: { recibido: string; preparando: string; listo: string; entregado: string }
-    subs: { recibido: string; preparando: string; listo: string; entregado: string }
-    wait: (mins: number) => string
-    waitWithAvg: (mins: number, avg: number) => string
+    titles: { recibido: string; preparando: string; listo: string; entregado: string; cancelado: string }
+    subs: { recibido: string; preparando: string; listo: string; entregado: string; cancelado: string }
+    etaWindow: (desde: string, hasta: string) => string
+    etaLate: string
+    readyAgo: (mins: number) => string
+    readyNow: string
     notFound: string
     notFoundSub: string
     backToMenu: string
     due: string
-    payInviteTitle: string
-    payInviteBody: string
+    payDueTitle: string
+    payDueBody: string
+    payDueBodyReady: string
     imHere: string
     imHereDone: string
     imHereHint: string
     paid: string
     offline: string
+    connecting: string
     live: string
+    doneClose: string
     whatYouOrdered: string
     total: string
     bell: string
@@ -70,7 +75,6 @@ export type Dictionary = {
     bellHintOff: string
     bellNote: string
     bellDenied: string
-    bellWarning: string
   }
   kitchen: {
     queuePosition: (n: number) => string
@@ -1020,37 +1024,43 @@ export const dictionary: Record<Lang, Dictionary> = {
         entregado: "Entregado",
       },
       titles: {
-        recibido: "Ya llegó a la cocina",
+        recibido: "La cocina ya tiene tu orden",
         preparando: "Lo están preparando",
         listo: "¡Listo! Pasa por él",
         entregado: "¡Gracias!",
+        cancelado: "Pedido cancelado",
       },
       subs: {
         recibido: "En un momento empiezan con él.",
         preparando: "Te avisamos aquí en cuanto esté.",
         listo: "Ve a la ventanilla y di tu número.",
-        entregado: "Que lo disfrutes. Aquí estaremos.",
+        entregado: "Gracias por tu visita. Te esperamos en tu próxima compra.",
+        cancelado: "Este pedido se canceló. Si no sabes por qué, pregunta en la ventanilla.",
       },
-      wait: (mins) => `Va ${mins} min`,
-      waitWithAvg: (mins, avg) => `Va ${mins} min · normalmente tardan unos ${avg}`,
+      etaWindow: (desde, hasta) => `Listo aproximadamente entre las ${desde} y las ${hasta}`,
+      etaLate: "Está tardando un poco más de lo normal. Sale en cuanto la cocina lo libere.",
+      readyAgo: (mins) => `Listo hace ${mins} min`,
+      readyNow: "Listo apenas",
       notFound: "No encontramos ese pedido",
       notFoundSub: "El enlace puede estar viejo o el pedido ya se entregó hace rato.",
       backToMenu: "Volver al menú",
       due: "Paga en la ventanilla",
-      payInviteTitle: "¿Pasas a pagar ahora?",
-      payInviteBody: "Tu pedido ya va en camino. Si te acercas a la ventanilla con tu número y pagas ahora, adelantas tu entrega.",
-      imHere: "Ya llegué al truck",
-      imHereDone: "Listo — la cocina sabe que estás esperando",
-      imHereHint: "Le avisa a la cocina que ya estás afuera esperando, para que no dejen tu pedido para después.",
+      payDueTitle: "Pago pendiente",
+      payDueBody: "Puedes pagar ahora en la ventanilla o cuando recojas tu pedido. Pagar ahora hace más rápida la recogida.",
+      payDueBodyReady: "Paga al recoger tu pedido.",
+      imHere: "Ya estoy aquí",
+      imHereDone: "Ya avisamos a la cocina que estás aquí",
+      imHereHint: "Avísanos que ya estás esperando frente al food truck.",
       paid: "Ya está pagado",
-      offline: "Sin conexión — reintentando",
+      offline: "Sin conexión",
+      connecting: "Conectando…",
       live: "En vivo",
+      doneClose: "Ya puedes cerrar esta ventana, o volver atrás si quieres hacer otro pedido.",
       whatYouOrdered: "Lo que pediste",
       total: "Total",
       bell: "Avísame cuando esté listo",
       bellOn: "Te avisamos ✓",
-      bellHint: "Te avisamos con un sonido en cuanto esté listo, mientras esta pantalla siga abierta.",
-      bellWarning: "Si bloqueas el celular o te sales a otra aplicación, no podremos avisarte. Vuelve a esta pantalla para ver cómo va tu pedido; si no se actualiza sola, recárgala.",
+      bellHint: "Mantén esta pantalla abierta para recibir el aviso.",
       bellHintOff: "Sin internet no se actualiza solo. Vuelve a cargar cuando tengas señal.",
       bellNote: "Listo. Te avisamos con un sonido en cuanto tu pedido esté.",
       bellDenied: "No diste permiso de notificación — igual te avisamos con un sonido si dejas esta pantalla abierta.",
@@ -2017,37 +2027,43 @@ export const dictionary: Record<Lang, Dictionary> = {
         entregado: "Picked up",
       },
       titles: {
-        recibido: "It reached the kitchen",
+        recibido: "The kitchen has your order",
         preparando: "They are cooking it",
         listo: "Ready! Come get it",
         entregado: "Thank you!",
+        cancelado: "Order cancelled",
       },
       subs: {
         recibido: "They will start on it in a moment.",
         preparando: "We will tell you here as soon as it is done.",
         listo: "Head to the window and say your number.",
-        entregado: "Enjoy it. See you next time.",
+        entregado: "Thanks for stopping by. We hope to see you again soon.",
+        cancelado: "This order was cancelled. If you are not sure why, ask at the window.",
       },
-      wait: (mins) => `${mins} min so far`,
-      waitWithAvg: (mins, avg) => `${mins} min so far · usually about ${avg}`,
+      etaWindow: (desde, hasta) => `Ready around ${desde}–${hasta}`,
+      etaLate: "It is taking a little longer than usual. It goes out as soon as the kitchen frees it up.",
+      readyAgo: (mins) => `Ready ${mins} min ago`,
+      readyNow: "Just now",
       notFound: "We could not find that order",
       notFoundSub: "The link may be old, or the order was already picked up a while ago.",
       backToMenu: "Back to the menu",
       due: "Pay at the window",
-      payInviteTitle: "Want to pay now?",
-      payInviteBody: "Your order is already on its way. Come to the window with your number and pay now — it speeds up your pickup.",
-      imHere: "I am at the truck",
-      imHereDone: "Done — the kitchen knows you are waiting",
-      imHereHint: "Tells the kitchen you are outside waiting, so your order does not sit.",
+      payDueTitle: "Payment due",
+      payDueBody: "You can pay now at the window or when you pick your order up. Paying now makes pickup faster.",
+      payDueBodyReady: "Pay when you pick your order up.",
+      imHere: "I'm here",
+      imHereDone: "We told the kitchen you are here",
+      imHereHint: "Let us know you are already waiting at the food truck.",
       paid: "Already paid",
-      offline: "Offline — retrying",
+      offline: "Offline",
+      connecting: "Connecting…",
       live: "Live",
+      doneClose: "You can close this window now, or go back if you want to order again.",
       whatYouOrdered: "What you ordered",
       total: "Total",
       bell: "Tell me when it's ready",
       bellOn: "We'll tell you ✓",
-      bellHint: "We'll play a sound as soon as it's ready, as long as this screen stays open.",
-      bellWarning: "If you lock your phone or switch to another app, we cannot reach you. Come back to this screen to see how your order is doing; if it does not update on its own, reload it.",
+      bellHint: "Keep this screen open to get the alert.",
       bellHintOff: "Without internet this won't update on its own. Reload when you have signal.",
       bellNote: "Done. We'll play a sound as soon as your order is ready.",
       bellDenied: "You didn't allow notifications — we'll still play a sound if you leave this screen open.",
