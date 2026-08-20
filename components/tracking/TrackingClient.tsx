@@ -311,9 +311,22 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
               >
                 {notifyOn ? t.tracking.bellOn : t.tracking.bell}
               </button>
-              <p className="mb-4 text-center text-xs leading-relaxed" style={{ color: INK_SOFT }}>
+              <p className="mb-2 text-center text-xs leading-relaxed" style={{ color: INK_SOFT }}>
                 {notifyOn ? (notifDenied ? t.tracking.bellDenied : t.tracking.bellNote) : online ? t.tracking.bellHint : t.tracking.bellHintOff}
               </p>
+
+              {/* Se dice sin rodeos y en alto contraste, no como letra chica:
+                  es una limitación NUESTRA. Sin service worker la página se
+                  congela cuando el celular se bloquea, y ahí no suena nada. Si
+                  el comensal cree que le vamos a avisar, bloquea el teléfono
+                  confiado y su comida se enfría en la ventanilla. */}
+              <div
+                className="mb-4 flex items-start gap-2.5 rounded-xl border-2 px-3.5 py-3"
+                style={{ background: "#FDF3E0", borderColor: "#E0B25C", color: "#6B4A12" }}
+              >
+                <span aria-hidden="true" className="text-base leading-none">⚠️</span>
+                <p className="text-[13px] font-semibold leading-snug">{t.tracking.bellWarning}</p>
+              </div>
             </>
           )}
 

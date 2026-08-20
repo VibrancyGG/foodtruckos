@@ -70,6 +70,7 @@ export type Dictionary = {
     bellHintOff: string
     bellNote: string
     bellDenied: string
+    bellWarning: string
   }
   kitchen: {
     queuePosition: (n: number) => string
@@ -1040,7 +1041,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       payInviteBody: "Tu pedido ya va en camino. Si te acercas a la ventanilla con tu número y pagas ahora, adelantas tu entrega.",
       imHere: "Ya llegué al truck",
       imHereDone: "Listo — la cocina sabe que estás esperando",
-      imHereHint: "Solo le avisa a la cocina que ya estás afuera esperando, para que no dejen tu pedido para después. No paga nada ni cambia tu turno.",
+      imHereHint: "Le avisa a la cocina que ya estás afuera esperando, para que no dejen tu pedido para después.",
       paid: "Ya está pagado",
       offline: "Sin conexión — reintentando",
       live: "En vivo",
@@ -1048,10 +1049,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       total: "Total",
       bell: "Avísame cuando esté listo",
       bellOn: "Te avisamos ✓",
-      bellHint: "Deja esta pantalla abierta y te avisamos con un sonido. También te llega la notificación si la aceptaste.",
+      bellHint: "Te avisamos con un sonido en cuanto esté listo, mientras esta pantalla siga abierta.",
+      bellWarning: "Si bloqueas el celular o te sales a otra aplicación, no podremos avisarte. Vuelve a esta pantalla para ver cómo va tu pedido; si no se actualiza sola, recárgala.",
       bellHintOff: "Sin internet no se actualiza solo. Vuelve a cargar cuando tengas señal.",
-      bellNote: "Te avisamos con un sonido y, si aceptas, con una notificación del navegador.",
-      bellDenied: "No diste permiso de notificación — igual te avisamos con este sonido si dejas la pantalla abierta.",
+      bellNote: "Listo. Te avisamos con un sonido en cuanto tu pedido esté.",
+      bellDenied: "No diste permiso de notificación — igual te avisamos con un sonido si dejas esta pantalla abierta.",
     },
     kitchen: {
       queuePosition: (n) => `#${n} en la fila de este truck`,
@@ -2036,7 +2038,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       payInviteBody: "Your order is already on its way. Come to the window with your number and pay now — it speeds up your pickup.",
       imHere: "I am at the truck",
       imHereDone: "Done — the kitchen knows you are waiting",
-      imHereHint: "This only tells the kitchen you are outside waiting, so your order does not sit. It pays nothing and does not change your place in line.",
+      imHereHint: "Tells the kitchen you are outside waiting, so your order does not sit.",
       paid: "Already paid",
       offline: "Offline — retrying",
       live: "Live",
@@ -2044,10 +2046,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       total: "Total",
       bell: "Tell me when it's ready",
       bellOn: "We'll tell you ✓",
-      bellHint: "Keep this screen open and we'll play a sound. You'll also get the notification if you allowed it.",
+      bellHint: "We'll play a sound as soon as it's ready, as long as this screen stays open.",
+      bellWarning: "If you lock your phone or switch to another app, we cannot reach you. Come back to this screen to see how your order is doing; if it does not update on its own, reload it.",
       bellHintOff: "Without internet this won't update on its own. Reload when you have signal.",
-      bellNote: "We'll tell you with a sound and, if you allow it, a browser notification.",
-      bellDenied: "You didn't allow notifications — we'll still play this sound if you leave the screen open.",
+      bellNote: "Done. We'll play a sound as soon as your order is ready.",
+      bellDenied: "You didn't allow notifications — we'll still play a sound if you leave this screen open.",
     },
     kitchen: {
       queuePosition: (n) => `#${n} in this truck's line`,

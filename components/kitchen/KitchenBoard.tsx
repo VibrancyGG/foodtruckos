@@ -582,6 +582,14 @@ export function KitchenBoard({
             .filter((o) => o.status === col)
             .sort((a, b) => {
               if (col === "recibido") {
+                // Quien está parado en la ventanilla manda sobre todo lo demás.
+                // Si avisar que llegaste no cambiara el orden, el botón sería
+                // solo una insignia bonita — y quien espera enfrente es siempre
+                // más urgente que quien pidió desde su casa, haya pagado o no.
+                const llegoA = a.customer_arrived_at ? 0 : 1
+                const llegoB = b.customer_arrived_at ? 0 : 1
+                if (llegoA !== llegoB) return llegoA - llegoB
+
                 const pagadaA = a.payment_status === "pagada" ? 0 : 1
                 const pagadaB = b.payment_status === "pagada" ? 0 : 1
                 if (pagadaA !== pagadaB) return pagadaA - pagadaB
