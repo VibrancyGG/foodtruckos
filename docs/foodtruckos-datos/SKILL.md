@@ -151,6 +151,20 @@ Si algún día una impresora se autenticara sola contra nosotros, ahí sí harí
 
 ---
 
+## Regla 9 — Lo público se le concede a `anon` Y a `authenticated`
+
+El comensal nunca tiene cuenta (Regla de Oro 3), pero eso **no significa que nunca tenga sesión**. Un dueño probando su propio QR, personal de un truck comprando en otro, o cualquiera que alguna vez entró al panel en ese celular llega con sesión abierta — y la base entonces lo trata como `authenticated`, no como `anon`.
+
+Las políticas de Postgres son **por rol**. Una política `to anon` no aplica a alguien con sesión: ese cae en la política de dueño/personal, que exige pertenecer al negocio, y su pedido se rechaza **sin dejar rastro** (error 42501, ninguna fila creada).
+
+Pasó de verdad: solo fallaba en el celular del dueño, y desde fuera parecía un problema de conexión.
+
+**Al abrir cualquier camino público, se conceden dos políticas con la MISMA condición** — una `to anon` y otra `to authenticated`. Nunca una más laxa que la otra: si el camino público exige que el punto de pedido esté activo y corresponda al truck, las dos lo exigen.
+
+Y al revés: lo que es de personal (capturar en ventanilla) se queda solo en su política. Tener sesión no debe convertir a un comensal en cajero.
+
+---
+
 ## Antes de dar por terminado cualquier trabajo de datos
 
 Revisa contra esta lista:
@@ -163,5 +177,6 @@ Revisa contra esta lista:
 6. ¿Los pedidos de ventanilla y de QR viven en el mismo lugar?
 7. ¿Estoy amarrando el esquema a "truck", a un solo QR por unidad, o a que un pedido sea siempre una venta cerrada? (Regla 7)
 8. ¿Estoy creando una tabla para algo que es una preferencia de un dispositivo que ya existe? (Regla 8)
+9. Si abrí un camino público, ¿lo probé con sesión iniciada y sin ella? (Regla 9)
 
 Si alguna respuesta es incómoda, plantéalo antes de avanzar en lugar de resolverlo por tu cuenta.
