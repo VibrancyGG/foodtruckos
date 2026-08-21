@@ -715,3 +715,190 @@
     width: auto;
   }
 }
+
+/* ---------- Comanda impresa ----------
+   La sección va de un objeto físico, así que se muestra como objeto: el
+   ticket es la única superficie clara de toda la página, igual que en una
+   cocina de noche el papel es lo único que refleja la luz. El contenido es
+   el que sale de escpos.ts renglón por renglón — mismo ancho de columna,
+   mismas reglas de guiones, lo que se quita en mayúsculas. */
+.printGrid {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: clamp(32px, 6vw, 72px);
+  align-items: start;
+}
+
+.ticketCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.ticket {
+  --paper: #f6f1e7;
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  background: var(--paper);
+  color: #16120e;
+  padding: 22px 18px 26px;
+  font-family: var(--font-landing-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: hidden;
+  box-shadow:
+    0 26px 60px -22px rgba(0, 0, 0, 0.85),
+    0 2px 0 rgba(255, 255, 255, 0.35) inset;
+  transform: rotate(-1.1deg);
+  /* Los dientes del corte se recortan del papel, no se pintan encima con el
+     color del fondo: la capa de luz que sigue al cursor vive detrás del
+     contenido, y unos triángulos opacos se verían como muescas apagadas
+     justo cuando el cursor pasa cerca. */
+  -webkit-mask-image:
+    linear-gradient(#000 0 0),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpolygon points='0,0 16,0 8,8' fill='%23000'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpolygon points='0,8 16,8 8,0' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% calc(100% - 16px), 16px 8px, 16px 8px;
+  -webkit-mask-position: center, bottom, top;
+  -webkit-mask-repeat: no-repeat, repeat-x, repeat-x;
+  mask-image:
+    linear-gradient(#000 0 0),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpolygon points='0,0 16,0 8,8' fill='%23000'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpolygon points='0,8 16,8 8,0' fill='%23000'/%3E%3C/svg%3E");
+  mask-size: 100% calc(100% - 16px), 16px 8px, 16px 8px;
+  mask-position: center, bottom, top;
+  mask-repeat: no-repeat, repeat-x, repeat-x;
+}
+
+.ticketCenter {
+  text-align: center;
+}
+.ticketUnit {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.ticketFolio {
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+.ticketRule {
+  color: rgba(22, 18, 14, 0.45);
+  overflow: hidden;
+}
+.ticketItem {
+  font-weight: 700;
+}
+.ticketMod {
+  color: rgba(22, 18, 14, 0.7);
+}
+.ticketFoot {
+  font-weight: 700;
+}
+
+.ticketCaption {
+  max-width: 320px;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--inkSoft);
+}
+
+.printWhy {
+  display: grid;
+  gap: 22px;
+  margin-bottom: 34px;
+}
+.printWhy h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.printWhy p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--inkSoft);
+}
+
+.printPick {
+  font-family: var(--font-landing-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 14px;
+}
+.printOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.printOption {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 18px;
+}
+.printOption h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.printOption p {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--inkSoft);
+}
+.printNote {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--inkSoft);
+  border-left: 2px solid var(--line);
+  padding-left: 14px;
+}
+
+@media (max-width: 860px) {
+  .printGrid {
+    grid-template-columns: 1fr;
+  }
+  .ticketCol {
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 480px) {
+  .printOptions {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticket {
+    transform: none;
+  }
+}
+
+.ticketRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.ticketGap {
+  height: 0.9em;
+}
+
+/* En un teléfono no caben marca + idioma + "Entrar" + "Prueba gratis" sin
+   encimarse. El que sobra es el de prueba gratis, y no por importancia: está
+   repetido tres veces en la página, y el primero de esos duplicados vive a
+   200 px de aquí, en el hero, más grande. "Entrar" no está en ningún otro
+   lado — y es lo único que el dueño que YA es cliente viene a buscar. */
+@media (max-width: 560px) {
+  .headerTrial {
+    display: none;
+  }
+}

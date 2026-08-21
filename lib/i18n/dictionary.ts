@@ -962,6 +962,32 @@ export type Dictionary = {
     stat2Label: string
     stat3Label: string
     showcaseHint: string
+    navEnter: string
+    printEyebrow: string
+    printTitle: string
+    printSub: string
+    printWhy1Title: string
+    printWhy1Body: string
+    printWhy2Title: string
+    printWhy2Body: string
+    printWhy3Title: string
+    printWhy3Body: string
+    printPickTitle: string
+    printOptionATitle: string
+    printOptionABody: string
+    printOptionBTitle: string
+    printOptionBBody: string
+    printHardwareNote: string
+    ticketTruck: string
+    ticketOrder: string
+    ticketItem1: string
+    ticketItem1Remove: string
+    ticketItem1Add: string
+    ticketItem2: string
+    ticketItem2Note: string
+    ticketCustomer: string
+    ticketCollect: string
+    ticketCaption: string
     benefitsEyebrow: string
     benefitsTitle: string
     benefitsSub: string
@@ -1996,6 +2022,32 @@ export const dictionary: Record<Lang, Dictionary> = {
       stat2Label: "Prom. entrega",
       stat3Label: "Venta hoy",
       showcaseHint: "Avanzar una orden toma un solo toque — hecho para manos ocupadas en hora pico.",
+      navEnter: "Entrar",
+      printEyebrow: "Comanda impresa",
+      printTitle: "El riel de tickets es la cola de tu cocina",
+      printSub: "No es un extra: es como trabaja el gremio. Conecta una impresora Bluetooth a la tablet y cada pedido — por QR o de ventanilla — sale en papel al instante.",
+      printWhy1Title: "Dos cocineros, dos tickets",
+      printWhy1Body: "Cada quien toma el suyo del riel y avanzan en paralelo. Una pantalla con tres columnas no replica eso.",
+      printWhy2Title: "Manos ocupadas, papel limpio",
+      printWhy2Body: "Se lee sin tocar nada. Nadie despega la mano de la plancha para deslizar una pantalla grasosa.",
+      printWhy3Title: "Sin señal, igual imprime",
+      printWhy3Body: "La impresora cuelga de la tablet por Bluetooth, no de internet. El pedido de ventanilla sale aunque el truck se quede sin datos.",
+      printPickTitle: "Tú eliges cómo montarlo",
+      printOptionATitle: "Dos tablets",
+      printOptionABody: "Una en cocina y otra en la ventanilla. Es como funciona hoy y no necesitas comprar nada más.",
+      printOptionBTitle: "Tablet + impresora",
+      printOptionBBody: "Una sola tablet y la comanda en papel. La impresora es opcional: la agregas cuando quieras.",
+      printHardwareNote: "Nosotros ponemos la aplicación y te acompañamos en la instalación. La tablet y la impresora las compras tú, de una lista corta de equipos que probamos nosotros — así no dependes de nuestro inventario ni de nuestros envíos.",
+      ticketTruck: "TRUCK CENTRO",
+      ticketOrder: "ORDEN",
+      ticketItem1: "TORTA DE ASADA",
+      ticketItem1Remove: "CEBOLLA",
+      ticketItem1Add: "Queso extra",
+      ticketItem2: "QUESABIRRIA",
+      ticketItem2Note: "bien dorada",
+      ticketCustomer: "Marisol",
+      ticketCollect: "COBRAR AL ENTREGAR",
+      ticketCaption: "La comanda que sale de verdad — lo que se quita va en mayúsculas, porque es el error caro en cocina.",
       benefitsEyebrow: "Por qué FoodTruckOS",
       benefitsTitle: "Todo lo que tu negocio necesita, en un solo lugar",
       benefitsSub: "Cada función existe porque un dueño de food truck la necesitó primero.",
@@ -3025,6 +3077,32 @@ export const dictionary: Record<Lang, Dictionary> = {
       stat2Label: "Avg. delivery",
       stat3Label: "Sales today",
       showcaseHint: "Moving an order forward takes one tap — built for busy hands at rush hour.",
+      navEnter: "Sign in",
+      printEyebrow: "Printed tickets",
+      printTitle: "The ticket rail is your kitchen's queue",
+      printSub: "Not an extra — it is how the trade works. Pair a Bluetooth printer with the tablet and every order, by QR or at the counter, comes out on paper right away.",
+      printWhy1Title: "Two cooks, two tickets",
+      printWhy1Body: "Each one takes their own off the rail and they work in parallel. A screen with three columns cannot do that.",
+      printWhy2Title: "Busy hands, clean paper",
+      printWhy2Body: "You read it without touching anything. Nobody lifts a hand off the griddle to swipe a greasy screen.",
+      printWhy3Title: "No signal, still prints",
+      printWhy3Body: "The printer hangs off the tablet over Bluetooth, not off the internet. A counter order prints even when the truck loses data.",
+      printPickTitle: "You choose the setup",
+      printOptionATitle: "Two tablets",
+      printOptionABody: "One in the kitchen, one at the window. That is how it works today and you buy nothing extra.",
+      printOptionBTitle: "Tablet + printer",
+      printOptionBBody: "A single tablet and the ticket on paper. The printer is optional — add it whenever you want.",
+      printHardwareNote: "We provide the app and walk you through the setup. You buy the tablet and the printer yourself, from a short list of gear we test — so you never wait on our stock or our shipping.",
+      ticketTruck: "CENTRO TRUCK",
+      ticketOrder: "ORDER",
+      ticketItem1: "STEAK TORTA",
+      ticketItem1Remove: "ONION",
+      ticketItem1Add: "Extra cheese",
+      ticketItem2: "QUESABIRRIA",
+      ticketItem2Note: "extra crispy",
+      ticketCustomer: "Marisol",
+      ticketCollect: "COLLECT ON DELIVERY",
+      ticketCaption: "The ticket that actually prints — anything removed goes in caps, because that is the expensive mistake in a kitchen.",
       benefitsEyebrow: "Why FoodTruckOS",
       benefitsTitle: "Everything your business needs, in one place",
       benefitsSub: "Every feature exists because a food truck owner needed it first.",

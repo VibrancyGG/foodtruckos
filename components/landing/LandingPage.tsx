@@ -21,8 +21,45 @@ const ICON_PATHS = {
   phone: "M7 3h10a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm3 15h4",
   menu: "M4 19 15 8l1 5-11 6-1-5ZM17 5l2 2-2 2-2-2 2-2Z",
   print: "M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-2M6 14h12v7H6v-7Z",
+  qr: "M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h2v2h-2v-2Zm4 0h2v2h-2v-2Zm-4 4h2v2h-2v-2Zm4 0h2v2h-2v-2Z",
   brand: "M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.2 4.2 0 0 0 21 12c0-5-4-9-9-9Z M7.5 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3-4a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm5 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
   sparkles: "M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3ZM5 15l.8 2.2L8 18l-2.2.8L5 21l-.8-2.2L2 18l2.2-.8L5 15Z",
+}
+
+// La comanda tal como sale de lib/kitchen/escpos.ts: nombre del truck
+// centrado, el folio grande porque es lo que se busca de un vistazo entre diez
+// tickets colgados del riel, las cantidades a la izquierda y lo que se QUITA en
+// mayúsculas — el error caro en cocina. Las reglas son guiones de verdad, no
+// bordes: es una impresora térmica, no una hoja de estilos.
+function Ticket({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
+  const regla = "-".repeat(80)
+  return (
+    <div className={styles.ticket} aria-label={l.ticketCaption}>
+      <div className={`${styles.ticketCenter} ${styles.ticketUnit}`}>{l.ticketTruck}</div>
+      <div className={styles.ticketRule}>{regla}</div>
+      <div className={`${styles.ticketCenter} ${styles.ticketFolio}`}>
+        {l.ticketOrder} #12
+      </div>
+      <div className={styles.ticketRule}>{regla}</div>
+      <div className={styles.ticketGap} />
+      <div className={styles.ticketItem}>{" 2  " + l.ticketItem1}</div>
+      <div className={styles.ticketMod}>{"      - " + l.ticketItem1Remove}</div>
+      <div className={styles.ticketMod}>{"      + " + l.ticketItem1Add}</div>
+      <div className={styles.ticketItem}>{" 1  " + l.ticketItem2}</div>
+      <div className={styles.ticketMod}>{'      "' + l.ticketItem2Note + '"'}</div>
+      <div className={styles.ticketRule}>{regla}</div>
+      {/* space-between en vez de rellenar con espacios: el ticket real cuadra
+          por número de caracteres, pero aquí el ancho lo manda el contenedor. */}
+      <div className={styles.ticketRow}>
+        <span>QR {l.ticketCustomer}</span>
+        <span>7:48</span>
+      </div>
+      <div className={`${styles.ticketRow} ${styles.ticketFoot}`}>
+        <span>{l.ticketCollect}</span>
+        <span>$70.61</span>
+      </div>
+    </div>
+  )
 }
 
 const ORDER_IDS = ["#0148", "#0147", "#0146"] as const
@@ -139,7 +176,7 @@ export function LandingPage() {
     { icon: ICON_PATHS.noFee, title: l.benefit3Title, body: l.benefit3Body },
     { icon: ICON_PATHS.phone, title: l.benefit4Title, body: l.benefit4Body },
     { icon: ICON_PATHS.menu, title: l.benefit5Title, body: l.benefit5Body },
-    { icon: ICON_PATHS.print, title: l.benefit6Title, body: l.benefit6Body },
+    { icon: ICON_PATHS.qr, title: l.benefit6Title, body: l.benefit6Body },
     { icon: ICON_PATHS.brand, title: l.benefit7Title, body: l.benefit7Body },
     { icon: ICON_PATHS.sparkles, title: l.benefit8Title, body: l.benefit8Body },
   ]
@@ -162,8 +199,8 @@ export function LandingPage() {
           <nav className={styles.nav}>
             <a href="#escaparate">{l.navProduct}</a>
             <a href="#beneficios">{l.navBenefits}</a>
+            <a href="#comanda">{l.printEyebrow}</a>
             <a href="#precios">{l.navPricing}</a>
-            <Link href="/login">{l.navLogin}</Link>
           </nav>
           <div className={styles.headerActions}>
             <button
@@ -174,7 +211,10 @@ export function LandingPage() {
             >
               {lang === "es" ? "EN" : "ES"}
             </button>
-            <Link href="/login/registro" className={`${styles.btn} ${styles.btnPrimary}`}>
+            <Link href="/login" className={`${styles.btn} ${styles.btnGhost}`}>
+              {l.navEnter}
+            </Link>
+            <Link href="/login/registro" className={`${styles.btn} ${styles.btnPrimary} ${styles.headerTrial}`}>
               {l.ctaTrial}
             </Link>
           </div>
@@ -254,6 +294,51 @@ export function LandingPage() {
             </div>
           </div>
           <p className={`${styles.showcaseHint} ${styles.reveal}`}>{l.showcaseHint}</p>
+        </section>
+
+        <section id="comanda" className={styles.section}>
+          <div className={`${styles.sectionHead} ${styles.reveal}`}>
+            <div className={styles.sectionEyebrow} style={{ fontFamily: "var(--font-landing-mono)" }}>
+              {l.printEyebrow}
+            </div>
+            <h2 className={styles.sectionTitle}>{l.printTitle}</h2>
+            <p className={styles.sectionSub}>{l.printSub}</p>
+          </div>
+
+          <div className={`${styles.printGrid} ${styles.reveal}`}>
+            <div className={styles.ticketCol}>
+              <Ticket l={l} />
+              <p className={styles.ticketCaption}>{l.ticketCaption}</p>
+            </div>
+
+            <div>
+              <div className={styles.printWhy}>
+                {[
+                  { t: l.printWhy1Title, b: l.printWhy1Body },
+                  { t: l.printWhy2Title, b: l.printWhy2Body },
+                  { t: l.printWhy3Title, b: l.printWhy3Body },
+                ].map((w, i) => (
+                  <div key={i}>
+                    <h3>{w.t}</h3>
+                    <p>{w.b}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.printPick}>{l.printPickTitle}</div>
+              <div className={styles.printOptions}>
+                <div className={styles.printOption}>
+                  <h4>{l.printOptionATitle}</h4>
+                  <p>{l.printOptionABody}</p>
+                </div>
+                <div className={styles.printOption}>
+                  <h4>{l.printOptionBTitle}</h4>
+                  <p>{l.printOptionBBody}</p>
+                </div>
+              </div>
+              <p className={styles.printNote}>{l.printHardwareNote}</p>
+            </div>
+          </div>
         </section>
 
         <section id="beneficios" className={styles.section}>
