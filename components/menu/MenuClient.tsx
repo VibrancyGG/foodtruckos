@@ -576,7 +576,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                             </div>
                           )}
                           {soldOut && <SoldOutTag label={t.menu.soldOut} />}
-                          {!soldOut && customizable && <CustomizableTag lang={lang} />}
+                          {!soldOut && customizable && <CustomizableTag etiqueta={t.menu.customizable} />}
                         </div>
                         <div className="flex flex-none flex-col items-end gap-2">
                           <div style={{ fontFamily: "var(--font-display)", fontSize: 18 }}>${p.price.toFixed(2)}</div>
@@ -610,7 +610,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
                         </div>
                       )}
                       {soldOut && <SoldOutTag label={t.menu.soldOut} />}
-                      {!soldOut && customizable && <CustomizableTag lang={lang} />}
+                      {!soldOut && customizable && <CustomizableTag etiqueta={t.menu.customizable} />}
                     </div>
                   )
                 })}
@@ -745,14 +745,14 @@ function SoldOutTag({ label }: { label: string }) {
 // la palabra se sigue leyendo igual de negra con las diez opciones de la
 // paleta — incluidas las claras, donde texto de color perdería contraste bajo
 // el sol.
-function CustomizableTag({ lang }: { lang: "es" | "en" }) {
+function CustomizableTag({ etiqueta }: { etiqueta: string }) {
   return (
     <span
       className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-[3px] text-[10px] font-black uppercase tracking-[0.06em]"
       style={{ borderColor: "var(--brand-primary)", color: INK, background: PANEL }}
     >
       <span className="h-[5px] w-[5px] flex-none rounded-full" style={{ background: "var(--brand-primary)" }} aria-hidden="true" />
-      {lang === "es" ? "Personalizable" : "Customizable"}
+      {etiqueta}
     </span>
   )
 }

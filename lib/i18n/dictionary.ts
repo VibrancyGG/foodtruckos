@@ -10,6 +10,7 @@ export type Dictionary = {
     tax: string
     total: string
     soldOut: string
+    customizable: string
     sending: string
     sendError: string
     orderError: {
@@ -390,6 +391,8 @@ export type Dictionary = {
       noPhotoYetHint: string
       addProductSubmit: string
       addCategoryHint: string
+      categoryExamplesLabel: string
+      categoryExamples: string
       noTrucksExclusiveYet: string
     }
     trucksPage: {
@@ -1047,6 +1050,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       tax: "Impuesto",
       total: "Total",
       soldOut: "Se acabó",
+      customizable: "Personalizable",
       sending: "Enviando tu pedido…",
       sendError: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
       orderError: {
@@ -1456,7 +1460,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         exclusivityOnlyHint: "Aparece solo en el menú de este truck, en ningún otro",
         noPhotoYetHint: "Si todavía no tienes la foto, guárdalo sin ella: en el menú se muestra un espacio marcado y la agregas cuando puedas. Nunca ponemos la imagen de otro plato.",
         addProductSubmit: "Agregar al menú",
-        addCategoryHint: "Los platillos que agregues después podrán ir aquí.",
+        addCategoryHint: "Una categoría es un grupo del menú: junta platillos parecidos para que tu cliente encuentre rápido lo que busca. En su celular se ven como secciones, en el orden que tú les des.",
+        categoryExamplesLabel: "Ejemplos — toca uno para usarlo",
+        categoryExamples: "Tacos, Burritos, Platos fuertes, Bebidas, Postres, Extras",
         noTrucksExclusiveYet: "Este truck no tiene platillos propios todavía.",
       },
       trucksPage: {
@@ -2115,6 +2121,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       tax: "Tax",
       total: "Total",
       soldOut: "Sold out",
+      customizable: "Customizable",
       sending: "Sending your order…",
       sendError: "We couldn't send your order. Check your connection and try again",
       orderError: {
@@ -2523,7 +2530,9 @@ export const dictionary: Record<Lang, Dictionary> = {
         exclusivityOnlyHint: "Shows up on this truck's menu only, nowhere else",
         noPhotoYetHint: "If you don't have the photo yet, save it without one: the menu shows a marked space and you can add it later. We never use another dish's image.",
         addProductSubmit: "Add to menu",
-        addCategoryHint: "Items you add later can go here.",
+        addCategoryHint: "A category is a group on your menu: it puts similar dishes together so your customer finds what they want fast. On their phone they show up as sections, in the order you set.",
+        categoryExamplesLabel: "Examples — tap one to use it",
+        categoryExamples: "Tacos, Burritos, Main dishes, Drinks, Desserts, Extras",
         noTrucksExclusiveYet: "This truck doesn't have its own items yet.",
       },
       trucksPage: {

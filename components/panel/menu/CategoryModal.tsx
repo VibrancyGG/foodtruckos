@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { createCategory, updateCategory, deleteCategory } from "@/lib/menu/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { dictionary } from "@/lib/i18n/dictionary"
 import { TranslateFieldActions } from "../TranslateFieldActions"
 import { Modal } from "../ui/Modal"
 import { Button } from "../ui/Button"
@@ -62,6 +63,31 @@ export function CategoryModal(props: Props) {
         {props.mode === "edit" ? m.editCategory : m.addCategory}
       </h3>
       <p className="mb-4 text-sm text-panel-ink-soft">{m.addCategoryHint}</p>
+
+      {/* Solo al crear: quien está editando ya sabe qué es una categoría. Los
+          ejemplos se tocan y llenan los DOS idiomas de una vez — el dueño que
+          abre esto por primera vez rara vez tiene un nombre pensado; tiene un
+          menú en la cabeza y no sabe por dónde empezar a partirlo. */}
+      {props.mode === "add" && (
+        <div className="mb-4">
+          <p className="mb-2 text-xs font-semibold text-panel-ink-soft">{m.categoryExamplesLabel}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {m.categoryExamples.split(", ").map((ejemplo, i) => (
+              <button
+                key={ejemplo}
+                type="button"
+                onClick={() => {
+                  setNameEs(dictionary.es.panel.menuPage.categoryExamples.split(", ")[i] ?? ejemplo)
+                  setNameEn(dictionary.en.panel.menuPage.categoryExamples.split(", ")[i] ?? ejemplo)
+                }}
+                className="rounded-full border border-panel-line px-2.5 py-1 text-xs font-semibold text-panel-ink-soft transition-colors hover:border-panel-brand hover:text-panel-brand"
+              >
+                {ejemplo}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-1.5 flex items-center justify-between">
         <label className={labelClass}>{c.nameEsPlaceholder}</label>
