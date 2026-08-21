@@ -310,6 +310,12 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const todayLabel = WEEKDAY_FULL[lang][WEEKDAY_INDEX[today.dayKey]]
 
   return (
+    <div style={{ background: PANEL, minHeight: "100vh" }}>
+    {/* La columna sigue midiendo max-w-lg, pero el crema ya no vive solo
+        dentro de ella: en cualquier ventana más ancha que 512 px — un
+        navegador con el zoom por debajo del 100 %, una tablet, la vista de
+        escritorio — el menú se veía como una tarjeta suelta flotando sobre
+        una página blanca. */}
     <div className={`${displayFont.variable} relative mx-auto max-w-lg pb-8`} style={{ background: PANEL, color: INK }}>
       {/* El fondo liso se sentía genérico. La textura es el MISMO motivo que
           el dueño ya eligió para su marca — tacos, mariscos, café — así que
@@ -721,6 +727,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         </div>
       )}
       </div>
+    </div>
     </div>
   )
 }

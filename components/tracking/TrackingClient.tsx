@@ -337,15 +337,21 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
 
   return (
     <BrandProvider brandColor={business?.brand_color ?? null}>
-      <div className={`${displayFont.variable} mx-auto max-w-lg pb-8`} style={{ background: "#FFFDF9", color: INK, minHeight: "100vh" }}>
+      {/* El crema y la banda de marca van al ancho completo de la pantalla; lo
+          que se limita a max-w-lg es el CONTENIDO. Si el color viviera solo
+          dentro de la columna, cualquier ventana más ancha que 512 px — un
+          navegador con el zoom por debajo del 100 %, una tablet, la vista de
+          escritorio — dejaría el encabezado flotando en medio de una página
+          blanca, como una tarjeta suelta. */}
+      <div className={`${displayFont.variable} pb-8`} style={{ background: "#FFFDF9", color: INK, minHeight: "100vh" }}>
         <header
-          className="flex items-center gap-3 px-4 py-3.5"
           style={
             business?.header_style === "black"
               ? { background: "#0A0A0A", color: "#fff" }
               : { background: "var(--brand-primary)", color: "var(--brand-on-primary)" }
           }
         >
+          <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-3.5">
           {business?.logo_url ? (
             // Mismo criterio que MenuClient: montado directo sobre el header,
             // sin placa — adopta el fondo (color de marca o negro).
@@ -380,9 +386,10 @@ export function TrackingClient({ initial }: { initial: OrderWithItems }) {
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: estadoPill.color }} />
             {estadoPill.texto}
           </div>
+          </div>
         </header>
 
-        <div className="px-4 pt-5">
+        <div className="mx-auto max-w-lg px-4 pt-5">
           <div className="pb-4 text-center">
             <div className="text-xs font-bold uppercase tracking-wide" style={{ color: INK_SOFT }}>
               {t.tracking.yourNumber}
