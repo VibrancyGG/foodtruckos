@@ -963,6 +963,24 @@ export type Dictionary = {
     stat3Label: string
     showcaseHint: string
     navEnter: string
+    navScan: string
+    scanEyebrow: string
+    scanTitle: string
+    scanSub: string
+    scanStep1Title: string
+    scanStep1Body: string
+    scanStep2Title: string
+    scanStep2Body: string
+    scanStep3Title: string
+    scanStep3Body: string
+    scanPhoneOpen: string
+    scanDish1: string
+    scanDish1Note: string
+    scanDish2: string
+    scanDish2Note: string
+    scanCustomChip: string
+    scanPhoneCta: string
+    scanCaption: string
     printEyebrow: string
     printTitle: string
     printSub: string
@@ -970,8 +988,7 @@ export type Dictionary = {
     printWhy1Body: string
     printWhy2Title: string
     printWhy2Body: string
-    printWhy3Title: string
-    printWhy3Body: string
+    printCompat: string
     printChoice: string
     ticketTruck: string
     ticketOrder: string
@@ -1995,13 +2012,13 @@ export const dictionary: Record<Lang, Dictionary> = {
       heroEyebrow: "Cocina en vivo, pedido por QR, cero comisión",
       heroTitleLine1: "Tu food truck,",
       heroTitleAccent: "iluminado de verdad",
-      heroSub: "El comensal escanea, ordena desde su celular con tu marca — no la nuestra — y el pedido aparece al instante en tu cocina. Sin apps, sin comisión por pedido, sin curva de aprendizaje.",
+      heroSub: "El comensal escanea, ordena desde su celular con tu marca — no la nuestra — y el pedido aparece al instante en tu cocina. Tu cliente no instala nada, no pagas comisión por pedido, y no hay nada que aprender.",
       heroCtaPrimary: "Empieza tu prueba gratis",
       heroCtaSecondary: "Ver cómo funciona",
-      heroMeta: "Sin tarjeta para empezar · Cancela cuando quieras",
+      heroMeta: "Sin tarjeta de crédito para empezar · Cancela cuando quieras",
       showcaseEyebrow: "Así se ve tu cocina",
       showcaseTitle: "Cada orden, en tiempo real",
-      showcaseSub: "Mueve el mouse sobre el panel — así reacciona tu pantalla de cocina en cada turno.",
+      showcaseSub: "Así se mueve tu pantalla de cocina en cada turno: la orden entra, avanza y sale.",
       boardTitle: "Cocina — en vivo",
       boardLive: "EN VIVO",
       order1Name: "2× Torta de asada",
@@ -2018,6 +2035,24 @@ export const dictionary: Record<Lang, Dictionary> = {
       stat3Label: "Venta hoy",
       showcaseHint: "Avanzar una orden toma un solo toque — hecho para manos ocupadas en hora pico.",
       navEnter: "Entrar",
+      navScan: "Cómo pide tu cliente",
+      scanEyebrow: "Así ordena tu cliente",
+      scanTitle: "Escanea, ve tu menú y ordena. Nada que instalar.",
+      scanSub: "Tu menú digital vive detrás de un código. Se actualiza cuando tú quieras y tu cliente lo abre en el celular que ya trae en la mano.",
+      scanStep1Title: "Escanea el código",
+      scanStep1Body: "Está pegado en la ventanilla, en la mesa o en tu volante. Se abre en el navegador — no hay app que bajar ni cuenta que crear.",
+      scanStep2Title: "Ve tu menú, con tu marca",
+      scanStep2Body: "Tus fotos, tus precios, tu logo y tu color. Lo que está agotado no aparece, así que nadie pide lo que no hay.",
+      scanStep3Title: "Ordena desde su celular",
+      scanStep3Body: "Elige, personaliza su platillo y manda el pedido. Después sigue en la misma pantalla cómo va, hasta que está listo.",
+      scanPhoneOpen: "Abierto",
+      scanDish1: "Taco al pastor",
+      scanDish1Note: "Con piña, cebolla y cilantro",
+      scanDish2: "Quesabirria",
+      scanDish2Note: "Con consomé",
+      scanCustomChip: "Personalizable",
+      scanPhoneCta: "Ordenar · $60.00",
+      scanCaption: "El mismo menú que ve tu cliente, con tu marca — no la nuestra.",
       printEyebrow: "Comanda impresa",
       printTitle: "El riel de tickets es la cola de tu cocina",
       printSub: "No es un extra: es como trabaja el gremio. Conecta una impresora Bluetooth a la tablet y cada pedido — por QR o de ventanilla — sale en papel al instante.",
@@ -2025,8 +2060,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       printWhy1Body: "Cada quien toma el suyo del riel y avanzan en paralelo. Una pantalla con tres columnas no replica eso.",
       printWhy2Title: "Manos ocupadas, papel limpio",
       printWhy2Body: "Se lee sin tocar nada. Nadie despega la mano de la plancha para deslizar una pantalla grasosa.",
-      printWhy3Title: "Sin señal, igual imprime",
-      printWhy3Body: "La impresora cuelga de la tablet por Bluetooth, no de internet. El pedido de ventanilla sale aunque el truck se quede sin datos.",
+      printCompat: "No todas las tablets ni todas las impresoras térmicas sirven. Antes de comprar, pregúntanos cuáles son los equipos compatibles — te pasamos la lista.",
       printChoice: "Tú eliges: la comanda en papel, o todo en pantalla como hasta ahora. Se enciende y se apaga cuando quieras.",
       ticketTruck: "TRUCK CENTRO",
       ticketOrder: "ORDEN",
@@ -2044,7 +2078,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       benefit1Title: "Tu negocio, en vivo",
       benefit1Body: "Abre el panel y mira, al instante, cuánto vendes, qué se agota y cómo va cada truck — sin esperar al cierre del día.",
       benefit2Title: "Tus clientes ordenan en segundos",
-      benefit2Body: "Escanean un código y piden desde su propio celular. Sin apps que instalar, sin filas, sin clientes que se cansan de esperar.",
+      benefit2Body: "Escanean un código y piden desde su propio celular. Nada que instalar, sin filas, sin clientes que se cansan de esperar.",
       benefit3Title: "Cero comisión, cero letra chica",
       benefit3Body: "Nunca cobramos por pedido ni te atamos a un contrato. Pagas tu mensualidad y el 100% de cada venta es tuyo.",
       benefit4Title: "Tu negocio en la palma de tu mano",
@@ -2066,7 +2100,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       priceNote: "por truck",
       pricePer: "/mes",
       ctaTitle: "Tu food truck, en línea en minutos",
-      ctaSub: "Crea tu cuenta gratis y tu truck queda listo para recibir pedidos hoy mismo. Sin tarjeta, sin instalación, sin compromiso.",
+      ctaSub: "Crea tu cuenta gratis y tu truck queda listo para recibir pedidos hoy mismo. Sin tarjeta de crédito y sin compromiso.",
       footerCredit: "Desarrollado por Vibrancy GG. Todos los derechos reservados.",
     },
   },
@@ -3045,13 +3079,13 @@ export const dictionary: Record<Lang, Dictionary> = {
       heroEyebrow: "Live kitchen screen, QR ordering, zero commission",
       heroTitleLine1: "Your food truck,",
       heroTitleAccent: "truly lit up",
-      heroSub: "Diners scan a code and order from their own phone — under your brand, not ours — and the order shows up instantly on your kitchen screen. No apps, no commission, no learning curve.",
+      heroSub: "Diners scan a code and order from their own phone — under your brand, not ours — and the order shows up instantly on your kitchen screen. Nothing for them to install, no commission, nothing to learn.",
       heroCtaPrimary: "Start your free trial",
       heroCtaSecondary: "See how it works",
-      heroMeta: "No card to start · Cancel anytime",
+      heroMeta: "No credit card to start · Cancel anytime",
       showcaseEyebrow: "This is your kitchen",
       showcaseTitle: "Every order, in real time",
-      showcaseSub: "Move your mouse over the panel — this is how your kitchen screen reacts on every shift.",
+      showcaseSub: "This is how your kitchen screen moves on every shift: the order lands, advances and goes out.",
       boardTitle: "Kitchen — live",
       boardLive: "LIVE",
       order1Name: "2× Carne asada torta",
@@ -3068,6 +3102,24 @@ export const dictionary: Record<Lang, Dictionary> = {
       stat3Label: "Sales today",
       showcaseHint: "Moving an order forward takes one tap — built for busy hands at rush hour.",
       navEnter: "Sign in",
+      navScan: "How they order",
+      scanEyebrow: "How your customer orders",
+      scanTitle: "Scan, see your menu, order. Nothing to install.",
+      scanSub: "Your digital menu lives behind a code. You update it whenever you like, and your customer opens it on the phone already in their hand.",
+      scanStep1Title: "Scan the code",
+      scanStep1Body: "It sits on the window, the table or your flyer. It opens in the browser — no app to download, no account to create.",
+      scanStep2Title: "See your menu, your brand",
+      scanStep2Body: "Your photos, your prices, your logo and your colour. Whatever sold out is gone, so nobody orders what you don't have.",
+      scanStep3Title: "Order from their phone",
+      scanStep3Body: "They pick, customise the dish and send it. Then they follow it on the same screen until it's ready.",
+      scanPhoneOpen: "Open",
+      scanDish1: "Taco al pastor",
+      scanDish1Note: "Pineapple, onion and cilantro",
+      scanDish2: "Quesabirria",
+      scanDish2Note: "With consommé",
+      scanCustomChip: "Customisable",
+      scanPhoneCta: "Order · $60.00",
+      scanCaption: "The same menu your customer sees, with your brand — not ours.",
       printEyebrow: "Printed tickets",
       printTitle: "The ticket rail is your kitchen's queue",
       printSub: "Not an extra — it is how the trade works. Pair a Bluetooth printer with the tablet and every order, by QR or at the counter, comes out on paper right away.",
@@ -3075,8 +3127,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       printWhy1Body: "Each one takes their own off the rail and they work in parallel. A screen with three columns cannot do that.",
       printWhy2Title: "Busy hands, clean paper",
       printWhy2Body: "You read it without touching anything. Nobody lifts a hand off the griddle to swipe a greasy screen.",
-      printWhy3Title: "No signal, still prints",
-      printWhy3Body: "The printer hangs off the tablet over Bluetooth, not off the internet. A counter order prints even when the truck loses data.",
+      printCompat: "Not every tablet and not every thermal printer will work. Before you buy, ask us which gear is compatible — we'll send you the list.",
       printChoice: "Your call: the ticket on paper, or everything on screen the way it works today. Turn it on and off whenever you like.",
       ticketTruck: "CENTRO TRUCK",
       ticketOrder: "ORDER",
@@ -3094,7 +3145,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       benefit1Title: "Your business, live",
       benefit1Body: "Open the panel and see, instantly, how much you're selling, what's running out, and how each truck is doing — no waiting for closing time.",
       benefit2Title: "Your customers order in seconds",
-      benefit2Body: "They scan a code and order from their own phone. No apps to install, no lines, no customers who give up waiting.",
+      benefit2Body: "They scan a code and order from their own phone. Nothing to install, no lines, no customers who give up waiting.",
       benefit3Title: "Zero commission, zero fine print",
       benefit3Body: "We never charge per order, and there's no contract locking you in. You pay a flat monthly fee and keep 100% of every sale.",
       benefit4Title: "Your business in the palm of your hand",
@@ -3116,7 +3167,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       priceNote: "per truck",
       pricePer: "/mo",
       ctaTitle: "Your food truck, online in minutes",
-      ctaSub: "Create your free account and your truck is ready to take orders today. No card, no install, no commitment.",
+      ctaSub: "Create your free account and your truck is ready to take orders today. No credit card and no commitment.",
       footerCredit: "Built by Vibrancy GG. All rights reserved.",
     },
   },

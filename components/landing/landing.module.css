@@ -867,3 +867,177 @@
     display: none;
   }
 }
+
+/* ---------- Cómo pide el comensal ----------
+   La página cuenta el recorrido con el objeto real de cada etapa: el teléfono
+   con el menú, el tablero de cocina, y el ticket de papel. Aquí toca el
+   teléfono, y es el mismo menú que ve el comensal — mismas filas de platillo,
+   mismo distintivo de personalizable, misma barra de pedir. */
+.scanGrid {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: clamp(32px, 6vw, 72px);
+  align-items: start;
+}
+
+.phoneCol { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+.phone {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 34px;
+  padding: 10px;
+  background: #16120f;
+  border: 1px solid rgba(251, 243, 231, 0.16);
+  box-shadow: 0 30px 70px -26px rgba(0, 0, 0, 0.9);
+}
+
+.phoneScreen {
+  border-radius: 26px;
+  overflow: hidden;
+  background: #fffdf9;
+  color: #1a1512;
+}
+
+.phoneTop {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 14px;
+  background: var(--brand);
+  color: #fff;
+}
+.phoneLogo {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.phoneName { font-size: 12.5px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; }
+.phoneOpen {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  background: rgba(0, 0, 0, 0.24);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.phoneOpen i { width: 5px; height: 5px; border-radius: 50%; background: #4ade80; display: block; }
+
+.phoneList { padding: 12px; display: grid; gap: 10px; }
+
+.dish {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #e4dcd0;
+  border-radius: 13px;
+  padding: 9px;
+  background: #fff;
+}
+.dishPhoto {
+  width: 46px;
+  height: 46px;
+  border-radius: 9px;
+  flex: none;
+  background: linear-gradient(135deg, #d9c9a8, #b98d5a);
+}
+.dish:nth-child(2) .dishPhoto { background: linear-gradient(135deg, #e0a97a, #a4522b); }
+.dishBody { min-width: 0; flex: 1; }
+.dishName { font-size: 12.5px; font-weight: 800; line-height: 1.25; }
+.dishNote { font-size: 10.5px; color: #6b615a; line-height: 1.35; margin-top: 1px; }
+.dishPrice { font-size: 12.5px; font-weight: 800; flex: none; }
+
+/* El mismo distintivo que lleva el platillo personalizable en el menú real. */
+.dishChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #14603c;
+  background: #e4f3ea;
+  border: 1px solid #bfe3ce;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+.dishChip i { width: 4px; height: 4px; border-radius: 50%; background: #14603c; display: block; }
+
+.phoneBar {
+  margin: 2px 12px 12px;
+  border-radius: 11px;
+  background: var(--brand);
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 11px;
+}
+
+.phoneCaption {
+  max-width: 280px;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--inkSoft);
+}
+
+/* Los pasos van numerados porque de verdad son una secuencia: escanear,
+   ver, ordenar. No es adorno — el orden es la información. */
+.scanSteps { display: grid; gap: 24px; }
+.scanStep { display: flex; gap: 16px; align-items: flex-start; }
+.scanStep .n {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-landing-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.scanStep h3 { font-size: 1rem; font-weight: 700; margin-bottom: 5px; }
+.scanStep p { font-size: 0.92rem; line-height: 1.6; color: var(--inkSoft); }
+
+@media (max-width: 860px) {
+  .scanGrid { grid-template-columns: 1fr; }
+  .phoneCol { margin-bottom: 8px; }
+}
+
+/* Letra chica, pero no escondida: no todas las tablets ni todas las impresoras
+   sirven, y es mejor que lo lea antes de comprar que después. */
+.printCompat {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--inkFaint, var(--inkSoft));
+  opacity: 0.75;
+}
+
+/* El cambio de estado se nota sin ser un espectáculo: entra desde abajo con un
+   parpadeo corto, como cuando cocina toca la tarjeta. */
+@keyframes badgeSwap {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.badgeSwap { animation: badgeSwap 0.34s cubic-bezier(0.16, 1, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .badgeSwap { animation: none; }
+}

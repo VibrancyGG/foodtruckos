@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { displayFont, landingMonoFont } from "@/lib/fonts"
@@ -62,6 +62,46 @@ function Ticket({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
   )
 }
 
+function PhoneMenu({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
+  return (
+    <div className={styles.phone} aria-label={l.scanCaption}>
+      <div className={styles.phoneScreen}>
+        <div className={styles.phoneTop}>
+          <div className={styles.phoneLogo}>TC</div>
+          <div>
+            <div className={styles.phoneName}>{l.ticketTruck}</div>
+          </div>
+          <span className={styles.phoneOpen}>
+            <i /> {l.scanPhoneOpen}
+          </span>
+        </div>
+        <div className={styles.phoneList}>
+          <div className={styles.dish}>
+            <div className={styles.dishPhoto} />
+            <div className={styles.dishBody}>
+              <div className={styles.dishName}>{l.scanDish1}</div>
+              <div className={styles.dishNote}>{l.scanDish1Note}</div>
+              <span className={styles.dishChip}>
+                <i /> {l.scanCustomChip}
+              </span>
+            </div>
+            <div className={styles.dishPrice}>$22.00</div>
+          </div>
+          <div className={styles.dish}>
+            <div className={styles.dishPhoto} />
+            <div className={styles.dishBody}>
+              <div className={styles.dishName}>{l.scanDish2}</div>
+              <div className={styles.dishNote}>{l.scanDish2Note}</div>
+            </div>
+            <div className={styles.dishPrice}>$38.00</div>
+          </div>
+        </div>
+        <div className={styles.phoneBar}>{l.scanPhoneCta}</div>
+      </div>
+    </div>
+  )
+}
+
 const ORDER_IDS = ["#0148", "#0147", "#0146"] as const
 const BADGE_CLASS = [styles.badgeNew, styles.badgeWarn, styles.badgeReady]
 
@@ -85,6 +125,17 @@ export function LandingPage() {
   const boardRef = useRef<HTMLDivElement>(null)
   const showcaseRef = useRef<HTMLElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
+
+  // El tablero se movía solo al pasar el mouse por encima — o sea, en ningún
+  // celular, que es donde va a verse la mitad de las veces. Ahora las órdenes
+  // avanzan solas: cada una toma el estado de la siguiente, igual que en un
+  // turno real, y eso se ve igual con dedo que con mouse.
+  const [turno, setTurno] = useState(0)
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    const id = setInterval(() => setTurno((v) => v + 1), 2800)
+    return () => clearInterval(id)
+  }, [])
 
   // Revelado al hacer scroll: consistente en todas las secciones para que
   // ninguna "pierda fuerza" bajando la página, no solo el hero.
@@ -197,8 +248,8 @@ export function LandingPage() {
             FoodTruck<span style={{ color: "var(--brand)" }}>OS</span>
           </div>
           <nav className={styles.nav}>
+            <a href="#pedir">{l.navScan}</a>
             <a href="#escaparate">{l.navProduct}</a>
-            <a href="#beneficios">{l.navBenefits}</a>
             <a href="#comanda">{l.printEyebrow}</a>
             <a href="#precios">{l.navPricing}</a>
           </nav>
@@ -251,6 +302,39 @@ export function LandingPage() {
           <p className={styles.heroMeta}>{l.heroMeta}</p>
         </section>
 
+        <section id="pedir" className={styles.section}>
+          <div className={`${styles.sectionHead} ${styles.reveal}`}>
+            <div className={styles.sectionEyebrow} style={{ fontFamily: "var(--font-landing-mono)" }}>
+              {l.scanEyebrow}
+            </div>
+            <h2 className={styles.sectionTitle}>{l.scanTitle}</h2>
+            <p className={styles.sectionSub}>{l.scanSub}</p>
+          </div>
+
+          <div className={`${styles.scanGrid} ${styles.reveal}`}>
+            <div className={styles.phoneCol}>
+              <PhoneMenu l={l} />
+              <p className={styles.phoneCaption}>{l.scanCaption}</p>
+            </div>
+
+            <div className={styles.scanSteps}>
+              {[
+                { t: l.scanStep1Title, b: l.scanStep1Body },
+                { t: l.scanStep2Title, b: l.scanStep2Body },
+                { t: l.scanStep3Title, b: l.scanStep3Body },
+              ].map((paso, i) => (
+                <div key={i} className={styles.scanStep}>
+                  <span className={styles.n}>{i + 1}</span>
+                  <div>
+                    <h3>{paso.t}</h3>
+                    <p>{paso.b}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section ref={showcaseRef} id="escaparate" className={`${styles.section} ${styles.showcase}`}>
           <div className={`${styles.sectionHead} ${styles.reveal}`}>
             <div className={styles.sectionEyebrow} style={{ fontFamily: "var(--font-landing-mono)" }}>
@@ -276,9 +360,18 @@ export function LandingPage() {
                     <div className={styles.orderName}>{o.name}</div>
                     <div className={styles.orderItems}>{o.items}</div>
                   </div>
-                  <span className={`${styles.badge} ${BADGE_CLASS[i]}`} style={{ fontFamily: "var(--font-landing-mono)" }}>
-                    {o.badge}
-                  </span>
+                  {(() => {
+                    const paso = (i + turno) % orders.length
+                    return (
+                      <span
+                        key={paso}
+                        className={`${styles.badge} ${BADGE_CLASS[paso]} ${styles.badgeSwap}`}
+                        style={{ fontFamily: "var(--font-landing-mono)" }}
+                      >
+                        {orders[paso].badge}
+                      </span>
+                    )
+                  })()}
                 </div>
               ))}
               <div className={styles.boardStats}>
@@ -316,7 +409,6 @@ export function LandingPage() {
                 {[
                   { t: l.printWhy1Title, b: l.printWhy1Body },
                   { t: l.printWhy2Title, b: l.printWhy2Body },
-                  { t: l.printWhy3Title, b: l.printWhy3Body },
                 ].map((w, i) => (
                   <div key={i}>
                     <h3>{w.t}</h3>
@@ -329,6 +421,7 @@ export function LandingPage() {
                   aquí es que la opción existe — qué equipo hace falta y cuánto
                   cuesta es conversación de venta, no de landing. */}
               <p className={styles.printNote}>{l.printChoice}</p>
+              <p className={styles.printCompat}>{l.printCompat}</p>
             </div>
           </div>
         </section>
