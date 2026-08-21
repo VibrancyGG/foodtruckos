@@ -787,6 +787,11 @@ export type Dictionary = {
     reactivateAsPaid: string
     cancel: string
     suspend: string
+    recoveryButton: string
+    recoveryHint: string
+    recoveryConfirm: string
+    recoverySend: string
+    recoverySent: (email: string) => string
     statusTrial: string
     statusActive: string
     statusSuspended: string
@@ -1814,6 +1819,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       reactivateAsPaid: "De pago",
       cancel: "Cancelar",
       suspend: "Suspender",
+      recoveryButton: "Mandar enlace de contraseña",
+      recoveryHint: "Le manda al dueño el mismo correo de \"olvidé mi contraseña\". Él elige la contraseña; nosotros nunca la vemos.",
+      recoveryConfirm: "¿Mandar el enlace al dueño?",
+      recoverySend: "Mandar",
+      recoverySent: (email) => `Enlace mandado a ${email}`,
       statusTrial: "Periodo de prueba",
       statusActive: "Activa",
       statusSuspended: "Suspendida",
@@ -2838,6 +2848,11 @@ export const dictionary: Record<Lang, Dictionary> = {
       reactivateAsPaid: "Paid",
       cancel: "Cancel",
       suspend: "Suspend",
+      recoveryButton: "Send password link",
+      recoveryHint: "Sends the owner the same \"forgot my password\" email. They pick the password; we never see it.",
+      recoveryConfirm: "Send the link to the owner?",
+      recoverySend: "Send",
+      recoverySent: (email) => `Link sent to ${email}`,
       statusTrial: "Trial",
       statusActive: "Active",
       statusSuspended: "Suspended",

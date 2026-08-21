@@ -1178,6 +1178,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_owner_email: { Args: { p_business_id: string }; Returns: string }
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }
       log_admin_action: {

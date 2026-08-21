@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { getAdminContext } from "@/lib/auth/getAdminContext"
 import { trialEndsFromNow } from "@/lib/billing/trial"
 
@@ -120,4 +121,49 @@ export async function setTrialEnd(businessId: string, endsAt: string | null): Pr
   })
   revalidatePath("/admin")
   return { ok: true }
+}
+
+// Desbloquear a un dueño que no puede entrar, SIN conocer su contraseña.
+//
+// La tentación es un campo "contraseña nueva" en el admin. No se hace: quien
+// pone la contraseña puede entrar como el dueño — cambiar precios, marcar
+// pedidos pagados, ver ventas — y el día que el cliente diga "yo no cambié
+// eso" no habría forma de distinguir quién fue. Aquí solo se dispara el mismo
+// correo que el dueño se manda a sí mismo desde "olvidé mi contraseña"; él
+// elige la contraseña y nadie de VibrancyGG la ve.
+//
+// Queda registrado en la bitácora (Regla 5), que es justo lo que un cambio
+// directo de contraseña NO dejaría.
+export async function sendOwnerRecovery(businessId: string): Promise<Result & { email?: string }> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+  // auth.users no se expone por la API; la función es SECURITY DEFINER y
+  // vuelve a comprobar platform_admin del lado de la base.
+  const { data: email, error: fallo } = await supabase.rpc("admin_owner_email", { p_business_id: businessId })
+  if (fallo || !email) return { ok: false, error: "Ese negocio no tiene un dueño con correo registrado" }
+
+  // Cliente sin sesión: mandar el enlace no debe depender de quién está
+  // conectado, y no queremos que la sesión del admin toque este camino.
+  const publico = createPublicClient()
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "https://foodtruckos.vercel.app"
+  const { error: envio } = await publico.auth.resetPasswordForEmail(email, {
+    redirectTo: `${site}/auth/callback?next=/auth/reset-password`,
+  })
+  if (envio) {
+    // El 429 es el caso frecuente: alguien ya lo pidió hace un momento.
+    if (envio.status === 429) {
+      return { ok: false, error: "Ya se mandó uno hace poco. Espera un minuto antes de volver a intentarlo." }
+    }
+    return { ok: false, error: "No se pudo mandar el enlace" }
+  }
+
+  await supabase.rpc("log_admin_action", {
+    p_business_id: businessId,
+    p_action: "owner_recovery_sent",
+    p_entity_type: "business",
+    p_entity_id: businessId,
+  })
+  return { ok: true, email }
 }

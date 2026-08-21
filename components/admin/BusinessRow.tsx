@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { suspendBusiness, reactivateBusiness, setTrialEnd } from "@/lib/admin/actions"
+import { suspendBusiness, reactivateBusiness, setTrialEnd, sendOwnerRecovery } from "@/lib/admin/actions"
 import { getTrialInfo } from "@/lib/billing/trial"
 import { startImpersonation } from "@/lib/admin/impersonate"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -26,6 +26,8 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
   const [pending, startTransition] = useTransition()
   const [eligiendoVuelta, setEligiendoVuelta] = useState(false)
   const [editandoFecha, setEditandoFecha] = useState(false)
+  const [confirmandoEnlace, setConfirmandoEnlace] = useState(false)
+  const [resultadoEnlace, setResultadoEnlace] = useState<string | null>(null)
 
   // Sin fecha no hay vencimiento: es un estado válido, no un dato faltante.
   const trial = getTrialInfo(business.subscription_status, business.trial_ends_at)
@@ -142,6 +144,45 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
               {a.suspend}
             </button>
           )}
+
+          {/* Manda el mismo correo que el dueño se manda a sí mismo. Se
+              pregunta antes porque es una acción que sale del producto: le
+              llega un correo a una persona real. */}
+          {confirmandoEnlace ? (
+            <span className="flex items-center gap-1.5">
+              <span className="text-xs text-neutral-400">{a.recoveryConfirm}</span>
+              <button
+                disabled={pending}
+                onClick={() =>
+                  startTransition(async () => {
+                    const r = await sendOwnerRecovery(business.id)
+                    setConfirmandoEnlace(false)
+                    setResultadoEnlace(r.ok ? a.recoverySent(r.email ?? "") : r.error)
+                  })
+                }
+                className="rounded-lg border border-blue-800 px-2.5 py-1 text-xs font-bold text-blue-300"
+              >
+                {a.recoverySend}
+              </button>
+              <button onClick={() => setConfirmandoEnlace(false)} className="px-1 text-xs text-neutral-500">
+                {a.cancel}
+              </button>
+            </span>
+          ) : (
+            <button
+              disabled={pending}
+              onClick={() => {
+                setResultadoEnlace(null)
+                setConfirmandoEnlace(true)
+              }}
+              title={a.recoveryHint}
+              className="rounded-lg border border-neutral-700 px-2.5 py-1 text-xs font-bold text-neutral-300 hover:border-blue-800 hover:text-blue-300"
+            >
+              {a.recoveryButton}
+            </button>
+          )}
+
+          {resultadoEnlace && <span className="text-xs font-semibold text-neutral-400">{resultadoEnlace}</span>}
         </div>
       </td>
     </tr>

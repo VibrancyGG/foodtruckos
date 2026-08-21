@@ -114,6 +114,20 @@ Si alguien propone un token para la impresora, o un endpoint que la impresora co
 
 ---
 
+## Nadie de VibrancyGG conoce la contraseña de un dueño
+
+El admin interno **no puede cambiar contraseñas**, y no es un hueco: es la decisión.
+
+Quien pone la contraseña puede entrar como el dueño — cambiar precios, marcar pedidos como pagados, ver ventas — y el día que el cliente diga *"yo no cambié eso"* no habría forma de distinguir quién fue. Es un problema de confianza con el cliente, no de código.
+
+Lo que sí existe, para el caso real de soporte ("el dueño no puede entrar y llamó"), es **Mandar enlace de contraseña** en la fila del negocio: dispara el mismo correo que el dueño se manda a sí mismo desde "olvidé mi contraseña". El admin desbloquea la situación, la contraseña la elige el dueño, y queda registrado en la bitácora (Regla 5 de datos) — que es justo lo que un cambio directo NO dejaría.
+
+Si el dueño perdió el acceso al buzón, el paso es **cambiarle el correo de la cuenta** tras verificar quién es, y que él haga la recuperación al nuevo. Sigue sin que nadie conozca su contraseña.
+
+`auth.users` no se expone por la API. La única puerta a esos correos es `admin_owner_email(business_id)`, y es estrecha a propósito: devuelve un solo correo, de un solo negocio, con **dos capas** — `execute` concedido solo a `authenticated`, y `is_platform_admin()` comprobado otra vez dentro de la función. Comprobado que con la llave anónima devuelve `permission denied`.
+
+**Nunca** se agrega una función que fije la contraseña de otro usuario.
+
 ## Antes de dar por terminado cualquier trabajo de accesos
 
 1. ¿El dueño puede resolver este caso sin llamarnos?
@@ -122,3 +136,4 @@ Si alguien propone un token para la impresora, o un endpoint que la impresora co
 4. ¿Se está pidiendo alguna cuenta o registro al comensal? (nunca debe ser así)
 5. ¿El lenguaje en pantalla evita sugerir control de asistencia?
 6. ¿Le estoy dando identidad propia a un accesorio que debería colgar de un dispositivo ya emparejado?
+7. ¿Estoy dándole a alguien la capacidad de fijar la contraseña de otro, en vez de mandarle un enlace para que la elija él?
