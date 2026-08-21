@@ -73,6 +73,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
   const [sendError, setSendError] = useState<string | null>(null)
   const [staleReload, setStaleReload] = useState(false)
   const [cartCleared, setCartCleared] = useState(false)
+  const [soldOutMsg, setSoldOutMsg] = useState<string | null>(null)
   const [customizing, setCustomizing] = useState<(typeof data.products)[number] | null>(null)
   const [hydrated, setHydrated] = useState(false)
 
@@ -288,6 +289,23 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
         setSendError(null)
         return
       }
+      // Se acabó algo mientras tenía el menú abierto. No se vacía el carrito
+      // entero como en badCart: lo demás sigue siendo perfectamente pedible, y
+      // borrarle todo por un platillo lo manda a empezar de cero. Se quita solo
+      // lo que ya no hay y se le dice cuál era, por su nombre.
+      if (result.error === "soldOut" && result.soldOutItems?.length) {
+        const fuera = new Set(result.soldOutItems)
+        setCart((lineas) => lineas.filter((l) => !fuera.has(l.productName)))
+        // Fuera de la barra del carrito, por lo mismo que badCart: si lo
+        // agotado era lo único que llevaba, la barra se va y el mensaje se
+        // iría con ella. El comensal vería su pedido esfumarse sin explicación.
+        setSoldOutMsg(t.menu.soldOutNow(result.soldOutItems.join(", ")))
+        setSendError(null)
+        // El menú se recarga para que esos platillos se vean marcados como
+        // agotados: si no, siguen ofreciéndose y los vuelve a agregar.
+        router.refresh()
+        return
+      }
       // El servidor manda un código (truck cerrado, en pausa, suspendido,
       // etc.), nunca el texto — mostrar siempre el mismo mensaje genérico
       // aquí escondía el motivo real, y un texto fijo en español no habría
@@ -472,6 +490,15 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
           )
         })}
       </nav>
+
+      {soldOutMsg && (
+        <div className="mx-4 mt-4 rounded-xl border-2 px-4 py-3 text-sm font-semibold" style={{ background: "#FDF3E0", borderColor: "#F0D9A8", color: "#6B4A12" }}>
+          {soldOutMsg}
+          <button onClick={() => setSoldOutMsg(null)} className="mt-1.5 block font-bold underline">
+            {t.menu.cancel}
+          </button>
+        </div>
+      )}
 
       {cartCleared && (
         <div className="mx-4 mt-4 rounded-xl border-2 px-4 py-3 text-sm font-semibold" style={{ background: "#FDF3E0", borderColor: "#F0D9A8", color: "#6B4A12" }}>

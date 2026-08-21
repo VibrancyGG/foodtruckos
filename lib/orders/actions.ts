@@ -20,7 +20,7 @@ export type CartItemInput = {
 // cliente con el diccionario bilingüe (t.menu.orderError.*), según el idioma
 // que tenga activo en ese momento — el servidor no sabe en qué idioma está
 // viendo la pantalla quien pidió.
-export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed" | "badCart"
+export type CreateOrderErrorCode = "emptyCart" | "verifyFailed" | "unavailable" | "paused" | "closed" | "sendFailed" | "badCart" | "soldOut"
 
 // Un pedido que no se pudo guardar es una venta perdida que NADIE ve: el
 // comensal se va, el dueño no se entera, y nosotros tampoco. Un truck podría
@@ -73,7 +73,7 @@ export async function createOrder(input: {
   taxIncluded: boolean
   customerName?: string
   items: CartItemInput[]
-}): Promise<{ orderId: string; folio: number } | { error: CreateOrderErrorCode }> {
+}): Promise<{ orderId: string; folio: number } | { error: CreateOrderErrorCode; soldOutItems?: string[] }> {
   if (input.items.length === 0) {
     return { error: "emptyCart" }
   }
@@ -114,6 +114,44 @@ export async function createOrder(input: {
   const openStatus = isOpenNow(parseWeeklyHours(unit.hours), business.timezone)
   if (!openStatus.open) {
     return { error: "closed" }
+  }
+
+  // La misma desconfianza, ahora por platillo. La pantalla del comensal es una
+  // foto del momento en que cargó: no escucha cambios, y su carrito sobrevive
+  // en el celular entre visitas. Así que alguien puede tener abierto un menú de
+  // ayer, o restaurar el carrito de ayer, y mandar algo que el dueño ya marcó
+  // agotado. Antes entraba, y a la cocina le llegaba una comanda de algo que no
+  // podían hacer.
+  //
+  // Mismo criterio que el menú (getMenuData): sin fila en unit_products el
+  // platillo se considera ofrecido y disponible — la fila solo existe cuando
+  // alguien tocó algo.
+  const { data: disponibilidad, error: errorDisponibilidad } = await supabase
+    .from("unit_products")
+    .select("product_id, is_offered, sold_out")
+    .eq("unit_id", input.unitId)
+    .in("product_id", input.items.map((i) => i.productId))
+
+  if (errorDisponibilidad) {
+    console.error("[createOrder] no se pudo comprobar disponibilidad", errorDisponibilidad)
+    avisarPedidoFallido({ codigo: "verifyFailed", negocio: business.name, truck: unit.name, businessId: input.businessId, detalle: "fallo al leer unit_products" })
+    return { error: "verifyFailed" }
+  }
+
+  const noDisponibles = input.items
+    .filter((item) => {
+      const fila = (disponibilidad ?? []).find((d) => d.product_id === item.productId)
+      if (!fila) return false
+      return fila.sold_out === true || fila.is_offered === false
+    })
+    // El nombre va tal como el comensal lo tiene en su carrito, en su idioma:
+    // decirle "se acabó el #a3f2-…" no le sirve de nada.
+    .map((item) => item.productName)
+
+  if (noDisponibles.length > 0) {
+    // No alarma por correo: que se acabe un platillo es la operación normal de
+    // un truck, no una falla nuestra.
+    return { error: "soldOut", soldOutItems: noDisponibles }
   }
 
   // El precio de línea se recalcula aquí, del lado del servidor, a partir de lo

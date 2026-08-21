@@ -10,6 +10,7 @@ export type Dictionary = {
     tax: string
     total: string
     soldOut: string
+    soldOutNow: (platillos: string) => string
     customizable: string
     sending: string
     sendError: string
@@ -21,6 +22,7 @@ export type Dictionary = {
       closed: string
       sendFailed: string
       badCart: string
+      soldOut: string
     }
     updatedReloading: string
     retry: string
@@ -1054,6 +1056,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       tax: "Impuesto",
       total: "Total",
       soldOut: "Se acabó",
+      soldOutNow: (platillos) => `Se acabó ${platillos}. Lo quitamos de tu pedido — puedes mandar el resto.`,
       customizable: "Personalizable",
       sending: "Enviando tu pedido…",
       sendError: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
@@ -1065,6 +1068,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         closed: "Este truck está cerrado ahora mismo — vuelve dentro de su horario",
         sendFailed: "No pudimos enviar tu pedido. Revisa tu conexión e intenta otra vez",
         badCart: "Algo de tu pedido quedó desactualizado. Lo vaciamos — vuelve a elegir tus platillos.",
+        soldOut: "Se acabó algo de tu pedido. Lo quitamos de tu carrito.",
       },
       updatedReloading: "Actualizamos el menú — recargando tu pantalla. Tu pedido sigue en el carrito, solo dale a enviar otra vez.",
       retry: "Reintentar",
@@ -2129,6 +2133,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       tax: "Tax",
       total: "Total",
       soldOut: "Sold out",
+      soldOutNow: (platillos) => `${platillos} just sold out. We took it off your order — you can send the rest.`,
       customizable: "Customizable",
       sending: "Sending your order…",
       sendError: "We couldn't send your order. Check your connection and try again",
@@ -2140,6 +2145,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         closed: "This truck is closed right now — come back during its hours",
         sendFailed: "We couldn't send your order. Check your connection and try again",
         badCart: "Something in your cart is out of date. We emptied it — please add your food again.",
+        soldOut: "Something in your order just sold out. We took it off your cart.",
       },
       updatedReloading: "We just updated the menu — reloading your screen. Your order is still in your cart, just tap send again.",
       retry: "Retry",
