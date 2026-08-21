@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { getPostLoginRedirect } from "@/lib/auth/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
@@ -17,6 +18,12 @@ export function LoginForm() {
   const [magicSending, setMagicSending] = useState(false)
   const [magicSent, setMagicSent] = useState(false)
   const [magicError, setMagicError] = useState<string | null>(null)
+
+  // El callback manda aquí cuando no pudo canjear el código: enlace ya usado
+  // (el antivirus del correo lo abre antes que la persona), vencido, o un
+  // Google que se cayó a mitad. Sin esto el dueño aterriza en el login sin una
+  // sola palabra sobre por qué, y concluye que el correo nunca llegó.
+  const enlaceFallido = useSearchParams().get("error") === "auth"
 
   async function withGoogle() {
     const supabase = createClient()
@@ -79,6 +86,12 @@ export function LoginForm() {
         <h1 className="text-2xl font-black tracking-tight text-white">{p.loginTitle}</h1>
         <p className="mt-1 text-sm text-neutral-400">{p.loginSubtitle}</p>
       </div>
+
+      {enlaceFallido && (
+        <div className="rounded-xl border px-3.5 py-3" style={{ borderColor: "#7A5A20", background: "#2A2113" }}>
+          <p className="text-[13px] font-semibold leading-snug text-amber-300">{p.linkFailed}</p>
+        </div>
+      )}
 
       <button
         onClick={withGoogle}

@@ -884,6 +884,28 @@ export type Dictionary = {
     magicLinkSentBody: (email: string) => string
     magicLinkError: string
     forgotPassword: string
+    recoverTitle: string
+    recoverSubtitle: string
+    recoverEmail: string
+    recoverSend: string
+    recoverSending: string
+    recoverSentTitle: string
+    recoverSentBody: (email: string) => string
+    recoverSentNote: string
+    recoverTooSoon: (segundos: number) => string
+    recoverFailed: string
+    recoverResend: string
+    recoverResendIn: (segundos: number) => string
+    recoverBackToLogin: string
+    linkFailed: string
+    newPasswordTitle: string
+    newPasswordSubtitle: string
+    newPasswordField: string
+    newPasswordSave: string
+    newPasswordSaving: string
+    newPasswordDone: string
+    newPasswordFailed: string
+    newPasswordNoSession: string
     noAccountYet: string
     registerLink: string
     registerTitle: string
@@ -1891,6 +1913,28 @@ export const dictionary: Record<Lang, Dictionary> = {
       magicLinkSentBody: (email) => `Te mandamos un enlace de acceso a ${email}. Ábrelo desde este mismo dispositivo para entrar.`,
       magicLinkError: "No pudimos enviar el enlace. Intenta de nuevo en un momento.",
       forgotPassword: "Olvidé mi contraseña",
+      recoverTitle: "Recuperar contraseña",
+      recoverSubtitle: "Te mandamos un enlace para elegir una nueva.",
+      recoverEmail: "Tu correo",
+      recoverSend: "Mandar enlace",
+      recoverSending: "Enviando…",
+      recoverSentTitle: "Enlace enviado",
+      recoverSentBody: (email) => `Si ${email} tiene una cuenta, ahí está el enlace para elegir una contraseña nueva.`,
+      recoverSentNote: "Revisa también el correo no deseado. El enlace sirve una sola vez y vence en una hora — si lo abres dos veces, la segunda dirá que ya no vale.",
+      recoverTooSoon: (segundos) => `Ya mandamos uno hace un momento. Espera ${segundos} s antes de pedir otro.`,
+      recoverFailed: "No pudimos mandar el enlace. Revisa el correo e inténtalo otra vez.",
+      recoverResend: "Mandar otro enlace",
+      recoverResendIn: (segundos) => `Puedes pedir otro en ${segundos} s`,
+      recoverBackToLogin: "Volver a entrar",
+      linkFailed: "No pudimos validar ese enlace: puede que ya se haya usado o que haya vencido. Pide uno nuevo.",
+      newPasswordTitle: "Nueva contraseña",
+      newPasswordSubtitle: "Elige una de al menos 8 caracteres.",
+      newPasswordField: "Nueva contraseña",
+      newPasswordSave: "Guardar contraseña",
+      newPasswordSaving: "Guardando…",
+      newPasswordDone: "Listo, entrando a tu panel…",
+      newPasswordFailed: "No pudimos actualizar tu contraseña. Pide un enlace nuevo.",
+      newPasswordNoSession: "Este enlace ya no vale. Pide uno nuevo desde \"Olvidé mi contraseña\".",
       noAccountYet: "¿Tu negocio todavía no está en FoodTruckOS?",
       registerLink: "Solicita tu acceso",
       registerTitle: "Solicita tu acceso",
@@ -2893,6 +2937,28 @@ export const dictionary: Record<Lang, Dictionary> = {
       magicLinkSentBody: (email) => `We sent a sign-in link to ${email}. Open it on this same device to continue.`,
       magicLinkError: "We couldn't send the link. Try again in a moment.",
       forgotPassword: "Forgot my password",
+      recoverTitle: "Reset your password",
+      recoverSubtitle: "We'll email you a link to pick a new one.",
+      recoverEmail: "Your email",
+      recoverSend: "Send link",
+      recoverSending: "Sending…",
+      recoverSentTitle: "Link sent",
+      recoverSentBody: (email) => `If ${email} has an account, the link to pick a new password is there.`,
+      recoverSentNote: "Check your spam folder too. The link works once and expires in an hour — open it twice and the second time it will say it is no longer valid.",
+      recoverTooSoon: (segundos) => `We just sent one. Wait ${segundos}s before asking for another.`,
+      recoverFailed: "We couldn't send the link. Check the address and try again.",
+      recoverResend: "Send another link",
+      recoverResendIn: (segundos) => `You can ask for another in ${segundos}s`,
+      recoverBackToLogin: "Back to sign in",
+      linkFailed: "We couldn't validate that link: it may have been used already or expired. Ask for a new one.",
+      newPasswordTitle: "New password",
+      newPasswordSubtitle: "Pick one with at least 8 characters.",
+      newPasswordField: "New password",
+      newPasswordSave: "Save password",
+      newPasswordSaving: "Saving…",
+      newPasswordDone: "Done — taking you to your panel…",
+      newPasswordFailed: "We couldn't update your password. Ask for a new link.",
+      newPasswordNoSession: "This link is no longer valid. Ask for a new one from \"Forgot my password\".",
       noAccountYet: "Is your business not on FoodTruckOS yet?",
       registerLink: "Request access",
       registerTitle: "Request access",
