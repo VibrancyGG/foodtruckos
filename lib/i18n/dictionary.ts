@@ -972,12 +972,7 @@ export type Dictionary = {
     printWhy2Body: string
     printWhy3Title: string
     printWhy3Body: string
-    printPickTitle: string
-    printOptionATitle: string
-    printOptionABody: string
-    printOptionBTitle: string
-    printOptionBBody: string
-    printHardwareNote: string
+    printChoice: string
     ticketTruck: string
     ticketOrder: string
     ticketItem1: string
@@ -2032,12 +2027,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       printWhy2Body: "Se lee sin tocar nada. Nadie despega la mano de la plancha para deslizar una pantalla grasosa.",
       printWhy3Title: "Sin señal, igual imprime",
       printWhy3Body: "La impresora cuelga de la tablet por Bluetooth, no de internet. El pedido de ventanilla sale aunque el truck se quede sin datos.",
-      printPickTitle: "Tú eliges cómo montarlo",
-      printOptionATitle: "Dos tablets",
-      printOptionABody: "Una en cocina y otra en la ventanilla. Es como funciona hoy y no necesitas comprar nada más.",
-      printOptionBTitle: "Tablet + impresora",
-      printOptionBBody: "Una sola tablet y la comanda en papel. La impresora es opcional: la agregas cuando quieras.",
-      printHardwareNote: "Nosotros ponemos la aplicación y te acompañamos en la instalación. La tablet y la impresora las compras tú, de una lista corta de equipos que probamos nosotros — así no dependes de nuestro inventario ni de nuestros envíos.",
+      printChoice: "Tú eliges: la comanda en papel, o todo en pantalla como hasta ahora. Se enciende y se apaga cuando quieras.",
       ticketTruck: "TRUCK CENTRO",
       ticketOrder: "ORDEN",
       ticketItem1: "TORTA DE ASADA",
@@ -3087,12 +3077,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       printWhy2Body: "You read it without touching anything. Nobody lifts a hand off the griddle to swipe a greasy screen.",
       printWhy3Title: "No signal, still prints",
       printWhy3Body: "The printer hangs off the tablet over Bluetooth, not off the internet. A counter order prints even when the truck loses data.",
-      printPickTitle: "You choose the setup",
-      printOptionATitle: "Two tablets",
-      printOptionABody: "One in the kitchen, one at the window. That is how it works today and you buy nothing extra.",
-      printOptionBTitle: "Tablet + printer",
-      printOptionBBody: "A single tablet and the ticket on paper. The printer is optional — add it whenever you want.",
-      printHardwareNote: "We provide the app and walk you through the setup. You buy the tablet and the printer yourself, from a short list of gear we test — so you never wait on our stock or our shipping.",
+      printChoice: "Your call: the ticket on paper, or everything on screen the way it works today. Turn it on and off whenever you like.",
       ticketTruck: "CENTRO TRUCK",
       ticketOrder: "ORDER",
       ticketItem1: "STEAK TORTA",

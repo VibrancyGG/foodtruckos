@@ -325,18 +325,10 @@ export function LandingPage() {
                 ))}
               </div>
 
-              <div className={styles.printPick}>{l.printPickTitle}</div>
-              <div className={styles.printOptions}>
-                <div className={styles.printOption}>
-                  <h4>{l.printOptionATitle}</h4>
-                  <p>{l.printOptionABody}</p>
-                </div>
-                <div className={styles.printOption}>
-                  <h4>{l.printOptionBTitle}</h4>
-                  <p>{l.printOptionBBody}</p>
-                </div>
-              </div>
-              <p className={styles.printNote}>{l.printHardwareNote}</p>
+              {/* Una línea, en voz baja. Lo que el prospecto necesita saber
+                  aquí es que la opción existe — qué equipo hace falta y cuánto
+                  cuesta es conversación de venta, no de landing. */}
+              <p className={styles.printNote}>{l.printChoice}</p>
             </div>
           </div>
         </section>
