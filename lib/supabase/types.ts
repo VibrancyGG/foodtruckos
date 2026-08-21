@@ -667,6 +667,7 @@ export type Database = {
           order_point_id: string | null
           payment_method: string | null
           payment_status: string
+          service_date: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -688,6 +689,7 @@ export type Database = {
           order_point_id?: string | null
           payment_method?: string | null
           payment_status?: string
+          service_date?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -709,6 +711,7 @@ export type Database = {
           order_point_id?: string | null
           payment_method?: string | null
           payment_status?: string
+          service_date?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -1030,6 +1033,32 @@ export type Database = {
           },
         ]
       }
+      unit_folio_counters: {
+        Row: {
+          next_folio: number
+          service_date: string
+          unit_id: string
+        }
+        Insert: {
+          next_folio: number
+          service_date: string
+          unit_id: string
+        }
+        Update: {
+          next_folio?: number
+          service_date?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_folio_counters_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       unit_products: {
         Row: {
           business_id: string
@@ -1173,7 +1202,7 @@ export type Database = {
         }
         Returns: undefined
       }
-      next_order_folio: { Args: { p_business_id: string }; Returns: number }
+      next_order_folio_for_unit: { Args: { p_unit_id: string }; Returns: number }
       request_subscription_cancel: {
         Args: { p_business_id: string; p_note?: string }
         Returns: undefined

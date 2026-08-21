@@ -13,6 +13,7 @@ type Result = {
   total: number
   customer_name: string | null
   created_at: string
+  service_date: string | null
   items: { product_name_snapshot: string; quantity: number }[]
 } | null
 
@@ -29,6 +30,11 @@ const STATUS_LABEL_KEY: Record<string, keyof (typeof dictionary)["es"]["kitchen"
 // consultarlo una vez que desaparece de las columnas activas. Acotado a 7
 // días para no tener que escanear todo el histórico del truck desde una
 // tablet.
+//
+// Desde que el folio se reinicia cada día, "orden 12" ya no es una sola: en
+// siete días hay hasta siete. Se devuelve la MÁS RECIENTE, que es la que
+// quiere decir quien está parado en la ventanilla, y si no es de hoy la
+// tarjeta lo dice con la fecha — callarlo sería peor que no encontrarla.
 export function OrderLookupModal({ unitId, lang, onClose }: { unitId: string; lang: Lang; onClose: () => void }) {
   const t = dictionary[lang].kitchen
   const [folio, setFolio] = useState("")
@@ -45,13 +51,15 @@ export function OrderLookupModal({ unitId, lang, onClose }: { unitId: string; la
 
     const supabase = createClient()
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    const { data: order } = await supabase
+    const { data: matches } = await supabase
       .from("orders")
-      .select("id, folio, status, payment_status, payment_method, total, customer_name, created_at")
+      .select("id, folio, service_date, status, payment_status, payment_method, total, customer_name, created_at")
       .eq("unit_id", unitId)
       .eq("folio", n)
       .gte("created_at", sevenDaysAgo)
-      .maybeSingle()
+      .order("created_at", { ascending: false })
+      .limit(1)
+    const order = matches?.[0]
 
     if (!order) {
       setNotFound(true)
@@ -72,12 +80,20 @@ export function OrderLookupModal({ unitId, lang, onClose }: { unitId: string; la
       total: toNumber(order.total),
       customer_name: order.customer_name,
       created_at: order.created_at,
+      service_date: order.service_date,
       items: items ?? [],
     })
     setSearching(false)
   }
 
   const paymentLabel = result?.payment_method === "tarjeta" ? t.paymentMethodCard : t.paymentMethodCash
+
+  // La fecha solo si NO es de hoy. Ponerla siempre sería ruido; omitirla
+  // cuando es de otro día haría creer que el pedido de ayer es el de ahora.
+  const hoy = new Date()
+  const hoyLocal = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`
+  const diaDistinto =
+    result?.service_date && result.service_date !== hoyLocal ? result.service_date : null
 
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-black/80 p-5" onClick={onClose}>
@@ -116,7 +132,14 @@ export function OrderLookupModal({ unitId, lang, onClose }: { unitId: string; la
         {result && (
           <div className="rounded-xl border p-4" style={{ borderColor: "#332F29", background: "#232019" }}>
             <div className="mb-2.5 flex items-center justify-between">
-              <span className="text-2xl font-black tabular-nums text-neutral-50">#{result.folio}</span>
+              <span className="flex items-baseline gap-2">
+                <span className="text-2xl font-black tabular-nums text-neutral-50">#{result.folio}</span>
+                {diaDistinto && (
+                  <span className="text-[11px] font-black uppercase tracking-wide" style={{ color: "#FFCB6B" }}>
+                    {t.lookupFromDay(new Date(`${diaDistinto}T12:00:00`).toLocaleDateString(lang === "en" ? "en-US" : "es-MX", { day: "numeric", month: "short" }))}
+                  </span>
+                )}
+              </span>
               <span className="rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wide" style={{ background: "#332F29", color: "#F6F3ED" }}>
                 {t[STATUS_LABEL_KEY[result.status] ?? "lookupStatusRecibido"] as string}
               </span>

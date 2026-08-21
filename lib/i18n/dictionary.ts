@@ -77,7 +77,6 @@ export type Dictionary = {
     bellDenied: string
   }
   kitchen: {
-    queuePosition: (n: number) => string
     newColumn: string
     prepColumn: string
     readyColumn: string
@@ -177,6 +176,7 @@ export type Dictionary = {
     lookupButton: string
     lookupTitle: string
     lookupSubtitle: string
+    lookupFromDay: (fecha: string) => string
     lookupPlaceholder: string
     lookupSearch: string
     lookupSearching: string
@@ -1066,7 +1066,6 @@ export const dictionary: Record<Lang, Dictionary> = {
       bellDenied: "No diste permiso de notificación — igual te avisamos con un sonido si dejas esta pantalla abierta.",
     },
     kitchen: {
-      queuePosition: (n) => `#${n} en la fila de este truck`,
       newColumn: "Nuevas",
       prepColumn: "Preparando",
       readyColumn: "Listas",
@@ -1166,7 +1165,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       lookupButton: "Buscar pedido",
       lookupTitle: "Buscar pedido",
-      lookupSubtitle: "Por número de folio, últimos 7 días",
+      lookupSubtitle: "Por número de orden, últimos 7 días. Si el número se repite, muestra el más reciente.",
+      lookupFromDay: (fecha) => `del ${fecha}`,
       lookupPlaceholder: "Ej. 42",
       lookupSearch: "Buscar",
       lookupSearching: "Buscando…",
@@ -2069,7 +2069,6 @@ export const dictionary: Record<Lang, Dictionary> = {
       bellDenied: "You didn't allow notifications — we'll still play a sound if you leave this screen open.",
     },
     kitchen: {
-      queuePosition: (n) => `#${n} in this truck's line`,
       newColumn: "New",
       prepColumn: "Cooking",
       readyColumn: "Ready",
@@ -2168,7 +2167,8 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
       lookupButton: "Find order",
       lookupTitle: "Find order",
-      lookupSubtitle: "By folio number, last 7 days",
+      lookupSubtitle: "By order number, last 7 days. If the number repeats, shows the most recent one.",
+      lookupFromDay: (fecha) => `from ${fecha}`,
       lookupPlaceholder: "E.g. 42",
       lookupSearch: "Search",
       lookupSearching: "Searching…",

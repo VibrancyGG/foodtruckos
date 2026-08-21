@@ -185,6 +185,26 @@ Y no al revés: una tabla que nadie mira en vivo no se publica. `order_items` y 
 
 ---
 
+## Regla 11 — El folio es de un truck y de una jornada, no del negocio
+
+El número que el comensal ve en su celular, el que sale impreso en la comanda y el que grita el cajero **se reinicia cada día y es propio de cada truck**. Nació como un consecutivo eterno por negocio y eso fallaba en dos frentes: a los seis meses el cajero gritaba "orden 4821", y con varios trucks los números se intercalaban entre ellos sin ninguna explicación para quien espera.
+
+Lo asigna `next_order_folio_for_unit(unit_id)` desde el disparador de `orders`, con el contador en `unit_folio_counters (unit_id, service_date)`. El día se calcula a **medianoche en la zona horaria del negocio**, no la del servidor ni la de la tablet — es la misma noción de "hoy" que usa el resto del producto, para que el folio y los reportes nunca discrepen.
+
+Cada pedido guarda su `service_date`. Sin esa columna, "orden 12" deja de tener respuesta: hay una por día.
+
+**Lo que se rompe si se olvida:**
+
+- **Cualquier índice único sobre `(business_id, folio)`.** Existía uno, y con el reinicio habría rechazado el segundo pedido del día siguiente con clave duplicada — es decir, el truck no habría podido vender. La garantía correcta es `(unit_id, service_date, folio)`, que es lo que el número promete de verdad.
+- **Cualquier búsqueda por folio con `maybeSingle()`.** En siete días hay hasta siete pedidos con el mismo número. Se pide el más reciente y se muestra la fecha cuando no es de hoy.
+- **Mostrar otro consecutivo al lado.** La tarjeta de cocina tenía uno propio del truck; desde el reinicio el folio ya es ese número, y enseñar los dos daba dos cifras distintas diciendo lo mismo.
+
+**El histórico no se renumera.** Los folios ya asignados se quedan como están (Regla 2). Al activar el reinicio se siembra el contador del día en curso con lo que cada truck ya llevaba vendido, para que el corte limpio ocurra al día siguiente y no a media jornada.
+
+**Pendiente conocido:** un truck abierto pasada la medianoche empieza serie nueva a mitad del servicio. No afecta a los clientes de hoy (cierran antes), y se resolvería con una hora de corte por negocio en vez de la medianoche.
+
+---
+
 ## Antes de dar por terminado cualquier trabajo de datos
 
 Revisa contra esta lista:
@@ -199,5 +219,6 @@ Revisa contra esta lista:
 8. ¿Estoy creando una tabla para algo que es una preferencia de un dispositivo que ya existe? (Regla 8)
 9. Si abrí un camino público, ¿lo probé con sesión iniciada y sin ella? (Regla 9)
 10. Si una pantalla mira esta tabla en vivo, ¿está publicada, en `replica identity full`, y lo comprobé cronometrando un UPDATE de verdad? (Regla 10)
+11. Si toqué el folio, ¿revisé los índices únicos, las búsquedas por número y que no quede otro consecutivo compitiendo en pantalla? (Regla 11)
 
 Si alguna respuesta es incómoda, plantéalo antes de avanzar en lugar de resolverlo por tu cuenta.

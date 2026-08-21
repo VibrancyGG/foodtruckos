@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo, useRef, useSyncExternalStore } from "react"
+import { useEffect, useState, useCallback, useRef, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -156,17 +156,11 @@ export function KitchenBoard({
   const puedeImprimir = useSyncExternalStore(sinSuscripcion, isPrintingAvailable, () => false)
   const printerMissing = printing.enabled && !puedeImprimir
 
-  // Consecutivo propio del truck, no el folio global del negocio (que puede
-  // saltar de orden en orden si otro truck vende al mismo tiempo). Se arma
-  // con lo que ya se pedía para el badge "N pedidos hoy" (entregados) más el
-  // lugar de cada pedido activo en la fila de este truck — sin consulta
-  // nueva, y siempre en vivo porque se recalcula con cada cambio de estado.
-  const queuePosition = useMemo(() => {
-    const activeSorted = [...orders].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    const map = new Map<string, number>()
-    activeSorted.forEach((o, i) => map.set(o.id, todayCount + i + 1))
-    return map
-  }, [orders, todayCount])
+  // Aquí vivía un consecutivo propio del truck, porque el folio era global
+  // del negocio y saltaba de orden en orden cuando dos trucks vendían a la
+  // vez. Desde que el folio se reinicia cada día y por truck, ESE número ya
+  // es el consecutivo del truck — mostrar los dos daba dos cifras distintas
+  // diciendo lo mismo, y la de arriba es la que el comensal tiene en la mano.
 
   // Un solo camino para imprimir: lo usan tanto la orden que acaba de entrar
   // como el botón de reimprimir, para que la copia salga idéntica al original.
@@ -636,9 +630,6 @@ export function KitchenBoard({
                         </span>
                       </div>
                       <div className="mb-2.5 flex items-center gap-2.5">
-                        <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: "#9C948A" }}>
-                          {t.kitchen.queuePosition(queuePosition.get(o.id) ?? 0)}
-                        </span>
                         {!readOnly && (printing.enabled || HAS_BACK[col]) && (
                           <span className="ml-auto flex flex-none items-center gap-2">
                             {printing.enabled && (
