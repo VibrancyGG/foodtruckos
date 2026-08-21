@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { displayFont, landingMonoFont } from "@/lib/fonts"
+import { MOTIFS } from "@/lib/branding/motifs"
 import styles from "./landing.module.css"
 
 function BenefitIcon({ path }: { path: string }) {
@@ -47,6 +48,7 @@ function Ticket({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
       <div className={styles.ticketMod}>{"      + " + l.ticketItem1Add}</div>
       <div className={styles.ticketItem}>{" 1  " + l.ticketItem2}</div>
       <div className={styles.ticketMod}>{'      "' + l.ticketItem2Note + '"'}</div>
+      <div className={styles.ticketItem}>{" 1  " + l.ticketItem3}</div>
       <div className={styles.ticketRule}>{regla}</div>
       {/* space-between en vez de rellenar con espacios: el ticket real cuadra
           por número de caracteres, pero aquí el ancho lo manda el contenedor. */}
@@ -56,45 +58,64 @@ function Ticket({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
       </div>
       <div className={`${styles.ticketRow} ${styles.ticketFoot}`}>
         <span>{l.ticketCollect}</span>
-        <span>$70.61</span>
+        <span>$29.50</span>
       </div>
     </div>
   )
 }
 
+// Réplica del menú real, no una interpretación: mismo encabezado con el
+// motivo de marca, mismos nombres en la tipografía de títulos y en mayúsculas,
+// y los PRECIOS DEL DEMO tal cual. Los precios inventados son lo primero que
+// delata una captura falsa ante alguien que sí tiene un food truck.
 function PhoneMenu({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
+  const platillos = [
+    { nombre: l.scanDish1, nota: l.scanDish1Note, precio: "$8.50", personalizable: true },
+    { nombre: l.scanDish2, nota: l.scanDish2Note, precio: "$4.00", personalizable: false },
+    { nombre: l.scanDish3, nota: l.scanDish3Note, precio: "$7.50", personalizable: true },
+  ]
   return (
     <div className={styles.phone} aria-label={l.scanCaption}>
       <div className={styles.phoneScreen}>
         <div className={styles.phoneTop}>
-          <div className={styles.phoneLogo}>TC</div>
-          <div>
-            <div className={styles.phoneName}>{l.ticketTruck}</div>
+          <svg width="100%" height="100%" className={styles.phoneMotif} aria-hidden="true">
+            <defs>
+              <pattern id="landingPhoneMotif" width="112" height="112" patternUnits="userSpaceOnUse">
+                <g
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  dangerouslySetInnerHTML={{ __html: MOTIFS.tacos.pat }}
+                />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#landingPhoneMotif)" />
+          </svg>
+          <div className={styles.phoneLogo} />
+          <div className={styles.phoneName} style={{ fontFamily: "var(--font-display)" }}>
+            {l.ticketTruck}
           </div>
-          <span className={styles.phoneOpen}>
-            <i /> {l.scanPhoneOpen}
-          </span>
         </div>
         <div className={styles.phoneList}>
-          <div className={styles.dish}>
-            <div className={styles.dishPhoto} />
-            <div className={styles.dishBody}>
-              <div className={styles.dishName}>{l.scanDish1}</div>
-              <div className={styles.dishNote}>{l.scanDish1Note}</div>
-              <span className={styles.dishChip}>
-                <i /> {l.scanCustomChip}
-              </span>
+          {platillos.map((d) => (
+            <div key={d.nombre} className={styles.dish}>
+              <div className={styles.dishPhoto} />
+              <div className={styles.dishBody}>
+                <div className={styles.dishName} style={{ fontFamily: "var(--font-display)" }}>
+                  {d.nombre}
+                </div>
+                {d.nota && <div className={styles.dishNote}>{d.nota}</div>}
+                {d.personalizable && (
+                  <span className={styles.dishChip}>
+                    <i /> {l.scanCustomChip}
+                  </span>
+                )}
+              </div>
+              <div className={styles.dishPrice}>{d.precio}</div>
             </div>
-            <div className={styles.dishPrice}>$22.00</div>
-          </div>
-          <div className={styles.dish}>
-            <div className={styles.dishPhoto} />
-            <div className={styles.dishBody}>
-              <div className={styles.dishName}>{l.scanDish2}</div>
-              <div className={styles.dishNote}>{l.scanDish2Note}</div>
-            </div>
-            <div className={styles.dishPrice}>$38.00</div>
-          </div>
+          ))}
         </div>
         <div className={styles.phoneBar}>{l.scanPhoneCta}</div>
       </div>

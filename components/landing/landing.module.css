@@ -1041,3 +1041,48 @@
 @media (prefers-reduced-motion: reduce) {
   .badgeSwap { animation: none; }
 }
+
+/* ---------- Réplica fiel del menú del comensal ----------
+   El encabezado lleva el mismo motivo de marca que el menú real, y los
+   nombres van en la tipografía de títulos y en mayúsculas, como ahí. */
+.phoneTop {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 14px;
+  gap: 11px;
+}
+.phoneMotif {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  pointer-events: none;
+  color: #fff;
+}
+.phoneLogo {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.26);
+}
+.phoneName {
+  position: relative;
+  font-size: 17px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.dishName {
+  font-size: 13px;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+.phoneBar {
+  margin: 4px 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 13px;
+}

@@ -978,11 +978,12 @@ export type Dictionary = {
     scanStep2Body: string
     scanStep3Title: string
     scanStep3Body: string
-    scanPhoneOpen: string
     scanDish1: string
     scanDish1Note: string
     scanDish2: string
     scanDish2Note: string
+    scanDish3: string
+    scanDish3Note: string
     scanCustomChip: string
     scanPhoneCta: string
     scanCaption: string
@@ -1002,6 +1003,7 @@ export type Dictionary = {
     ticketItem1Add: string
     ticketItem2: string
     ticketItem2Note: string
+    ticketItem3: string
     ticketCustomer: string
     ticketCollect: string
     ticketCaption: string
@@ -2055,13 +2057,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       scanStep2Body: "Tus fotos, tus precios, tu logo y tu color. Lo que está agotado no aparece, así que nadie pide lo que no hay.",
       scanStep3Title: "Ordena desde su celular",
       scanStep3Body: "Elige, personaliza su platillo y manda el pedido. Después sigue en la misma pantalla cómo va, hasta que está listo.",
-      scanPhoneOpen: "Abierto",
-      scanDish1: "Taco al pastor",
-      scanDish1Note: "Con piña, cebolla y cilantro",
-      scanDish2: "Quesabirria",
-      scanDish2Note: "Con consomé",
+      scanDish1: "Burrito de asada",
+      scanDish1Note: "Carne asada, frijoles y arroz",
+      scanDish2: "Agua de horchata",
+      scanDish2Note: "",
+      scanDish3: "Taco al pastor",
+      scanDish3Note: "Con piña, cebolla y cilantro",
       scanCustomChip: "Personalizable",
-      scanPhoneCta: "Ordenar · $60.00",
+      scanPhoneCta: "Agregar",
       scanCaption: "El mismo menú que ve tu cliente, con tu marca — no la nuestra.",
       printEyebrow: "Comanda impresa",
       printTitle: "El riel de tickets es la cola de tu cocina",
@@ -2074,11 +2077,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       printChoice: "Tú eliges: la comanda en papel, o todo en pantalla como hasta ahora. Se enciende y se apaga cuando quieras.",
       ticketTruck: "TRUCK CENTRO",
       ticketOrder: "ORDEN",
-      ticketItem1: "TORTA DE ASADA",
+      ticketItem1: "TACO AL PASTOR",
       ticketItem1Remove: "CEBOLLA",
       ticketItem1Add: "Queso extra",
-      ticketItem2: "QUESABIRRIA",
-      ticketItem2Note: "bien dorada",
+      ticketItem2: "BURRITO DE ASADA",
+      ticketItem2Note: "bien dorado",
+      ticketItem3: "AGUA DE HORCHATA",
       ticketCustomer: "Marisol",
       ticketCollect: "COBRAR AL ENTREGAR",
       ticketCaption: "La comanda que sale de verdad — lo que se quita va en mayúsculas, porque es el error caro en cocina.",
@@ -3127,13 +3131,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       scanStep2Body: "Your photos, your prices, your logo and your colour. Whatever sold out is gone, so nobody orders what you don't have.",
       scanStep3Title: "Order from their phone",
       scanStep3Body: "They pick, customise the dish and send it. Then they follow it on the same screen until it's ready.",
-      scanPhoneOpen: "Open",
-      scanDish1: "Taco al pastor",
-      scanDish1Note: "Pineapple, onion and cilantro",
-      scanDish2: "Quesabirria",
-      scanDish2Note: "With consommé",
+      scanDish1: "Burrito de asada",
+      scanDish1Note: "Steak, beans and rice",
+      scanDish2: "Agua de horchata",
+      scanDish2Note: "",
+      scanDish3: "Taco al pastor",
+      scanDish3Note: "Pineapple, onion and cilantro",
       scanCustomChip: "Customisable",
-      scanPhoneCta: "Order · $60.00",
+      scanPhoneCta: "Add",
       scanCaption: "The same menu your customer sees, with your brand — not ours.",
       printEyebrow: "Printed tickets",
       printTitle: "The ticket rail is your kitchen's queue",
@@ -3146,11 +3151,12 @@ export const dictionary: Record<Lang, Dictionary> = {
       printChoice: "Your call: the ticket on paper, or everything on screen the way it works today. Turn it on and off whenever you like.",
       ticketTruck: "CENTRO TRUCK",
       ticketOrder: "ORDER",
-      ticketItem1: "STEAK TORTA",
+      ticketItem1: "TACO AL PASTOR",
       ticketItem1Remove: "ONION",
       ticketItem1Add: "Extra cheese",
-      ticketItem2: "QUESABIRRIA",
-      ticketItem2Note: "extra crispy",
+      ticketItem2: "BURRITO DE ASADA",
+      ticketItem2Note: "well done",
+      ticketItem3: "AGUA DE HORCHATA",
       ticketCustomer: "Marisol",
       ticketCollect: "COLLECT ON DELIVERY",
       ticketCaption: "The ticket that actually prints — anything removed goes in caps, because that is the expensive mistake in a kitchen.",
