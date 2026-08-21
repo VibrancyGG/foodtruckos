@@ -1,6 +1,16 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+
+// REGLA DE ESTE ARCHIVO: todo lo que cambie el menú revalida LAS DOS rutas —
+// la del panel y la del comensal. Cambiar solo la del panel deja al dueño
+// viendo su cambio aplicado mientras el comensal sigue con el menú viejo.
+//
+// Se escribe porque ya pasó: seis acciones revalidaban solo el panel, y entre
+// ellas estaba el interruptor de "se acabó" de un platillo — o sea, el dueño
+// marcaba agotado, lo veía agotado, y el comensal seguía pudiendo pedirlo.
+// La versión masiva del mismo interruptor sí lo hacía bien, así que el
+// defecto dependía de si el truck tenía uno o varios.
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
 import { mejorarFoto } from "@/lib/media/mejorarFoto"
@@ -118,6 +128,7 @@ export async function toggleSoldOut(input: {
 
   if (error) return { ok: false, error: "No se pudo actualizar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -405,6 +416,7 @@ export async function createOptionGroup(input: {
 
   if (error) return { ok: false, error: "No se pudo crear el grupo" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -421,6 +433,7 @@ export async function deleteOptionGroup(groupId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo eliminar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -463,6 +476,7 @@ export async function createOption(input: {
 
   if (error) return { ok: false, error: "No se pudo crear la opción" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -499,6 +513,7 @@ export async function updateOption(input: {
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
@@ -515,6 +530,7 @@ export async function deleteOption(optionId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo eliminar" }
   revalidatePath("/panel/menu")
+  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
   return { ok: true }
 }
 
