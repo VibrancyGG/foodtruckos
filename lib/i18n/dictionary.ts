@@ -387,6 +387,8 @@ export type Dictionary = {
       exclusivityAll: string
       exclusivityAllHint: string
       exclusivityOnly: (truckName: string) => string
+      hasOptions: string
+      hasOptionsTitle: (n: number) => string
       exclusivityOnlyHint: string
       noPhotoYetHint: string
       addProductSubmit: string
@@ -1457,6 +1459,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         exclusivityAll: "Todos",
         exclusivityAllHint: "Aparece en el menú de todos tus trucks",
         exclusivityOnly: (truckName: string) => `Solo ${truckName}`,
+        hasOptions: "Personalizable",
+        hasOptionsTitle: (n) => `${n} grupo${n === 1 ? "" : "s"} de opciones — el cliente elige al ordenar`,
         exclusivityOnlyHint: "Aparece solo en el menú de este truck, en ningún otro",
         noPhotoYetHint: "Si todavía no tienes la foto, guárdalo sin ella: en el menú se muestra un espacio marcado y la agregas cuando puedas. Nunca ponemos la imagen de otro plato.",
         addProductSubmit: "Agregar al menú",
@@ -2527,6 +2531,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         exclusivityAll: "All",
         exclusivityAllHint: "Shows up on every truck's menu",
         exclusivityOnly: (truckName: string) => `Only ${truckName}`,
+        hasOptions: "Customizable",
+        hasOptionsTitle: (n) => `${n} option group${n === 1 ? "" : "s"} — the customer picks when ordering`,
         exclusivityOnlyHint: "Shows up on this truck's menu only, nowhere else",
         noPhotoYetHint: "If you don't have the photo yet, save it without one: the menu shows a marked space and you can add it later. We never use another dish's image.",
         addProductSubmit: "Add to menu",

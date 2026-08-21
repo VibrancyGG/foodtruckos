@@ -59,6 +59,14 @@ export function ProductRow({
 
   const exclusiveUnitName = exclusiveUnitId ? units.find((u) => u.id === exclusiveUnitId)?.name : null
 
+  // Qué platillos dejan elegir algo al ordenar, sin entrar a editarlos. Un
+  // grupo vacío no cuenta: el dueño lo creó pero no le puso opciones, así que
+  // el comensal no vería nada — es el mismo criterio que usa el menú del
+  // comensal para pintar su distintivo.
+  const gruposConOpciones = optionGroups.filter(
+    (g) => g.product_id === product.id && options.some((o) => o.group_id === g.id),
+  ).length
+
   return (
     <div className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 border-t border-panel-line px-4 py-3 transition-opacity first:border-t-0 ${soldOut ? "opacity-55" : ""}`}>
       <div className="h-11 w-11 flex-none overflow-hidden rounded-lg bg-panel-bg">
@@ -75,6 +83,15 @@ export function ProductRow({
           <span className="truncate font-semibold text-panel-ink">{lang === "es" ? product.name_es : product.name_en}</span>
           {exclusiveUnitName && (
             <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700">{m.exclusivityOnly(exclusiveUnitName)}</span>
+          )}
+          {gruposConOpciones > 0 && (
+            <span
+              title={m.hasOptionsTitle(gruposConOpciones)}
+              className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700"
+            >
+              <span aria-hidden="true" className="h-1 w-1 rounded-full bg-violet-500" />
+              {m.hasOptions}
+            </span>
           )}
           {soldOut && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700">{m.soldOut}</span>}
         </div>
