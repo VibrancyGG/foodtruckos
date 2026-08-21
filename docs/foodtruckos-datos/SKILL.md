@@ -165,6 +165,26 @@ Y al revés: lo que es de personal (capturar en ventanilla) se queda solo en su 
 
 ---
 
+## Regla 10 — Una tabla que se mira en vivo se publica Y se pone en `replica identity full`
+
+Que una pantalla diga "En vivo" no significa que esté recibiendo nada. Hacen falta dos cosas, y las dos se olvidan por separado:
+
+1. **La tabla tiene que estar en la publicación `supabase_realtime`.** Si no está, la suscripción se conecta, reporta `SUBSCRIBED`, y no llega un solo evento. Le pasó a `product_options`: la cocina llevaba meses suscrita a una tabla que no publicaba nada.
+2. **La tabla tiene que estar en `replica identity full`.** Con la identidad por omisión, Postgres solo le manda a Realtime la llave primaria del registro viejo, y Realtime **no puede autorizar el evento contra RLS: lo descarta sin avisar**. Los INSERT sí pasan, así que la pantalla parece sana — pero ningún UPDATE llega. Le pasó a `orders` y a `unit_products`: avanzar una orden, avisar "ya estoy aquí" y agotar un platillo entraban solo por la consulta de respaldo, con hasta 10 segundos de retraso. Medido: 10 s antes, 554 ms después.
+
+```sql
+alter publication supabase_realtime add table public.mi_tabla;
+alter table public.mi_tabla replica identity full;
+```
+
+**Cómo se comprueba, porque a ojo no se ve:** suscribirse con la llave anónima al mismo canal y filtro que usa la pantalla, hacer un UPDATE por fuera y cronometrar. Si en veinte segundos no llega el evento, la consulta de respaldo está tapando el hueco.
+
+`replica identity full` hace que cada UPDATE escriba la fila entera en el WAL. En tablas angostas y de poco volumen — que son las nuestras — no se nota; en una tabla ancha y muy escrita habría que pensarlo.
+
+Y no al revés: una tabla que nadie mira en vivo no se publica. `order_items` y `order_status_events` solo se insertan, así que se quedan como están.
+
+---
+
 ## Antes de dar por terminado cualquier trabajo de datos
 
 Revisa contra esta lista:
@@ -178,5 +198,6 @@ Revisa contra esta lista:
 7. ¿Estoy amarrando el esquema a "truck", a un solo QR por unidad, o a que un pedido sea siempre una venta cerrada? (Regla 7)
 8. ¿Estoy creando una tabla para algo que es una preferencia de un dispositivo que ya existe? (Regla 8)
 9. Si abrí un camino público, ¿lo probé con sesión iniciada y sin ella? (Regla 9)
+10. Si una pantalla mira esta tabla en vivo, ¿está publicada, en `replica identity full`, y lo comprobé cronometrando un UPDATE de verdad? (Regla 10)
 
 Si alguna respuesta es incómoda, plantéalo antes de avanzar en lugar de resolverlo por tu cuenta.
