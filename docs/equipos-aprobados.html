@@ -1,0 +1,429 @@
+<title>Qué comprar</title>
+
+<style>
+  :root {
+    --bg: #E9E8E3;
+    --surface: #FAF9F6;
+    --surface-2: #F1F0EC;
+    --ink: #1A1815;
+    --ink-soft: #5E5A52;
+    --ink-faint: #8A857B;
+    --line: #D2D0C8;
+    --line-strong: #B8B5AB;
+    --accent: #B4670A;
+    --accent-bg: #F7E9CF;
+    --go: #1B6E52;
+    --go-bg: #DCEFE5;
+    --go-line: #9CCDB6;
+    --stop: #A32229;
+    --stop-bg: #F7DFDE;
+    --stop-line: #E2A9A6;
+
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #100F0D;
+      --surface: #1B1917;
+      --surface-2: #232019;
+      --ink: #F6F3ED;
+      --ink-soft: #9C948A;
+      --ink-faint: #79726A;
+      --line: #332F29;
+      --line-strong: #453F37;
+      --accent: #F5A524;
+      --accent-bg: #3A2A12;
+      --go: #6FD3A6;
+      --go-bg: #14291F;
+      --go-line: #2A5943;
+      --stop: #FFB3B5;
+      --stop-bg: #3A1E1F;
+      --stop-line: #6B3336;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #100F0D;
+    --surface: #1B1917;
+    --surface-2: #232019;
+    --ink: #F6F3ED;
+    --ink-soft: #9C948A;
+    --ink-faint: #79726A;
+    --line: #332F29;
+    --line-strong: #453F37;
+    --accent: #F5A524;
+    --accent-bg: #3A2A12;
+    --go: #6FD3A6;
+    --go-bg: #14291F;
+    --go-line: #2A5943;
+    --stop: #FFB3B5;
+    --stop-bg: #3A1E1F;
+    --stop-line: #6B3336;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; }
+
+  .top { padding: 52px 0 0; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+
+  h1 {
+    font-size: clamp(29px, 6vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+    max-width: 58ch;
+  }
+
+  section { padding-top: 44px; }
+
+  h2 {
+    font-size: 13px;
+    font-family: var(--mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  .block-title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+
+  .block-note { color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
+
+  p { margin: 0 0 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ---------- Los dos montajes ---------- */
+
+  .kits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+  .kit {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .kit h3 { font-size: 18px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.012em; }
+  .kit .who { color: var(--ink-faint); font-size: 13.5px; margin: 0 0 16px; }
+
+  .kit ul { margin: 0; padding: 0; list-style: none; }
+  .kit li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14.5px;
+  }
+  .kit li:first-child { border-top: 0; }
+  .kit li b { font-family: var(--mono); font-size: 13px; color: var(--accent); flex: none; }
+
+  /* ---------- Especificaciones ---------- */
+
+  .spec {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px 22px;
+    margin-bottom: 14px;
+  }
+  .spec .row {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .spec .row:last-child { border-bottom: 0; }
+  .spec .row .k { font-weight: 600; font-size: 14px; flex: none; width: 190px; }
+  .spec .row .v { flex: 1; min-width: 200px; font-size: 14.5px; color: var(--ink-soft); }
+  .spec .row .v strong { color: var(--ink); }
+
+  .tested {
+    background: var(--go-bg);
+    border: 1px solid var(--go-line);
+    border-radius: 14px;
+    padding: 18px 22px;
+  }
+  .tested .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--go);
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .tested .model { font-size: 19px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.015em; }
+  .tested p { color: var(--ink-soft); font-size: 14.5px; }
+
+  /* ---------- Lo que no se compra ---------- */
+
+  .avoid {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px 22px;
+  }
+  .avoid .row { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .avoid .row:last-child { border-bottom: 0; }
+  .avoid .row .k { font-weight: 700; font-size: 14.5px; flex: none; width: 190px; color: var(--stop); }
+  .avoid .row .v { flex: 1; min-width: 200px; font-size: 14.5px; color: var(--ink-soft); }
+
+  .pending {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 14px;
+    padding: 18px 22px;
+  }
+  .pending .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .pending ul { margin: 8px 0 0; padding-left: 20px; color: var(--ink-soft); font-size: 14.5px; }
+  .pending li { margin-bottom: 5px; }
+
+  ol.steps { margin: 0; padding-left: 22px; }
+  ol.steps li { margin-bottom: 10px; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 1.5px 5px;
+    border-radius: 4px;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 14px;
+  }
+
+  @media (max-width: 620px) {
+    .kits { grid-template-columns: 1fr; }
+    .spec .row .k, .avoid .row .k { width: 100%; }
+    body { padding: 0 16px 72px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <p class="eyebrow">FoodTruckOS · Equipos aprobados</p>
+    <h1>Qué comprar</h1>
+    <p class="standfirst">
+      Lista corta, de equipos que probamos nosotros. Los compras tú donde quieras —
+      normalmente Amazon Estados Unidos — y nosotros te acompañamos en la instalación.
+    </p>
+    <p class="standfirst">
+      No vendemos aparatos a propósito: así no dependes de nuestro inventario, de
+      nuestros envíos ni de nuestras garantías. Si algo se descompone, lo cambias con
+      quien te lo vendió, sin pedirnos permiso.
+    </p>
+  </div>
+
+  <section>
+    <h2>Empieza aquí</h2>
+    <p class="block-title">Los dos montajes</p>
+    <p class="block-note">
+      Los dos funcionan igual de bien. La diferencia es si tu cocina trabaja mirando
+      una pantalla o tomando tickets de un riel, que es como trabaja la mayoría.
+    </p>
+
+    <div class="kits">
+      <div class="kit">
+        <h3>Solo pantallas</h3>
+        <p class="who">Lo más simple. Es como funciona hoy.</p>
+        <ul>
+          <li><b>2×</b><div>Tablet Android</div></li>
+          <li><b>2×</b><div>Soporte o base (opcional)</div></li>
+        </ul>
+      </div>
+
+      <div class="kit">
+        <h3>Con comanda impresa</h3>
+        <p class="who">La cocina trabaja con papel; una sola tablet.</p>
+        <ul>
+          <li><b>1×</b><div>Tablet Android</div></li>
+          <li><b>1×</b><div>Impresora térmica Bluetooth de 80 mm</div></li>
+          <li><b>1×</b><div>Caja de rollos térmicos de 80 mm</div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>La tablet</h2>
+    <p class="block-title">Cualquiera con Google Play sirve</p>
+    <p class="block-note">
+      Aquí no hace falta gastar: la pantalla de cocina es una página web y una
+      impresora por Bluetooth. Lo único que sí importa es que tenga Google Play.
+    </p>
+
+    <div class="spec">
+      <div class="row"><div class="k">Sistema</div><div class="v"><strong>Android 8.0 o más nuevo</strong>, con <strong>Google Play</strong>. Sin Play no se puede instalar la aplicación.</div></div>
+      <div class="row"><div class="k">Pantalla</div><div class="v">10 pulgadas. En 8″ las tarjetas de pedido se aprietan; en 12″ no ganas nada.</div></div>
+      <div class="row"><div class="k">Bluetooth</div><div class="v">Cualquiera de los últimos años. No necesita versión especial.</div></div>
+      <div class="row"><div class="k">Batería</div><div class="v">Va a estar enchufada todo el turno. No es un criterio.</div></div>
+      <div class="row"><div class="k">Cuánto cuesta</div><div class="v">Del orden de <strong>$95 a $220</strong>. Verifica el precio del día — esto es referencia, no cotización.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>La impresora</h2>
+    <p class="block-title">80 mm, Bluetooth, con autocorte</p>
+    <p class="block-note">
+      Solo si quieres la comanda en papel. Cuelga de la tablet por Bluetooth, así que
+      <strong>no necesita internet propio</strong> ni configuración de red: nada de IP
+      fija, router ni contraseñas de WiFi.
+    </p>
+
+    <div class="spec">
+      <div class="row"><div class="k">Ancho de papel</div><div class="v"><strong>80 mm.</strong> Las de 58 mm son de recibo de tarjeta: en una comanda no cabe el nombre del platillo con sus cambios.</div></div>
+      <div class="row"><div class="k">Lenguaje</div><div class="v"><strong>ESC/POS.</strong> Es el estándar; casi todas lo traen y viene escrito en la caja.</div></div>
+      <div class="row"><div class="k">Conexión</div><div class="v"><strong>Bluetooth clásico.</strong> Si solo dice WiFi o Ethernet, no sirve para esto.</div></div>
+      <div class="row"><div class="k">Autocorte</div><div class="v"><strong>Sí.</strong> Sin cuchilla alguien tiene que arrancar cada ticket a mano, y en hora pico eso no pasa.</div></div>
+      <div class="row"><div class="k">Chicharra</div><div class="v">Da igual si la trae. El aviso sonoro lo da la tablet, que es la que la cocina escucha.</div></div>
+      <div class="row"><div class="k">Cuánto cuesta</div><div class="v">Del orden de <strong>$90 a $160</strong>. Verifica el precio del día.</div></div>
+    </div>
+
+    <div class="tested">
+      <p class="label">Probada por nosotros</p>
+      <p class="model">MUNBYN P047</p>
+      <p>
+        Es la que tenemos en la mano y con la que está probado el formato de la
+        comanda. Dos cosas que descubrimos con ella y que ya están resueltas en la
+        aplicación, sin que tengas que hacer nada: <strong>no tiene chicharra
+        funcional</strong> (no entiende el comando estándar, así que la dejamos
+        apagada) y <strong>retiene unos 8 renglones</strong> antes de la cuchilla, por
+        lo que la aplicación avanza el papel antes de cortar para que el total nunca
+        se quede adentro.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>El rollo</h2>
+    <p class="block-title">Papel térmico de 80 mm</p>
+    <div class="spec">
+      <div class="row"><div class="k">Qué pedir</div><div class="v">Rollo <strong>térmico</strong> de 80 mm. No de matriz ni con papel carbón.</div></div>
+      <div class="row"><div class="k">Cuál lado</div><div class="v">El papel térmico solo imprime de un lado. Si sale una hoja en blanco, casi siempre es el rollo al revés — es el error número uno.</div></div>
+      <div class="row"><div class="k">Cuánto comprar</div><div class="v">Se venden por caja y salen baratos. Ten siempre un rollo de repuesto en el truck.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ojo con esto</h2>
+    <p class="block-title">Lo que no debes comprar</p>
+    <p class="block-note">
+      Todo lo de esta lista se ve bien en la tienda y no sirve para lo nuestro.
+      Vale la pena leerla antes de darle a comprar.
+    </p>
+
+    <div class="avoid">
+      <div class="row">
+        <div class="k">Tablets Fire de Amazon</div>
+        <div class="v">Usan la tienda de Amazon y <strong>no traen Google Play</strong>. La aplicación no se puede instalar. Es la equivocación más fácil de cometer, porque son las más baratas.</div>
+      </div>
+      <div class="row">
+        <div class="k">Impresoras de nube</div>
+        <div class="v">Las que consultan a un servidor por internet cuestan dos o tres veces más y <strong>exigen que la impresora tenga su propia conexión</strong>. Si el truck se queda sin señal, la cocina se queda sin comandas.</div>
+      </div>
+      <div class="row">
+        <div class="k">Impresoras solo WiFi</div>
+        <div class="v">Obligan a montar y mantener una red en el truck. El Bluetooth no necesita nada de eso.</div>
+      </div>
+      <div class="row">
+        <div class="k">Impresoras de 58 mm</div>
+        <div class="v">Son de recibo de tarjeta. En una comanda no cabe el platillo con sus cambios, y es justo lo que la cocina necesita leer de un vistazo.</div>
+      </div>
+      <div class="row">
+        <div class="k">Impresoras de etiquetas</div>
+        <div class="v">Las de stickers imprimen una etiqueta corta, no una comanda. Sirven para marcar vasos, no para el riel.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cuando llegue</h2>
+    <p class="block-title">Cómo se pone a andar</p>
+    <ol class="steps">
+      <li>Prende la impresora, mete el rollo y cierra la tapa.</li>
+      <li>En la tablet, ve a <strong>Ajustes › Bluetooth</strong> y empareja la impresora como emparejarías una bocina. El PIN suele ser <code>0000</code>.</li>
+      <li>Instala la aplicación de FoodTruckOS desde el enlace que te damos en tu panel.</li>
+      <li>Ábrela y mete el código de aparato que generas desde tu panel, y luego tu PIN.</li>
+      <li>Elige la impresora en la lista y manda una comanda de prueba.</li>
+    </ol>
+    <p style="margin-top:14px; color:var(--ink-soft)">
+      Te acompañamos en esta parte la primera vez. Después es prender y trabajar.
+    </p>
+  </section>
+
+  <section>
+    <h2>Interno · no mandar al cliente</h2>
+    <p class="block-title">Datos que faltan de la P047</p>
+    <div class="pending">
+      <p class="label">Pendiente de las pruebas</p>
+      <p>Estos salen de tener el aparato enfrente y todavía no están anotados en la bitácora. Sin ellos, el documento sirve para elegir, pero no para dar soporte por teléfono:</p>
+      <ul>
+        <li>Nombre con el que aparece al emparejar por Bluetooth</li>
+        <li>PIN de emparejamiento real (si no es <code>0000</code>, hay que avisarlo)</li>
+        <li>Cuántos segundos tarda en reconectar tras apagarla y prenderla</li>
+        <li>Diámetro máximo de rollo que le entra</li>
+        <li>Cuánto papel sobra debajo del último renglón al cortar</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    FoodTruckOS es un producto de VibrancyGG. Los precios son de referencia y cambian;
+    verifica al comprar. No vendemos, revendemos ni damos garantía de hardware.
+  </footer>
+
+</div>

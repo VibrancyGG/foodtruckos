@@ -451,6 +451,40 @@
   </section>
 
   <section>
+    <h2>Ya registrado</h2>
+    <p class="block-title">Lo que el código ya sabe de la P047</p>
+    <p class="block-note">
+      Tres hallazgos que salieron de probarla y que ya están resueltos en
+      <code>lib/kitchen/escpos.ts</code>. No hace falta volver a descubrirlos — pero sí
+      marcar arriba la prueba que les corresponde, con lo que hayas visto tú.
+    </p>
+    <div class="tests">
+      <div class="test">
+        <div class="test-head"><span class="num">A4</span><h3>La chicharra no suena — y no importa</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag note">18/08/2026</span><div>La P047 <strong>no entiende <code>ESC B</code></strong>: imprime los cuatro bytes como texto en vez de sonar.</div></div>
+          <div class="row"><span class="tag do">Resuelto</span><div>Queda apagada por omisión (<code>buzzer</code> en <code>escpos.ts</code>). Dejarla activada ensuciaría cada comanda justo en la impresora que recomendamos. El aviso sonoro lo da la tablet, que es la que la cocina escucha de todos modos.</div></div>
+          <div class="row"><span class="tag pass">Veredicto</span><div>No es motivo de rechazo, y así lo dice la propia prueba A4.</div></div>
+        </div>
+      </div>
+      <div class="test">
+        <div class="test-head"><span class="num">A3</span><h3>Cortar sin avanzar parte el ticket a la mitad</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag note">Medido</span><div>La cuchilla está más arriba que el cabezal: la P047 <strong>retiene unos 8 renglones</strong> dentro del mecanismo. Al cortar sin avance, el total — la última línea — se queda adentro.</div></div>
+          <div class="row"><span class="tag do">Resuelto</span><div><code>GS V 66 n</code> con <code>CORTE_AVANCE_PUNTOS = 220</code> (≈ 27 mm a 203 ppp), con holgura sobre esos 8 renglones.</div></div>
+          <div class="row"><span class="tag note">Si sobra papel</span><div>Se baja midiendo: imprime, corta, y mide el blanco debajo del último renglón.</div></div>
+        </div>
+      </div>
+      <div class="test">
+        <div class="test-head"><span class="num">A2</span><h3>Acentos y eñes: tabla CP850</h3></div>
+        <div class="rows">
+          <div class="row"><span class="tag do">Resuelto</span><div>Se manda <code>ESC t 2</code> (CP850) antes de cualquier texto. Sin eso la impresora escupe <code>Ã±</code> donde va la <code>ñ</code>. Lo que no está en CP850 cae a su equivalente sin acento antes que imprimir basura.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
     <h2>Bloque A · sin código</h2>
     <p class="block-title">El día que llega la caja</p>
     <p class="block-note">
