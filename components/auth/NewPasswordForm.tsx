@@ -2,27 +2,63 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { getPostLoginRedirect } from "@/lib/auth/actions"
 import { useLang } from "@/lib/i18n/LangProvider"
+
+type Estado = "revisando" | "listo" | "sinEnlace"
 
 export function NewPasswordForm() {
   const { t } = useLang()
   const p = t.auth
-  const router = useRouter()
 
   const [password, setPassword] = useState("")
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
-  // Sin sesión no hay nada que guardar: el enlace se usó, venció, o lo abrió
-  // el antivirus del correo antes que la persona. Decirlo al entrar evita que
-  // teclee una contraseña nueva para que se la rechacen al final.
-  const [sesion, setSesion] = useState<"revisando" | "si" | "no">("revisando")
+  const [estado, setEstado] = useState<Estado>("revisando")
 
+  // El enlace de recuperación llega con la sesión en el FRAGMENTO de la URL
+  // (#access_token=…), no en la consulta. Eso es a propósito: el fragmento no
+  // viaja al servidor, así que el enlace no depende del navegador que lo pidió
+  // — se puede pedir en la computadora y abrir en el celular, que es como lo
+  // usa la gente de verdad.
+  //
+  // Aquí se canjea a mano por una sesión de cookie (setSession), que es la que
+  // el panel entiende, y se limpia el fragmento para que la contraseña nueva
+  // no quede escrita en el historial del navegador.
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data }) => setSesion(data.session ? "si" : "no"))
+
+    async function abrirSesion() {
+      const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : ""
+      const params = new URLSearchParams(hash)
+
+      const descripcion = params.get("error_description")
+      if (descripcion) {
+        setEstado("sinEnlace")
+        return
+      }
+
+      const access_token = params.get("access_token")
+      const refresh_token = params.get("refresh_token")
+
+      if (access_token && refresh_token) {
+        const { error: fallo } = await supabase.auth.setSession({ access_token, refresh_token })
+        // Se borra el fragmento pase lo que pase: dejar tokens en la barra de
+        // direcciones no le sirve a nadie.
+        window.history.replaceState(null, "", window.location.pathname)
+        setEstado(fallo ? "sinEnlace" : "listo")
+        return
+      }
+
+      // Sin fragmento: puede que ya venga con sesión (volvió a la pestaña, o
+      // entró desde el panel a cambiar su contraseña).
+      const { data } = await supabase.auth.getSession()
+      setEstado(data.session ? "listo" : "sinEnlace")
+    }
+
+    abrirSesion()
   }, [])
 
   async function submit(e: React.FormEvent) {
@@ -37,7 +73,14 @@ export function NewPasswordForm() {
       return
     }
     setDone(true)
-    setTimeout(() => router.push("/panel"), 1500)
+    // Navegación completa y por el mismo camino que el login normal: la cookie
+    // de sesión se escribe en un listener asíncrono, así que empujar la ruta de
+    // inmediato puede ganarle a esa escritura. Y el destino depende del rol —
+    // no todos los que recuperan contraseña van al panel del dueño.
+    const destino = await getPostLoginRedirect()
+    setTimeout(() => {
+      window.location.href = destino
+    }, 1200)
   }
 
   return (
@@ -47,7 +90,7 @@ export function NewPasswordForm() {
 
       {done ? (
         <p className="text-sm font-bold text-emerald-400">{p.newPasswordDone}</p>
-      ) : sesion === "no" ? (
+      ) : estado === "sinEnlace" ? (
         <>
           <p className="mb-4 text-sm font-semibold text-amber-400">{p.newPasswordNoSession}</p>
           <Link
@@ -67,14 +110,14 @@ export function NewPasswordForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={p.newPasswordField}
             autoComplete="new-password"
-            disabled={sesion === "revisando"}
-            className="w-full rounded-xl border px-3.5 py-3 text-sm text-neutral-50 placeholder:text-neutral-500"
+            disabled={estado === "revisando"}
+            className="w-full rounded-xl border px-3.5 py-3 text-sm text-neutral-50 placeholder:text-neutral-500 disabled:opacity-50"
             style={{ background: "#161617", borderColor: "#3A3A3D" }}
           />
           {error && <p className="text-sm font-semibold text-amber-400">{error}</p>}
           <button
             type="submit"
-            disabled={saving || sesion === "revisando"}
+            disabled={saving || estado === "revisando"}
             className="w-full rounded-xl bg-white py-3 text-sm font-black text-neutral-900 disabled:opacity-50"
           >
             {saving ? p.newPasswordSaving : p.newPasswordSave}

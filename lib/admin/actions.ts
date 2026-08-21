@@ -149,7 +149,7 @@ export async function sendOwnerRecovery(businessId: string): Promise<Result & { 
   const publico = createPublicClient()
   const site = process.env.NEXT_PUBLIC_SITE_URL || "https://foodtruckos.vercel.app"
   const { error: envio } = await publico.auth.resetPasswordForEmail(email, {
-    redirectTo: `${site}/auth/callback?next=/auth/reset-password`,
+    redirectTo: `${site}/auth/reset-password`,
   })
   if (envio) {
     // El 429 es el caso frecuente: alguien ya lo pidió hace un momento.

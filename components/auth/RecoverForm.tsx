@@ -2,13 +2,25 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
+import { createPublicClient } from "@/lib/supabase/public"
 import { useLang } from "@/lib/i18n/LangProvider"
 
 // Supabase limita cuántos correos manda al mismo destinatario seguidos. Antes
 // ese rechazo se tragaba en silencio y la pantalla decía "te llegó un enlace"
 // igual — que es exactamente cómo alguien termina convencido de que el correo
 // de recuperación no funciona. Ahora se dice, con la cuenta regresiva.
+//
+// El enlace se pide con el cliente SIN sesión, no con el de @supabase/ssr, y
+// no es un detalle: el de ssr usa PKCE, que deja un "verificador" guardado en
+// el navegador que pidió el enlace y exige presentarlo al abrirlo. Eso rompe
+// el caso más común de todos — pedirlo en la computadora y abrir el correo en
+// el celular — y rompe por completo el enlace que dispara el admin, porque
+// ahí el verificador nace en el servidor y no llega a ningún lado.
+//
+// Sin PKCE, Supabase manda la sesión en el fragmento de la URL y el enlace
+// sirve desde cualquier aparato. Por eso apunta directo a la pantalla de
+// contraseña nueva y no a /auth/callback: el fragmento nunca viaja al
+// servidor, solo lo puede leer el navegador.
 export function RecoverForm() {
   const { t } = useLang()
   const p = t.auth
@@ -28,9 +40,9 @@ export function RecoverForm() {
   async function pedirEnlace() {
     setSending(true)
     setError(null)
-    const supabase = createClient()
+    const supabase = createPublicClient()
     const { error: fallo } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     })
     setSending(false)
 
