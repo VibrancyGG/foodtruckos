@@ -56,9 +56,9 @@ h1{font-size:clamp(27px,6vw,36px);font-weight:900;letter-spacing:-.03em;line-hei
 .foot{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:#8A8078}
 .pr{margin-top:22px}
 .pr button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:12px 20px;font:800 14px var(--f);cursor:pointer;color:var(--ink)}
-[data-en]{display:none}
-body.en [data-es]{display:none}
-body.en [data-en]{display:revert}
+body:not(.en) [data-en]{display:none!important}
+body.en [data-es]{display:none!important}
+
 @media print{.top,.pr{display:none}body{background:#fff}.step,.warn,.no{break-inside:avoid}}
 </style>
 </head>
@@ -78,8 +78,8 @@ body.en [data-en]{display:revert}
 
   <h1 data-es>Cómo usar la pantalla</h1>
   <h1 data-en>How to use the screen</h1>
-  <p class="lede" data-es>Nueve cosas y ya. Si algo no está aquí, pregúntale al patrón.</p>
-  <p class="lede" data-en>Nine things, that's it. If it's not here, ask the owner.</p>
+  <p class="lede" data-es>Doce cosas y ya. Si algo no está aquí, pregúntale al patrón.</p>
+  <p class="lede" data-en>Twelve things, that's it. If it's not here, ask the owner.</p>
 
   <div class="step"><div class="n">1</div><div class="b">
     <h2 data-es>Entra con tu PIN</h2><h2 data-en>Sign in with your PIN</h2>
@@ -162,6 +162,34 @@ body.en [data-en]{display:revert}
     <p data-en>One thing: while it's down, <b>no new orders from customers' phones will come in</b>. Walk-ups get entered normally.</p>
   </div></div>
 
+  <div class="step"><div class="n">10</div><div class="b">
+    <h2 data-es>Cuando el cliente avisa que ya llegó</h2><h2 data-en>When a customer says they're here</h2>
+    <p data-es>Desde su celular, el cliente puede tocar <b>Ya estoy aquí</b> cuando está parado afuera esperando. Su tarjeta <b>se sube hasta arriba</b> de la columna de Nuevas y late en verde.</p>
+    <p data-en>From their phone, the customer can tap <b>I'm here</b> when they're outside waiting. Their card <b>jumps to the top</b> of the New column and pulses green.</p>
+    <p data-es>Suena distinto al de orden nueva: el de orden nueva sube, este baja. Es para que sepas, sin mirar, que hay alguien parado en la ventanilla.</p>
+    <p data-en>It sounds different from a new order: a new order goes up, this one goes down. It's so you know, without looking, that someone is standing at the window.</p>
+    <p data-es>No cambia su turno ni te obliga a nada. Solo te dice que ya está ahí, para que su comida no se enfríe esperando.</p>
+    <p data-en>It doesn't change their place in line or force you to do anything. It just tells you they're there, so their food doesn't sit getting cold.</p>
+  </div></div>
+
+  <div class="step"><div class="n">11</div><div class="b">
+    <h2 data-es>Si te preguntan por una orden que ya no ves</h2><h2 data-en>If someone asks about an order you can't see</h2>
+    <p data-es>Toca <b>Buscar</b> arriba y escribe el número que te diga el cliente. Encuentra órdenes de los últimos 7 días, aunque ya se hayan entregado o cancelado.</p>
+    <p data-en>Tap <b>Search</b> at the top and type the number the customer gives you. It finds orders from the last 7 days, even ones already handed over or cancelled.</p>
+    <p data-es>Los números se reinician cada día, así que puede haber varios con el mismo. Te muestra el más reciente, y si no es de hoy te lo dice con la fecha.</p>
+    <p data-en>Numbers start over each day, so there can be several with the same one. It shows you the most recent, and if it isn't from today it tells you the date.</p>
+  </div></div>
+
+  <div class="step"><div class="n">12</div><div class="b">
+    <h2 data-es>Si te dice que tu sesión venció</h2><h2 data-en>If it says your session expired</h2>
+    <p class="big" data-es>Toca <b>Volver a entrar</b> y mete tu PIN. Nada se perdió.</p>
+    <p class="big" data-en>Tap <b>Sign in again</b> and enter your PIN. Nothing was lost.</p>
+    <p data-es>Mientras dice eso, los botones se apagan a propósito: lo que toques no llegaría a ningún lado. Vuelve a entrar y sigue donde ibas.</p>
+    <p data-en>While it says that, the buttons are off on purpose: whatever you tap wouldn't reach anywhere. Sign back in and pick up where you were.</p>
+    <p data-es>Pasa como mucho una vez al día, y solo si la tablet lleva muchas horas encendida sin que nadie entre.</p>
+    <p data-en>It happens at most once a day, and only if the tablet has been on for many hours without anyone signing in.</p>
+  </div></div>
+
   <div class="warn">
     <b data-es>El sonido déjalo encendido</b><b data-en>Leave the sound on</b>
     <p data-es>Cuando entra un pedido nuevo suena. Nadie está viendo la pantalla en hora pico — el sonido es lo que evita que una orden se quede parada.</p>
@@ -182,6 +210,14 @@ body.en [data-en]{display:revert}
       <li>You don't need to charge the tablet by hand if it's plugged in.</li>
       <li>You don't change prices or the menu — that's the owner's job.</li>
     </ul>
+  </div>
+
+  <div class="warn">
+    <b data-es>Si tu truck imprime comandas</b><b data-en>If your truck prints tickets</b>
+    <p data-es>La comanda sale sola en cuanto entra el pedido — no tienes que tocar nada. Si se atoró el papel o alguien perdió el ticket, cada tarjeta tiene un botón para <b>reimprimir</b>: sale igualita, con la palabra COPIA arriba para que nadie prepare el platillo dos veces.</p>
+    <p data-en>The ticket prints on its own as soon as the order lands — you don't touch anything. If the paper jammed or someone lost the ticket, every card has a <b>reprint</b> button: it comes out identical, with COPY at the top so nobody makes the dish twice.</p>
+    <p data-es>Si la impresora está apagada o sin papel, las comandas <b>no se pierden</b>: se guardan y salen todas juntas en cuanto la prendas.</p>
+    <p data-en>If the printer is off or out of paper, the tickets <b>are not lost</b>: they're held and all come out as soon as you turn it on.</p>
   </div>
 
   <div class="pr">
