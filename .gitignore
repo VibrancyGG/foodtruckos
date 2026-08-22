@@ -42,3 +42,8 @@ next-env.d.ts
 
 # SQL generado con hashes de PIN — no pertenece al repo
 scripts/demo-villita.sql
+
+# Archivos temporales de pruebas — nunca deben viajar al repo
+enlace.txt
+*-tmp.mjs
+*-tmp.cjs
