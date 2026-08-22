@@ -84,7 +84,7 @@ class PrinterService : Service() {
             .setContentTitle(getString(R.string.notif_title))
             .setContentText(estado)
             .setStyle(Notification.BigTextStyle().bigText(estado))
-            .setSmallIcon(android.R.drawable.ic_menu_edit)
+            .setSmallIcon(R.drawable.ic_notificacion)
             .setContentIntent(abrir)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- El mismo negro del icono de la marca en la web (public/icons), para que
+         la app de la tablet y el sitio se reconozcan como lo mismo. -->
+    <color name="ic_launcher_background">#0A0A0A</color>
+</resources>

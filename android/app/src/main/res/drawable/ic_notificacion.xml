@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono de la notificación permanente del servicio de impresión.
+     Android lo tiñe de un solo color y descarta todo lo demás, así que tiene
+     que ser una silueta blanca sobre transparente — un icono a color aquí sale
+     como una mancha. Antes se usaba el lápiz genérico del sistema, que no
+     dice nada y es lo que el cocinero ve en la barra todo el turno. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,4 H18 V7.5 H11 V10.5 H17 V14 H11 V20 H6 Z" />
+</vector>
