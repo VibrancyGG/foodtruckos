@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- El mismo negro del icono de la marca en la web (public/icons), para que
-         la app de la tablet y el sitio se reconozcan como lo mismo. -->
-    <color name="ic_launcher_background">#0A0A0A</color>
+    <!-- El bermellón de la marca, el mismo de la landing y de los botones del
+         menú del comensal. Se prefirió sobre el negro del icono web por dónde
+         vive esta app: una pantalla de inicio de tablet, casi siempre con fondo
+         oscuro, donde un icono negro se pierde entre los demás y alguien con
+         las manos ocupadas tiene que encontrarlo rápido. -->
+    <color name="ic_launcher_background">#FF5A36</color>
 </resources>
