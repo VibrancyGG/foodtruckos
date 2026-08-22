@@ -4,6 +4,15 @@ import { generateOpaqueToken, parseOpaqueToken, secretMatches, pepperedPin, hash
 import { getTrialInfo } from "@/lib/billing/trial"
 
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000 // 12h — una tablet no debería tener que re-entrar a media jornada
+
+// Techo duro desde que se tecleó el PIN. La sesión se renueva mientras la
+// pantalla siga abierta, pero nunca más allá de esto — así nadie se cae a
+// media venta y, aun así, la sesión de ayer no sirve hoy.
+//
+// 16 h cubre cualquier jornada real de un truck con holgura. Sin este tope, una
+// tablet encendida de forma permanente dejaría la sesión viva para siempre, y
+// quien salió del turno a las 3 de la tarde seguiría técnicamente dentro.
+const SESSION_MAX_AGE_MS = 16 * 60 * 60 * 1000
 const LOCKOUT_STEPS_SECONDS = [30, 60, 120, 300, 900] // 30s, 1m, 2m, 5m, tope 15m
 
 type Device = {
@@ -178,10 +187,23 @@ export async function verifyStaffSession(
 // Extiende expires_at en la base, no solo el max-age de la cookie — sin esto
 // una sesión "refrescada" del lado del cliente seguiría venciendo del lado
 // del servidor a las 12h originales.
-export async function extendStaffSession(sessionId: string) {
+export async function extendStaffSession(sessionId: string): Promise<Date | null> {
   const supabase = createServiceClient()
+  const { data: sesion } = await supabase
+    .from("device_sessions")
+    .select("issued_at")
+    .eq("id", sessionId)
+    .maybeSingle()
+  if (!sesion) return null
+
+  const tope = new Date(sesion.issued_at).getTime() + SESSION_MAX_AGE_MS
+  const nuevo = Math.min(Date.now() + SESSION_TTL_MS, tope)
+  // Ya pasó el techo: no se extiende y la sesión muere sola cuando toque.
+  if (nuevo <= Date.now()) return null
+
   await supabase
     .from("device_sessions")
-    .update({ expires_at: new Date(Date.now() + SESSION_TTL_MS).toISOString() })
+    .update({ expires_at: new Date(nuevo).toISOString() })
     .eq("id", sessionId)
+  return new Date(nuevo)
 }

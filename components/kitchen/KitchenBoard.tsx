@@ -248,6 +248,27 @@ export function KitchenBoard({
     }
   }, [syncPrinting])
 
+  // Mantiene viva la sesión mientras la pantalla siga abierta, con el techo de
+  // 16 h desde el PIN que aplica el servidor. La maquinaria existía desde hace
+  // rato (/api/staff/refresh extiende la fecha en la base y reemite la cookie)
+  // pero NADIE la llamaba: la sesión moría a las 12 h exactas aunque la tablet
+  // estuviera en pleno uso, y en un truck que abre 7:00–20:00 eso cae una hora
+  // antes de cerrar, con gente pidiendo.
+  //
+  // No corre en la vista del dueño (/panel/cocina): ahí no hay sesión de
+  // personal, así que pedir renovarla daría 401 y bloquearía su tablero.
+  const renovarSesion = useCallback(async () => {
+    if (readOnly) return
+    try {
+      const res = await fetch("/api/staff/refresh", { method: "POST" })
+      // Solo un 401 bloquea: es el servidor diciendo que la sesión ya no vale.
+      // Un fallo de red no significa nada — se reintenta al siguiente ciclo.
+      if (res.status === 401) setSessionExpired(true)
+    } catch {
+      // sin red la sesión sigue igual de válida; no hay nada que hacer aquí
+    }
+  }, [readOnly])
+
   const refetch = useCallback(async () => {
     const supabase = createClient()
     const { data: freshOrders } = await supabase
@@ -349,6 +370,8 @@ export function KitchenBoard({
       fetchTodayCount()
       syncPrintingPrefs()
     }, 60000)
+    // Cada media hora basta: la sesión dura 12 h y esto solo corre la fecha.
+    const sessionPoll = setInterval(renovarSesion, 30 * 60 * 1000)
     const countKick = setTimeout(fetchTodayCount, 0)
 
     return () => {
@@ -357,9 +380,10 @@ export function KitchenBoard({
       clearInterval(drain)
       clearInterval(clock)
       clearInterval(countPoll)
+      clearInterval(sessionPoll)
       clearTimeout(countKick)
     }
-  }, [unitId, businessId, refetch, fetchTodayCount, syncPrintingPrefs])
+  }, [unitId, businessId, refetch, fetchTodayCount, syncPrintingPrefs, renovarSesion])
 
   // Cierra la sesión de la persona, no el emparejamiento del dispositivo —
   // el siguiente en el turno solo teclea su PIN (lib/staff/session.ts:
