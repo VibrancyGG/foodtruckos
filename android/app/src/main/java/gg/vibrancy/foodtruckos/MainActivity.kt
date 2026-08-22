@@ -84,7 +84,7 @@ class MainActivity : Activity() {
             // personal navegando dentro de la pantalla de trabajo.
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 val host = Uri.parse(url).host ?: return true
-                if (host.endsWith(DOMINIO)) return false
+                if (DOMINIOS_PROPIOS.any { host == it || host.endsWith(".$it") }) return false
                 try {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } catch (_: Exception) {
@@ -214,8 +214,22 @@ class MainActivity : Activity() {
     }
 
     companion object {
-        private const val DOMINIO = "foodtruckos.vercel.app"
+        // El dominio al que entra la tablet. Cambiarlo obliga a volver a
+        // emparejar el aparato: la sesión de personal vive en cookies, y las
+        // cookies no viajan entre dominios.
+        private const val DOMINIO = "foodtruckos.vibrancygg.com"
         private const val COCINA = "https://$DOMINIO/cocina"
+
+        // Todos los dominios que cuentan como "nuestro sitio". Está aparte del
+        // de arriba a propósito: durante una mudanza los dos sirven a la vez, y
+        // una tablet que siga en el viejo no debe empezar a mandar cada enlace
+        // al navegador del sistema. Cuando el viejo se apague, se borra de aquí
+        // y nadie tiene que reinstalar la app.
+        private val DOMINIOS_PROPIOS = listOf(
+            "foodtruckos.vibrancygg.com",
+            "foodtruckos.vercel.app",
+        )
+
         private const val PERMISOS = 10
     }
 }
