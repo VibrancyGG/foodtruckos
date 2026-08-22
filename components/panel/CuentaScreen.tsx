@@ -14,10 +14,12 @@ export function CuentaScreen({
   billing,
   ownerEmail,
   signInMethod,
+  impersonating = false,
 }: {
   billing: OwnerBillingData
   ownerEmail: string
   signInMethod: "google" | "password"
+  impersonating?: boolean
 }) {
   const { t } = useLang()
   const p = t.panel.cuentaPage
@@ -123,8 +125,10 @@ export function CuentaScreen({
       </div>
 
       <div className="panel-animate-in rounded-[20px] border border-panel-line bg-panel-surface p-5 shadow-[0_1px_2px_rgba(23,20,15,0.04)]" style={{ animationDelay: "240ms" }}>
-        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-panel-ink/40">{p.yourDataTitle}</div>
-        <p className="mb-3 text-xs text-panel-ink/40">{p.yourDataHint}</p>
+        <div className="mb-1 text-xs font-bold uppercase tracking-wide text-panel-ink/40">
+          {impersonating ? p.businessDataTitle : p.yourDataTitle}
+        </div>
+        <p className="mb-3 text-xs text-panel-ink/40">{impersonating ? p.businessDataHint : p.yourDataHint}</p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between gap-3 border-b border-panel-line pb-2">
             <span className="text-panel-ink-soft">{p.businessLabel}</span>
@@ -134,10 +138,14 @@ export function CuentaScreen({
             <span className="text-panel-ink-soft">{p.emailLabel}</span>
             <span className="font-semibold text-panel-ink">{ownerEmail}</span>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-panel-ink-soft">{p.signInLabel}</span>
-            <span className="font-semibold text-panel-ink">{signInMethod === "google" ? p.signInGoogle : p.signInPassword}</span>
-          </div>
+          {/* El método de ingreso es de quien tiene la sesión. Viendo como
+              admin sería el del admin, así que no se muestra. */}
+          {!impersonating && (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-panel-ink-soft">{p.signInLabel}</span>
+              <span className="font-semibold text-panel-ink">{signInMethod === "google" ? p.signInGoogle : p.signInPassword}</span>
+            </div>
+          )}
         </div>
         <button
           data-tour="onboarding-restart"

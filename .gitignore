@@ -44,6 +44,6 @@ next-env.d.ts
 scripts/demo-villita.sql
 
 # Archivos temporales de pruebas — nunca deben viajar al repo
-enlace.txt
+enlace*.txt
 *-tmp.mjs
 *-tmp.cjs
