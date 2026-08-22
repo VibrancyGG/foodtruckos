@@ -677,6 +677,8 @@ export type Dictionary = {
       howYouPayManual: string
       howYouPayStripe: string
       yourDataTitle: string
+      businessDataTitle: string
+      businessDataHint: string
       yourDataHint: string
       businessLabel: string
       emailLabel: string
@@ -1756,6 +1758,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         howYouPayManual: "Te mandamos el recibo por correo y lo pagas por transferencia. El cobro automático con tarjeta llega en una fase futura; cuando esté, lo activas desde aquí y dejas de recibir el correo.",
         howYouPayStripe: "Se cobra automático a tu tarjeta guardada cada mes — no tienes que hacer nada.",
         yourDataTitle: "Tus datos",
+        businessDataTitle: "Datos del negocio",
+        businessDataHint: "Lo que sale en su recibo — estás viendo esto como admin",
         yourDataHint: "Lo que sale en el recibo",
         businessLabel: "Negocio",
         emailLabel: "Correo",
@@ -2832,6 +2836,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         howYouPayManual: "We email you the receipt and you pay by bank transfer. Automatic card billing is coming in a future phase; once it's ready, you'll turn it on from here and stop getting the email.",
         howYouPayStripe: "Your saved card is charged automatically every month — nothing to do on your end.",
         yourDataTitle: "Your info",
+        businessDataTitle: "Business details",
+        businessDataHint: "What shows on their receipt — you are viewing this as an admin",
         yourDataHint: "What shows up on your receipt",
         businessLabel: "Business",
         emailLabel: "Email",
