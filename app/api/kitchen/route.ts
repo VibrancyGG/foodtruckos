@@ -13,8 +13,8 @@ const PREV: Record<string, string> = { preparando: "recibido", listo: "preparand
 const TAX_RATE = 0.08625
 
 type Body =
-  | { action: "advance"; orderId: string; unitId?: string }
-  | { action: "regress"; orderId: string; unitId?: string }
+  | { action: "advance"; orderId: string; fromStatus?: string; unitId?: string }
+  | { action: "regress"; orderId: string; fromStatus?: string; unitId?: string }
   | { action: "deliver"; orderId: string; paid: boolean; paymentMethod?: string; unitId?: string }
   | { action: "markPaid"; orderId: string; paymentMethod?: string; unitId?: string }
   | { action: "cancel"; orderId: string; unitId?: string }
@@ -84,6 +84,20 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
     if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
 
+    // "Avanzar" es relativo: lee el estado y pasa al siguiente. Por eso una
+    // acción repetida movía DOS pasos — pasó de verdad con la orden 47, que
+    // saltó de recibido a listo en 1.3 s cuando la cola drenó dos avances
+    // acumulados mientras la sesión estaba caducada.
+    //
+    // El cliente manda desde qué estado creía estar avanzando. Si el pedido ya
+    // no está ahí, alguien más lo movió o esta acción ya se aplicó: se rechaza
+    // con 409, que la cola descarta sin reintentar. Es opcional a propósito —
+    // una tablet puede traer acciones encoladas de la versión anterior, y esas
+    // deben seguir funcionando en vez de atorarse para siempre.
+    if (body.fromStatus && order.status !== body.fromStatus) {
+      return NextResponse.json({ error: "El pedido ya cambió de estado" }, { status: 409 })
+    }
+
     const to = NEXT[order.status]
     if (!to) return NextResponse.json({ error: "Ese pedido no puede avanzar así" }, { status: 400 })
 
@@ -107,6 +121,12 @@ export async function POST(req: NextRequest) {
       .eq("unit_id", unit.id)
       .maybeSingle()
     if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 })
+
+    // Mismo cuidado que en "avanzar": relativo y repetible es lo que hace que
+    // una acción encolada dos veces mueva dos pasos.
+    if (body.fromStatus && order.status !== body.fromStatus) {
+      return NextResponse.json({ error: "El pedido ya cambió de estado" }, { status: 409 })
+    }
 
     const to = PREV[order.status]
     if (!to) return NextResponse.json({ error: "Ese pedido no puede regresar" }, { status: 400 })

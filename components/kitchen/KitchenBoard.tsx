@@ -124,6 +124,12 @@ export function KitchenBoard({
   const [askCollectFor, setAskCollectFor] = useState<string | null>(null)
   const [sessionExpired, setSessionExpired] = useState(false)
   const [confirmingLogout, setConfirmingLogout] = useState(false)
+
+  // La sesión caducada bloquea la pantalla igual que el modo de solo lectura.
+  // Antes solo salía un letrero rojo y todos los botones seguían vivos: cada
+  // toque encolaba una acción que nadie podía mandar, y al volver a entrar se
+  // aplicaban todas juntas. Así saltó la orden 47 de "recibido" a "listo".
+  const bloqueado = readOnly || sessionExpired
   const [now, setNow] = useState(() => Date.now())
   const [soundOn, setSoundOn] = useState(true)
   const [activeTab, setActiveTab] = useState<Column>("recibido")
@@ -364,6 +370,11 @@ export function KitchenBoard({
   }
 
   function act(body: Record<string, unknown>) {
+    // Con la sesión caducada nada se puede escribir, así que tampoco se encola:
+    // antes el letrero avisaba pero los botones seguían vivos, y cada toque
+    // sumaba otra acción a la cola. Al volver a entrar, todas se aplicaban de
+    // golpe y el pedido saltaba varios estados.
+    if (bloqueado) return
     // El Encargado puede operar un truck que no es el de su dispositivo
     // emparejado (foodtruckos-accesos) — el servidor solo lo honra si el rol
     // verificado en la sesión es "encargado" y el truck es del mismo negocio
@@ -375,14 +386,18 @@ export function KitchenBoard({
 
   function advance(orderId: string) {
     const NEXT: Record<string, string> = { recibido: "preparando", preparando: "listo" }
+    // Se manda desde qué estado se avanza. Si para cuando la acción llega al
+    // servidor el pedido ya no está ahí, se rechaza en vez de mover otro paso.
+    const desde = orders.find((o) => o.id === orderId)?.status
     setOrders((os) => os.map((o) => (o.id === orderId ? { ...o, status: NEXT[o.status] ?? o.status } : o)))
-    act({ action: "advance", orderId })
+    act({ action: "advance", orderId, fromStatus: desde })
   }
 
   function regress(orderId: string) {
     const PREV: Record<string, string> = { preparando: "recibido", listo: "preparando" }
+    const desde = orders.find((o) => o.id === orderId)?.status
     setOrders((os) => os.map((o) => (o.id === orderId ? { ...o, status: PREV[o.status] ?? o.status } : o)))
-    act({ action: "regress", orderId })
+    act({ action: "regress", orderId, fromStatus: desde })
   }
 
   function deliver(orderId: string, paid: boolean, paymentMethod?: "efectivo" | "tarjeta") {
@@ -509,7 +524,7 @@ export function KitchenBoard({
         >
           {lang === "es" ? "EN" : "ES"}
         </button>
-        {!readOnly &&
+        {!bloqueado &&
           (confirmingLogout ? (
             <div className="flex items-center gap-1.5 text-xs font-bold">
               <span style={{ color: "#FFB3B5" }}>{t.kitchen.confirmLogout}</span>
@@ -536,7 +551,7 @@ export function KitchenBoard({
         <div className="ml-auto flex w-full flex-wrap gap-2 md:w-auto">
           <ToolButton onClick={() => setShowDaySummary(true)} label={t.kitchen.salesButton} />
           <ToolButton onClick={() => setShowLookup(true)} label={t.kitchen.lookupButton} />
-          {!readOnly && (
+          {!bloqueado && (
             <>
               <ToolButton onClick={() => setSoundOn((s) => !s)} label={soundOn ? t.kitchen.soundOn : t.kitchen.soundOff} on={soundOn} />
               <ToolButton onClick={() => setShowSoldOut(true)} label={t.kitchen.soldOutToggle} />
@@ -630,7 +645,7 @@ export function KitchenBoard({
                         </span>
                       </div>
                       <div className="mb-2.5 flex items-center gap-2.5">
-                        {!readOnly && (printing.enabled || HAS_BACK[col]) && (
+                        {!bloqueado && (printing.enabled || HAS_BACK[col]) && (
                           <span className="ml-auto flex flex-none items-center gap-2">
                             {printing.enabled && (
                               <button
@@ -684,7 +699,7 @@ export function KitchenBoard({
                         {/* Cobrar sin sacar la orden de la fila. Solo donde
                             tiene sentido: aún no está entregada y no se ha
                             pagado. En "listo" ya existe el cobro al entregar. */}
-                        {!readOnly && o.payment_status !== "pagada" && col !== "listo" && askCollectFor !== o.id && (
+                        {!bloqueado && o.payment_status !== "pagada" && col !== "listo" && askCollectFor !== o.id && (
                           <button
                             onClick={() => setAskCollectFor(o.id)}
                             className="ml-auto rounded-lg px-3 py-1 text-[13px] font-extrabold"
@@ -769,7 +784,7 @@ export function KitchenBoard({
                           <span>${o.total.toFixed(2)}</span>
                         </div>
                       )}
-                      {!readOnly && (col === "listo" ? (
+                      {!bloqueado && (col === "listo" ? (
                         askPayFor === o.id ? (
                           <div className="mt-2.5 space-y-1.5">
                             <div className="mb-0.5 text-center text-[11px] font-bold uppercase tracking-wide text-neutral-400">
@@ -793,7 +808,7 @@ export function KitchenBoard({
                       ) : (
                         <CtaButton onClick={() => advance(o.id)} kind={NEXT_CTA[col]} label={col === "recibido" ? t.kitchen.start : t.kitchen.ready} />
                       ))}
-                      {!readOnly && (askCancelFor === o.id ? (
+                      {!bloqueado && (askCancelFor === o.id ? (
                         <div className="mt-2 flex gap-1.5">
                           <button
                             onClick={() => cancelOrder(o.id)}
