@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { createPublicClient } from "@/lib/supabase/public"
+import { SITE_URL } from "@/lib/utils/siteUrl"
 import { getAdminContext } from "@/lib/auth/getAdminContext"
 import { trialEndsFromNow } from "@/lib/billing/trial"
 
@@ -147,9 +148,8 @@ export async function sendOwnerRecovery(businessId: string): Promise<Result & { 
   // Cliente sin sesión: mandar el enlace no debe depender de quién está
   // conectado, y no queremos que la sesión del admin toque este camino.
   const publico = createPublicClient()
-  const site = process.env.NEXT_PUBLIC_SITE_URL || "https://foodtruckos.vercel.app"
   const { error: envio } = await publico.auth.resetPasswordForEmail(email, {
-    redirectTo: `${site}/auth/reset-password`,
+    redirectTo: `${SITE_URL}/auth/reset-password`,
   })
   if (envio) {
     // El 429 es el caso frecuente: alguien ya lo pidió hace un momento.

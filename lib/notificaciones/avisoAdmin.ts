@@ -2,6 +2,7 @@ import "server-only"
 import { after } from "next/server"
 import { Resend } from "resend"
 import { armarHtml, type Aviso } from "./plantilla"
+import { SITE_URL } from "@/lib/utils/siteUrl"
 
 // Avisos internos de VibrancyGG: alguien quiere entrar, alguien quiere crecer,
 // alguien quiere irse. No son correos al cliente — el destinatario somos
@@ -26,7 +27,7 @@ async function enviar(aviso: Aviso): Promise<void> {
       from: REMITENTE,
       to: DESTINO,
       subject: aviso.asunto,
-      html: armarHtml(aviso, process.env.NEXT_PUBLIC_SITE_URL || "https://foodtruckos.com"),
+      html: armarHtml(aviso, SITE_URL),
     })
     if (error) {
       console.error("[avisoAdmin] Resend rechazó el envío:", error)

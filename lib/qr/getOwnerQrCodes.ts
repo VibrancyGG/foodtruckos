@@ -1,10 +1,9 @@
 import QRCode from "qrcode"
 import { createClient } from "@/lib/supabase/server"
 import { slugify } from "@/lib/utils/slugify"
-
-// Siempre apunta al dominio real, nunca a localhost — lo que se imprime tiene
-// que funcionar sin importar desde dónde el dueño esté viendo este panel.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://foodtruckos.vercel.app"
+// Siempre el dominio real, nunca localhost: lo que se imprime tiene que
+// funcionar sin importar desde dónde el dueño esté viendo este panel.
+import { SITE_URL } from "@/lib/utils/siteUrl"
 
 export async function getOwnerQrCodes(businessId: string) {
   const supabase = await createClient()
