@@ -125,6 +125,12 @@ td:first-child{font-weight:600}
       <p class="lede">Todo lo que llevamos construido, pantalla por pantalla, con el porqué de cada decisión. El porqué es la parte que se pierde con el tiempo y la que más cuesta reconstruir.</p>
     </div>
 
+    <div class="card ok">
+      <h4>Cómo leer este manual</h4>
+      <p><strong>El producto ya está construido y en producción</strong> — el estado real está en la sección 17. Las secciones 04 a 14 conservan los <strong>prototipos de diseño</strong> con los que se decidió cada pantalla, así que cuando una de ellas dice "cuando exista Supabase" o "todavía no guarda", está describiendo aquel prototipo, no el producto de hoy.</p>
+      <p>Se conservan a propósito: son la mejor explicación del porqué de cada decisión, y ese porqué no se puede reconstruir mirando el código terminado.</p>
+    </div>
+
     <h2 id="que"><span class="num">01</span>Qué es y para quién</h2>
     <p class="h2s">Tres frases para que cualquiera entienda el producto.</p>
     <p>El comensal escanea un código QR pegado en el truck, ve el menú con la marca del negocio en su propio celular, arma su pedido y lo envía. La orden aparece de inmediato en la pantalla de la cocina. El dueño ve desde su panel cómo van sus ventas y si está creciendo.</p>
@@ -486,32 +492,47 @@ td:first-child{font-weight:600}
       <p>Varios botones sonaban a que ya habían hecho algo real: “descargando tu recibo” sin generar ningún archivo, “recibimos tu cancelación” sin cancelar nada. La corrección no fue esconder esos botones ni llenarlos de advertencias — fue hacer que la acción fuera honesta: el recibo ahora sí se descarga, y la cancelación dice explícitamente que es una simulación. <strong>Cuando algo no se puede cumplir de verdad, es mejor decirlo que fingirlo.</strong></p>
     </div>
 
-    <h2 id="estado"><span class="num">17</span>Qué falta</h2>
-    <p class="h2s">Estas pantallas son prototipos de diseño. Esto todavía no existe.</p>
+    <h2 id="estado"><span class="num">17</span>Dónde está el producto hoy</h2>
+    <p class="h2s">Esta sección describía prototipos de diseño. Ya no: el producto está construido y en producción.</p>
+
+    <div class="card ok">
+      <h4>En vivo desde agosto de 2026</h4>
+      <p>La aplicación corre en <strong>foodtruckos.vibrancygg.com</strong> (el dominio <code>.vercel.app</code> sigue sirviendo en paralelo mientras haya pósters impresos con él). Las cuatro superficies funcionan con datos reales: menú del comensal, seguimiento del pedido, pantalla de cocina y panel del dueño, más el admin interno.</p>
+      <p>La base tiene el esquema completo con aislamiento por RLS, el histórico preservado en instantáneas por pedido, y periodo de prueba de 14 días armado de punta a punta. Los correos salen por Resend con dominio propio.</p>
+    </div>
+
+    <p class="block-title" style="margin-top:34px">Lo que sí falta</p>
     <div class="scroll"><table>
       <thead><tr><th>Pendiente</th><th>Dónde</th><th>Estado</th></tr></thead>
       <tbody>
-        <tr><td>Base de datos y aislamiento entre negocios</td><td>Supabase</td><td class="no">Proyecto creado, esquema sin construir</td></tr>
-        <tr><td>La aplicación real</td><td>C:\dev\foodtruckos</td><td class="no">Sin empezar</td></tr>
-        <tr><td>Pantalla de Cuenta del dueño</td><td>Panel</td><td class="no">Marcada como “pronto” en la navegación</td></tr>
-        <tr><td>Guardado de verdad</td><td>Todas</td><td class="no">Los prototipos olvidan todo al recargar</td></tr>
-        <tr><td>Panel del dueño conectado a las ventas reales</td><td>Panel</td><td class="no">Sus números son de ejemplo; un pedido nuevo no los mueve — pendiente hasta Supabase</td></tr>
-        <tr><td>Herramienta de mejora de fotos conectada al producto</td><td>Menú y Trucks</td><td class="no">Decisión tomada: en el piloto se trata a mano en el onboarding, no en vivo — ver sección 09</td></tr>
+        <tr><td>Pruebas de la impresora con hardware</td><td>Bitácora de la P047</td><td class="no">Las 15 pruebas siguen sin marcar</td></tr>
+        <tr><td>Cobro en línea (Stripe)</td><td>Comensal</td><td class="no">Fase 2 — hoy se paga en la ventanilla</td></tr>
+        <tr><td>Notificación al comensal con la pantalla cerrada</td><td>Seguimiento</td><td class="no">Fase 2 con WhatsApp; el push web casi no sirve en iPhone</td></tr>
+        <tr><td>Dominio propio de Supabase</td><td>Auth</td><td class="no">La pantalla de Google muestra la dirección de Supabase — requiere plan de pago</td></tr>
+        <tr><td>Herramienta de mejora de fotos conectada</td><td>Menú</td><td class="no">Decidida y apagada a propósito, para no gastar en pruebas — ver sección 09</td></tr>
+        <tr><td>Promociones y lealtad</td><td>Todas</td><td class="no">Fase 3, solo bajo demanda</td></tr>
       </tbody>
     </table></div>
-    <p>Las diez pantallas están completas como prototipo: <strong>no queda ningún botón sin función ni ningún enlace muerto</strong>. Lo que falta es todo lo que vive por debajo.</p>
+
+    <div class="card why">
+      <h4>Lo que se aprendió por las malas y no debe volver a descubrirse</h4>
+      <p><strong>Realtime descartaba en silencio todos los UPDATE.</strong> Sin <code>replica identity full</code> no puede autorizar el evento contra RLS y lo tira sin avisar; los INSERT sí pasaban, así que la pantalla decía "En vivo" y era cierto — lo que no llegaba eran los cambios. Medido: 10 s de retraso antes, 554 ms después. Está escrito como Regla 10 en la skill de datos.</p>
+      <p><strong>El folio se reinicia cada día y por truck</strong>, no es un consecutivo eterno del negocio. Al cambiarlo hubo que reemplazar el índice único, que de otro modo habría impedido vender al día siguiente. Regla 11.</p>
+      <p><strong>La recuperación de contraseña no puede usar PKCE.</strong> Guarda un verificador en el navegador que pidió el enlace, así que se rompe al pedirlo en la computadora y abrirlo en el celular — el caso más común de todos.</p>
+      <p><strong>Una acción de cocina encolada no puede ser relativa.</strong> "Avanzar" leía el estado y pasaba al siguiente, así que una acción repetida movía dos pasos. Ahora viaja con el estado de origen y el servidor la rechaza si ya no coincide.</p>
+    </div>
 
     <h2 id="sigue"><span class="num">18</span>Lo que sigue</h2>
     <p class="h2s">En este orden, y hay una razón.</p>
     <ol>
-      <li><strong>Autorizar el conector de Supabase</strong> incluyendo la organización VibrancyGG. Sin eso no se pueden crear las tablas ni sus políticas de aislamiento desde aquí.</li>
-      <li><strong>El esquema de la base de datos, primero.</strong> Ahí vive la regla que no se puede arreglar después: el aislamiento entre negocios y la preservación del histórico. Es el error más fácil de cometer y el más difícil de detectar, porque el sistema se ve perfecto el día que se comete.</li>
-      <li><strong>La aplicación</strong> en Next.js, portando estos prototipos como referencia de comportamiento, no solo de aspecto.</li>
-      <li><strong>Enseñarle esto a La Villita</strong> antes de construir de más. Son diez minutos y te dice qué sobra y qué falta — con tres trucks es el cliente que más te conviene escuchar.</li>
+      <li><strong>Correr el Bloque A de pruebas de la impresora.</strong> Es lo único que bloquea ofrecer la comanda impresa con confianza, y la impresora ya está comprada. La prueba que detiene todo es la A1: que imprima desde una app de ESC/POS que no sea la del fabricante.</li>
+      <li><strong>Volver a emparejar la tablet con la app v0.6</strong>, que ya apunta al dominio nuevo. Con los trucks cerrados, porque las cookies de personal no viajan entre dominios.</li>
+      <li><strong>El primer cliente real.</strong> Todo lo demás — dominio propio de Supabase, subir el tope de correos por hora, retirar el dominio viejo — se decide mejor con un cliente que paga que con suposiciones.</li>
+      <li><strong>Antes de escalar a varios clientes a la vez:</strong> el dominio propio de Supabase (para que la pantalla de Google no muestre una dirección que parece spam) y revisar el tope de correos por hora en Authentication → Rate Limits.</li>
     </ol>
 
     <div class="foot">
-      Menú de prueba: Taquería El Farol, rescatado del prototipo anterior. Precios y textos de la carta son reales; los del armado de tacos y burritos son de demostración.<br>
+      Las secciones 04 a 14 conservan los prototipos de diseño con los que se decidió cada pantalla: siguen siendo la mejor explicación del porqué de cada decisión, aunque la aplicación real ya los haya superado.<br>
       Este manual carga las pantallas reales desde esta misma carpeta. Si mueves los archivos, los recuadros dejan de cargar.
     </div>
   </main>
