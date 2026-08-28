@@ -658,7 +658,7 @@ export function MenuClient({ data }: { data: ActiveMenuData }) {
       )}
 
       <footer className="px-4 pb-8 pt-6 text-center text-xs" style={{ color: INK_SOFT }}>
-        <div className="opacity-60">FoodTruckOS</div>
+        <div className="opacity-60">Pavessa</div>
       </footer>
 
       {cartCount > 0 && (

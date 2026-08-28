@@ -1,9 +1,9 @@
 ---
 name: foodtruckos-diseno
-description: Sistema de diseño de FoodTruckOS — la regla de las dos marcas, personalización por cliente, y los tres contextos visuales muy distintos (menú del comensal, panel del dueño, pantalla de cocina). Consulta esta skill SIEMPRE que diseñes, construyas o modifiques cualquier pantalla, componente, color, tipografía o layout de FoodTruckOS, incluso para cambios pequeños, y también cuando alguien pida "hacerlo más bonito", agregar una vista nueva o revisar una interfaz existente.
+description: Sistema de diseño de Pavessa — la regla de las dos marcas, personalización por cliente, y los tres contextos visuales muy distintos (menú del comensal, panel del dueño, pantalla de cocina). Consulta esta skill SIEMPRE que diseñes, construyas o modifiques cualquier pantalla, componente, color, tipografía o layout de Pavessa, incluso para cambios pequeños, y también cuando alguien pida "hacerlo más bonito", agregar una vista nueva o revisar una interfaz existente.
 ---
 
-# FoodTruckOS — Sistema de diseño
+# Pavessa — Sistema de diseño
 
 Este producto no compite solo por funcionalidad. Compite por convencer a un dueño de food truck, en una demostración de diez minutos, de cambiar cómo trabaja. La calidad visual es argumento de venta, no acabado.
 
@@ -15,9 +15,9 @@ Pero "bonito" significa cosas opuestas en las tres pantallas del sistema. Esa es
 
 Es la decisión de diseño más importante y la que más fácilmente se rompe.
 
-**Lo que ve el comensal pertenece al cliente.** Alguien parado frente a un truck de "La Villita" debe sentir que está viendo el menú de La Villita — su logo, sus colores, sus fotos. FoodTruckOS no aparece, o aparece de forma discreta al pie.
+**Lo que ve el comensal pertenece al cliente.** Alguien parado frente a un truck de "La Villita" debe sentir que está viendo el menú de La Villita — su logo, sus colores, sus fotos. Pavessa no aparece, o aparece de forma discreta al pie.
 
-**Lo que ve el dueño es nuestro producto.** El panel administrativo sí lleva la identidad de FoodTruckOS.
+**Lo que ve el dueño es nuestro producto.** El panel administrativo sí lleva la identidad de Pavessa.
 
 **Consecuencia práctica:** en la interfaz del comensal, ningún color, logo o tipografía de acento puede estar fijo en el código. Todo lo que sea marca se resuelve por variables que cambian según el cliente. Si escribes un color de marca directamente en un componente del comensal, estás creando trabajo manual para cada cliente futuro.
 
@@ -73,7 +73,7 @@ Lo opuesto: moderno, minimalista, ordenado, casi sobrio.
 - Números grandes, mucho espacio en blanco, sin adornos
 - Debe entenderse sin capacitación. El dueño no es usuario de software y no va a leer un manual
 - Si una función requiere explicación larga, está mal diseñada — replantéala antes de documentarla
-- Es el único lugar donde la marca FoodTruckOS aparece con fuerza
+- Es el único lugar donde la marca Pavessa aparece con fuerza
 
 ### Pantalla de cocina
 

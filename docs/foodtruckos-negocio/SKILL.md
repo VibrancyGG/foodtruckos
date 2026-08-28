@@ -1,9 +1,9 @@
 ---
 name: foodtruckos-negocio
-description: Modelo de negocio y disciplina de fases de FoodTruckOS — reglas de suscripción y facturación, escalera de precios por truck, archivado de dos años, y qué pertenece a Fase 1, 2 o 3. Consulta esta skill SIEMPRE que trabajes en suscripciones, cobros, precios de la plataforma, altas o bajas de trucks o negocios, el panel de administración interno, o cuando se pida una función nueva — para verificar en qué fase cae antes de construirla. Aplica también al escribir material de venta o estimar alcance.
+description: Modelo de negocio y disciplina de fases de Pavessa — reglas de suscripción y facturación, escalera de precios por truck, archivado de dos años, y qué pertenece a Fase 1, 2 o 3. Consulta esta skill SIEMPRE que trabajes en suscripciones, cobros, precios de la plataforma, altas o bajas de trucks o negocios, el panel de administración interno, o cuando se pida una función nueva — para verificar en qué fase cae antes de construirla. Aplica también al escribir material de venta o estimar alcance.
 ---
 
-# FoodTruckOS — Modelo de negocio y fases
+# Pavessa — Modelo de negocio y fases
 
 Este producto no compite por tener más funciones: compite por ser tan simple y tan barato de operar que el dueño no tenga razones para irse ni nosotros costos ocultos para atenderlo.
 

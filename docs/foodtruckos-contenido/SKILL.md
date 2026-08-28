@@ -1,9 +1,9 @@
 ---
 name: foodtruckos-contenido
-description: "Voz, textos de interfaz y política de imágenes de FoodTruckOS — español e inglés sin sonar a traducción, cero jerga técnica en pantalla, lenguaje que evita implicaciones legales, y la regla de que las fotos de platillos siempre son reales. Consulta esta skill SIEMPRE que escribas o revises cualquier texto que vea un usuario: botones, mensajes de error, estados vacíos, notificaciones, correos, nombres de funciones, textos de ayuda, material de venta, o cuando trabajes con imágenes de platillos."
+description: "Voz, textos de interfaz y política de imágenes de Pavessa — español e inglés sin sonar a traducción, cero jerga técnica en pantalla, lenguaje que evita implicaciones legales, y la regla de que las fotos de platillos siempre son reales. Consulta esta skill SIEMPRE que escribas o revises cualquier texto que vea un usuario: botones, mensajes de error, estados vacíos, notificaciones, correos, nombres de funciones, textos de ayuda, material de venta, o cuando trabajes con imágenes de platillos."
 ---
 
-# FoodTruckOS — Voz, textos e imágenes
+# Pavessa — Voz, textos e imágenes
 
 Los usuarios de este producto son un dueño de food truck que nunca ha pagado por software, un cocinero con prisa, y un comensal parado en la calle. Ninguno va a leer un manual ni tolerar lenguaje de sistema.
 
@@ -84,7 +84,7 @@ Si falta la foto de un producto, **usa un marcador de posición honesto** y pide
 
 **Confirmaciones destructivas:** di exactamente qué va a pasar. "Este truck dejará de recibir pedidos y su código QR dejará de funcionar. Sus ventas anteriores se conservan."
 
-**Correos al cliente:** breves, en el idioma que el dueño eligió, firmados por el negocio cuando van dirigidos al comensal y por FoodTruckOS cuando son administrativos.
+**Correos al cliente:** breves, en el idioma que el dueño eligió, firmados por el negocio cuando van dirigidos al comensal y por Pavessa cuando son administrativos.
 
 ---
 

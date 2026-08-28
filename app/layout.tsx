@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FoodTruckOS",
+  title: "Pavessa",
   description: "Sistema de pedidos digitales para food trucks.",
-  applicationName: "FoodTruckOS",
+  applicationName: "Pavessa",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "FoodTruckOS",
+    title: "Pavessa",
   },
   icons: {
     icon: [

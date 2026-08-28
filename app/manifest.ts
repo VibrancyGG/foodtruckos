@@ -6,9 +6,9 @@ import type { MetadataRoute } from "next"
 // quede enlazado ahí.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "FoodTruckOS",
-    short_name: "FoodTruckOS",
-    description: "Panel de FoodTruckOS: cocina y administración del negocio.",
+    name: "Pavessa",
+    short_name: "Pavessa",
+    description: "Panel de Pavessa: cocina y administración del negocio.",
     start_url: "/panel",
     display: "standalone",
     background_color: "#0B0B0B",

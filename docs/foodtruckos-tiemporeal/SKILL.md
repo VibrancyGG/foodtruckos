@@ -1,9 +1,9 @@
 ---
 name: foodtruckos-tiemporeal
-description: Confiabilidad y tiempo real de FoodTruckOS — órdenes que nunca se pierden, actualización en vivo sin recargar, reconexión con re-sincronización, y comportamiento correcto con conexión inestable en hora pico. Consulta esta skill SIEMPRE que trabajes en el flujo de órdenes, la pantalla de cocina, el seguimiento del pedido del comensal, suscripciones de tiempo real, manejo de conexión, sincronización de estado, o cualquier pantalla que deba actualizarse sola — incluso si la tarea parece un ajuste menor. Aplica también al revisar código existente de estas áreas.
+description: Confiabilidad y tiempo real de Pavessa — órdenes que nunca se pierden, actualización en vivo sin recargar, reconexión con re-sincronización, y comportamiento correcto con conexión inestable en hora pico. Consulta esta skill SIEMPRE que trabajes en el flujo de órdenes, la pantalla de cocina, el seguimiento del pedido del comensal, suscripciones de tiempo real, manejo de conexión, sincronización de estado, o cualquier pantalla que deba actualizarse sola — incluso si la tarea parece un ajuste menor. Aplica también al revisar código existente de estas áreas.
 ---
 
-# FoodTruckOS — Tiempo real y confiabilidad
+# Pavessa — Tiempo real y confiabilidad
 
 El contexto real de este producto es un truck en hora pico: la cocina con las manos ocupadas, el internet saliendo de un hotspot de celular, y un sábado a la una de la tarde donde cada falla es una venta perdida de verdad.
 

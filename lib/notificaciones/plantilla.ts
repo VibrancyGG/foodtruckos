@@ -41,7 +41,7 @@ export function armarHtml(aviso: Aviso, base: string): string {
     : ""
 
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:520px;margin:0 auto;padding:28px 24px;color:#1a1a1a">
-  <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b4670a;font-weight:700;margin-bottom:14px">FoodTruckOS</div>
+  <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b4670a;font-weight:700;margin-bottom:14px">Pavessa</div>
   <h1 style="font-size:21px;margin:0 0 20px;line-height:1.3">${escapar(aviso.titulo)}</h1>
   <table style="border-collapse:collapse;width:100%">${filas}</table>
   ${nota}

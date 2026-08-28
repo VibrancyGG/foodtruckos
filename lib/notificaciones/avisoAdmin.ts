@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/utils/siteUrl"
 // todo está envuelto y nada se relanza.
 
 const DESTINO = process.env.ADMIN_NOTICE_EMAIL || "ggvibrancy@gmail.com"
-const REMITENTE = "FoodTruckOS <avisos@mail.vibrancygg.com>"
+const REMITENTE = "Pavessa <avisos@mail.vibrancygg.com>"
 
 async function enviar(aviso: Aviso): Promise<void> {
   const llave = process.env.RESEND_API_KEY

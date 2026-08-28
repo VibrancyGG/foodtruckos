@@ -1,4 +1,4 @@
-# FoodTruckOS
+# Pavessa
 
 Sistema de pedidos digitales para food trucks: el comensal escanea un QR, ordena desde su celular con la marca del negocio, y la orden aparece en vivo en la pantalla de cocina. Multi-tenant desde el día uno (varios negocios clientes en la misma plataforma, cada uno con uno o varios trucks). Producto de **VibrancyGG**, separado de los proyectos Jetgo.
 
@@ -19,7 +19,7 @@ Sistema de pedidos digitales para food trucks: el comensal escanea un QR, ordena
   - Creado con **"expose new tables" desactivado** y **RLS automática activada**: toda tabla nueva nace con RLS puesta y necesita un permiso explícito en su migración para ser accesible por la API. Es deliberado — obliga a decidir conscientemente quién lee cada tabla.
 - **App nativa (Fase 2):** caparazón Android que envuelve la pantalla de cocina para poder imprimir comandas en una impresora Bluetooth. **Solo la pantalla de cocina** — panel del dueño, landing, registro y menú del comensal siguen siendo web y no cambian. Vive en `C:\dev\foodtruckos\android\`.
 - **Despliegue:** Vercel.
-- **Cuentas:** organización **VibrancyGG** en GitHub, Supabase y Vercel (el Team de Vercel se crea al lanzar el piloto). Nada de FoodTruckOS vive en las organizaciones o proyectos de Jetgo.
+- **Cuentas:** organización **VibrancyGG** en GitHub, Supabase y Vercel (el Team de Vercel se crea al lanzar el piloto). Nada de Pavessa vive en las organizaciones o proyectos de Jetgo.
 - **Código:** vive en `C:\dev\foodtruckos` (fuera de OneDrive).
 - **Estos documentos:** viven en `docs/` dentro del mismo repo, para que tengan historial igual que el código. **Esta copia es la que manda.** Hay otra en la carpeta de OneDrive que es solo una instantánea: si las dos difieren, gana la del repo. Al cambiar cualquier documento, cámbialo aquí.
 
@@ -45,7 +45,7 @@ El detalle y el porqué viven en las skills; esto es el resumen que nunca se rom
 1. **Aislamiento entre negocios con RLS en la base de datos**, nunca solo en la aplicación.
 2. **El histórico jamás se destruye.** Un pedido guarda su propia copia de nombre, precio y personalizaciones.
 3. **El comensal nunca tiene cuenta.** En ninguna fase.
-4. **Dos marcas:** lo que ve el comensal es del cliente (todo por variables, nada fijo en código); el panel del dueño es FoodTruckOS.
+4. **Dos marcas:** lo que ve el comensal es del cliente (todo por variables, nada fijo en código); el panel del dueño es Pavessa.
 5. **Avanzar una orden en cocina toma un solo toque.**
 6. **Toda venta — QR o ventanilla — vive en el mismo registro.**
 7. **La actividad de venta nunca se llama ni se presenta como asistencia o checador.**

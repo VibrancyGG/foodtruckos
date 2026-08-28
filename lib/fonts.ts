@@ -10,7 +10,7 @@ export const displayFont = Anton({
 })
 
 // Identidad propia del panel del dueño — el único lugar donde la marca
-// FoodTruckOS se muestra con fuerza (foodtruckos-diseno). Space Grotesk para
+// Pavessa se muestra con fuerza (foodtruckos-diseno). Space Grotesk para
 // cifras y encabezados (carácter técnico, de "centro de operaciones"), Inter
 // para todo lo demás porque el dueño debe entender sin capacitación y la
 // legibilidad manda sobre la personalidad en texto de cuerpo.

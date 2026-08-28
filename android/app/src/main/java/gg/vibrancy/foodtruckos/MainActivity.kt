@@ -54,7 +54,7 @@ class MainActivity : Activity() {
         // varias veces al día, y sin esto es imposible saber si la tablet
         // tiene la corrección que se acaba de publicar — ya nos costó una
         // ronda entera de diagnóstico equivocado.
-        web.postDelayed({ aviso("FoodTruckOS Cocina v" + version() + " · impresora: " + PrinterLink.estado()) }, 2_500)
+        web.postDelayed({ aviso("Pavessa Cocina v" + version() + " · impresora: " + PrinterLink.estado()) }, 2_500)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -217,7 +217,7 @@ class MainActivity : Activity() {
         // El dominio al que entra la tablet. Cambiarlo obliga a volver a
         // emparejar el aparato: la sesión de personal vive en cookies, y las
         // cookies no viajan entre dominios.
-        private const val DOMINIO = "foodtruckos.vibrancygg.com"
+        private const val DOMINIO = "pavessa.com"
         private const val COCINA = "https://$DOMINIO/cocina"
 
         // Todos los dominios que cuentan como "nuestro sitio". Está aparte del
@@ -226,6 +226,8 @@ class MainActivity : Activity() {
         // al navegador del sistema. Cuando el viejo se apague, se borra de aquí
         // y nadie tiene que reinstalar la app.
         private val DOMINIOS_PROPIOS = listOf(
+            "pavessa.com",
+            "www.pavessa.com",
             "foodtruckos.vibrancygg.com",
             "foodtruckos.vercel.app",
         )

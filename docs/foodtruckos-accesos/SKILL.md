@@ -1,9 +1,9 @@
 ---
 name: foodtruckos-accesos
-description: Esquema de usuarios, roles y accesos de FoodTruckOS — cuentas con correo para dueños, PIN vinculado a dispositivo para personal de cocina y ventanilla, y comensal sin cuenta nunca. Consulta esta skill SIEMPRE que trabajes en autenticación, inicio de sesión, permisos, roles, recuperación de contraseña, sesiones, PINs, alta o baja de empleados, o cualquier pantalla que dependa de quién es el usuario. Consúltala también antes de agregar cualquier pantalla nueva, para determinar quién debe poder verla.
+description: Esquema de usuarios, roles y accesos de Pavessa — cuentas con correo para dueños, PIN vinculado a dispositivo para personal de cocina y ventanilla, y comensal sin cuenta nunca. Consulta esta skill SIEMPRE que trabajes en autenticación, inicio de sesión, permisos, roles, recuperación de contraseña, sesiones, PINs, alta o baja de empleados, o cualquier pantalla que dependa de quién es el usuario. Consúltala también antes de agregar cualquier pantalla nueva, para determinar quién debe poder verla.
 ---
 
-# FoodTruckOS — Usuarios, roles y accesos
+# Pavessa — Usuarios, roles y accesos
 
 El sistema tiene **dos poblaciones de usuarios completamente distintas**, y el error más común es tratarlas igual.
 

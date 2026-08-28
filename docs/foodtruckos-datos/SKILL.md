@@ -1,11 +1,11 @@
 ---
 name: foodtruckos-datos
-description: Reglas obligatorias de datos para FoodTruckOS — aislamiento entre negocios clientes, preservación permanente del histórico de ventas, archivado de trucks dados de baja y registro de auditoría. Consulta esta skill SIEMPRE que trabajes en el esquema de base de datos, consultas, migraciones, reportes, analítica, borrado de registros, edición de menús o precios, alta o baja de trucks, o cualquier cambio que toque cómo se guarda o se consulta información en FoodTruckOS — incluso si la tarea parece pequeña o el usuario no menciona estos temas explícitamente. Aplica también al revisar código existente.
+description: Reglas obligatorias de datos para Pavessa — aislamiento entre negocios clientes, preservación permanente del histórico de ventas, archivado de trucks dados de baja y registro de auditoría. Consulta esta skill SIEMPRE que trabajes en el esquema de base de datos, consultas, migraciones, reportes, analítica, borrado de registros, edición de menús o precios, alta o baja de trucks, o cualquier cambio que toque cómo se guarda o se consulta información en Pavessa — incluso si la tarea parece pequeña o el usuario no menciona estos temas explícitamente. Aplica también al revisar código existente.
 ---
 
-# FoodTruckOS — Reglas de datos
+# Pavessa — Reglas de datos
 
-FoodTruckOS es una plataforma de pedidos que atiende a **varios negocios de food trucks distintos desde el mismo sistema**. Cada negocio puede tener uno o varios trucks.
+Pavessa es una plataforma de pedidos que atiende a **varios negocios de food trucks distintos desde el mismo sistema**. Cada negocio puede tener uno o varios trucks.
 
 Dos características del negocio hacen que los errores de datos aquí sean especialmente caros:
 

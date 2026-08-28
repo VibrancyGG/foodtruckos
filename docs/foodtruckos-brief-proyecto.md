@@ -4,7 +4,7 @@
 
 ## 1. Resumen ejecutivo
 
-FoodTruckOS es un sistema de pedidos digitales pensado específicamente para food trucks.
+Pavessa es un sistema de pedidos digitales pensado específicamente para food trucks.
 
 El cliente escanea un código QR pegado en el truck, ve el menú con fotos en su celular, arma su pedido con las personalizaciones que quiera, y lo envía. El pedido aparece de inmediato en una pantalla en la cocina. El personal lo va marcando conforme avanza, y el cliente ve el progreso en vivo desde su teléfono, sin instalar ninguna aplicación.
 
@@ -115,7 +115,7 @@ Es fácil construir un sistema que muestre bien el presente y destruya el pasado
 Esta es la decisión de diseño más importante del proyecto y debe entenderse antes de dibujar una sola pantalla.
 
 - **Lo que ve el comensal pertenece al cliente.** Un comensal frente a un truck de La Villita debe sentir que está viendo el menú de La Villita, no el de un proveedor de software. Nuestro nombre no aparece, o aparece de forma discreta al pie.
-- **Lo que ve el dueño es nuestro producto.** El panel de administración sí lleva la identidad de FoodTruckOS.
+- **Lo que ve el dueño es nuestro producto.** El panel de administración sí lleva la identidad de Pavessa.
 
 En consecuencia, el color principal, el logo y las imágenes de marca deben ser **configurables por cliente desde el inicio**. Si el sistema se construye con colores fijos, para el tercer cliente el equipo estará reescribiendo estilos a mano.
 
@@ -153,7 +153,7 @@ La referencia rica está en el mundo del propio cliente: la **rotulación mexica
 - Lo opuesto: moderno, minimalista, ordenado, casi sobrio. Números grandes, sin adornos
 - Debe entenderse sin capacitación. El dueño no es usuario de software
 - Con graficos de barras, torta y otros que muestren con un vistazo el estado de su negocio
-- Es el único lugar donde la marca FoodTruckOS aparece con fuerza
+- Es el único lugar donde la marca Pavessa aparece con fuerza
 
 **Pantalla de cocina**
 - Fondo oscuro, texto muy grande, color usado solo con función: verde = lista, ámbar = lleva tiempo, rojo = urgente

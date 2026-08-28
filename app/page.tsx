@@ -3,7 +3,7 @@ import { LangProvider } from "@/lib/i18n/LangProvider"
 import { LandingPage } from "@/components/landing/LandingPage"
 
 export const metadata: Metadata = {
-  title: "FoodTruckOS — Digital ordering for food trucks",
+  title: "Pavessa — Digital ordering for food trucks",
   description:
     "Live kitchen screen, QR ordering, zero commission. The software food trucks actually need.",
 }

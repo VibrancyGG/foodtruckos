@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FoodTruckOS Cocina</string>
+    <string name="app_name">Pavessa Cocina</string>
 
     <!-- Todo lo que ve el personal está en español, igual que el resto de la
          pantalla de cocina. La app es un caparazón: casi no tiene textos

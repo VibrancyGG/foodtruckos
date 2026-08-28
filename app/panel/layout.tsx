@@ -42,7 +42,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       <OnboardingProvider shouldAutoStart={shouldAutoStart}>
         <div className={`${panelDisplayFont.variable} ${panelBodyFont.variable} min-h-screen bg-panel-bg font-[family-name:var(--font-panel-body)] text-panel-ink`}>
           <PanelHeaderNav
-            businessName={businessId && business ? business.name : "FoodTruckOS"}
+            businessName={businessId && business ? business.name : "Pavessa"}
             logoUrl={businessId && business ? business.logo_url : null}
             showNav={!!businessId && !suspended}
             logoutAction={logoutAction}

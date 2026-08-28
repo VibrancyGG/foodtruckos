@@ -38,7 +38,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           style={{ background: "radial-gradient(circle at 15% 15%, rgba(255,90,54,.16), transparent 55%)" }}
         />
         <div className="relative">
-          <div className="text-sm font-black tracking-tight text-white">FoodTruckOS</div>
+          <div className="text-sm font-black tracking-tight text-white">Pavessa</div>
         </div>
 
         <div className="relative">
@@ -78,7 +78,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       <main className="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center justify-between lg:hidden">
-            <span className="text-sm font-black tracking-tight text-white">FoodTruckOS</span>
+            <span className="text-sm font-black tracking-tight text-white">Pavessa</span>
             <button
               onClick={() => setLang(lang === "es" ? "en" : "es")}
               className="rounded-full border border-neutral-700 px-2.5 py-1 text-[11px] font-bold text-neutral-300"

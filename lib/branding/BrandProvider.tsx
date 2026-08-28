@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react"
 import { onColorFor } from "./color"
 
-// La marca del comensal es del negocio cliente, no de FoodTruckOS (regla de las
+// La marca del comensal es del negocio cliente, no de Pavessa (regla de las
 // dos marcas). Todo por variable CSS, nada fijo en el código de los componentes.
 export function BrandProvider({
   brandColor,

@@ -1234,7 +1234,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       add: "Agregar",
       counterFallbackName: "Mostrador",
       reprintButton: "Reimprimir",
-      printerMissingApp: "Esta tablet tiene la impresión activada, pero no está usando la app de FoodTruckOS — por eso no salen las comandas.",
+      printerMissingApp: "Esta tablet tiene la impresión activada, pero no está usando la app de Pavessa — por eso no salen las comandas.",
       ticket: {
         order: "ORDEN",
         note: "Nota",
@@ -1321,7 +1321,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         finish: "Terminar",
         stepOf: (current, total) => `Paso ${current} de ${total}`,
         restartButton: "Ver el tutorial de nuevo",
-        welcomeTitle: "¡Bienvenido a FoodTruckOS!",
+        welcomeTitle: "¡Bienvenido a Pavessa!",
         welcomeBody: "Te mostramos rápido qué puedes hacer en cada pantalla. Toma menos de dos minutos, y puedes saltarlo cuando quieras.",
         resumenTitle: "Resumen",
         resumenBody: "Aquí ves cómo va tu negocio: cuánto vendiste este mes, qué se vende más, y cómo se comparan tus trucks entre sí.",
@@ -1378,8 +1378,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         daysLeft <= 0
           ? "Tu prueba gratis termina hoy — contáctanos para no perder acceso."
           : daysLeft === 1
-            ? "Tu prueba gratis termina mañana — contáctanos para seguir usando FoodTruckOS."
-            : `Tu prueba gratis termina en ${daysLeft} días — contáctanos para seguir usando FoodTruckOS.`,
+            ? "Tu prueba gratis termina mañana — contáctanos para seguir usando Pavessa."
+            : `Tu prueba gratis termina en ${daysLeft} días — contáctanos para seguir usando Pavessa.`,
       common: {
         save: "Guardar",
         saving: "Guardando…",
@@ -1859,7 +1859,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
     },
     admin: {
-      headerTitle: "FoodTruckOS · Admin interno",
+      headerTitle: "Pavessa · Admin interno",
       logout: "Cerrar sesión",
       mrr: "Ingreso mensual recurrente",
       businessesTotal: (n: number) => `${n} negocio${n === 1 ? "" : "s"} en total`,
@@ -1963,7 +1963,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       ticketPrep: "Preparando",
       ticketReady: "Lista",
       loginTitle: "Entra a tu panel",
-      loginSubtitle: "Para dueños y equipo de FoodTruckOS.",
+      loginSubtitle: "Para dueños y equipo de Pavessa.",
       googleButton: "Continuar con Google",
       dividerLabel: "o con tu correo",
       orGoogleLabel: "o continúa con Google",
@@ -2003,7 +2003,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       newPasswordDone: "Listo, entrando a tu panel…",
       newPasswordFailed: "No pudimos actualizar tu contraseña. Pide un enlace nuevo.",
       newPasswordNoSession: "Este enlace ya no vale. Pide uno nuevo desde \"Olvidé mi contraseña\".",
-      noAccountYet: "¿Tu negocio todavía no está en FoodTruckOS?",
+      noAccountYet: "¿Tu negocio todavía no está en Pavessa?",
       registerLink: "Solicita tu acceso",
       registerTitle: "Solicita tu acceso",
       registerSubtitle: "Cuéntanos de tu negocio y te contactamos para activar tu panel — no se necesita tarjeta ni contraseña ahora mismo.",
@@ -2094,7 +2094,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       ticketCustomer: "Marisol",
       ticketCollect: "COBRAR AL ENTREGAR",
       ticketCaption: "La comanda que sale de verdad — lo que se quita va en mayúsculas, porque es el error caro en cocina.",
-      benefitsEyebrow: "Por qué FoodTruckOS",
+      benefitsEyebrow: "Por qué Pavessa",
       benefitsTitle: "Todo lo que tu negocio necesita, en un solo lugar",
       benefitsSub: "Cada función existe porque un dueño de food truck la necesitó primero.",
       benefit1Title: "Tu negocio, en vivo",
@@ -2110,7 +2110,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       benefit6Title: "Imprime tus QR las veces que quieras",
       benefit6Body: "Descarga el código de cada truck y ponlo en tu ventanilla, tu mesa o tu volante — sin límite y sin costo extra.",
       benefit7Title: "Tu marca, no la nuestra",
-      benefit7Body: "Logo, color y estilo del negocio en cada pantalla que ve tu cliente. FoodTruckOS trabaja detrás, invisible.",
+      benefit7Body: "Logo, color y estilo del negocio en cada pantalla que ve tu cliente. Pavessa trabaja detrás, invisible.",
       benefit8Title: "Insights que trabajan por ti",
       benefit8Body: "El panel te avisa solo qué platillo se vende más, cuándo tienes más movimiento y qué truck va mejor — sin armar una sola gráfica.",
       pricingEyebrow: "Precio simple",
@@ -2312,7 +2312,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       add: "Add",
       counterFallbackName: "Counter",
       reprintButton: "Print again",
-      printerMissingApp: "This tablet has printing turned on, but it is not running the FoodTruckOS app — that is why no tickets come out.",
+      printerMissingApp: "This tablet has printing turned on, but it is not running the Pavessa app — that is why no tickets come out.",
       ticket: {
         order: "ORDER",
         note: "Note",
@@ -2399,7 +2399,7 @@ export const dictionary: Record<Lang, Dictionary> = {
         finish: "Finish",
         stepOf: (current, total) => `Step ${current} of ${total}`,
         restartButton: "Watch the tutorial again",
-        welcomeTitle: "Welcome to FoodTruckOS!",
+        welcomeTitle: "Welcome to Pavessa!",
         welcomeBody: "We'll show you quickly what you can do on each screen. It takes less than two minutes, and you can skip it anytime.",
         resumenTitle: "Summary",
         resumenBody: "This is where you see how your business is doing: how much you sold this month, what's selling best, and how your trucks compare.",
@@ -2456,8 +2456,8 @@ export const dictionary: Record<Lang, Dictionary> = {
         daysLeft <= 0
           ? "Your free trial ends today — contact us to keep your access."
           : daysLeft === 1
-            ? "Your free trial ends tomorrow — contact us to keep using FoodTruckOS."
-            : `Your free trial ends in ${daysLeft} days — contact us to keep using FoodTruckOS.`,
+            ? "Your free trial ends tomorrow — contact us to keep using Pavessa."
+            : `Your free trial ends in ${daysLeft} days — contact us to keep using Pavessa.`,
       common: {
         save: "Save",
         saving: "Saving…",
@@ -2937,7 +2937,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       },
     },
     admin: {
-      headerTitle: "FoodTruckOS · Internal admin",
+      headerTitle: "Pavessa · Internal admin",
       logout: "Log out",
       mrr: "Monthly recurring revenue",
       businessesTotal: (n: number) => `${n} business${n === 1 ? "" : "es"} total`,
@@ -3041,7 +3041,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       ticketPrep: "Cooking",
       ticketReady: "Ready",
       loginTitle: "Sign in to your panel",
-      loginSubtitle: "For FoodTruckOS owners and staff.",
+      loginSubtitle: "For Pavessa owners and staff.",
       googleButton: "Continue with Google",
       dividerLabel: "or with your email",
       orGoogleLabel: "or continue with Google",
@@ -3081,7 +3081,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       newPasswordDone: "Done — taking you to your panel…",
       newPasswordFailed: "We couldn't update your password. Ask for a new link.",
       newPasswordNoSession: "This link is no longer valid. Ask for a new one from \"Forgot my password\".",
-      noAccountYet: "Is your business not on FoodTruckOS yet?",
+      noAccountYet: "Is your business not on Pavessa yet?",
       registerLink: "Request access",
       registerTitle: "Request access",
       registerSubtitle: "Tell us about your business and we'll reach out to set up your panel — no card or password needed right now.",
@@ -3172,7 +3172,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       ticketCustomer: "Marisol",
       ticketCollect: "COLLECT ON DELIVERY",
       ticketCaption: "The ticket that actually prints — anything removed goes in caps, because that is the expensive mistake in a kitchen.",
-      benefitsEyebrow: "Why FoodTruckOS",
+      benefitsEyebrow: "Why Pavessa",
       benefitsTitle: "Everything your business needs, in one place",
       benefitsSub: "Every feature exists because a food truck owner needed it first.",
       benefit1Title: "Your business, live",
@@ -3188,7 +3188,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       benefit6Title: "Print your QR codes as many times as you want",
       benefit6Body: "Download each truck's code and put it on your window, your table or your flyer — no limit, no extra cost.",
       benefit7Title: "Your brand, not ours",
-      benefit7Body: "Your logo, color and style on every screen your customer sees. FoodTruckOS works behind the scenes, invisible.",
+      benefit7Body: "Your logo, color and style on every screen your customer sees. Pavessa works behind the scenes, invisible.",
       benefit8Title: "Insights that work for you",
       benefit8Body: "The panel tells you on its own what's selling best, when you're busiest, and which truck is doing better — no charts to build.",
       pricingEyebrow: "Simple pricing",
