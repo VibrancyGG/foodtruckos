@@ -302,11 +302,18 @@
  * bermellón se aviva bermellón, no se vuelve del mismo dorado que el resto. */
 .bulb {
   --avivada: 0;
+  /* Cuánto se multiplica el avivado para que la máscara de la capa de fondo no
+     se lo coma. En el hero no hay máscara, así que vale 1. */
+  --compensa: 1;
   position: absolute;
   border-radius: 50%;
-  background: rgba(var(--tono), calc(var(--brillo) + 0.6 * var(--avivada)));
-  box-shadow: 0 0 calc(4px + 30px * var(--avivada)) calc(1px + 8px * var(--avivada))
-    rgba(var(--tono), calc(var(--brillo) * 0.55 + 0.55 * var(--avivada)));
+  background: rgba(var(--tono), calc(var(--brillo) + 0.7 * var(--avivada) * var(--compensa)));
+  /* El halo también crece con la compensación, no solo el alfa. Las pavesas de
+     fondo miden entre 1.6 y 3.5px: por muy encendido que esté, un punto de dos
+     píxeles no se ve — lo que se ve es el resplandor a su alrededor. */
+  box-shadow: 0 0 calc(4px + 34px * var(--avivada) * var(--compensa))
+    calc(1px + 9px * var(--avivada) * var(--compensa))
+    rgba(var(--tono), calc(var(--brillo) * 0.55 + 0.6 * var(--avivada) * var(--compensa)));
   will-change: transform;
   animation-name: ascender;
   animation-timing-function: linear;

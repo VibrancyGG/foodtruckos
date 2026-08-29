@@ -184,6 +184,32 @@ const PAVESAS = generarPavesas(88)
 // Repartir la opacidad pavesa por pavesa daba escalones visibles; una máscara
 // degradada sobre toda la capa baja parejo hasta desaparecer, y además es una
 // sola declaración en vez de aritmética en ochenta y tantos elementos.
+// Cuánto apaga la máscara del CSS a una altura dada de la página. Es la misma
+// curva que .bgLightsLayer, escrita aquí para poder compensarla.
+//
+// Hace falta porque la máscara multiplica TODO lo que hay debajo, y eso incluye
+// el avivado del cursor: en las secciones de abajo las pavesas sí reaccionaban,
+// pero el resultado quedaba tan apagado que no se veía nada. La máscara debe
+// apagar el reposo, no la reacción.
+const PARADAS: [number, number][] = [
+  [0, 1],
+  [0.35, 0.72],
+  [0.65, 0.46],
+  [0.88, 0.2],
+  [1, 0],
+]
+
+function mascaraEn(t: number) {
+  for (let i = 1; i < PARADAS.length; i++) {
+    const [x1, v1] = PARADAS[i]
+    if (t <= x1) {
+      const [x0, v0] = PARADAS[i - 1]
+      return v0 + ((v1 - v0) * (t - x0)) / (x1 - x0)
+    }
+  }
+  return 0
+}
+
 function generarPavesasDeFondo(cuantas: number) {
   let semilla = 71042
   const aleatorio = () => {
@@ -191,19 +217,29 @@ function generarPavesasDeFondo(cuantas: number) {
     return semilla / 4294967296
   }
 
-  return Array.from({ length: cuantas }, () => ({
-    x: aleatorio() * 100,
+  return Array.from({ length: cuantas }, () => {
+    const x = aleatorio() * 100
     // Repartidas parejo por el alto de la página: aquí no hay foco de calor
     // hacia el que apiñarse, la lumbre quedó arriba.
-    y: aleatorio() * 100,
-    tam: 1.6 + aleatorio() * 1.9,
-    // Casi todas doradas. Una de cada seis se pone ámbar para que el campo no
-    // quede plano, pero ninguna llega a bermellón: ese calor es del hero.
-    tono: aleatorio() > 0.84 ? 1 : 0,
-    opacidad: 0.22 + aleatorio() * 0.3,
-    subida: 17 + aleatorio() * 18,
-    demora: aleatorio() * -34,
-  }))
+    const y = aleatorio() * 100
+    return {
+      x,
+      y,
+      // Lo que hay que multiplicar el avivado para que la máscara no se lo
+      // coma. Se topa en 6 porque abajo del todo la máscara llega a cero y esto
+      // se dispararía al infinito: ahí la pavesa ya no está, y forzarla a
+      // brillar sería contradecir el desvanecido en el único sitio donde debe
+      // ser total.
+      compensa: Math.min(6, 1 / Math.max(mascaraEn(y / 100), 0.16)),
+      tam: 1.6 + aleatorio() * 1.9,
+      // Casi todas doradas. Una de cada seis se pone ámbar para que el campo no
+      // quede plano, pero ninguna llega a bermellón: ese calor es del hero.
+      tono: aleatorio() > 0.84 ? 1 : 0,
+      opacidad: 0.22 + aleatorio() * 0.3,
+      subida: 17 + aleatorio() * 18,
+      demora: aleatorio() * -34,
+    }
+  })
 }
 
 const PAVESAS_FONDO = generarPavesasDeFondo(84)
@@ -463,6 +499,7 @@ export function LandingPage() {
                 height: `${p.tam.toFixed(2)}px`,
                 "--tono": TONOS[p.tono],
                 "--brillo": p.opacidad.toFixed(2),
+                "--compensa": p.compensa.toFixed(2),
                 animationDuration: `${p.subida.toFixed(1)}s`,
                 animationDelay: `${p.demora.toFixed(1)}s`,
               } as React.CSSProperties
