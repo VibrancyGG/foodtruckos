@@ -1181,6 +1181,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_business: {
+        Args: { p_business_id: string; p_confirmacion: string }
+        Returns: Json
+      }
+      admin_export_business: { Args: { p_business_id: string }; Returns: Json }
       admin_owner_email: { Args: { p_business_id: string }; Returns: string }
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }

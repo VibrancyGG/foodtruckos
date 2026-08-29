@@ -5,6 +5,7 @@ import { suspendBusiness, reactivateBusiness, setTrialEnd, sendOwnerRecovery } f
 import { getTrialInfo } from "@/lib/billing/trial"
 import { startImpersonation } from "@/lib/admin/impersonate"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { DeleteBusinessModal } from "@/components/admin/DeleteBusinessModal"
 import type { AdminOverview } from "@/lib/admin/getAdminOverview"
 
 const STATUS_STYLE: Record<string, string> = {
@@ -28,6 +29,7 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
   const [editandoFecha, setEditandoFecha] = useState(false)
   const [confirmandoEnlace, setConfirmandoEnlace] = useState(false)
   const [resultadoEnlace, setResultadoEnlace] = useState<string | null>(null)
+  const [eliminando, setEliminando] = useState(false)
 
   // Sin fecha no hay vencimiento: es un estado válido, no un dato faltante.
   const trial = getTrialInfo(business.subscription_status, business.trial_ends_at)
@@ -183,6 +185,24 @@ export function BusinessRow({ business }: { business: AdminOverview["businesses"
           )}
 
           {resultadoEnlace && <span className="text-xs font-semibold text-neutral-400">{resultadoEnlace}</span>}
+
+          {/* Aparte del resto y en rojo porque es el unico boton de esta fila
+              que no se puede deshacer. La confirmacion de verdad (respaldo +
+              escribir el nombre) vive dentro del modal, no aqui. */}
+          <button
+            disabled={pending}
+            onClick={() => setEliminando(true)}
+            className="ml-auto rounded-lg border border-neutral-800 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-800 hover:text-red-400"
+          >
+            {a.deleteButton}
+          </button>
+
+          {eliminando && (
+            <DeleteBusinessModal
+              business={{ id: business.id, name: business.name, slug: business.slug }}
+              onClose={() => setEliminando(false)}
+            />
+          )}
         </div>
       </td>
     </tr>

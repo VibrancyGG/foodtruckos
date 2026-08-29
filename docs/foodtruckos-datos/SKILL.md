@@ -257,3 +257,41 @@ deja toda URL en 28 caracteres, sin importar cómo se llame el negocio.
   pósters que ya no se pueden cambiar.
 - El código corto usa un alfabeto sin `0/O` ni `1/l/I`, para que se pueda leer
   en voz alta y teclear desde un póster sin equivocarse.
+
+---
+
+## Regla 13 — La única forma legítima de destruir un negocio
+
+La Regla 2 dice que el histórico no se destruye, y sigue en pie para todo lo que
+hace un dueño. Pero borrar una cuenta entera —una de prueba, una abandonada— es
+una operación real que alguien va a necesitar, y **si no existe en el producto
+se hace con SQL a mano contra producción**, que es donde se saltan los dos pasos
+que no perdonan.
+
+Vive en el panel de admin (`admin_export_business` y `admin_delete_business`,
+las dos `SECURITY DEFINER` y con `is_platform_admin()` comprobado dentro). Al
+tocar esa zona, estas son las razones de cada guarda:
+
+- **El respaldo se descarga antes, no después.** El botón de eliminar no se
+  habilita hasta que el JSON está en la máquina del admin. Si el respaldo se
+  entregara junto con el borrado, una pestaña que se cierra a destiempo se
+  llevaría los datos.
+- **El respaldo no puede hacerse con la llave de servicio.** `service_role` no
+  tiene `GRANT` sobre `order_points`, `business_members`, `truck_requests`,
+  `audit_log` ni `business_signup_requests`: sale cojo y sin avisar. Por eso el
+  export es `SECURITY DEFINER` y no un cliente de servicio.
+- **El respaldo excluye `pin_hash` y `device_secret_hash`.** Restaurar un
+  negocio no debe restaurar credenciales.
+- **Los archivos de Storage se borran aparte, y primero.** La cascada de la base
+  no toca el bucket: sin ese paso las fotos quedan huérfanas, facturándose y
+  accesibles por URL pública para siempre. Van antes que el borrado porque la
+  base es el punto sin retorno y va al final.
+- **El nombre escrito se comprueba también en la base**, no solo en la pantalla.
+  Una confirmación que vive únicamente en el navegador no es una confirmación.
+- **Un negocio con `subscription_status = 'active'` no se borra.** Primero se
+  cancela la suscripción; recién entonces.
+- **Las cuentas de acceso solo caen si quedan huérfanas**: nunca la de un
+  administrador de la plataforma, y nunca una que pertenezca a otro negocio.
+- **La entrada de auditoría se escribe antes del borrado**, con el nombre y los
+  recuentos dentro. Al irse el negocio queda con `business_id` nulo (SET NULL)
+  pero sobrevive — que es todo el punto de auditar un borrado.

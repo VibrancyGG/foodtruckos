@@ -801,6 +801,26 @@ export type Dictionary = {
     recoveryConfirm: string
     recoverySend: string
     recoverySent: (email: string) => string
+    deleteButton: string
+    deleteTitle: string
+    deleteLead: (nombre: string) => string
+    deleteInventory: string
+    deleteKeeps: string
+    deleteStep1: string
+    deleteStep1Button: string
+    deleteStep1Done: string
+    deleteStep2: (nombre: string) => string
+    deleteConfirmPlaceholder: string
+    deleteFinal: string
+    deleteWorking: string
+    deleteDone: (nombre: string) => string
+    deleteCountUnits: (n: number) => string
+    deleteCountOrders: (n: number) => string
+    deleteCountProducts: (n: number) => string
+    deleteCountStaff: (n: number) => string
+    deleteCountDevices: (n: number) => string
+    deleteCountPhotos: string
+    deleteCountAccounts: string
     statusTrial: string
     statusActive: string
     statusSuspended: string
@@ -1882,6 +1902,26 @@ export const dictionary: Record<Lang, Dictionary> = {
       recoveryConfirm: "¿Mandar el enlace al dueño?",
       recoverySend: "Mandar",
       recoverySent: (email) => `Enlace mandado a ${email}`,
+      deleteButton: "Eliminar negocio",
+      deleteTitle: "Eliminar negocio",
+      deleteLead: (nombre) => `Vas a borrar «${nombre}» para siempre. No hay deshacer ni papelera.`,
+      deleteInventory: "Esto desaparece:",
+      deleteKeeps: "El registro de auditoría sobrevive: queda constancia de quién borró qué y cuándo.",
+      deleteStep1: "1 · Guarda el respaldo",
+      deleteStep1Button: "Descargar respaldo",
+      deleteStep1Done: "Respaldo descargado",
+      deleteStep2: (nombre) => `2 · Escribe «${nombre}» para confirmar`,
+      deleteConfirmPlaceholder: "Nombre exacto del negocio",
+      deleteFinal: "Eliminar definitivamente",
+      deleteWorking: "Eliminando…",
+      deleteDone: (nombre) => `«${nombre}» eliminado`,
+      deleteCountUnits: (n) => `${n} truck${n === 1 ? "" : "s"}`,
+      deleteCountOrders: (n) => `${n} orden${n === 1 ? "" : "es"} con todo su histórico de ventas`,
+      deleteCountProducts: (n) => `${n} platillo${n === 1 ? "" : "s"} del menú`,
+      deleteCountStaff: (n) => `${n} empleado${n === 1 ? "" : "s"} con sus PINs`,
+      deleteCountDevices: (n) => `${n} tablet${n === 1 ? "" : "s"} emparejada${n === 1 ? "" : "s"}`,
+      deleteCountPhotos: "Todas las fotos que subió (logo, portada, platillos)",
+      deleteCountAccounts: "La cuenta con la que el dueño entra",
       statusTrial: "Periodo de prueba",
       statusActive: "Activa",
       statusSuspended: "Suspendida",
@@ -2960,6 +3000,26 @@ export const dictionary: Record<Lang, Dictionary> = {
       recoveryConfirm: "Send the link to the owner?",
       recoverySend: "Send",
       recoverySent: (email) => `Link sent to ${email}`,
+      deleteButton: "Delete business",
+      deleteTitle: "Delete business",
+      deleteLead: (nombre) => `You are about to erase “${nombre}” for good. There is no undo and no trash.`,
+      deleteInventory: "This goes away:",
+      deleteKeeps: "The audit log survives: there stays a record of who deleted what, and when.",
+      deleteStep1: "1 · Save the backup",
+      deleteStep1Button: "Download backup",
+      deleteStep1Done: "Backup downloaded",
+      deleteStep2: (nombre) => `2 · Type “${nombre}” to confirm`,
+      deleteConfirmPlaceholder: "Exact business name",
+      deleteFinal: "Delete for good",
+      deleteWorking: "Deleting…",
+      deleteDone: (nombre) => `“${nombre}” deleted`,
+      deleteCountUnits: (n) => `${n} truck${n === 1 ? "" : "s"}`,
+      deleteCountOrders: (n) => `${n} order${n === 1 ? "" : "s"} with their whole sales history`,
+      deleteCountProducts: (n) => `${n} menu item${n === 1 ? "" : "s"}`,
+      deleteCountStaff: (n) => `${n} staff member${n === 1 ? "" : "s"} and their PINs`,
+      deleteCountDevices: (n) => `${n} paired tablet${n === 1 ? "" : "s"}`,
+      deleteCountPhotos: "Every photo they uploaded (logo, cover, dishes)",
+      deleteCountAccounts: "The account the owner signs in with",
       statusTrial: "Trial",
       statusActive: "Active",
       statusSuspended: "Suspended",

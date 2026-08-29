@@ -167,3 +167,78 @@ export async function sendOwnerRecovery(businessId: string): Promise<Result & { 
   })
   return { ok: true, email }
 }
+
+// ---------------------------------------------------------------------------
+// Eliminar un negocio
+//
+// Antes esto no existía: quitar una cuenta de prueba obligaba a escribir SQL a
+// mano contra producción, y por ese camino se saltan los dos pasos que no
+// perdonan — respaldar antes, y limpiar los archivos de Storage.
+//
+// El borrado de la base y de las cuentas vive en admin_delete_business
+// (SECURITY DEFINER, que vuelve a comprobar platform_admin del lado de la
+// base). Aquí solo se hace lo que SQL no puede: vaciar el bucket.
+// ---------------------------------------------------------------------------
+
+// Devuelve el respaldo completo para que el admin lo descargue ANTES de borrar.
+// La pantalla no habilita el botón de eliminar hasta que esto se descargó.
+export async function exportBusiness(
+  businessId: string,
+): Promise<(Result & { data?: unknown }) | { ok: false; error: string }> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.rpc("admin_export_business", { p_business_id: businessId })
+  if (error) return { ok: false, error: "No se pudo generar el respaldo" }
+  return { ok: true, data }
+}
+
+export async function deleteBusiness(
+  businessId: string,
+  confirmacion: string,
+): Promise<Result & { resumen?: unknown }> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+
+  // Los archivos primero, y a propósito: el borrado de la base es el punto sin
+  // retorno y va al final. Si vaciar el bucket falla, no se ha destruido nada
+  // todavía y se puede reintentar. Al revés quedarían fotos huérfanas en el
+  // bucket para siempre — facturándose y accesibles por URL pública, porque la
+  // cascada de la base no toca Storage.
+  //
+  // Corre con la sesión del propio admin: la política de borrado de
+  // business-media ya contempla is_platform_admin(), así que no hace falta la
+  // llave de servicio.
+  const rutas: string[] = []
+  async function recorrer(prefijo: string) {
+    const { data } = await supabase.storage.from("business-media").list(prefijo, { limit: 1000 })
+    for (const entrada of data ?? []) {
+      const ruta = `${prefijo}/${entrada.name}`
+      // Sin id es carpeta, no archivo.
+      if (entrada.id === null) await recorrer(ruta)
+      else rutas.push(ruta)
+    }
+  }
+  await recorrer(businessId)
+
+  if (rutas.length > 0) {
+    const { error: fallo } = await supabase.storage.from("business-media").remove(rutas)
+    if (fallo) return { ok: false, error: "No se pudieron borrar las fotos; no se eliminó nada" }
+  }
+
+  const { data: resumen, error } = await supabase.rpc("admin_delete_business", {
+    p_business_id: businessId,
+    p_confirmacion: confirmacion,
+  })
+  if (error) {
+    // El mensaje viene de la función y ya está redactado para leerse: nombre que
+    // no coincide, suscripción activa, negocio inexistente.
+    return { ok: false, error: error.message.replace(/^.*?:\s*/, "") }
+  }
+
+  revalidatePath("/admin")
+  return { ok: true, resumen }
+}
