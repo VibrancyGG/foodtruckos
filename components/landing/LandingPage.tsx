@@ -172,6 +172,42 @@ function generarPavesas(cuantas: number) {
 
 const PAVESAS = generarPavesas(88)
 
+// El mismo aire, pero para el resto de la página.
+//
+// El hero es la lumbre; todo lo que viene debajo está cada vez más lejos de
+// ella. Por eso este campo es otra cosa y no una copia: muchas menos, más
+// pequeñas, más apagadas y subiendo más despacio — así se leen como brasas
+// lejanas y no compiten con el texto de las secciones, que es lo que la gente
+// vino a leer.
+//
+// El desvanecido hacia abajo NO se calcula aquí sino con una máscara en el CSS.
+// Repartir la opacidad pavesa por pavesa daba escalones visibles; una máscara
+// degradada sobre toda la capa baja parejo hasta desaparecer, y además es una
+// sola declaración en vez de aritmética en ochenta y tantos elementos.
+function generarPavesasDeFondo(cuantas: number) {
+  let semilla = 71042
+  const aleatorio = () => {
+    semilla = (semilla * 1664525 + 1013904223) % 4294967296
+    return semilla / 4294967296
+  }
+
+  return Array.from({ length: cuantas }, () => ({
+    x: aleatorio() * 100,
+    // Repartidas parejo por el alto de la página: aquí no hay foco de calor
+    // hacia el que apiñarse, la lumbre quedó arriba.
+    y: aleatorio() * 100,
+    tam: 1.6 + aleatorio() * 1.9,
+    // Casi todas doradas. Una de cada seis se pone ámbar para que el campo no
+    // quede plano, pero ninguna llega a bermellón: ese calor es del hero.
+    tono: aleatorio() > 0.84 ? 1 : 0,
+    opacidad: 0.22 + aleatorio() * 0.3,
+    subida: 17 + aleatorio() * 18,
+    demora: aleatorio() * -34,
+  }))
+}
+
+const PAVESAS_FONDO = generarPavesasDeFondo(84)
+
 // Oro, ámbar y bermellón: los tres tonos que ya usa la marca. El campo no
 // introduce color nuevo, solo lo reparte por temperatura.
 const TONOS = ["255,209,102", "255,138,61", "255,90,54"] as const
@@ -186,6 +222,7 @@ export function LandingPage() {
 
   const heroRef = useRef<HTMLElement>(null)
   const lightsRef = useRef<HTMLDivElement>(null)
+  const bgLightsRef = useRef<HTMLDivElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const showcaseRef = useRef<HTMLElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -230,7 +267,20 @@ export function LandingPage() {
     if (!canHover) return
 
     const root = document.documentElement
-    const pavesas = lightsRef.current ? (Array.from(lightsRef.current.children) as HTMLDivElement[]) : []
+
+    // Las dos capas se recorren juntas: la del hero y la de fondo. Cada una
+    // tiene su propia caja de referencia, así que se guardan emparejadas.
+    const grupos = [
+      { capa: lightsRef.current, datos: PAVESAS },
+      { capa: bgLightsRef.current, datos: PAVESAS_FONDO },
+    ]
+    const pavesas: { el: HTMLDivElement; grupo: number; i: number; ultimo: number }[] = []
+    grupos.forEach((g, gi) => {
+      if (!g.capa) return
+      Array.from(g.capa.children).forEach((el, i) => {
+        pavesas.push({ el: el as HTMLDivElement, grupo: gi, i, ultimo: 0 })
+      })
+    })
 
     // Dónde está cada pavesa, sin preguntárselo al navegador.
     //
@@ -247,10 +297,12 @@ export function LandingPage() {
     // Guardándola en coordenadas de pantalla, bastaba que el visitante bajara un
     // poco para que el avivado apuntara cientos de píxeles fuera de sitio y
     // dejara de encenderse nada.
-    let capa = { x: 0, y: 0, w: 0, h: 0 }
+    const cajas = grupos.map(() => ({ x: 0, y: 0, w: 0, h: 0 }))
     function medir() {
-      const r = lightsRef.current?.getBoundingClientRect()
-      if (r) capa = { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height }
+      grupos.forEach((g, gi) => {
+        const r = g.capa?.getBoundingClientRect()
+        if (r) cajas[gi] = { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height }
+      })
     }
     medir()
 
@@ -264,19 +316,21 @@ export function LandingPage() {
     const DESDE_Y = 14
     const HASTA_Y = -104
     const HASTA_X = 14
+    const RADIO = 260
 
     // desX/desY son el scroll actual: se leen una vez por cuadro, no una vez
     // por pavesa, y devuelven la posición a coordenadas de pantalla para poder
     // compararla con la del puntero.
-    function centro(i: number, ahora: number, desX: number, desY: number): [number, number] {
-      const p = PAVESAS[i]
+    function centro(grupo: number, i: number, ahora: number, desX: number, desY: number): [number, number] {
+      const p = grupos[grupo].datos[i]
+      const caja = cajas[grupo]
       // La demora es negativa, así que restarla suma: la pavesa ya iba a medio
       // camino cuando la página cargó.
       const vuelta = ((ahora - p.demora) / p.subida) % 1
       const base = vuelta < 0 ? vuelta + 1 : vuelta
       return [
-        capa.x - desX + (p.x / 100) * capa.w + p.tam / 2 + HASTA_X * base,
-        capa.y - desY + (p.y / 100) * capa.h + p.tam / 2 + DESDE_Y + (HASTA_Y - DESDE_Y) * base,
+        caja.x - desX + (p.x / 100) * caja.w + p.tam / 2 + HASTA_X * base,
+        caja.y - desY + (p.y / 100) * caja.h + p.tam / 2 + DESDE_Y + (HASTA_Y - DESDE_Y) * base,
       ]
     }
 
@@ -295,14 +349,35 @@ export function LandingPage() {
       const ahora = performance.now() / 1000
       const desX = window.scrollX
       const desY = window.scrollY
+      const alto = window.innerHeight
+
       for (let i = 0; i < pavesas.length; i++) {
-        const c = centro(i, ahora, desX, desY)
-        const d = Math.hypot(x - c[0], y - c[1])
-        // Se escribe una sola propiedad y el color lo compone el CSS. El tono
-        // de cada pavesa es suyo: al acercarse el cursor se aviva, no se
-        // vuelve del mismo dorado que todas las demás.
-        const cerca = d > 260 ? 0 : 1 - d / 260
-        pavesas[i].style.setProperty("--avivada", cerca.toFixed(3))
+        const p = pavesas[i]
+        const c = centro(p.grupo, p.i, ahora, desX, desY)
+
+        // Con dos capas hay ciento y pico de pavesas, y casi todas están fuera
+        // de la pantalla en cualquier momento. Descartarlas con una resta antes
+        // de hacer la raíz cuadrada evita el grueso del trabajo.
+        let cerca = 0
+        if (c[1] > -RADIO && c[1] < alto + RADIO) {
+          const dx = x - c[0]
+          const dy = y - c[1]
+          if (dx > -RADIO && dx < RADIO && dy > -RADIO && dy < RADIO) {
+            const d = Math.hypot(dx, dy)
+            if (d < RADIO) cerca = 1 - d / RADIO
+          }
+        }
+
+        // Y no se escribe si ya estaba apagada y sigue apagada: escribir una
+        // propiedad personalizada obliga al navegador a recalcular estilos de
+        // ese elemento, y sería tirar ese trabajo por las ~140 que en cualquier
+        // momento están lejos del cursor.
+        if (cerca === 0 && p.ultimo === 0) continue
+        p.ultimo = cerca
+        // El color lo compone el CSS a partir de esta sola propiedad. El tono
+        // de cada pavesa es suyo: al acercarse el cursor se aviva, no se vuelve
+        // del mismo dorado que todas las demás.
+        p.el.style.setProperty("--avivada", cerca.toFixed(3))
       }
     }
 
@@ -372,18 +447,49 @@ export function LandingPage() {
 
   return (
     <div ref={rootRef} className={`${styles.page} ${displayFont.variable} ${landingMonoFont.variable}`}>
+      {/* Va antes del contenido y por debajo de él: las pavesas de fondo son
+          aire, no decoración encima del texto. La capa cubre el alto entero de
+          la página porque .page es el contenedor posicionado. */}
+      <div ref={bgLightsRef} className={styles.bgLightsLayer} aria-hidden="true">
+        {PAVESAS_FONDO.map((p, i) => (
+          <div
+            key={i}
+            className={styles.bulb}
+            style={
+              {
+                left: `${p.x.toFixed(2)}%`,
+                top: `${p.y.toFixed(2)}%`,
+                width: `${p.tam.toFixed(2)}px`,
+                height: `${p.tam.toFixed(2)}px`,
+                "--tono": TONOS[p.tono],
+                "--brillo": p.opacidad.toFixed(2),
+                animationDuration: `${p.subida.toFixed(1)}s`,
+                animationDelay: `${p.demora.toFixed(1)}s`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+
       <div className={styles.pageGlow} />
 
       <div className={styles.content}>
         <header className={styles.header}>
           <div className={styles.brand}>
             <img src="/icons/icon-512.png" alt="" />
-            {/* Sin partir en dos ni teñir media palabra: "FoodTruckOS" se
-                separaba en marca + sufijo porque el sufijo era el producto.
-                "Pavessa" es una sola palabra y se lee mejor entera. El color
-                de marca ya lo pone el icono, y el degradado se reserva para el
-                titular — es lo único que debe gritar en esta página. */}
-            Pavessa
+            {/* El nombre y la categoría, uno debajo del otro.
+                "Pavessa" no dice por sí solo a qué se dedica, y en una landing
+                que un dueño abre por primera vez eso cuesta caro. El renglón de
+                abajo lo resuelve sin robarle protagonismo: mono, pequeño y muy
+                espaciado, que es como se lee un descriptor y no un segundo
+                nombre. Van en la misma jerarquía visual que tienen de verdad —
+                la marca manda, la categoría explica. */}
+            <span className={styles.brandLockup}>
+              <span className={styles.brandName}>Pavessa</span>
+              <span className={styles.brandDescriptor} style={{ fontFamily: "var(--font-landing-mono)" }}>
+                FoodTruck OS
+              </span>
+            </span>
           </div>
           <nav className={styles.nav}>
             <a href="#pedir">{l.navScan}</a>

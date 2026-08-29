@@ -127,9 +127,28 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+/* El nombre manda, la categoría explica. Van pegados —interlineado por debajo
+   de 1— para que se lean como una sola marca y no como dos renglones sueltos. */
+.brandLockup {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  gap: 3px;
+}
+.brandName {
   font-weight: 800;
   font-size: 1.05rem;
   letter-spacing: -0.01em;
+}
+.brandDescriptor {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: var(--inkSoft);
+  opacity: 0.65;
+  white-space: nowrap;
 }
 .brand img {
   width: 26px;
@@ -233,6 +252,40 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+/* Las pavesas del resto de la página.
+ *
+ * Cubre la altura entera del documento y va por debajo del contenido: es aire,
+ * no adorno encima del texto.
+ *
+ * La máscara es lo que le da sentido. El hero es la lumbre, y cuanto más bajas
+ * más lejos estás de ella: el degradado apaga el campo de forma continua hasta
+ * desaparecer en el pie. Se hace con una máscara sobre la capa entera y no
+ * repartiendo opacidad pavesa por pavesa porque aquello dejaba escalones
+ * visibles al hacer scroll — y porque así es una declaración en lugar de
+ * aritmética en sesenta y cuatro elementos. */
+.bgLightsLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.72) 35%,
+    rgba(0, 0, 0, 0.46) 65%,
+    rgba(0, 0, 0, 0.2) 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.72) 35%,
+    rgba(0, 0, 0, 0.46) 65%,
+    rgba(0, 0, 0, 0.2) 88%,
+    transparent 100%
+  );
 }
 /* Una pavesa: la brasa que salta del fuego, sube y se apaga.
  *
