@@ -234,39 +234,57 @@
   inset: 0;
   pointer-events: none;
 }
+/* Una pavesa: la brasa que salta del fuego, sube y se apaga.
+ *
+ * El tamaño, el color y el ritmo se los pone cada una en su style inline
+ * (--tono, --brillo, duración y demora). Aquí solo vive cómo se comporta.
+ *
+ * --avivada la escribe el puntero: 0 lejos, 1 encima. Se escribe UNA propiedad
+ * por pavesa y el color lo compone el calc() de aquí abajo. Antes el JavaScript
+ * armaba las cadenas de background y box-shadow enteras para cada punto en cada
+ * movimiento del ratón; hacerlo en CSS le ahorra al navegador rehacer ese
+ * trabajo cincuenta y cuatro veces por cuadro.
+ *
+ * Y el avivado respeta el tono propio de cada una: la brasa que ya iba
+ * bermellón se aviva bermellón, no se vuelve del mismo dorado que el resto. */
 .bulb {
+  --avivada: 0;
   position: absolute;
-  width: 9px;
-  height: 9px;
   border-radius: 50%;
-  background: rgba(255, 209, 102, 0.35);
-  box-shadow: 0 0 6px 2px rgba(255, 209, 102, 0.15);
-  transition:
-    background 70ms linear,
-    box-shadow 70ms linear;
-  animation: flicker 3.6s ease-in-out infinite;
+  background: rgba(var(--tono), calc(var(--brillo) + 0.6 * var(--avivada)));
+  box-shadow: 0 0 calc(4px + 30px * var(--avivada)) calc(1px + 8px * var(--avivada))
+    rgba(var(--tono), calc(var(--brillo) * 0.55 + 0.55 * var(--avivada)));
+  will-change: transform;
+  animation-name: ascender;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
-@keyframes flicker {
-  0%,
+
+/* Sube, se ladea un poco y se apaga arriba. La opacidad vuelve a cero en los
+ * dos extremos a propósito: así el salto del final del ciclo no se ve. Es el
+ * detalle que separa "brasas subiendo" de "puntos reapareciendo". */
+@keyframes ascender {
+  0% {
+    transform: translate3d(0, 14px, 0) scale(0.7);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.9;
+  }
   100% {
-    opacity: 1;
+    transform: translate3d(14px, -104px, 0) scale(1);
+    opacity: 0;
   }
-  47% {
-    opacity: 1;
-  }
-  48% {
-    opacity: 0.55;
-  }
-  49% {
-    opacity: 1;
-  }
-  76% {
-    opacity: 1;
-  }
-  77% {
-    opacity: 0.6;
-  }
-  78% {
+}
+
+/* Sin movimiento: el campo se queda quieto y encendido. Sigue siendo la misma
+ * imagen —brasas repartidas— pero sin nada que suba ni parpadee. */
+@media (prefers-reduced-motion: reduce) {
+  .bulb {
+    animation: none;
     opacity: 1;
   }
 }

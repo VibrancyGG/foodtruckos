@@ -126,12 +126,55 @@ function PhoneMenu({ l }: { l: ReturnType<typeof useLang>["t"]["landing"] }) {
 const ORDER_IDS = ["#0148", "#0147", "#0146"] as const
 const BADGE_CLASS = [styles.badgeNew, styles.badgeWarn, styles.badgeReady]
 
-// Posiciones fijas de los focos ambientales del hero — dato estático, no
-// pertenece a un ref (no cambia entre renders ni necesita sobrevivir a uno).
-const BULB_POSITIONS: [number, number][] = [
-  [8, 18], [16, 10], [24, 20], [32, 9], [40, 18], [48, 8], [56, 17], [64, 9], [72, 18], [80, 10], [88, 19], [94, 11],
-  [12, 30], [28, 28], [44, 32], [60, 27], [76, 31], [90, 28],
-]
+// El campo de pavesas del hero.
+//
+// Pavesa es la brasa que salta del fuego y sube apagándose. Antes esto era una
+// rejilla de dieciocho puntos idénticos a dos alturas fijas: eso se lee como una
+// guirnalda de feria, no como brasas. Una brasa real es densa cerca del fuego y
+// rala arriba, cada una de su tamaño, y ninguna parpadea al mismo compás que su
+// vecina.
+//
+// De ahí las tres cosas que definen cada una:
+//   · la altura sesga la densidad — hay muchas abajo y pocas arriba
+//   · el tamaño baja con la altura: las de arriba están más lejos y ya se apagan
+//   · el tono va de oro a bermellón, con las más calientes abajo
+//
+// Las posiciones se calculan con un generador de semilla fija, no con
+// Math.random: tienen que salir idénticas en el servidor y en el navegador o
+// React se queja de que el HTML no coincide al hidratar.
+function generarPavesas(cuantas: number) {
+  let semilla = 20260829
+  const aleatorio = () => {
+    semilla = (semilla * 1664525 + 1013904223) % 4294967296
+    return semilla / 4294967296
+  }
+
+  return Array.from({ length: cuantas }, () => {
+    // Elevar a una potencia empuja el reparto hacia abajo: sin esto quedarían
+    // uniformes de arriba abajo y volveríamos a la guirnalda.
+    const altura = Math.pow(aleatorio(), 0.78)
+    const y = 4 + altura * 92
+    const cercania = altura            // 0 arriba y lejos, 1 abajo y cerca
+    return {
+      x: aleatorio() * 100,
+      y,
+      tam: 2 + cercania * 4.4,
+      // Las de abajo arden más; las de arriba ya casi se apagaron.
+      tono: cercania > 0.72 ? 2 : cercania > 0.42 ? 1 : 0,
+      opacidad: 0.3 + cercania * 0.45,
+      // Cada una con su propio compás, para que el campo nunca lata al unísono.
+      subida: 9 + aleatorio() * 13,
+      demora: aleatorio() * -22,
+      parpadeo: 2.6 + aleatorio() * 3.4,
+    }
+  })
+}
+
+const PAVESAS = generarPavesas(88)
+
+// Oro, ámbar y bermellón: los tres tonos que ya usa la marca. El campo no
+// introduce color nuevo, solo lo reparte por temperatura.
+const TONOS = ["255,209,102", "255,138,61", "255,90,54"] as const
 
 export function LandingPage() {
   const { lang, setLang, t } = useLang()
@@ -187,24 +230,92 @@ export function LandingPage() {
     if (!canHover) return
 
     const root = document.documentElement
-    const bulbs = lightsRef.current ? Array.from(lightsRef.current.children) as HTMLDivElement[] : []
+    const pavesas = lightsRef.current ? (Array.from(lightsRef.current.children) as HTMLDivElement[]) : []
+
+    // Dónde está cada pavesa, sin preguntárselo al navegador.
+    //
+    // La versión anterior llamaba a getBoundingClientRect() sobre cada punto en
+    // cada movimiento del ratón. Eso obliga a recalcular la maquetación por
+    // punto y por evento: con dieciocho ya costaba, y con cincuenta y cuatro la
+    // página se habría atascado justo al mover el cursor, que es cuando se
+    // supone que luce.
+    //
+    // Se mide UNA sola caja —la de la capa— y el resto sale de aritmética: la
+    // posición de cada pavesa es un porcentaje fijo de esa caja.
+    // Se guarda en coordenadas del DOCUMENTO, no de la pantalla: getBoundingClientRect
+    // devuelve la posición relativa a la ventana, y esa cambia con cada scroll.
+    // Guardándola en coordenadas de pantalla, bastaba que el visitante bajara un
+    // poco para que el avivado apuntara cientos de píxeles fuera de sitio y
+    // dejara de encenderse nada.
+    let capa = { x: 0, y: 0, w: 0, h: 0 }
+    function medir() {
+      const r = lightsRef.current?.getBoundingClientRect()
+      if (r) capa = { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height }
+    }
+    medir()
+
+    // Y las pavesas SUBEN: el fotograma las desplaza hasta 118px hacia arriba a
+    // lo largo de su ciclo. Un centro guardado al montar se queda viejo en
+    // segundos, y el cursor acabaría encendiendo brasas que ya no están ahí.
+    //
+    // Como el recorrido es determinista (los mismos valores que declara el
+    // fotograma ascender), la posición actual se calcula en vez de medirse —
+    // exacto y sin tocar la maquetación.
+    const DESDE_Y = 14
+    const HASTA_Y = -104
+    const HASTA_X = 14
+
+    // desX/desY son el scroll actual: se leen una vez por cuadro, no una vez
+    // por pavesa, y devuelven la posición a coordenadas de pantalla para poder
+    // compararla con la del puntero.
+    function centro(i: number, ahora: number, desX: number, desY: number): [number, number] {
+      const p = PAVESAS[i]
+      // La demora es negativa, así que restarla suma: la pavesa ya iba a medio
+      // camino cuando la página cargó.
+      const vuelta = ((ahora - p.demora) / p.subida) % 1
+      const base = vuelta < 0 ? vuelta + 1 : vuelta
+      return [
+        capa.x - desX + (p.x / 100) * capa.w + p.tam / 2 + HASTA_X * base,
+        capa.y - desY + (p.y / 100) * capa.h + p.tam / 2 + DESDE_Y + (HASTA_Y - DESDE_Y) * base,
+      ]
+    }
+
+    // El desplazamiento se guarda y se aplica una sola vez por cuadro. Sin
+    // esto el navegador dispara pointermove muchas más veces de las que puede
+    // pintar, y se hace trabajo que nadie llega a ver.
+    let x = 0
+    let y = 0
+    let pendiente = false
+
+    function pintar() {
+      pendiente = false
+      root.style.setProperty("--mx", (x / window.innerWidth) * 100 + "%")
+      root.style.setProperty("--my", (y / window.innerHeight) * 100 + "%")
+
+      const ahora = performance.now() / 1000
+      const desX = window.scrollX
+      const desY = window.scrollY
+      for (let i = 0; i < pavesas.length; i++) {
+        const c = centro(i, ahora, desX, desY)
+        const d = Math.hypot(x - c[0], y - c[1])
+        // Se escribe una sola propiedad y el color lo compone el CSS. El tono
+        // de cada pavesa es suyo: al acercarse el cursor se aviva, no se
+        // vuelve del mismo dorado que todas las demás.
+        const cerca = d > 260 ? 0 : 1 - d / 260
+        pavesas[i].style.setProperty("--avivada", cerca.toFixed(3))
+      }
+    }
 
     function handlePointerMove(e: PointerEvent) {
-      const mx = (e.clientX / window.innerWidth) * 100
-      const my = (e.clientY / window.innerHeight) * 100
-      root.style.setProperty("--mx", mx + "%")
-      root.style.setProperty("--my", my + "%")
-
-      bulbs.forEach((b) => {
-        const br = b.getBoundingClientRect()
-        const bx = br.left + br.width / 2
-        const by = br.top + br.height / 2
-        const d = Math.hypot(e.clientX - bx, e.clientY - by)
-        const t2 = Math.max(0, 1 - d / 240)
-        b.style.background = `rgba(255,209,102,${(0.35 + 0.65 * t2).toFixed(2)})`
-        b.style.boxShadow = `0 0 ${(6 + 34 * t2).toFixed(0)}px ${(2 + 10 * t2).toFixed(0)}px rgba(255,209,102,${(0.15 + 0.65 * t2).toFixed(2)})`
-      })
+      x = e.clientX
+      y = e.clientY
+      if (!pendiente) {
+        pendiente = true
+        requestAnimationFrame(pintar)
+      }
     }
+
+    window.addEventListener("resize", medir)
 
     function handleShowcaseMove(e: PointerEvent) {
       const board = boardRef.current
@@ -227,6 +338,7 @@ export function LandingPage() {
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove)
+      window.removeEventListener("resize", medir)
       showcaseEl?.removeEventListener("pointermove", handleShowcaseMove)
       showcaseEl?.removeEventListener("pointerleave", handleShowcaseLeave)
     }
@@ -266,7 +378,12 @@ export function LandingPage() {
         <header className={styles.header}>
           <div className={styles.brand}>
             <img src="/icons/icon-512.png" alt="" />
-            FoodTruck<span style={{ color: "var(--brand)" }}>OS</span>
+            {/* Sin partir en dos ni teñir media palabra: "FoodTruckOS" se
+                separaba en marca + sufijo porque el sufijo era el producto.
+                "Pavessa" es una sola palabra y se lee mejor entera. El color
+                de marca ya lo pone el icono, y el degradado se reserva para el
+                titular — es lo único que debe gritar en esta página. */}
+            Pavessa
           </div>
           <nav className={styles.nav}>
             <a href="#pedir">{l.navScan}</a>
@@ -294,11 +411,25 @@ export function LandingPage() {
 
         <section ref={heroRef} className={styles.hero}>
           <div ref={lightsRef} className={styles.lightsLayer}>
-            {BULB_POSITIONS.map(([x, y], i) => (
+            {PAVESAS.map((p, i) => (
               <div
                 key={i}
                 className={styles.bulb}
-                style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${(i * 0.37) % 3}s` }}
+                style={
+                  {
+                    left: `${p.x.toFixed(2)}%`,
+                    top: `${p.y.toFixed(2)}%`,
+                    width: `${p.tam.toFixed(2)}px`,
+                    height: `${p.tam.toFixed(2)}px`,
+                    "--tono": TONOS[p.tono],
+                    "--brillo": p.opacidad.toFixed(2),
+                    // La demora es negativa: cada pavesa arranca a media
+                    // subida, así el campo se ve ya encendido al cargar en vez
+                    // de empezar las cincuenta y cuatro a la vez desde cero.
+                    animationDuration: `${p.subida.toFixed(1)}s`,
+                    animationDelay: `${p.demora.toFixed(1)}s`,
+                  } as React.CSSProperties
+                }
               />
             ))}
           </div>
