@@ -21,7 +21,7 @@ Sistema de pedidos digitales para food trucks: el comensal escanea un QR, ordena
 - **Despliegue:** Vercel.
 - **Cuentas:** organización **VibrancyGG** en GitHub, Supabase y Vercel (el Team de Vercel se crea al lanzar el piloto). Nada de Pavessa vive en las organizaciones o proyectos de Jetgo.
 - **Código:** vive en `C:\dev\foodtruckos` (fuera de OneDrive).
-- **Estos documentos:** viven en `docs/` dentro del mismo repo, para que tengan historial igual que el código. **Esta copia es la que manda.** Hay otra en la carpeta de OneDrive que es solo una instantánea: si las dos difieren, gana la del repo. Al cambiar cualquier documento, cámbialo aquí.
+- **Estos documentos:** viven en `docs/` dentro del mismo repo, para que tengan historial igual que el código. **Esta copia es la que manda.** Hay otra en la carpeta de OneDrive que es solo una instantánea: si las dos difieren, gana la del repo. Al cambiar cualquier documento, cámbialo aquí. El espejo de OneDrive se actualiza solo: un hook de `post-commit` corre `npm run docs:sync` después de cada commit. Para instalarlo en un clon nuevo: `cp scripts/hooks/post-commit .git/hooks/post-commit`. Para ver si hay desfase sin tocar nada: `npm run docs:check`.
 
 ## Skills obligatorias
 

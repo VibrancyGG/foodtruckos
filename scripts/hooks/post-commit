@@ -1,0 +1,15 @@
+#!/bin/sh
+# Mantiene la carpeta espejo de OneDrive al día con docs/ sin que nadie tenga
+# que acordarse. Se ejecuta después de cada commit.
+#
+# Instalar (una vez por clon):
+#   cp scripts/hooks/post-commit .git/hooks/post-commit
+#
+# Los hooks no viajan en el repo —viven en .git/hooks, que no se versiona—, por
+# eso el archivo bueno se guarda aquí y se copia a mano.
+#
+# Corre después del commit, así que si falla no rompe nada: el commit ya está
+# hecho. Por eso mismo no se le pone `set -e`.
+
+node scripts/sync-docs.mjs
+exit 0
