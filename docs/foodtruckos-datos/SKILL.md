@@ -222,3 +222,38 @@ Revisa contra esta lista:
 11. Si toqué el folio, ¿revisé los índices únicos, las búsquedas por número y que no quede otro consecutivo compitiendo en pantalla? (Regla 11)
 
 Si alguna respuesta es incómoda, plantéalo antes de avanzar en lugar de resolverlo por tu cuenta.
+
+---
+
+## Regla 12 — Un QR impreso es un hecho consumado
+
+El comensal llega por un código pegado en la lámina de un truck. Ese papel no se
+puede actualizar a distancia: **cualquier ruta que haya estado dentro de un QR
+sirve para siempre.**
+
+Hoy hay dos, y las dos entregan el mismo menú:
+
+| Ruta | Quién la trae |
+|---|---|
+| `/q/{short_code}` | Los QR generados desde agosto de 2026 |
+| `/{negocio}/{truck}/{qr_slug}` | Los pósters impresos antes |
+
+La larga nació con el nombre del negocio metido dos veces —una en el primer
+segmento y otra dentro del propio `qr_slug`— y con un largo sin tope, porque
+salía del nombre que el dueño escribiera: llegó a haber un punto de pedido con
+una URL de 168 caracteres. Importa más de lo que parece: mientras más texto
+lleva un QR, más cuadros necesita y más pequeños quedan, y esto se escanea de
+noche, con la lámina sucia y el celular de alguien con hambre. El código corto
+deja toda URL en 28 caracteres, sin importar cómo se llame el negocio.
+
+**Consecuencias al tocar esta zona:**
+
+- **`order_points.short_code` y `order_points.qr_slug` no se regeneran nunca.**
+  Cambiar cualquiera de los dos invalida pósters que ya están pegados. Nada en
+  la aplicación los actualiza, y así debe seguir.
+- **Al agregar una ruta nueva del comensal**, se agrega a
+  `revalidarMenuDelComensal()` y no a mano en cada acción. Si no, el menú del
+  comensal se queda viejo en la ruta olvidada — que será justamente la de los
+  pósters que ya no se pueden cambiar.
+- El código corto usa un alfabeto sin `0/O` ni `1/l/I`, para que se pueda leer
+  en voz alta y teclear desde un póster sin equivocarse.

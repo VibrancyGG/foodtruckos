@@ -1,14 +1,17 @@
 import { redirect, notFound } from "next/navigation"
 import { getMenuData } from "@/lib/menu/getMenuData"
-import { LangProvider } from "@/lib/i18n/LangProvider"
-import { BrandProvider } from "@/lib/branding/BrandProvider"
-import { MenuClient } from "@/components/menu/MenuClient"
-import { PausedScreen } from "@/components/menu/PausedScreen"
+import { MenuSurface } from "@/components/menu/MenuSurface"
 import { slugify } from "@/lib/utils/slugify"
 
-// El qr_slug es la clave real; businessSlug/unitSlug en la URL son cosméticos.
-// Si alguien edita esos segmentos a mano pero el qr_slug sigue siendo válido,
-// se redirige a la ruta canónica en vez de confiar en lo que escribió.
+// La ruta larga, la de los QR impresos antes de que existiera /q/{código}.
+//
+// **No se retira nunca.** Hay pósters pegados en trucks que resuelven por
+// aquí, y esos no se pueden actualizar a distancia. Sirve exactamente el mismo
+// menú que la ruta corta.
+//
+// El qr_slug es la clave real; businessSlug/unitSlug son cosméticos. Si
+// alguien edita esos segmentos a mano pero el qr_slug sigue siendo válido, se
+// redirige a la ruta canónica en vez de confiar en lo que escribió.
 export default async function MenuPage({
   params,
 }: {
@@ -19,48 +22,17 @@ export default async function MenuPage({
 
   if (!data) notFound()
 
-  if (data.suspended) {
-    return (
-      <LangProvider defaultLang="es">
-        <PausedScreen businessName={data.business.name} notAvailable />
-      </LangProvider>
-    )
+  // La corrección de ruta solo aplica al menú servible. Con el negocio
+  // suspendido o el truck en pausa no hay ruta canónica que perseguir: se
+  // muestra el aviso y se acabó.
+  if (!data.suspended && !data.paused) {
+    const canonicalBusinessSlug = data.business.slug
+    const canonicalUnitSlug = slugify(data.unit.name)
+
+    if (businessSlug !== canonicalBusinessSlug || unitSlug !== canonicalUnitSlug) {
+      redirect(`/${canonicalBusinessSlug}/${canonicalUnitSlug}/${qrSlug}`)
+    }
   }
 
-  if (data.paused) {
-    const reopenTime = data.pausedUntil
-      ? new Date(data.pausedUntil).toLocaleString("es-MX", {
-          timeZone: data.business.timezone,
-          weekday: "long",
-          hour: "numeric",
-          minute: "2-digit",
-        })
-      : null
-    return (
-      <LangProvider defaultLang="es">
-        <PausedScreen
-          businessName={data.business.name}
-          unitName={data.unit.name}
-          logoUrl={data.business.logo_url}
-          brandColor={data.business.brand_color}
-          reopenTime={reopenTime}
-        />
-      </LangProvider>
-    )
-  }
-
-  const canonicalBusinessSlug = data.business.slug
-  const canonicalUnitSlug = slugify(data.unit.name)
-
-  if (businessSlug !== canonicalBusinessSlug || unitSlug !== canonicalUnitSlug) {
-    redirect(`/${canonicalBusinessSlug}/${canonicalUnitSlug}/${qrSlug}`)
-  }
-
-  return (
-    <LangProvider defaultLang="es">
-      <BrandProvider brandColor={data.business.brand_color}>
-        <MenuClient data={data} />
-      </BrandProvider>
-    </LangProvider>
-  )
+  return <MenuSurface data={data} />
 }

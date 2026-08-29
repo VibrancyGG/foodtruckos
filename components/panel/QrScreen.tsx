@@ -6,6 +6,10 @@ import { Button } from "./ui/Button"
 
 type QrCode = { unitName: string; label: string; location: string | null; url: string; qrDataUrl: string }
 
+// El "https://" ocupa un tercio de la línea y no le dice nada a nadie. La
+// dirección se muestra como se lee en voz alta.
+const sinProtocolo = (url: string) => url.replace(/^https?:\/\//, "")
+
 export function QrScreen({
   codes,
   businessName,
@@ -66,7 +70,7 @@ export function QrScreen({
               <div className="mb-3 text-xs text-panel-ink-soft">{c.label}</div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={c.qrDataUrl} alt={`QR — ${c.unitName}`} className="mx-auto h-48 w-48" />
-              <p className="mt-3 break-all text-[11px] text-panel-ink/40">{c.url}</p>
+              <p className="mt-3 break-all text-[11px] text-panel-ink/40">{sinProtocolo(c.url)}</p>
               <div className="mt-3 flex flex-wrap justify-center gap-2">
                 <a
                   href={c.qrDataUrl}
@@ -159,7 +163,7 @@ export function QrScreen({
                 <p className="mt-5 text-center text-xs font-semibold text-neutral-500">{p.posterPayNote}</p>
               </div>
 
-              <p className="mt-6 text-[10px] text-neutral-400">{c.url}</p>
+              <p className="mt-6 text-[10px] text-neutral-400">{sinProtocolo(c.url)}</p>
             </div>
           </div>
         ))}

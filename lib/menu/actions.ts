@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { revalidarMenuDelComensal } from "@/lib/menu/revalidarComensal"
 
 // REGLA DE ESTE ARCHIVO: todo lo que cambie el menú revalida LAS DOS rutas —
 // la del panel y la del comensal. Cambiar solo la del panel deja al dueño
@@ -11,6 +12,10 @@ import { revalidatePath } from "next/cache"
 // marcaba agotado, lo veía agotado, y el comensal seguía pudiendo pedirlo.
 // La versión masiva del mismo interruptor sí lo hacía bien, así que el
 // defecto dependía de si el truck tenía uno o varios.
+//
+// La del comensal ya no es una ruta sino dos —la corta /q/ de los QR nuevos y
+// la larga de los pósters impresos—, así que se revalidan llamando a
+// revalidarMenuDelComensal(), no escribiendo las rutas a mano.
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
 import { mejorarFoto } from "@/lib/media/mejorarFoto"
@@ -71,7 +76,7 @@ export async function updateProduct(input: {
   }
 
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -100,7 +105,7 @@ export async function retireProduct(productId: string): Promise<Result> {
   })
 
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -128,7 +133,7 @@ export async function toggleSoldOut(input: {
 
   if (error) return { ok: false, error: "No se pudo actualizar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -159,7 +164,7 @@ export async function setSoldOutForUnits(input: {
 
   if (error) return { ok: false, error: "No se pudo actualizar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -199,7 +204,7 @@ export async function setProductExclusivity(input: {
   }
 
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -226,7 +231,7 @@ export async function createCategory(input: {
 
   if (error) return { ok: false, error: "No se pudo crear la categoría" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -248,7 +253,7 @@ export async function updateCategory(input: {
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -277,7 +282,7 @@ export async function deleteCategory(categoryId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo eliminar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -373,7 +378,7 @@ export async function createProduct(input: {
   }
 
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true, productId: product.id }
 }
 
@@ -416,7 +421,7 @@ export async function createOptionGroup(input: {
 
   if (error) return { ok: false, error: "No se pudo crear el grupo" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -433,7 +438,7 @@ export async function deleteOptionGroup(groupId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo eliminar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -476,7 +481,7 @@ export async function createOption(input: {
 
   if (error) return { ok: false, error: "No se pudo crear la opción" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -513,7 +518,7 @@ export async function updateOption(input: {
 
   if (error) return { ok: false, error: "No se pudo guardar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -530,7 +535,7 @@ export async function deleteOption(optionId: string): Promise<Result> {
 
   if (error) return { ok: false, error: "No se pudo eliminar" }
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -599,6 +604,6 @@ export async function uploadProductPhoto(
   if (updateError) return { ok: false, error: "La imagen se subió pero no se pudo guardar" }
 
   revalidatePath("/panel/menu")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true, publicUrl }
 }

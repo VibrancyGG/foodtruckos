@@ -3,11 +3,19 @@ import { toNumber } from "@/lib/supabase/numeric"
 import { isOpenNow, parseWeeklyHours } from "@/lib/units/hours"
 import { accessBlocked } from "@/lib/billing/trial"
 
-// Resuelve SIEMPRE por qr_slug (la clave real y única del punto de pedido).
-// businessSlug/unitSlug en la URL son cosméticos, no autoritativos — si no
-// coinciden con lo que el qr_slug resuelve, quien llama a esta función debe
-// redirigir a la ruta canónica en vez de confiar en ellos.
-export async function getMenuData(qrSlug: string) {
+// Resuelve por la clave real y única del punto de pedido. Hay dos, y las dos
+// son permanentes:
+//
+//   short_code  la corta, /q/k7m2xp — la que llevan los QR nuevos
+//   qr_slug     la larga, /negocio/truck/negocio-truck-1 — la de los QR viejos
+//
+// La vieja no se retira nunca: hay pósters impresos y pegados en trucks que
+// resuelven por ella. Las dos entregan exactamente el mismo menú.
+//
+// En la ruta larga, businessSlug/unitSlug son cosméticos, no autoritativos —
+// si no coinciden con lo que la clave resuelve, quien llama a esta función
+// debe redirigir a la ruta canónica en vez de confiar en ellos.
+export async function getMenuData(clave: string, por: "qr_slug" | "short_code" = "qr_slug") {
   // Sin cookies, igual que al crear el pedido: el menú del comensal se ve
   // idéntico traiga o no una sesión encima ese celular.
   const supabase = createPublicClient()
@@ -20,7 +28,7 @@ export async function getMenuData(qrSlug: string) {
     .select(
       "id, label, active, unit_id, business_id, units(id, name, photo_url, hours, status, paused_until), businesses(*)",
     )
-    .eq("qr_slug", qrSlug)
+    .eq(por, clave)
     .eq("active", true)
     .maybeSingle()
 

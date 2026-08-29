@@ -568,6 +568,7 @@ export type Database = {
           id: string
           label: string
           qr_slug: string
+          short_code: string
           unit_id: string
         }
         Insert: {
@@ -577,6 +578,7 @@ export type Database = {
           id?: string
           label?: string
           qr_slug: string
+          short_code?: string
           unit_id: string
         }
         Update: {
@@ -586,6 +588,7 @@ export type Database = {
           id?: string
           label?: string
           qr_slug?: string
+          short_code?: string
           unit_id?: string
         }
         Relationships: [
@@ -1203,6 +1206,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      new_order_point_code: { Args: never; Returns: string }
       next_order_folio_for_unit: { Args: { p_unit_id: string }; Returns: number }
       request_subscription_cancel: {
         Args: { p_business_id: string; p_note?: string }

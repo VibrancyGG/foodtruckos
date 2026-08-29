@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { revalidarMenuDelComensal } from "@/lib/menu/revalidarComensal"
 import { createClient } from "@/lib/supabase/server"
 import { getOwnerContext } from "@/lib/auth/dal"
 
@@ -64,7 +65,7 @@ export async function saveBrandSettings(input: {
   if (error) return { ok: false, error: "No se pudo guardar" }
 
   revalidatePath("/panel")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
 
@@ -88,6 +89,6 @@ export async function updateUnitBrandColor(input: {
   if (error) return { ok: false, error: "No se pudo guardar" }
 
   revalidatePath("/panel")
-  revalidatePath("/[businessSlug]/[unitSlug]/[qrSlug]", "page")
+  revalidarMenuDelComensal()
   return { ok: true }
 }
