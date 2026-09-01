@@ -47,3 +47,7 @@ scripts/demo-villita.sql
 enlace*.txt
 *-tmp.mjs
 *-tmp.cjs
+
+# Videos en crudo de la landing: pesan cientos de megas y solo son la materia
+# prima. Lo que se publica son los comprimidos de public/video/.
+videos-crudos/
