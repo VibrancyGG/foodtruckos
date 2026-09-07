@@ -1164,3 +1164,117 @@
   text-transform: uppercase;
   padding: 13px;
 }
+
+/* ---------- La demostración en video ---------- */
+/* Tres grabaciones de la misma orden, corriendo a la vez. El ancho de cada
+   columna sale de la forma de su video: el celular y la impresora son
+   verticales y estrechos, la cocina es apaisada y es la que lleva la
+   información — por eso se lleva el espacio que sobra. */
+.demoFila {
+  display: grid;
+  grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 215px);
+  gap: 18px;
+  /* stretch, no start: los tres videos tienen formas muy distintas —uno casi
+     cuadrado y dos verticales— así que con alturas libres los pies de foto
+     caían a tres alturas y la fila se veía desalineada. Estirando las tarjetas
+     y empujando el texto al fondo, los tres pies comparten una sola línea. */
+  align-items: stretch;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+@media (max-width: 1020px) {
+  .demoFila {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+}
+
+.demoPanel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.demoPanel .demoQuien {
+  margin-top: auto;
+}
+.demoVideo {
+  display: block;
+  width: 100%;
+  border-radius: 11px;
+  background: #000;
+}
+.demoQuien {
+  font-weight: 700;
+  font-size: 14.5px;
+  margin-top: 1px;
+}
+.demoPie {
+  color: var(--inkSoft);
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 0;
+  /* Reservar tres renglones en los tres. La columna de la cocina es el doble
+     de ancha, así que su pie cabe en uno solo y su rótulo terminaba flotando
+     más abajo que los otros dos. Con el mismo espacio reservado, los tres
+     rótulos comparten una línea. */
+  min-height: calc(1.55em * 3);
+}
+@media (max-width: 1020px) {
+  /* Apilados no hay nada con lo que alinearse, y el hueco reservado se vería
+     como un error de maquetación. */
+  .demoPie {
+    min-height: 0;
+  }
+}
+
+/* La línea de tiempo no es adorno: la marca señala el segundo exacto en que la
+   orden entra, que es lo único que esta sección existe para demostrar. Sin
+   ella hay que adivinar dónde mirar. */
+.demoPista {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  max-width: 1180px;
+  margin: 0 auto 40px;
+}
+.demoAvance {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), var(--gold));
+}
+.demoMarca {
+  position: absolute;
+  top: -7px;
+  width: 2px;
+  height: 18px;
+  background: var(--mint);
+}
+.demoMarca span {
+  position: absolute;
+  left: 8px;
+  top: 0;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mint);
+  white-space: nowrap;
+}
+
+/* Decirlo de frente evita que un cliente lo descubra solo y se pregunte qué
+   más se maquilló. */
+.demoNota {
+  color: var(--inkSoft);
+  opacity: 0.75;
+  font-size: 12.5px;
+  text-align: center;
+  margin: 26px auto 0;
+  max-width: 60ch;
+}

@@ -1058,6 +1058,17 @@ export type Dictionary = {
     price3Tag: string
     priceNote: string
     pricePer: string
+    demoEyebrow: string
+    demoTitle: string
+    demoSub: string
+    demoPhone: string
+    demoPhoneCaption: string
+    demoKitchen: string
+    demoKitchenCaption: string
+    demoPrinter: string
+    demoPrinterCaption: string
+    demoMoment: string
+    demoHonesty: string
     ctaTitle: string
     ctaSub: string
     footerCredit: string
@@ -2161,6 +2172,17 @@ export const dictionary: Record<Lang, Dictionary> = {
       price3Tag: "3 o más",
       priceNote: "por truck",
       pricePer: "/mes",
+      demoEyebrow: "Al mismo tiempo",
+      demoTitle: "Una orden, tres pantallas",
+      demoSub: "Grabado en un truck de verdad, sin montajes. El comensal toca «Ordenar» y en ese momento el pedido aparece en la cocina y el papel empieza a salir.",
+      demoPhone: "El comensal",
+      demoPhoneCaption: "Escanea el código pegado en la ventanilla y pide desde su celular. No instala nada.",
+      demoKitchen: "La cocina",
+      demoKitchenCaption: "La orden entra sola, con el queso extra y la cebolla quitada a la vista. Nadie tocó la tablet.",
+      demoPrinter: "La comanda",
+      demoPrinterCaption: "El papel sale y se corta. El cocinero lo arranca y lo cuelga en el riel.",
+      demoMoment: "La orden entra",
+      demoHonesty: "Solo está acelerado el paseo por el menú. Desde que toca «Ordenar», todo va a velocidad real.",
       ctaTitle: "Tu food truck, en línea en minutos",
       ctaSub: "Crea tu cuenta gratis y tu truck queda listo para recibir pedidos hoy mismo. Sin tarjeta de crédito y sin compromiso.",
       footerCredit: "Desarrollado por Vibrancy GG. Todos los derechos reservados.",
@@ -3259,6 +3281,17 @@ export const dictionary: Record<Lang, Dictionary> = {
       price3Tag: "3 or more",
       priceNote: "per truck",
       pricePer: "/mo",
+      demoEyebrow: "All at once",
+      demoTitle: "One order, three screens",
+      demoSub: "Filmed at a real truck, nothing staged. The diner taps Order and at that moment it lands on the kitchen screen and the paper starts coming out.",
+      demoPhone: "The diner",
+      demoPhoneCaption: "Scans the code stuck to the window and orders from their own phone. Nothing to install.",
+      demoKitchen: "The kitchen",
+      demoKitchenCaption: "The order lands on its own, extra cheese and no onion right there. Nobody touched the tablet.",
+      demoPrinter: "The ticket",
+      demoPrinterCaption: "The paper comes out and cuts. The cook tears it off and hangs it on the rail.",
+      demoMoment: "The order lands",
+      demoHonesty: "Only the menu browsing is sped up. From the tap on Order, everything runs at real speed.",
       ctaTitle: "Your food truck, online in minutes",
       ctaSub: "Create your free account and your truck is ready to take orders today. No credit card and no commitment.",
       footerCredit: "Built by Vibrancy GG. All rights reserved.",

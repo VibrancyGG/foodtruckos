@@ -259,6 +259,12 @@ export function LandingPage() {
   const heroRef = useRef<HTMLElement>(null)
   const lightsRef = useRef<HTMLDivElement>(null)
   const bgLightsRef = useRef<HTMLDivElement>(null)
+  const demoRef = useRef<HTMLElement>(null)
+  const v1Ref = useRef<HTMLVideoElement>(null)
+  const v2Ref = useRef<HTMLVideoElement>(null)
+  const v3Ref = useRef<HTMLVideoElement>(null)
+  const avanceRef = useRef<HTMLDivElement>(null)
+  const marcaRef = useRef<HTMLDivElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
   const showcaseRef = useRef<HTMLElement>(null)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -292,6 +298,88 @@ export function LandingPage() {
     )
     els.forEach((el) => io.observe(el))
     return () => io.disconnect()
+  }, [])
+
+  // Los tres videos de la demostración, corriendo en sincronía.
+  //
+  // Se grabaron por separado, así que el instante de la orden cae en un
+  // segundo distinto dentro de cada uno. Estos números salieron de extraer
+  // cuadros sueltos de los archivos finales, uno por uno; medirlos "a ojo"
+  // sobre los originales dejó la cocina segundo y pico por delante.
+  useEffect(() => {
+    const seccion = demoRef.current
+    const videos = [v1Ref.current, v2Ref.current, v3Ref.current]
+    if (!seccion || videos.some((v) => !v)) return
+
+    const TOTAL = 30.9
+    const ORDENA = 11.3 // el segundo del ciclo en que se toca «Ordenar»
+    const ANCLA = [11.3, 6.1, 0.65] // dónde cae ese instante dentro de cada clip
+    // Lo que de verdad tarda el pedido en ir al servidor y volver. No es cero:
+    // ponerlo en cero se vería más redondo pero sería mentira, y medio segundo
+    // se lee igual de instantáneo.
+    const RETRASO = [0, 0.4, 0.5]
+    const INICIO = ANCLA.map((a, i) => ORDENA + RETRASO[i] - a)
+
+    if (marcaRef.current) marcaRef.current.style.left = (ORDENA / TOTAL) * 100 + "%"
+
+    const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    let t0 = 0
+    let corriendo = false
+    let cuadro = 0
+
+    function seguir(video: HTMLVideoElement, objetivo: number) {
+      const dur = video.duration || Infinity
+      if (objetivo < 0 || objetivo >= dur) {
+        if (!video.paused) video.pause()
+        if (objetivo < 0 && video.currentTime > 0.05) video.currentTime = 0
+        return
+      }
+      // Un cuadro y medio de margen: por debajo de eso nadie percibe el
+      // desfase, y recolocar más seguido se ve como un tirón.
+      if (Math.abs(video.currentTime - objetivo) > 0.05) video.currentTime = objetivo
+      if (video.paused) video.play().catch(() => {})
+    }
+
+    function latir() {
+      if (!corriendo) return
+      let t = (performance.now() - t0) / 1000
+      if (t >= TOTAL) {
+        t0 = performance.now()
+        t = 0
+      }
+      if (avanceRef.current) avanceRef.current.style.width = (t / TOTAL) * 100 + "%"
+      videos.forEach((v, i) => seguir(v!, t - INICIO[i]))
+      cuadro = requestAnimationFrame(latir)
+    }
+
+    // Nada se descarga ni se reproduce hasta que la sección se ve: son 1.5 MB
+    // que no tiene por qué pagar quien nunca llega hasta abajo. Y al salir de
+    // pantalla se detiene, para no dejar tres videos girando en una pestaña
+    // que ya nadie mira.
+    const io = new IntersectionObserver(
+      ([entrada]) => {
+        if (entrada.isIntersecting && !corriendo) {
+          videos.forEach((v) => {
+            if (v!.preload === "none") v!.preload = "auto"
+          })
+          if (quieto) return
+          corriendo = true
+          t0 = performance.now()
+          cuadro = requestAnimationFrame(latir)
+        } else if (!entrada.isIntersecting && corriendo) {
+          corriendo = false
+          cancelAnimationFrame(cuadro)
+          videos.forEach((v) => v!.pause())
+        }
+      },
+      { threshold: 0.25 }
+    )
+    io.observe(seccion)
+
+    return () => {
+      io.disconnect()
+      cancelAnimationFrame(cuadro)
+    }
   }, [])
 
   // La luz que sigue el cursor vive en una capa fija de toda la página, no
@@ -762,6 +850,53 @@ export function LandingPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* La prueba, al final y después del precio.
+            Va aquí a propósito: quien llegó hasta el precio ya entendió qué es
+            y cuánto cuesta, y lo único que le queda por resolver es si de
+            verdad funciona. Las maquetas de arriba explican; esto demuestra.
+            No lleva numeración porque el punto no es que sean tres pasos —
+            es que son tres cosas pasando a la vez. */}
+        <section id="demo" ref={demoRef} className={`${styles.section} ${styles.reveal}`}>
+          <div className={styles.sectionHead}>
+            <div className={styles.sectionEyebrow} style={{ fontFamily: "var(--font-landing-mono)" }}>
+              {l.demoEyebrow}
+            </div>
+            <h2 className={styles.sectionTitle}>{l.demoTitle}</h2>
+            <p className={styles.sectionSub}>{l.demoSub}</p>
+          </div>
+
+          <div className={styles.demoPista}>
+            <div className={styles.demoAvance} ref={avanceRef} />
+            <div className={styles.demoMarca} ref={marcaRef}>
+              <span style={{ fontFamily: "var(--font-landing-mono)" }}>{l.demoMoment}</span>
+            </div>
+          </div>
+
+          <div className={styles.demoFila}>
+            {[
+              { ref: v1Ref, src: "comensal", quien: l.demoPhone, pie: l.demoPhoneCaption },
+              { ref: v2Ref, src: "cocina", quien: l.demoKitchen, pie: l.demoKitchenCaption },
+              { ref: v3Ref, src: "impresora", quien: l.demoPrinter, pie: l.demoPrinterCaption },
+            ].map((p) => (
+              <div key={p.src} className={styles.demoPanel}>
+                <video
+                  ref={p.ref}
+                  className={styles.demoVideo}
+                  muted
+                  playsInline
+                  preload="none"
+                  poster={`/video/${p.src}.jpg`}
+                  src={`/video/${p.src}.mp4`}
+                />
+                <div className={styles.demoQuien}>{p.quien}</div>
+                <p className={styles.demoPie}>{p.pie}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className={styles.demoNota}>{l.demoHonesty}</p>
         </section>
 
         <div className={`${styles.ctaBand} ${styles.reveal}`}>
