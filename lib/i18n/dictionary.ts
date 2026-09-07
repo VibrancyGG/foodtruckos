@@ -917,6 +917,10 @@ export type Dictionary = {
     magicLinkSentTitle: string
     magicLinkSentBody: (email: string) => string
     magicLinkError: string
+    magicLinkHint: string
+    emailRequired: string
+    usePassword: string
+    backToMagicLink: string
     forgotPassword: string
     recoverTitle: string
     recoverSubtitle: string
@@ -2031,6 +2035,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       magicLinkSentTitle: "Revisa tu correo",
       magicLinkSentBody: (email) => `Te mandamos un enlace de acceso a ${email}. Ábrelo desde este mismo dispositivo para entrar.`,
       magicLinkError: "No pudimos enviar el enlace. Intenta de nuevo en un momento.",
+      magicLinkHint: "Sin contraseña: te llega un enlace y entras con un toque. Ábrelo en este mismo dispositivo.",
+      emailRequired: "Escribe tu correo para mandarte el enlace.",
+      usePassword: "Tengo contraseña",
+      backToMagicLink: "Mejor mándame un enlace",
       forgotPassword: "Olvidé mi contraseña",
       recoverTitle: "Recuperar contraseña",
       recoverSubtitle: "Te mandamos un enlace para elegir una nueva.",
@@ -3140,6 +3148,10 @@ export const dictionary: Record<Lang, Dictionary> = {
       magicLinkSentTitle: "Check your email",
       magicLinkSentBody: (email) => `We sent a sign-in link to ${email}. Open it on this same device to continue.`,
       magicLinkError: "We couldn't send the link. Try again in a moment.",
+      magicLinkHint: "No password: we email you a link and one tap gets you in. Open it on this same device.",
+      emailRequired: "Enter your email so we can send the link.",
+      usePassword: "I have a password",
+      backToMagicLink: "Email me a link instead",
       forgotPassword: "Forgot my password",
       recoverTitle: "Reset your password",
       recoverSubtitle: "We'll email you a link to pick a new one.",

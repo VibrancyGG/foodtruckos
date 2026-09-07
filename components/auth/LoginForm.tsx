@@ -18,6 +18,15 @@ export function LoginForm() {
   const [magicSending, setMagicSending] = useState(false)
   const [magicSent, setMagicSent] = useState(false)
   const [magicError, setMagicError] = useState<string | null>(null)
+  // La contraseña es la salida de emergencia, no la puerta.
+  //
+  // A los dueños se les da de alta con un enlace por correo y la mayoría nunca
+  // llega a crear una contraseña. Aun así esta pantalla ponía correo+contraseña
+  // como camino principal, con los dos campos obligatorios: quien entraba por
+  // enlace se encontraba pidiéndole algo que nunca tuvo, se inventaba una, y
+  // recibía "no coinciden con ninguna cuenta" — que es verdad y no ayuda nada.
+  // Pasó de verdad en la primera prueba con un correo nuevo.
+  const [conContrasena, setConContrasena] = useState(false)
 
   // El callback manda aquí cuando no pudo canjear el código: enlace ya usado
   // (el antivirus del correo lo abre antes que la persona), vencido, o un
@@ -53,7 +62,9 @@ export function LoginForm() {
 
   async function withMagicLink() {
     if (!email) {
-      setError(p.invalidCredentials)
+      // Antes reusaba "ese correo y contraseña no coinciden", que no es lo que
+      // pasa: falta el correo y no hay ninguna contraseña de por medio.
+      setMagicError(p.emailRequired)
       return
     }
     setMagicSending(true)
@@ -107,7 +118,16 @@ export function LoginForm() {
         <div className="h-px flex-1 bg-neutral-800" />
       </div>
 
-      <form onSubmit={withPassword} className="space-y-3">
+      {/* Un solo campo de correo para los dos caminos: quien despliega la
+          contraseña no tiene que volver a escribirlo. */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (conContrasena) withPassword(e)
+          else withMagicLink()
+        }}
+        className="space-y-3"
+      >
         <div>
           <label className="mb-1 block text-xs font-bold text-neutral-500">{p.emailLabel}</label>
           <input
@@ -120,48 +140,76 @@ export function LoginForm() {
             className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#FF5A36]"
           />
         </div>
-        <div>
-          <label className="mb-1 block text-xs font-bold text-neutral-500">{p.passwordLabel}</label>
-          <input
-            type="password"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={p.passwordPlaceholder}
-            className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#FF5A36]"
-          />
-        </div>
-        {error && (
+
+        {conContrasena && (
+          <div>
+            <label className="mb-1 block text-xs font-bold text-neutral-500">{p.passwordLabel}</label>
+            <input
+              type="password"
+              required
+              autoFocus
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={p.passwordPlaceholder}
+              className="w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#FF5A36]"
+            />
+          </div>
+        )}
+
+        {conContrasena && error && (
           <div className="rounded-lg border border-red-900/60 bg-red-950/40 p-3">
             <p className="text-sm text-red-300">{error}</p>
             <p className="mt-1 text-xs text-red-400/80">{p.tryMagicLinkHint}</p>
           </div>
         )}
+
         <button
           type="submit"
-          disabled={sending}
+          disabled={conContrasena ? sending : magicSending}
           className="w-full rounded-xl py-2.5 text-sm font-bold text-white transition disabled:opacity-60"
           style={{ background: "#FF5A36" }}
         >
-          {sending ? p.signingIn : p.signInButton}
+          {conContrasena
+            ? sending
+              ? p.signingIn
+              : p.signInButton
+            : magicSending
+              ? p.sendingMagicLink
+              : p.magicLinkButton}
         </button>
+
+        {!conContrasena && (
+          <p className="text-center text-xs leading-relaxed text-neutral-500">{p.magicLinkHint}</p>
+        )}
+        {!conContrasena && magicError && (
+          <p className="text-center text-xs text-red-400">{magicError}</p>
+        )}
       </form>
 
       <button
-        onClick={withMagicLink}
-        disabled={magicSending}
-        className="w-full rounded-xl border border-neutral-700 py-2.5 text-sm font-bold text-neutral-200 transition hover:border-neutral-500 disabled:opacity-60"
+        onClick={() => {
+          setConContrasena(!conContrasena)
+          setError(null)
+          setMagicError(null)
+        }}
+        className="w-full text-center text-xs text-neutral-500 underline decoration-neutral-700 underline-offset-2 transition hover:text-neutral-300"
       >
-        {magicSending ? p.sendingMagicLink : p.magicLinkButton}
+        {conContrasena ? p.backToMagicLink : p.usePassword}
       </button>
-      {magicError && <p className="text-center text-xs text-red-400">{magicError}</p>}
 
+      {/* "Olvidé mi contraseña" solo tiene sentido para quien tiene una. A
+          quien entra por enlace le ofrecía recuperar algo que nunca existió,
+          que es la misma confusión por otra puerta. */}
       <div className="flex items-center justify-center gap-3 text-xs text-neutral-500">
-        <Link href="/login/recuperar" className="underline decoration-neutral-700 underline-offset-2 hover:text-neutral-300">
-          {p.forgotPassword}
-        </Link>
-        <span className="text-neutral-700">·</span>
+        {conContrasena && (
+          <>
+            <Link href="/login/recuperar" className="underline decoration-neutral-700 underline-offset-2 hover:text-neutral-300">
+              {p.forgotPassword}
+            </Link>
+            <span className="text-neutral-700">·</span>
+          </>
+        )}
         <Link href="/login/registro" className="underline decoration-neutral-700 underline-offset-2 hover:text-neutral-300">
           {p.registerLink}
         </Link>
