@@ -3,6 +3,7 @@ import { after } from "next/server"
 import { Resend } from "resend"
 import { armarHtml, type Aviso } from "./plantilla"
 import { SITE_URL } from "@/lib/utils/siteUrl"
+import { CORREO_CONTACTO } from "@/lib/utils/contacto"
 
 // Avisos internos de VibrancyGG: alguien quiere entrar, alguien quiere crecer,
 // alguien quiere irse. No son correos al cliente — el destinatario somos
@@ -12,7 +13,19 @@ import { SITE_URL } from "@/lib/utils/siteUrl"
 // está caído o falta la llave, la solicitud del dueño igual se guarda. Por eso
 // todo está envuelto y nada se relanza.
 
-const DESTINO = process.env.ADMIN_NOTICE_EMAIL || "ggvibrancy@gmail.com"
+const DESTINO = process.env.ADMIN_NOTICE_EMAIL || CORREO_CONTACTO
+
+// El remitente NO puede ser la cuenta de Gmail de Pavessa, por mucho que sea
+// la dirección oficial del producto. Resend —como cualquier servicio de correo
+// transaccional— solo deja enviar desde un dominio verificado con registros
+// DNS, y gmail.com no se puede verificar: no es nuestro, y su política DMARC
+// hace que los buzones rechacen cualquier correo que diga venir de ahí sin
+// venir de Google. Poner ftspavessa@gmail.com aquí no daría error al guardar:
+// simplemente los avisos dejarían de llegar.
+//
+// Se queda en el dominio que sí está verificado. Para moverlo a Pavessa hay
+// que verificar mail.pavessa.com en Resend (registros DNS en Namecheap) y
+// entonces sí cambiar esta línea.
 const REMITENTE = "Pavessa <avisos@mail.vibrancygg.com>"
 
 async function enviar(aviso: Aviso): Promise<void> {

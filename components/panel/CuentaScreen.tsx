@@ -6,6 +6,7 @@ import { requestCancellation } from "@/lib/billing/actions"
 import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
 import { pricePerTruck } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
+import { CORREO_CONTACTO } from "@/lib/utils/contacto"
 import { useOnboarding } from "./onboarding/OnboardingProvider"
 import { Modal } from "./ui/Modal"
 import { Button } from "./ui/Button"
@@ -180,7 +181,7 @@ export function CuentaScreen({
                 {pending ? p.sendingLabel : p.sendRequest}
               </button>
               <a
-                href="mailto:jetgosolutions@gmail.com?subject=Quiero%20hablarlo"
+                href={`mailto:${CORREO_CONTACTO}?subject=Quiero%20hablarlo`}
                 className="rounded-lg border border-panel-line px-3 py-1.5 text-xs font-bold text-panel-ink transition-colors hover:border-panel-brand hover:text-panel-brand"
               >
                 {p.wantToTalk}
@@ -215,7 +216,7 @@ export function CuentaScreen({
               {p.cancelKeepGoing}
             </Button>
             <a
-              href="mailto:jetgosolutions@gmail.com?subject=Quiero%20hablarlo"
+              href={`mailto:${CORREO_CONTACTO}?subject=Quiero%20hablarlo`}
               className="rounded-xl border border-panel-line px-3 py-2.5 text-sm font-bold text-panel-ink transition-colors hover:border-panel-ink/20"
             >
               {p.wantToTalk}
