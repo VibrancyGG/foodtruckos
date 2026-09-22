@@ -62,6 +62,46 @@ export async function submitBusinessSignupRequest(input: {
   return { ok: true }
 }
 
+/** Guarda lo que escribió el prospecto en "Solicita tu acceso", ANTES de que
+ *  tenga cuenta. Si esto fallara y siguiéramos, el correo saldría igual y
+ *  volveríamos a pedirle todo después, así que el formulario se detiene. */
+export async function savePendingBusinessSignup(input: {
+  email: string
+  businessName: string
+  city: string
+  phone: string
+}): Promise<Result> {
+  if (!input.email.trim() || !input.businessName.trim() || !input.city.trim()) {
+    return { ok: false, error: "Faltan datos" }
+  }
+  const supabase = await createClient()
+  const { error } = await supabase.rpc("save_pending_business_signup", {
+    p_email: input.email,
+    p_business_name: input.businessName,
+    p_city: input.city,
+    p_phone: input.phone,
+  })
+  if (error) return { ok: false, error: "No se pudo guardar la solicitud" }
+  return { ok: true }
+}
+
+/** Se llama justo después de iniciar sesión, por cualquier vía (enlace,
+ *  Google). Si esa cuenta dejó datos en "Solicita tu acceso", la solicitud se
+ *  arma con ellos y no se le vuelven a pedir. La base solo los entrega si el
+ *  correo de la cuenta está confirmado y coincide. */
+export async function submitPendingBusinessSignupIfAny(): Promise<void> {
+  const supabase = await createClient()
+  const { data } = await supabase.rpc("claim_pending_business_signup")
+  const pendiente = data?.[0]
+  if (!pendiente) return
+  await submitBusinessSignupRequest({
+    businessName: pendiente.business_name,
+    city: pendiente.city,
+    phone: pendiente.phone ?? "",
+    note: "",
+  })
+}
+
 export async function getMyPendingBusinessSignupRequest() {
   const supabase = await createClient()
   const {

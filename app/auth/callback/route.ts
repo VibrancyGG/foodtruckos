@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { resolvePostLoginDestination } from "@/lib/auth/postLoginDestination"
-import { submitBusinessSignupRequest } from "@/lib/business/signupRequests"
+import { submitBusinessSignupRequest, submitPendingBusinessSignupIfAny } from "@/lib/business/signupRequests"
 
 // "next" sirve para flujos que no deben caer en el destino normal
 // post-login (paneles según rol) — hoy solo lo usa recuperación de
 // contraseña, que necesita aterrizar en /auth/reset-password con la sesión
 // ya intercambiada, antes de que el dueño vea ningún panel.
 //
-// "intent=business_signup" es el registro nuevo (sin contraseña): los datos
-// del negocio viajan como query params en la URL de retorno del enlace
-// mágico/Google, y en cuanto la sesión queda establecida aquí se deja la
-// solicitud registrada — el dueño nunca ve un formulario aparte después de
-// confirmar su correo.
+// "intent=business_signup" es el registro con Google: los datos del negocio
+// viajan como query params en la URL de retorno, porque antes de Google no
+// sabemos el correo y no hay dónde guardarlos. El registro por correo ya no
+// los manda así: quedan guardados en el servidor al enviar el formulario
+// (submitPendingBusinessSignupIfAny los recoge aquí y en /auth/confirm).
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
@@ -35,6 +35,7 @@ export async function GET(request: Request) {
           })
         }
       }
+      await submitPendingBusinessSignupIfAny()
       const destination = next && next.startsWith("/") ? next : await resolvePostLoginDestination()
       return NextResponse.redirect(`${origin}${destination}`)
     }

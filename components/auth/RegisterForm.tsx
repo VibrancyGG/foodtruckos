@@ -5,13 +5,15 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { GoogleIcon } from "./GoogleIcon"
+import { savePendingBusinessSignup } from "@/lib/business/signupRequests"
 
 // Registrarse no crea una cuenta con acceso inmediato — deja una solicitud
 // (foodtruckos-negocio Regla 2: el alta no es autoservicio en Fase 1). El
 // correo confirma la identidad vía enlace mágico (sin contraseña que
-// inventar ni recordar); los datos del negocio viajan en la URL de retorno y
-// app/auth/callback/route.ts los usa para dejar la solicitud registrada en
-// cuanto la sesión queda establecida.
+// inventar ni recordar). Los datos del negocio se guardan en el servidor al
+// enviar (pending_business_signups) y se convierten en solicitud en cuanto la
+// persona inicia sesión, por el enlace o con Google. Con Google desde aquí
+// viajan además en la URL de retorno, porque antes de Google no hay correo.
 export function RegisterForm() {
   const { t } = useLang()
   const p = t.auth
@@ -37,11 +39,19 @@ export function RegisterForm() {
     if (!businessName.trim() || !city.trim() || !email.trim()) return
     setSending(true)
     setError(null)
+    // Primero se guardan los datos en el servidor; el enlace del correo ya no
+    // los lleva. Si el enlace falla o la persona entra luego con Google, la
+    // solicitud se arma igual con lo que escribió aquí.
+    const saved = await savePendingBusinessSignup({ email, businessName, city, phone })
+    if (!saved.ok) {
+      setSending(false)
+      setError(p.requestError)
+      return
+    }
     const supabase = createClient()
-    const params = new URLSearchParams({ intent: "business_signup", business_name: businessName, city, phone })
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?${params.toString()}` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
     setSending(false)
     if (error) {

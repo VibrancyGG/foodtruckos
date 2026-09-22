@@ -1213,6 +1213,14 @@ export type Database = {
         }[]
       }
       claim_orphan_account_notice: { Args: never; Returns: boolean }
+      claim_pending_business_signup: {
+        Args: never
+        Returns: { business_name: string; city: string; phone: string | null }[]
+      }
+      save_pending_business_signup: {
+        Args: { p_email: string; p_business_name: string; p_city: string; p_phone: string }
+        Returns: undefined
+      }
       admin_owner_email: { Args: { p_business_id: string }; Returns: string }
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }
