@@ -23,10 +23,15 @@ const DESTINO = process.env.ADMIN_NOTICE_EMAIL || CORREO_CONTACTO
 // venir de Google. Poner ftspavessa@gmail.com aquí no daría error al guardar:
 // simplemente los avisos dejarían de llegar.
 //
-// Se queda en el dominio que sí está verificado. Para moverlo a Pavessa hay
-// que verificar mail.pavessa.com en Resend (registros DNS en Namecheap) y
-// entonces sí cambiar esta línea.
-const REMITENTE = "Pavessa <avisos@mail.vibrancygg.com>"
+// Sale de mail.pavessa.com (verificado en Resend el 21/09/2026, cuenta
+// jetgosolutions) para que remitente, marca y enlaces sean del mismo dominio:
+// cuando salía de mail.vibrancygg.com firmando como "Pavessa" y enlazando a
+// pavessa.com, Gmail lo mandaba a spam.
+//
+// Las respuestas sí van a la Gmail oficial vía Reply-To, que es lo único que
+// Resend permite hacer con una dirección que no es de un dominio verificado.
+const REMITENTE = "Pavessa <avisos@mail.pavessa.com>"
+const RESPONDER_A = CORREO_CONTACTO
 
 /** Envía un aviso de prueba y DEVUELVE lo que dijo Resend, en vez de tragarse
  *  el error como hace el envío normal.
@@ -46,6 +51,7 @@ export async function probarAviso(): Promise<
     const resend = new Resend(llave)
     const { data, error } = await resend.emails.send({
       from: REMITENTE,
+      replyTo: RESPONDER_A,
       to: DESTINO,
       subject: "Prueba de avisos de Pavessa",
       html: armarHtml(
@@ -76,6 +82,7 @@ async function enviar(aviso: Aviso): Promise<void> {
     const resend = new Resend(llave)
     const { error } = await resend.emails.send({
       from: REMITENTE,
+      replyTo: RESPONDER_A,
       to: DESTINO,
       subject: aviso.asunto,
       html: armarHtml(aviso, SITE_URL),
