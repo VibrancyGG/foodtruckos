@@ -43,6 +43,7 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
     staff_removed: a.actionStaffRemoved,
     device_created: a.actionDeviceCreated,
     device_revoked: a.actionDeviceRevoked,
+    account_deleted: a.actionAccountDeleted,
   }
   const STATUS_LABEL: Record<string, string> = {
     trial: a.statusTrial,

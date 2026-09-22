@@ -254,3 +254,22 @@ export async function sendTestNotice(): Promise<
   if (!isAdmin) return { ok: false, error: "No autorizado" }
   return probarAviso()
 }
+
+/** Borra una cuenta de acceso sin negocio (y sus solicitudes rechazadas).
+ *  Las reglas —solo admin, nunca un admin ni una cuenta con negocio o con
+ *  solicitud sin resolver, correo escrito igual al de la cuenta— las comprueba
+ *  la función de la base, no esta pantalla. */
+export async function deleteAccount(userId: string, emailConfirmation: string): Promise<Result> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+
+  const supabase = await createClient()
+  const { error } = await supabase.rpc("admin_delete_account", {
+    p_user_id: userId,
+    p_confirmacion: emailConfirmation,
+  })
+  if (error) return { ok: false, error: error.message }
+
+  revalidatePath("/admin")
+  return { ok: true }
+}

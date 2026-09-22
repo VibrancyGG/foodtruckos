@@ -894,6 +894,11 @@ export type Dictionary = {
     orphanUnconfirmed: string
     orphanSignedUpOn: (date: string) => string
     orphanWrite: string
+    orphanRejected: string
+    orphanDelete: string
+    orphanDeleteConfirm: (email: string) => string
+    orphanDeleteYes: string
+    orphanDeleting: string
     businessSignupApprove: string
     businessSignupApproving: string
     businessSignupConfirm: string
@@ -908,6 +913,7 @@ export type Dictionary = {
     actionStaffRemoved: string
     actionDeviceCreated: string
     actionDeviceRevoked: string
+    actionAccountDeleted: string
     billingNoteTitle: string
     billingNoteBody: string
     billingRuleTitle: string
@@ -2024,14 +2030,19 @@ export const dictionary: Record<Lang, Dictionary> = {
       testNoticeButton: "Probar aviso por correo",
       testNoticeSending: "Enviando…",
       testNoticeSent: (destino) => `Resend lo aceptó. Revisa ${destino} en un minuto.`,
-      orphanAccountsHeader: "Cuentas sin solicitud",
-      orphanAccountsHint: "Crearon su cuenta pero se fueron sin dejar los datos de su negocio. Escríbeles.",
+      orphanAccountsHeader: "Cuentas sin negocio",
+      orphanAccountsHint: "Crearon su cuenta pero no tienen negocio: se fueron sin dejar sus datos, o su solicitud fue rechazada.",
       noOrphanAccounts: "Ninguna.",
       orphanViaGoogle: "Google",
       orphanViaEmail: "Enlace por correo",
       orphanUnconfirmed: "Sin confirmar",
       orphanSignedUpOn: (date) => `Entró el ${date}`,
       orphanWrite: "Escribir",
+      orphanRejected: "Solicitud rechazada",
+      orphanDelete: "Eliminar",
+      orphanDeleteConfirm: (email) => `¿Eliminar la cuenta ${email}? No se puede deshacer.`,
+      orphanDeleteYes: "Sí, eliminar",
+      orphanDeleting: "Eliminando…",
       businessSignupApprove: "Aprobar y activar",
       businessSignupApproving: "Activando…",
       businessSignupConfirm: "Confirmar alta",
@@ -2046,6 +2057,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionStaffRemoved: "Quitó personal",
       actionDeviceCreated: "Emparejó un dispositivo",
       actionDeviceRevoked: "Revocó un dispositivo",
+      actionAccountDeleted: "Eliminó una cuenta sin negocio",
       billingNoteTitle: "Cobro automático:",
       billingNoteBody:
         "en Fase 1 la suscripción se cobra fuera del sistema y aquí solo se registra el estado. Cada cliente ya lleva marcado si cobra por transferencia manual o si tiene Stripe conectado, para no tener que rehacer la tabla cuando se active — la conexión en sí entra en Fase 2. Hasta entonces, suspender por falta de pago es una acción manual.",
@@ -3159,14 +3171,19 @@ export const dictionary: Record<Lang, Dictionary> = {
       testNoticeButton: "Test email notice",
       testNoticeSending: "Sending…",
       testNoticeSent: (destino) => `Resend accepted it. Check ${destino} in a minute.`,
-      orphanAccountsHeader: "Accounts without a request",
-      orphanAccountsHint: "They created an account but left without sending their business details. Reach out.",
+      orphanAccountsHeader: "Accounts without a business",
+      orphanAccountsHint: "They created an account but have no business: they left without sending their details, or their request was rejected.",
       noOrphanAccounts: "None.",
       orphanViaGoogle: "Google",
       orphanViaEmail: "Email link",
       orphanUnconfirmed: "Unconfirmed",
       orphanSignedUpOn: (date) => `Signed up ${date}`,
       orphanWrite: "Email",
+      orphanRejected: "Request rejected",
+      orphanDelete: "Delete",
+      orphanDeleteConfirm: (email) => `Delete the account ${email}? This cannot be undone.`,
+      orphanDeleteYes: "Yes, delete",
+      orphanDeleting: "Deleting…",
       businessSignupApprove: "Approve and activate",
       businessSignupApproving: "Activating…",
       businessSignupConfirm: "Confirm setup",
@@ -3181,6 +3198,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       actionStaffRemoved: "Removed staff",
       actionDeviceCreated: "Paired a device",
       actionDeviceRevoked: "Revoked a device",
+      actionAccountDeleted: "Deleted an account without a business",
       billingNoteTitle: "Automatic billing:",
       billingNoteBody:
         "in Phase 1, subscriptions are billed outside the system and this only records the status. Every client is already marked as manual transfer or Stripe-connected, so the table won't need rework once it's activated — the actual connection lands in Phase 2. Until then, suspending for non-payment is a manual action.",

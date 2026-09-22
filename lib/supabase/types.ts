@@ -1210,7 +1210,12 @@ export type Database = {
           created_at: string
           email_confirmed_at: string | null
           last_sign_in_at: string | null
+          rejected_requests: number
         }[]
+      }
+      admin_delete_account: {
+        Args: { p_user_id: string; p_confirmacion: string }
+        Returns: Json
       }
       claim_orphan_account_notice: { Args: never; Returns: boolean }
       claim_pending_business_signup: {

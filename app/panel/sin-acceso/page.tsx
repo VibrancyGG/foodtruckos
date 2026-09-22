@@ -30,7 +30,7 @@ export default async function SinAccesoPage() {
           ["Correo", user.email ?? ""],
           ["Entró con", user.app_metadata?.provider === "google" ? "Google" : "Enlace por correo"],
         ],
-        nota: "Puede que la complete en unos minutos; si es así, te llegará también el aviso de negocio nuevo. Si no, escríbele: aparece en Admin → Cuentas sin solicitud.",
+        nota: "Puede que la complete en unos minutos; si es así, te llegará también el aviso de negocio nuevo. Si no, escríbele: aparece en Admin → Cuentas sin negocio.",
         destino: "/admin",
       })
     }
