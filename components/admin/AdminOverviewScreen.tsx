@@ -8,6 +8,7 @@ import { PendingRequestRow } from "./PendingRequestRow"
 import { ArchiveExpiryRow } from "./ArchiveExpiryRow"
 import { BusinessSignupRequestRow } from "./BusinessSignupRequestRow"
 import { TestNoticeButton } from "./TestNoticeButton"
+import { OrphanAccountRow } from "./OrphanAccountRow"
 
 const CARTERA_COLOR: Record<string, string> = {
   trial: "#1F5FBF",
@@ -16,7 +17,7 @@ const CARTERA_COLOR: Record<string, string> = {
   cancelled: "#71717a",
 }
 
-export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, pendingRequests, pendingBusinessSignups, archivedExpiring, activity }: AdminOverview) {
+export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMonths, perClientAvg, cartera, mrrHistory, pendingRequests, pendingBusinessSignups, orphanAccounts, archivedExpiring, activity }: AdminOverview) {
   const { lang, t } = useLang()
   const a = t.admin
   const locale = lang === "es" ? "es-MX" : "en-US"
@@ -136,6 +137,20 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
           <div>
             {pendingBusinessSignups.map((r) => (
               <BusinessSignupRequestRow key={r.id} request={r} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+        <h2 className="mb-1 text-sm font-bold">{a.orphanAccountsHeader}</h2>
+        <p className="mb-3 text-xs text-neutral-500">{a.orphanAccountsHint}</p>
+        {orphanAccounts.length === 0 ? (
+          <p className="text-sm text-neutral-500">{a.noOrphanAccounts}</p>
+        ) : (
+          <div>
+            {orphanAccounts.map((acc) => (
+              <OrphanAccountRow key={acc.id} account={acc} />
             ))}
           </div>
         )}

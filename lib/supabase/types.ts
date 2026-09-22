@@ -1200,6 +1200,19 @@ export type Database = {
         Returns: Json
       }
       admin_export_business: { Args: { p_business_id: string }; Returns: Json }
+      admin_list_orphan_accounts: {
+        Args: never
+        Returns: {
+          id: string
+          email: string
+          full_name: string | null
+          provider: string | null
+          created_at: string
+          email_confirmed_at: string | null
+          last_sign_in_at: string | null
+        }[]
+      }
+      claim_orphan_account_notice: { Args: never; Returns: boolean }
       admin_owner_email: { Args: { p_business_id: string }; Returns: string }
       get_my_business_ids: { Args: never; Returns: string[] }
       is_platform_admin: { Args: never; Returns: boolean }

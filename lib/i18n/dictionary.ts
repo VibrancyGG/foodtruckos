@@ -886,6 +886,14 @@ export type Dictionary = {
     testNoticeButton: string
     testNoticeSending: string
     testNoticeSent: (destino: string) => string
+    orphanAccountsHeader: string
+    orphanAccountsHint: string
+    noOrphanAccounts: string
+    orphanViaGoogle: string
+    orphanViaEmail: string
+    orphanUnconfirmed: string
+    orphanSignedUpOn: (date: string) => string
+    orphanWrite: string
     businessSignupApprove: string
     businessSignupApproving: string
     businessSignupConfirm: string
@@ -2015,6 +2023,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       testNoticeButton: "Probar aviso por correo",
       testNoticeSending: "Enviando…",
       testNoticeSent: (destino) => `Resend lo aceptó. Revisa ${destino} en un minuto.`,
+      orphanAccountsHeader: "Cuentas sin solicitud",
+      orphanAccountsHint: "Crearon su cuenta pero se fueron sin dejar los datos de su negocio. Escríbeles.",
+      noOrphanAccounts: "Ninguna.",
+      orphanViaGoogle: "Google",
+      orphanViaEmail: "Enlace por correo",
+      orphanUnconfirmed: "Sin confirmar",
+      orphanSignedUpOn: (date) => `Entró el ${date}`,
+      orphanWrite: "Escribir",
       businessSignupApprove: "Aprobar y activar",
       businessSignupApproving: "Activando…",
       businessSignupConfirm: "Confirmar alta",
@@ -3141,6 +3157,14 @@ export const dictionary: Record<Lang, Dictionary> = {
       testNoticeButton: "Test email notice",
       testNoticeSending: "Sending…",
       testNoticeSent: (destino) => `Resend accepted it. Check ${destino} in a minute.`,
+      orphanAccountsHeader: "Accounts without a request",
+      orphanAccountsHint: "They created an account but left without sending their business details. Reach out.",
+      noOrphanAccounts: "None.",
+      orphanViaGoogle: "Google",
+      orphanViaEmail: "Email link",
+      orphanUnconfirmed: "Unconfirmed",
+      orphanSignedUpOn: (date) => `Signed up ${date}`,
+      orphanWrite: "Email",
       businessSignupApprove: "Approve and activate",
       businessSignupApproving: "Activating…",
       businessSignupConfirm: "Confirm setup",

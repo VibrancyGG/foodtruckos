@@ -8,7 +8,7 @@ function monthsBetween(a: Date, b: Date) {
 export async function getAdminOverview() {
   const supabase = await createClient()
 
-  const [{ data: businesses }, { data: units }, { data: requests }, { data: businessSignups }] = await Promise.all([
+  const [{ data: businesses }, { data: units }, { data: requests }, { data: businessSignups }, { data: orphanAccounts }] = await Promise.all([
     supabase
       .from("businesses")
       .select("id, name, slug, subscription_status, billing_mode, created_at, trial_ends_at")
@@ -24,6 +24,9 @@ export async function getAdminOverview() {
       .select("id, business_name, city, phone, note, contact_email, created_at")
       .eq("status", "pending")
       .order("created_at"),
+    // Entraron pero nunca dejaron solicitud: prospectos a los que escribirles
+    // (y, a veces, cuentas de prueba que sobran).
+    supabase.rpc("admin_list_orphan_accounts"),
   ])
 
   const unitList = units ?? []
@@ -117,6 +120,7 @@ export async function getAdminOverview() {
     mrrHistory,
     pendingRequests,
     pendingBusinessSignups: businessSignups ?? [],
+    orphanAccounts: orphanAccounts ?? [],
     archivedExpiring,
     activity: (activity ?? []).map((a) => ({
       ...a,
