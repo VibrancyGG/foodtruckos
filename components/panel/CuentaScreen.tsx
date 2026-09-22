@@ -7,6 +7,7 @@ import type { OwnerBillingData } from "@/lib/billing/getOwnerBilling"
 import { pricePerTruck } from "@/lib/billing/pricing"
 import { useLang } from "@/lib/i18n/LangProvider"
 import { CORREO_CONTACTO } from "@/lib/utils/contacto"
+import { updateContactPhone } from "@/lib/business/contactActions"
 import { useOnboarding } from "./onboarding/OnboardingProvider"
 import { Modal } from "./ui/Modal"
 import { Button } from "./ui/Button"
@@ -14,11 +15,13 @@ import { Button } from "./ui/Button"
 export function CuentaScreen({
   billing,
   ownerEmail,
+  phone,
   signInMethod,
   impersonating = false,
 }: {
   billing: OwnerBillingData
   ownerEmail: string
+  phone: string | null
   signInMethod: "google" | "password"
   impersonating?: boolean
 }) {
@@ -139,6 +142,7 @@ export function CuentaScreen({
             <span className="text-panel-ink-soft">{p.emailLabel}</span>
             <span className="font-semibold text-panel-ink">{ownerEmail}</span>
           </div>
+          <PhoneRow phone={phone} p={p} />
           {/* El método de ingreso es de quien tiene la sesión. Viendo como
               admin sería el del admin, así que no se muestra. */}
           {!impersonating && (
@@ -233,6 +237,102 @@ export function CuentaScreen({
           </div>
         </Modal>
       )}
+    </div>
+  )
+}
+
+// 4054172392 → (405) 417-2392. Solo con exactamente 10 dígitos de EE. UU.;
+// cualquier otra cosa se muestra tal cual la escribió el dueño, porque
+// "arreglar" un número que no entendemos es peor que dejarlo.
+function formatearTelefono(tel: string) {
+  const d = tel.replace(/\D/g, "")
+  const diez = d.length === 11 && d.startsWith("1") ? d.slice(1) : d
+  if (diez.length !== 10) return tel
+  return `(${diez.slice(0, 3)}) ${diez.slice(3, 6)}-${diez.slice(6)}`
+}
+
+// El teléfono de contacto, con edición en la misma fila. Llega de la solicitud
+// de alta y el dueño lo corrige aquí si cambia de número — sin esto, un número
+// viejo seguía siendo el único con el que podíamos llamarle.
+function PhoneRow({
+  phone,
+  p,
+}: {
+  phone: string | null
+  p: ReturnType<typeof useLang>["t"]["panel"]["cuentaPage"]
+}) {
+  const [editando, setEditando] = useState(false)
+  const [valor, setValor] = useState(phone ?? "")
+  const [error, setError] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
+
+  function guardar() {
+    setError(null)
+    startTransition(async () => {
+      const r = await updateContactPhone(valor)
+      if (!r.ok) {
+        setError(r.error === "Ese teléfono parece incompleto" ? r.error : p.phoneError)
+        return
+      }
+      setEditando(false)
+    })
+  }
+
+  return (
+    <div className="border-b border-panel-line pb-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-panel-ink-soft">{p.phoneLabel}</span>
+        {editando ? (
+          <span className="flex items-center gap-2">
+            <input
+              type="tel"
+              autoFocus
+              autoComplete="tel"
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") guardar()
+                if (e.key === "Escape") setEditando(false)
+              }}
+              placeholder={p.phonePlaceholder}
+              className="w-40 rounded-lg border border-panel-line bg-white px-2.5 py-1.5 text-sm text-panel-ink outline-none focus:border-panel-brand"
+            />
+            <button
+              onClick={guardar}
+              disabled={pending}
+              className="rounded-lg bg-panel-brand px-2.5 py-1.5 text-xs font-bold text-white disabled:opacity-60"
+            >
+              {pending ? p.phoneSaving : p.phoneSave}
+            </button>
+            <button
+              onClick={() => {
+                setEditando(false)
+                setValor(phone ?? "")
+                setError(null)
+              }}
+              className="text-xs text-panel-ink-soft hover:text-panel-ink"
+            >
+              {p.phoneCancel}
+            </button>
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            {phone ? (
+              <span className="font-semibold text-panel-ink">{formatearTelefono(phone)}</span>
+            ) : (
+              <span className="text-panel-ink/40">{p.phoneEmpty}</span>
+            )}
+            <button
+              onClick={() => setEditando(true)}
+              className="text-xs font-bold text-panel-ink-soft underline decoration-panel-line hover:text-panel-ink"
+            >
+              {phone ? p.phoneEdit : p.phoneAdd}
+            </button>
+          </span>
+        )}
+      </div>
+      {editando && <p className="mt-1.5 text-xs text-panel-ink/40">{p.phoneHint}</p>}
+      {error && <p className="mt-1.5 text-xs font-semibold text-rose-600">{error}</p>}
     </div>
   )
 }

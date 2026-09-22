@@ -28,7 +28,7 @@ export async function approveBusinessSignup(
 
   const { data: request } = await supabase
     .from("business_signup_requests")
-    .select("id, auth_user_id, business_name, status")
+    .select("id, auth_user_id, business_name, status, phone")
     .eq("id", requestId)
     .maybeSingle()
   if (!request || request.status !== "pending") return { ok: false, error: "Solicitud no encontrada" }
@@ -80,6 +80,14 @@ export async function approveBusinessSignup(
     qr_slug: `${slug}-${slugify(unitName)}`,
   })
   if (orderPointError) return { ok: false, error: "El negocio se creó pero no se pudo generar el código QR del truck" }
+
+  // El teléfono de la solicitud pasa al negocio. Antes se quedaba en la
+  // solicitud y, ya aprobado, no había dónde verlo sin ir a buscarla. No
+  // detiene la aprobación si falla: sin teléfono el negocio funciona igual, y
+  // el admin puede anotarlo después.
+  if (request.phone?.trim()) {
+    await supabase.from("business_contacts").insert({ business_id: business.id, phone: request.phone.trim() })
+  }
 
   const { error: reqError } = await supabase
     .from("business_signup_requests")

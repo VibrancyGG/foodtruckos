@@ -21,6 +21,15 @@ export default async function PanelCuentaPage() {
     const { data } = await supabase.rpc("admin_owner_email", { p_business_id: businessId })
     ownerEmail = data ?? ""
   }
+  // El teléfono vive aparte de businesses porque el menú público lee esa
+  // tabla entera; aquí lo lee el dueño (o el admin viendo como él).
+  const supabaseContacto = await createClient()
+  const { data: contacto } = await supabaseContacto
+    .from("business_contacts")
+    .select("phone")
+    .eq("business_id", businessId)
+    .maybeSingle()
+
   const signInMethod = user?.app_metadata?.provider === "google" ? "google" : "password"
 
   return (
@@ -28,6 +37,7 @@ export default async function PanelCuentaPage() {
       <CuentaScreen
         billing={billing}
         ownerEmail={ownerEmail}
+        phone={contacto?.phone ?? null}
         signInMethod={signInMethod}
         impersonating={impersonating}
       />

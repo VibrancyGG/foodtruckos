@@ -682,6 +682,16 @@ export type Dictionary = {
       yourDataHint: string
       businessLabel: string
       emailLabel: string
+      phoneLabel: string
+      phoneEmpty: string
+      phoneAdd: string
+      phoneEdit: string
+      phoneSave: string
+      phoneSaving: string
+      phoneCancel: string
+      phonePlaceholder: string
+      phoneHint: string
+      phoneError: string
       signInLabel: string
       signInGoogle: string
       signInPassword: string
@@ -1798,6 +1808,16 @@ export const dictionary: Record<Lang, Dictionary> = {
         yourDataHint: "Lo que sale en el recibo",
         businessLabel: "Negocio",
         emailLabel: "Correo",
+        phoneLabel: "Teléfono",
+        phoneEmpty: "Sin agregar",
+        phoneAdd: "Agregar",
+        phoneEdit: "Cambiar",
+        phoneSave: "Guardar",
+        phoneSaving: "Guardando…",
+        phoneCancel: "Cancelar",
+        phonePlaceholder: "(405) 555-0100",
+        phoneHint: "Para poder contactarte sobre tu cuenta. Tus clientes no lo ven.",
+        phoneError: "No se pudo guardar el teléfono. Intenta de nuevo.",
         signInLabel: "Entras con",
         signInGoogle: "Cuenta de Google",
         signInPassword: "Correo y contraseña",
@@ -2911,6 +2931,16 @@ export const dictionary: Record<Lang, Dictionary> = {
         yourDataHint: "What shows up on your receipt",
         businessLabel: "Business",
         emailLabel: "Email",
+        phoneLabel: "Phone",
+        phoneEmpty: "Not added",
+        phoneAdd: "Add",
+        phoneEdit: "Edit",
+        phoneSave: "Save",
+        phoneSaving: "Saving…",
+        phoneCancel: "Cancel",
+        phonePlaceholder: "(405) 555-0100",
+        phoneHint: "So we can reach you about your account. Not shown to your customers.",
+        phoneError: "Could not save the phone. Try again.",
         signInLabel: "You sign in with",
         signInGoogle: "Google account",
         signInPassword: "Email and password",
