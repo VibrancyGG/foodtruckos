@@ -6,6 +6,7 @@ import { createPublicClient } from "@/lib/supabase/public"
 import { SITE_URL } from "@/lib/utils/siteUrl"
 import { getAdminContext } from "@/lib/auth/getAdminContext"
 import { trialEndsFromNow } from "@/lib/billing/trial"
+import { probarAviso } from "@/lib/notificaciones/avisoAdmin"
 
 type Result = { ok: true } | { ok: false; error: string }
 
@@ -241,4 +242,15 @@ export async function deleteBusiness(
 
   revalidatePath("/admin")
   return { ok: true, resumen }
+}
+
+// Botón "Probar aviso" del admin. Síncrono a propósito — a diferencia del aviso
+// normal, que va en after() y nunca reporta nada — para que la respuesta real
+// de Resend llegue a la pantalla y se pueda diagnosticar sin registros.
+export async function sendTestNotice(): Promise<
+  { ok: true; id: string; destino: string } | { ok: false; error: string }
+> {
+  const { isAdmin } = await getAdminContext()
+  if (!isAdmin) return { ok: false, error: "No autorizado" }
+  return probarAviso()
 }

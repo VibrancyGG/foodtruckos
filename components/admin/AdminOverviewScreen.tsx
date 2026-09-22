@@ -7,6 +7,7 @@ import { MrrTrendChart } from "./MrrTrendChart"
 import { PendingRequestRow } from "./PendingRequestRow"
 import { ArchiveExpiryRow } from "./ArchiveExpiryRow"
 import { BusinessSignupRequestRow } from "./BusinessSignupRequestRow"
+import { TestNoticeButton } from "./TestNoticeButton"
 
 const CARTERA_COLOR: Record<string, string> = {
   trial: "#1F5FBF",
@@ -123,7 +124,12 @@ export function AdminOverviewScreen({ businesses, mrr, trucksBilled, avgTenureMo
       </div>
 
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-        <h2 className="mb-3 text-sm font-bold">{a.businessSignupsHeader}</h2>
+        {/* El botón va aquí porque es justo de esto de lo que avisan los correos:
+            una solicitud nueva que nadie ve si el aviso no llega. */}
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-bold">{a.businessSignupsHeader}</h2>
+          <TestNoticeButton />
+        </div>
         {pendingBusinessSignups.length === 0 ? (
           <p className="text-sm text-neutral-500">{a.noBusinessSignups}</p>
         ) : (

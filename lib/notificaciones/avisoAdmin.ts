@@ -28,6 +28,44 @@ const DESTINO = process.env.ADMIN_NOTICE_EMAIL || CORREO_CONTACTO
 // entonces sí cambiar esta línea.
 const REMITENTE = "Pavessa <avisos@mail.vibrancygg.com>"
 
+/** Envía un aviso de prueba y DEVUELVE lo que dijo Resend, en vez de tragarse
+ *  el error como hace el envío normal.
+ *
+ *  Existe porque los avisos reales fallaban en silencio: el único rastro era un
+ *  console.error en los registros de Vercel, que en el plan gratuito se borran
+ *  a la hora. Llegaban dos solicitudes de negocio y no había forma de saber si
+ *  el correo no salió, rebotó o se perdió. Esto corre en el mismo entorno, con
+ *  la misma llave, remitente y destino que un aviso de verdad — si esto llega,
+ *  los avisos reales también. */
+export async function probarAviso(): Promise<
+  { ok: true; id: string; destino: string } | { ok: false; error: string }
+> {
+  const llave = process.env.RESEND_API_KEY
+  if (!llave) return { ok: false, error: "En este entorno no está configurada RESEND_API_KEY" }
+  try {
+    const resend = new Resend(llave)
+    const { data, error } = await resend.emails.send({
+      from: REMITENTE,
+      to: DESTINO,
+      subject: "Prueba de avisos de Pavessa",
+      html: armarHtml(
+        {
+          asunto: "Prueba de avisos de Pavessa",
+          titulo: "Si lees esto, los avisos funcionan",
+          datos: [["Enviado", new Date().toISOString()]],
+          nota: "Es una prueba lanzada desde el panel de admin.",
+          destino: "/admin",
+        },
+        SITE_URL,
+      ),
+    })
+    if (error) return { ok: false, error: `${error.name}: ${error.message}` }
+    return { ok: true, id: data?.id ?? "", destino: DESTINO }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 async function enviar(aviso: Aviso): Promise<void> {
   const llave = process.env.RESEND_API_KEY
   // Sin llave no se avisa y no se rompe nada: es lo que pasa en desarrollo y

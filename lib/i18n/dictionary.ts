@@ -883,6 +883,9 @@ export type Dictionary = {
     archiveMarkContacted: string
     businessSignupsHeader: string
     noBusinessSignups: string
+    testNoticeButton: string
+    testNoticeSending: string
+    testNoticeSent: (destino: string) => string
     businessSignupApprove: string
     businessSignupApproving: string
     businessSignupConfirm: string
@@ -2009,6 +2012,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       archiveMarkContacted: "Marcar contactado",
       businessSignupsHeader: "Nuevos negocios",
       noBusinessSignups: "Nada pendiente.",
+      testNoticeButton: "Probar aviso por correo",
+      testNoticeSending: "Enviando…",
+      testNoticeSent: (destino) => `Resend lo aceptó. Revisa ${destino} en un minuto.`,
       businessSignupApprove: "Aprobar y activar",
       businessSignupApproving: "Activando…",
       businessSignupConfirm: "Confirmar alta",
@@ -3132,6 +3138,9 @@ export const dictionary: Record<Lang, Dictionary> = {
       archiveMarkContacted: "Mark contacted",
       businessSignupsHeader: "New businesses",
       noBusinessSignups: "Nothing pending.",
+      testNoticeButton: "Test email notice",
+      testNoticeSending: "Sending…",
+      testNoticeSent: (destino) => `Resend accepted it. Check ${destino} in a minute.`,
       businessSignupApprove: "Approve and activate",
       businessSignupApproving: "Activating…",
       businessSignupConfirm: "Confirm setup",
