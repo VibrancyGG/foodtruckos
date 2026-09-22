@@ -957,6 +957,7 @@ export type Dictionary = {
     recoverResendIn: (segundos: number) => string
     recoverBackToLogin: string
     linkFailed: string
+    confirmingEmail: string
     newPasswordTitle: string
     newPasswordSubtitle: string
     newPasswordField: string
@@ -2096,6 +2097,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       recoverResendIn: (segundos) => `Puedes pedir otro en ${segundos} s`,
       recoverBackToLogin: "Volver a entrar",
       linkFailed: "No pudimos validar ese enlace: puede que ya se haya usado o que haya vencido. Pide uno nuevo.",
+      confirmingEmail: "Confirmando tu correo…",
       newPasswordTitle: "Nueva contraseña",
       newPasswordSubtitle: "Elige una de al menos 8 caracteres.",
       newPasswordField: "Nueva contraseña",
@@ -3230,6 +3232,7 @@ export const dictionary: Record<Lang, Dictionary> = {
       recoverResendIn: (segundos) => `You can ask for another in ${segundos}s`,
       recoverBackToLogin: "Back to sign in",
       linkFailed: "We couldn't validate that link: it may have been used already or expired. Ask for a new one.",
+      confirmingEmail: "Confirming your email…",
       newPasswordTitle: "New password",
       newPasswordSubtitle: "Pick one with at least 8 characters.",
       newPasswordField: "New password",
